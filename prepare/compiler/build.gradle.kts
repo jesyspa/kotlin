@@ -124,6 +124,7 @@ val distCompilerPluginProjects = listOf(
     ":plugins:parcelize:parcelize-runtime",
     ":kotlin-noarg-compiler-plugin",
     ":kotlin-sam-with-receiver-compiler-plugin",
+    ":kotlin-formver-compiler-plugin",
     ":kotlinx-serialization-compiler-plugin",
     ":kotlin-lombok-compiler-plugin",
     ":kotlin-assignment-compiler-plugin",
