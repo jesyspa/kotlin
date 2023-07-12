@@ -770,6 +770,7 @@ tasks {
         dependsOn(":kotlin-allopen-compiler-plugin:test")
         dependsOn(":kotlin-assignment-compiler-plugin:test")
         dependsOn(":kotlin-atomicfu-compiler-plugin:test")
+        dependsOn(":kotlin-formver-compiler-plugin:test")
         dependsOn(":plugins:fir-plugin-prototype:test")
         dependsOn(":plugins:fir-plugin-prototype:fir-plugin-ic-test:test")
         dependsOn(":kotlin-imports-dumper-compiler-plugin:test")
