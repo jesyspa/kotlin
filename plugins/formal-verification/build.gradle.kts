@@ -9,11 +9,10 @@ repositories {
     mavenLocal()
 }
 
-
 dependencies {
-
     implementation("viper:silver_2.13:0.1-SNAPSHOT")
-    runtimeOnly("viper:silicon_2.13:1.1-SNAPSHOT")
+    implementation("viper:silicon_2.13:1.1-SNAPSHOT")
+    implementation("org.scala-lang:scala-library:2.13.10")
 
     compileOnly(project(":compiler:fir:cones"))
     compileOnly(project(":compiler:fir:tree"))
