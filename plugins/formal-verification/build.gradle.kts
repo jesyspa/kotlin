@@ -9,6 +9,12 @@ repositories {
     mavenLocal()
 }
 
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
+}
+
 dependencies {
     implementation("viper:silver_2.13:0.1-SNAPSHOT")
     implementation("viper:silicon_2.13:1.1-SNAPSHOT")
