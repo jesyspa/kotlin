@@ -16,7 +16,7 @@ java {
 }
 
 dependencies {
-    implementation("viper:silver:1.1-SNAPSHOT")
+    implementation("viper:silicon:1.1-SNAPSHOT")
 
     compileOnly(project(":compiler:fir:cones"))
     compileOnly(project(":compiler:fir:tree"))

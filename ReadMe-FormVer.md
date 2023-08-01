@@ -21,8 +21,7 @@ generation the intermediate representation) and
 [silicon](https://github.com/viperproject/silicon) (the symbolic engine for
 performing the verification of Viper code).
 
-However, the `silicon` *project structure* and *building file* require some
-important modifications for allowing Gradle to resolve the dependencies required by both projects.
+
 
 Therefore, to install the dependencies, be sure to have installed locally:
 * The Java Development Kit
@@ -46,7 +45,9 @@ echo "export Z3_EXE=$Z3_EXE" >> ~/.bashrc
 
 Make sure that running `$Z3_EXE --version` gives `Z3 version 4.8.7`.
 
-Now, we can clone `silicon` from its GitHub repository and install the Viper's JAR file required for the plugin. Open a new terminal emulator and type
+Now, we can clone `silicon` from its GitHub repository and install it in our local Maven repository. 
+The compilation process, through the command `sbt assembly`, will create a new fat-JAR file containing `Silicon + Silver` and other Scala dependencies.
+Open a new terminal emulator and type
 the following commands:
 
 ```bash
@@ -54,19 +55,19 @@ the following commands:
 git clone --recursive https://github.com/viperproject/silicon.git
 cd silicon
 # Compile Scala code into JVM bytecode.
-sbt build
+sbt compile
 # This command build the fat-JAR file containing all the dependencies
 # required by Silver (Silicon, Scala Library, ...)
 sbt assembly
 # We can now publish the built JAR file into our local Maven repository
 mvn install:install-file \
   -Dfile=$(pwd)/target/scala-2.13/silicon.jar \
-  -DgroupId=viper -DartifactId=silver -Dversion=1.1-SNAPSHOT \
+  -DgroupId=viper -DartifactId=silicon -Dversion=1.1-SNAPSHOT \
   -Dpackaging=jar
 ```
 
 If everything went well, you should see the following new directory in the local Maven repository: 
-`~/.m2/repository/viper/silver/1.1-SNAPSHOT/silver-1.1-SNAPSHOT.jar`.
+`~/.m2/repository/viper/silicon/1.1-SNAPSHOT/silicon-1.1-SNAPSHOT.jar`.
 
 ### Common Errors
 
