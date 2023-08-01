@@ -39,53 +39,34 @@ At the moment we use the text-based interface, meaning you need to:
 
 One way to do this is as follows:
 ```bash
-export Z3_EXE /usr/bin/z3 # or a different directory in $PATH
+export Z3_EXE=/usr/bin/z3 # or a different directory in $PATH
 sudo cp z3-4.8.7-*/bin/z3 $Z3_EXE
 echo "export Z3_EXE=$Z3_EXE" >> ~/.bashrc
 ```
 
 Make sure that running `$Z3_EXE --version` gives `Z3 version 4.8.7`.
 
-Now, we can clone `silicon` from its GitHub repository.
-Once the cloning process is complete, open `silicon`'s `build.sbt` in your favorite editor
-and modify it applying the following [patch](./resources/patches/silicon-edits.patch).
+Now, we can clone `silicon` from its GitHub repository and install the Viper's JAR file required for the plugin. Open a new terminal emulator and type
+the following commands:
 
 ```bash
-# Clone the Silicon project in a directory.
-# The flag `--recursive` will also clone `silver`.
-git clone --recursive https://github.com/viperproject/silicon
-
+# The recursive cloning pulls `silver` as well. 
+git clone --recursive https://github.com/viperproject/silicon.git
 cd silicon
-
-# Apply the patch with the needed modifications
-git apply silicon-edits.patch
+# Compile Scala code into JVM bytecode.
+sbt build
+# This command build the fat-JAR file containing all the dependencies
+# required by Silver (Silicon, Scala Library, ...)
+sbt assembly
+# We can now publish the built JAR file into our local Maven repository
+mvn install:install-file \
+  -Dfile=$(pwd)/target/scala-2.13/silicon.jar \
+  -DgroupId=viper -DartifactId=silver -Dversion=1.1-SNAPSHOT \
+  -Dpackaging=jar
 ```
 
-
-Now, open up the `silver`'s building file (located at `./silicon/silver/build.sbt`), and in the _Publishing settings_, 
-add the following lines:
-
-```sbt
-// Publishing settings
-/* ... */
-ThisBuild / publishArtifact := true
-publishTo := Some(MavenCache("local-maven", file(Path.userHome.absolutePath + "/.m2/repository")))
-```
-
-Once done with all the modifications, from the `silicon` root directory we can compile and publish the projects
-running `sbt`:
-
-```bash
-# Compile and publish silver first
-cd silver
-sbt compile && sbt publish
-# Compile and publish silicon
-cd ..
-sbt compile && sbt publish
-```
-
-If everything went well, you should see the following new directories in the local Maven repository: 
-`~/.m2/repository/viper/silicon_2.13` and `~/.m2/repository/viper/silver_2.13`.
+If everything went well, you should see the following new directory in the local Maven repository: 
+`~/.m2/repository/viper/silver/1.0/silver-1.0.jar`.
 
 ### Common Errors
 
