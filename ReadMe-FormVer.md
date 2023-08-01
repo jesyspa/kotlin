@@ -66,7 +66,7 @@ mvn install:install-file \
 ```
 
 If everything went well, you should see the following new directory in the local Maven repository: 
-`~/.m2/repository/viper/silver/1.0/silver-1.0.jar`.
+`~/.m2/repository/viper/silver/1.0/silver-1.1-SNAPSHOT.jar`.
 
 ### Common Errors
 
