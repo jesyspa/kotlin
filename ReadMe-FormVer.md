@@ -1,16 +1,22 @@
 # Formal Verification
 
-## Running the plugin
+This document contains all the necessary information on setting-up
+the project for development and running the plugin.
 
-To execute the plugin, build the `dist` target and then
-specify the plugin `.jar` with `-Xplugin=`:
+*Table of Contents*:
+- [How to install Viper dependencies](#viper-dependency)
+- [Running the plugin](#running-the-plugin)
+- [Debugging builds](#debugging-builds)
+- [Git Usage](#git-usage)
 
-```sh
-./gradlew dist
-dist/kotlinc/bin/kotlinc -language-version 2.0 -Xplugin=dist/kotlinc/lib/formver-compiler-plugin.jar,$HOME/.m2/repository/viper/silicon/1.1-SNAPSHOT/silicon-1.1-SNAPSHOT.jar myfile.kt
-```
+## Viper dependencies
 
-## Viper dependency
+**Before proceeding**, as said by the main [README file](ReadMe.md), **it is important** to create
+the `local.properties` file in the project's root directory.
+
+> For local development, if you're not working on the standard library, it's OK to avoid installing JDK 1.6 and JDK 1.7. 
+> Add `kotlin.build.isObsoleteJdkOverrideEnabled=true` to the `local.properties` file, so build will only use JDK 1.8+. 
+
 
 To build the plugin, two main Viper dependencies are needed: 
 [silver](https://github.com/viperproject/silver) (the API for
@@ -19,9 +25,8 @@ generation the intermediate representation) and
 performing the verification of Viper code).
 
 
-
-Therefore, to install the dependencies, be sure to have installed locally:
-* The Java Development Kit
+Therefore, **to install the dependencies**, be sure to have installed locally:
+* [The Java Development Kit](https://sdkman.io/): we suggest to use the JDK-17 (these instructions have been written using `17.0.7-amzn`).
 * [Maven](https://maven.apache.org/index.html)
 * [SBT](https://www.scala-sbt.org/)
 * [Z3](https://github.com/Z3Prover/z3) v4.8.7: the best way of installing Z3 with all the necessary would be to
@@ -68,6 +73,8 @@ If everything went well, you should see the following new directory in the local
 
 ### Common Errors
 
+#### Gradle can't find local dependencies
+
 If you synchronize the Gradle file, and you get an error of non-resolved dependency, create a `~/.m2/settings.xml`
 and paste onto it the following content:
 
@@ -78,6 +85,16 @@ and paste onto it the following content:
   <localRepository>${user.home}/.m2/repository</localRepository>
   <offline>false</offline>
 </settings>
+```
+
+## Running the plugin
+
+To execute the plugin, build the `dist` target and then
+specify the plugin `.jar` with `-Xplugin=`:
+
+```sh
+./gradlew dist
+dist/kotlinc/bin/kotlinc -language-version 2.0 -Xplugin=dist/kotlinc/lib/formver-compiler-plugin.jar,$HOME/.m2/repository/viper/silicon/1.1-SNAPSHOT/silicon-1.1-SNAPSHOT.jar myfile.kt
 ```
 
 ## Debugging builds
