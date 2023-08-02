@@ -165,7 +165,7 @@ successfully done it some time.
 
 When you've finished work on a branch, open a pull request on
 GitHub against the `formal-verification` branch in `jesyspa/kotlin`
-(not `JetBrains/kotlin`! unfortunately that's the default) and
+(**not** `JetBrains/kotlin`! unfortunately that's the default) and
 add someone else as a reviewer.  Some tips:
 - Anyone can do reviews: don't worry about whom you ask.
 - That said, if someone is most familiar with the part you're changing, they may be the best choice.
