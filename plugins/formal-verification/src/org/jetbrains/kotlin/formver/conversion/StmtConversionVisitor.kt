@@ -89,14 +89,9 @@ class StmtConversionVisitor : FirVisitor<Exp?, StmtConversionContext>() {
         }
         val cvar = ConvertedVar(symbol.callableId.convertName(), data.methodCtx.programCtx.convertType(type) as ConvertedType)
         val propInitializer = property.initializer
-        var initializer: Exp? = null
-        if (propInitializer != null) {
-            initializer = propInitializer.accept(this, data)
-        }
+        val initializer = propInitializer?.accept(this, data)
         data.declarations.add(cvar.toLocalVarDecl())
-        if (initializer != null) {
-            data.statements.add(Stmt.LocalVarAssign(cvar.toLocalVar(), initializer))
-        }
+        initializer?.let { data.statements.add(Stmt.LocalVarAssign(cvar.toLocalVar(), it)) }
         return null
     }
 }
