@@ -16,3 +16,25 @@ FILE: no_contracts.kt
         lval x: R|kotlin/Int| = Int(0)
         ^with_int_declaration R|<local>/x|
     }
+    public final fun simple_if(): R|kotlin/Int| {
+        when () {
+            Boolean(true) ->  {
+                ^simple_if Int(0)
+            }
+            else ->  {
+                ^simple_if Int(1)
+            }
+        }
+
+    }
+    public final fun if_on_parameter(b: R|kotlin/Boolean|): R|kotlin/Int| {
+        when () {
+            R|<local>/b| ->  {
+                ^if_on_parameter Int(0)
+            }
+            else ->  {
+                ^if_on_parameter Int(1)
+            }
+        }
+
+    }
