@@ -52,7 +52,8 @@ class StmtConversionVisitor : FirVisitor<Exp?, StmtConversionContext>() {
     override fun <T> visitConstExpression(constExpression: FirConstExpression<T>, data: StmtConversionContext): Exp =
         when (constExpression.kind) {
             ConstantValueKind.Int -> Exp.IntLit((constExpression.value as Long).toInt().toScalaBigInt())
-            else -> TODO("Not implemented yet")
+            ConstantValueKind.Boolean -> Exp.BoolLit(constExpression.value as Boolean)
+            else -> TODO("Constant Expression of type ${constExpression.kind} is not yet implemented.")
         }
 
     override fun visitPropertyAccessExpression(
