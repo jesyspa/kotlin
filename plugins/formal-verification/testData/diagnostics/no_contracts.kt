@@ -7,3 +7,10 @@ fun <!VIPER_TEXT!>with_int_declaration<!>(): Int {
     val x = 0
     return x
 }
+fun <!VIPER_TEXT!>while_loop<!>(b: Boolean): Int {
+    while (b) {
+        val a = 1
+        return a
+    }
+    return 0
+}
