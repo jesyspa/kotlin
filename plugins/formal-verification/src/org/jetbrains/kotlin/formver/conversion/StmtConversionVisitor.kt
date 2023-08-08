@@ -100,7 +100,7 @@ class StmtConversionVisitor : FirVisitor<Exp?, StmtConversionContext>() {
         val invariants: List<Exp> = emptyList()
         val bodyStmtConversionContext = StmtConversionContext(data.methodCtx)
         bodyStmtConversionContext.convertAndAppend(whileLoop.block)
-        val body = Stmt.Seqn(bodyStmtConversionContext.statements, bodyStmtConversionContext.declarations)
+        val body = bodyStmtConversionContext.block
         data.statements.add(Stmt.While(cond!!, invariants, body))
         return null
     }
