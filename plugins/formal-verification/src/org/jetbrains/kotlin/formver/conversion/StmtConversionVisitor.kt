@@ -80,8 +80,8 @@ class StmtConversionVisitor : FirVisitor<Exp?, StmtConversionContext>() {
                 data.statements.add(
                     Stmt.If(
                         cond ?: throw Exception("Missing IF condition"),
-                        Stmt.Seqn(thenCtx.statements, thenCtx.declarations),
-                        Stmt.Seqn(elseCtx.statements, thenCtx.declarations)
+                        thenCtx.block,
+                        elseCtx.block
                     )
                 )
             }

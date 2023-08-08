@@ -54,7 +54,7 @@ method global$pkg_$while_loop(local$b: Bool) returns (ret$: Int)
   ret$ := 0
 }
 
-/no_contracts.kt:(285,294): info: field backing_int: Int
+/no_contracts.kt:(392,401): info: field backing_int: Int
 
 method global$pkg_$simple_if() returns (ret$: Int)
 {
@@ -64,7 +64,7 @@ method global$pkg_$simple_if() returns (ret$: Int)
     ret$ := 1}
 }
 
-/no_contracts.kt:(379,394): info: field backing_int: Int
+/no_contracts.kt:(486,501): info: field backing_int: Int
 
 method global$pkg_$if_on_parameter(local$b: Bool) returns (ret$: Int)
 {
