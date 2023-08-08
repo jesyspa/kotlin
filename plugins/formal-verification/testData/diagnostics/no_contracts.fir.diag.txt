@@ -41,6 +41,19 @@ method global$pkg_$with_int_declaration() returns (ret$: Int)
   ret$ := local$x
 }
 
+/no_contracts.kt:(285,295): info: field backing_int: Int
+
+method global$pkg_$while_loop(local$b: Bool) returns (ret$: Int)
+{
+  while (local$b) {
+    var local$a: Int
+    var local$c: Int
+    local$a := 1
+    local$c := 2
+  }
+  ret$ := 0
+}
+
 /no_contracts.kt:(285,294): info: field backing_int: Int
 
 method global$pkg_$simple_if() returns (ret$: Int)
