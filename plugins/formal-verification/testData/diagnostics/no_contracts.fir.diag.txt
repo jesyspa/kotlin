@@ -47,8 +47,9 @@ method global$pkg_$while_loop(local$b: Bool) returns (ret$: Int)
 {
   while (local$b) {
     var local$a: Int
+    var local$c: Int
     local$a := 1
-    ret$ := local$a
+    local$c := 2
   }
   ret$ := 0
 }

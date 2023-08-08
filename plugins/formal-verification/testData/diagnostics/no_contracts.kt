@@ -10,7 +10,7 @@ fun <!VIPER_TEXT!>with_int_declaration<!>(): Int {
 fun <!VIPER_TEXT!>while_loop<!>(b: Boolean): Int {
     while (b) {
         val a = 1
-        return a
+        val c = 2
     }
     return 0
 }
