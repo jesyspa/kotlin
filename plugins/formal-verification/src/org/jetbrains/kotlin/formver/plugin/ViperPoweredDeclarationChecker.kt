@@ -47,8 +47,7 @@ object ViperPoweredDeclarationChecker : FirSimpleFunctionChecker() {
                 reporter.reportOn(declaration.source, PluginErrors.FUNCTION_WITH_UNVERIFIED_CONTRACT, context)
             }
         } catch (e: Exception) {
-            System.err.println("Viper verification failed with an exception.  Viper text:")
-            System.err.println(program.toString())
+            System.err.println("Viper verification failed with an exception.  Viper text:\n$program\nException: $e")
             throw e
         }
     }
