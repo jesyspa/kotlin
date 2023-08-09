@@ -26,7 +26,8 @@ performing the verification of Viper code).
 
 
 Therefore, **to install the dependencies**, be sure to have installed locally:
-* [The Java Development Kit](https://sdkman.io/): we suggest to use the JDK-17 (these instructions have been written using `17.0.7-amzn`).
+* [The Java Development Kit](https://sdkman.io/): we suggest to use the JDK-17 (these instructions have been written using `17.0.7-amzn`). To install the
+JDK easily, you can use [SdkMan](https://sdkman.io/).
 * [Maven](https://maven.apache.org/index.html)
 * [SBT](https://www.scala-sbt.org/)
 * [Z3](https://github.com/Z3Prover/z3) v4.8.7: the best way of installing Z3 with all the necessary would be to
