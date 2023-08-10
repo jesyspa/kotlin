@@ -23,10 +23,8 @@ import org.jetbrains.kotlin.test.services.TestServices
 import org.jetbrains.kotlin.test.services.moduleStructure
 import org.jetbrains.kotlin.test.services.service
 
-class NoFirCompilationErrorsHandler(
-    testServices: TestServices,
-    failureDisablesNextSteps: Boolean = true,
-) : FirAnalysisHandler(testServices, failureDisablesNextSteps) {
+class NoFirCompilationErrorsHandler(testServices: TestServices) : FirAnalysisHandler(testServices) {
+    override val failureDisablesNextSteps: Boolean = true
     override val directiveContainers: List<DirectivesContainer>
         get() = listOf(CodegenTestDirectives)
 

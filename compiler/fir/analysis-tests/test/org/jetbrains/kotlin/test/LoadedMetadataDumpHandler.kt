@@ -141,9 +141,7 @@ abstract class AbstractLoadedMetadataDumpHandler<A : ResultingArtifact.Binary<A>
     override val artifactKind: ArtifactKind<A>
 ) : BinaryArtifactHandler<A>(
     testServices,
-    artifactKind,
-    failureDisablesNextSteps = false,
-    doNotRunIfThereWerePreviousFailures = false
+    artifactKind
 ) {
     private val dumper: MultiModuleInfoDumper = MultiModuleInfoDumper()
 
