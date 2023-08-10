@@ -1,40 +1,40 @@
-/when.kt:(4,13): info: domain unit$  {
+/when.kt:(4,13): info: domain dom$Unit  {
 
-  unique function unit$element(): unit$
+  function dom$Unit$element(): dom$Unit
 }
 
 method global$pkg_$simple_if() returns (ret$: Int)
 {
-  var anonymous$1: unit$
+  var anonymous$1: dom$Unit
   if (true) {
     ret$ := 0
-    anonymous$1 := unit$element()
+    anonymous$1 := dom$Unit$element()
   } else {
     ret$ := 1
-    anonymous$1 := unit$element()
+    anonymous$1 := dom$Unit$element()
   }
 }
 
-/when.kt:(98,113): info: domain unit$  {
+/when.kt:(98,113): info: domain dom$Unit  {
 
-  unique function unit$element(): unit$
+  function dom$Unit$element(): dom$Unit
 }
 
 method global$pkg_$if_on_parameter(local$b: Bool) returns (ret$: Int)
 {
-  var anonymous$1: unit$
+  var anonymous$1: dom$Unit
   if (local$b) {
     ret$ := 0
-    anonymous$1 := unit$element()
+    anonymous$1 := dom$Unit$element()
   } else {
     ret$ := 1
-    anonymous$1 := unit$element()
+    anonymous$1 := dom$Unit$element()
   }
 }
 
-/when.kt:(205,221): info: domain unit$  {
+/when.kt:(205,221): info: domain dom$Unit  {
 
-  unique function unit$element(): unit$
+  function dom$Unit$element(): dom$Unit
 }
 
 method global$pkg_$simple_if() returns (ret$: Int)

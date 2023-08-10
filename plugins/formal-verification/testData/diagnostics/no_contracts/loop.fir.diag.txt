@@ -1,6 +1,6 @@
-/loop.kt:(4,14): info: domain unit$  {
+/loop.kt:(4,14): info: domain dom$Unit  {
 
-  unique function unit$element(): unit$
+  function dom$Unit$element(): dom$Unit
 }
 
 method global$pkg_$while_loop(local$b: Bool) returns (ret$: Int)

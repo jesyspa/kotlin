@@ -183,6 +183,54 @@ sealed class Exp : IntoViper<viper.silver.ast.Exp> {
         override fun toViper(): viper.silver.ast.Exp =
             Not(arg.toViper(), pos.toViper(), info.toViper(), trafos.toViper())
     }
+
+    class Trigger(
+        val exps: List<Exp>,
+        val pos: Position = Position.NoPosition,
+        val info: Info = Info.NoInfo,
+        val trafos: Trafos = Trafos.NoTrafos,
+    ) : IntoViper<viper.silver.ast.Trigger> {
+        override fun toViper(): viper.silver.ast.Trigger =
+            Trigger(exps.map { it.toViper() }.toScalaSeq(), pos.toViper(), info.toViper(), trafos.toViper())
+    }
+
+    data class Forall(
+        val variables: List<LocalVarDecl>,
+        val triggers: List<Trigger>,
+        val exp: Exp,
+        val pos: Position = Position.NoPosition,
+        val info: Info = Info.NoInfo,
+        val trafos: Trafos = Trafos.NoTrafos,
+    ) : Exp() {
+        override fun toViper(): viper.silver.ast.Exp =
+            Forall(
+                variables.toScalaSeq(),
+                triggers.map { it.toViper() }.toScalaSeq(),
+                exp.toViper(),
+                pos.toViper(),
+                info.toViper(),
+                trafos.toViper()
+            )
+    }
+
+    data class Exists(
+        val variables: List<LocalVarDecl>,
+        val triggers: List<Trigger>,
+        val exp: Exp,
+        val pos: Position = Position.NoPosition,
+        val info: Info = Info.NoInfo,
+        val trafos: Trafos = Trafos.NoTrafos,
+    ) : Exp() {
+        override fun toViper(): viper.silver.ast.Exp =
+            Exists(
+                variables.toScalaSeq(),
+                triggers.map { it.toViper() }.toScalaSeq(),
+                exp.toViper(),
+                pos.toViper(),
+                info.toViper(),
+                trafos.toViper()
+            )
+    }
     //endregion
 
     data class IntLit(

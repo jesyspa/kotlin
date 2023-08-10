@@ -1,6 +1,6 @@
-/returns_booleans.kt:(121,133): info: domain unit$  {
+/returns_booleans.kt:(121,133): info: domain dom$Unit  {
 
-  unique function unit$element(): unit$
+  function dom$Unit$element(): dom$Unit
 }
 
 method global$pkg_$returns_true() returns (ret$: Bool)
@@ -10,9 +10,9 @@ method global$pkg_$returns_true() returns (ret$: Bool)
   ret$ := true
 }
 
-/returns_booleans.kt:(268,281): info: domain unit$  {
+/returns_booleans.kt:(268,281): info: domain dom$Unit  {
 
-  unique function unit$element(): unit$
+  function dom$Unit$element(): dom$Unit
 }
 
 method global$pkg_$returns_false() returns (ret$: Bool)
@@ -22,9 +22,9 @@ method global$pkg_$returns_false() returns (ret$: Bool)
   ret$ := false
 }
 
-/returns_booleans.kt:(418,435): info: domain unit$  {
+/returns_booleans.kt:(418,429): info: domain dom$Unit  {
 
-  unique function unit$element(): unit$
+  function dom$Unit$element(): dom$Unit
 }
 
 method global$pkg_$conditional_basic(local$b: Bool) returns (ret$: Bool)

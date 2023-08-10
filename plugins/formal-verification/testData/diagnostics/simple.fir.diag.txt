@@ -1,18 +1,18 @@
-/simple.kt:(84,100): info: domain unit$  {
+/simple.kt:(84,100): info: domain dom$Unit  {
 
-  unique function unit$element(): unit$
+  function dom$Unit$element(): dom$Unit
 }
 
-method global$pkg_$without_contract() returns (ret$: unit$)
+method global$pkg_$without_contract() returns (ret$: dom$Unit)
 {
 }
 
-/simple.kt:(148,161): info: domain unit$  {
+/simple.kt:(148,161): info: domain dom$Unit  {
 
-  unique function unit$element(): unit$
+  function dom$Unit$element(): dom$Unit
 }
 
-method global$pkg_$with_contract() returns (ret$: unit$)
+method global$pkg_$with_contract() returns (ret$: dom$Unit)
   ensures true
 {
 }
