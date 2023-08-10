@@ -6,6 +6,11 @@
 package org.jetbrains.kotlin.formver.conversion
 
 import org.jetbrains.kotlin.fir.FirElement
+import org.jetbrains.kotlin.fir.contracts.FirEffectDeclaration
+import org.jetbrains.kotlin.fir.contracts.description.ConeCallsEffectDeclaration
+import org.jetbrains.kotlin.fir.contracts.description.ConeConditionalEffectDeclaration
+import org.jetbrains.kotlin.fir.contracts.description.ConeContractConstantValues
+import org.jetbrains.kotlin.fir.contracts.description.ConeReturnsEffectDeclaration
 import org.jetbrains.kotlin.fir.declarations.FirProperty
 import org.jetbrains.kotlin.fir.expressions.*
 import org.jetbrains.kotlin.fir.expressions.impl.FirNoReceiverExpression
@@ -165,5 +170,28 @@ class StmtConversionVisitor : FirVisitor<Exp, StmtConversionContext>() {
         val convertedRValue = variableAssignment.rValue.accept(this, data)
         data.addStatement(Stmt.assign(convertedLValue, convertedRValue))
         return UnitDomain.element
+    }
+
+    override fun visitEffectDeclaration(effectDeclaration: FirEffectDeclaration, data: StmtConversionContext): Exp {
+        val retType = data.methodCtx.returnVar.type.viperType
+        return when (effectDeclaration.effect) {
+            is ConeReturnsEffectDeclaration -> when ((effectDeclaration.effect as ConeReturnsEffectDeclaration).value) {
+                ConeContractConstantValues.WILDCARD -> Exp.BoolLit(true)
+                ConeContractConstantValues.NULL -> Exp.EqCmp(Exp.LocalVar("ret\$", retType), Exp.NullLit())
+                ConeContractConstantValues.NOT_NULL -> Exp.NeCmp(Exp.LocalVar("ret\$", retType), Exp.NullLit())
+                ConeContractConstantValues.TRUE -> Exp.EqCmp(Exp.LocalVar("ret\$", retType), Exp.BoolLit(true))
+                ConeContractConstantValues.FALSE -> Exp.EqCmp(Exp.LocalVar("ret\$", retType), Exp.BoolLit(false))
+                else -> throw Exception("contract returns type not supported")
+            }
+            is ConeConditionalEffectDeclaration -> {
+                val cond = (effectDeclaration.effect as ConeConditionalEffectDeclaration).condition
+                val effect = (effectDeclaration.effect as ConeConditionalEffectDeclaration).effect
+                println(cond); println(effect)
+//                Exp.Implies(effect.accept(this, data), cond.accept(this, data))
+                Exp.BoolLit(true)
+            }
+            is ConeCallsEffectDeclaration -> TODO("implement calls in place effect")
+            else -> throw Exception("contract type not supported")
+        }
     }
 }
