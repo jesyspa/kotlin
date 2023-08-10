@@ -1,0 +1,42 @@
+/contracts.kt:(121,133): info: domain unit$  {
+
+  unique function unit$element(): unit$
+}
+
+field backing_int: Int
+
+method global$pkg_$returns_true() returns (ret$: Bool)
+  ensures true
+  ensures ret$ == true
+{
+  ret$ := true
+}
+
+/contracts.kt:(268,281): info: domain unit$  {
+
+  unique function unit$element(): unit$
+}
+
+field backing_int: Int
+
+method global$pkg_$returns_false() returns (ret$: Bool)
+  ensures true
+  ensures ret$ == false
+{
+  ret$ := false
+}
+
+/contracts.kt:(418,429): info: domain unit$  {
+
+  unique function unit$element(): unit$
+}
+
+field backing_int: Int
+
+method global$pkg_$conditional(local$a: Bool, local$b: Bool)
+  returns (ret$: Bool)
+  ensures true
+  ensures true
+{
+  ret$ := true
+}
