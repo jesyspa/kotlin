@@ -173,25 +173,6 @@ class StmtConversionVisitor : FirVisitor<Exp, StmtConversionContext>() {
     }
 
     override fun visitEffectDeclaration(effectDeclaration: FirEffectDeclaration, data: StmtConversionContext): Exp {
-        val retType = data.methodCtx.returnVar.type.viperType
-        return when (effectDeclaration.effect) {
-            is ConeReturnsEffectDeclaration -> when ((effectDeclaration.effect as ConeReturnsEffectDeclaration).value) {
-                ConeContractConstantValues.WILDCARD -> Exp.BoolLit(true)
-                ConeContractConstantValues.NULL -> Exp.EqCmp(Exp.LocalVar("ret\$", retType), Exp.NullLit())
-                ConeContractConstantValues.NOT_NULL -> Exp.NeCmp(Exp.LocalVar("ret\$", retType), Exp.NullLit())
-                ConeContractConstantValues.TRUE -> Exp.EqCmp(Exp.LocalVar("ret\$", retType), Exp.BoolLit(true))
-                ConeContractConstantValues.FALSE -> Exp.EqCmp(Exp.LocalVar("ret\$", retType), Exp.BoolLit(false))
-                else -> throw Exception("contract returns type not supported")
-            }
-            is ConeConditionalEffectDeclaration -> {
-                val cond = (effectDeclaration.effect as ConeConditionalEffectDeclaration).condition
-                val effect = (effectDeclaration.effect as ConeConditionalEffectDeclaration).effect
-                println(cond); println(effect)
-//                Exp.Implies(effect.accept(this, data), cond.accept(this, data))
-                Exp.BoolLit(true)
-            }
-            is ConeCallsEffectDeclaration -> TODO("implement calls in place effect")
-            else -> throw Exception("contract type not supported")
-        }
+        return effectDeclaration.effect.accept(ContractDescriptionConversionVisitor(), data)
     }
 }

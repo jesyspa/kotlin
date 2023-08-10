@@ -23,7 +23,6 @@ fun <!VIPER_TEXT!>returns_false<!>(): Boolean {
 fun <!VIPER_TEXT!>conditional<!>(a: Boolean, b: Boolean): Boolean {
     contract {
         returns(false) implies (b)
-        returns(false) implies (a && b)
     }
     return true
 }
