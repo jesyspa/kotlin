@@ -10,10 +10,10 @@ import org.jetbrains.kotlin.test.services.TestServices
 import org.jetbrains.kotlin.test.services.assertions
 
 abstract class AnalysisHandler<A : ResultingArtifact<A>>(
-    val testServices: TestServices,
-    val failureDisablesNextSteps: Boolean,
-    val doNotRunIfThereWerePreviousFailures: Boolean
+    val testServices: TestServices
 ) : ServicesAndDirectivesContainer {
+    open val failureDisablesNextSteps: Boolean = false
+    open val doNotRunIfThereWerePreviousFailures: Boolean = false
     protected val assertions: Assertions
         get() = testServices.assertions
 
@@ -27,20 +27,14 @@ abstract class AnalysisHandler<A : ResultingArtifact<A>>(
 abstract class FrontendOutputHandler<R : ResultingArtifact.FrontendOutput<R>>(
     testServices: TestServices,
     override val artifactKind: FrontendKind<R>,
-    failureDisablesNextSteps: Boolean,
-    doNotRunIfThereWerePreviousFailures: Boolean
-) : AnalysisHandler<R>(testServices, failureDisablesNextSteps, doNotRunIfThereWerePreviousFailures)
+) : AnalysisHandler<R>(testServices)
 
 abstract class BackendInputHandler<I : ResultingArtifact.BackendInput<I>>(
     testServices: TestServices,
     override val artifactKind: BackendKind<I>,
-    failureDisablesNextSteps: Boolean,
-    doNotRunIfThereWerePreviousFailures: Boolean
-) : AnalysisHandler<I>(testServices, failureDisablesNextSteps, doNotRunIfThereWerePreviousFailures)
+) : AnalysisHandler<I>(testServices)
 
 abstract class BinaryArtifactHandler<A : ResultingArtifact.Binary<A>>(
     testServices: TestServices,
     override val artifactKind: BinaryKind<A>,
-    failureDisablesNextSteps: Boolean,
-    doNotRunIfThereWerePreviousFailures: Boolean
-) : AnalysisHandler<A>(testServices, failureDisablesNextSteps, doNotRunIfThereWerePreviousFailures)
+) : AnalysisHandler<A>(testServices)
