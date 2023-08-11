@@ -63,5 +63,4 @@ class ContractDescriptionConversionVisitor : KtContractDescriptionVisitor<Exp, S
         val cond = conditionalEffect.condition.accept(this, data)
         return Exp.Implies(effect, cond)
     }
-
 }
