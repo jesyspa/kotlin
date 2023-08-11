@@ -1,4 +1,4 @@
-FILE: contracts.kt
+FILE: returns_booleans.kt
     @R|kotlin/OptIn|(markerClass = vararg(<getClass>(Q|kotlin/contracts/ExperimentalContracts|))) public final fun returns_true(): R|kotlin/Boolean|
         [R|Contract description]
          <

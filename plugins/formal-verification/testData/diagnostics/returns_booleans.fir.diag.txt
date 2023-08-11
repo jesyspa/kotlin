@@ -1,4 +1,4 @@
-/contracts.kt:(121,133): info: domain unit$  {
+/returns_booleans.kt:(121,133): info: domain unit$  {
 
   unique function unit$element(): unit$
 }
@@ -12,7 +12,7 @@ method global$pkg_$returns_true() returns (ret$: Bool)
   ret$ := true
 }
 
-/contracts.kt:(268,281): info: domain unit$  {
+/returns_booleans.kt:(268,281): info: domain unit$  {
 
   unique function unit$element(): unit$
 }
@@ -26,7 +26,7 @@ method global$pkg_$returns_false() returns (ret$: Bool)
   ret$ := false
 }
 
-/contracts.kt:(418,429): info: domain unit$  {
+/returns_booleans.kt:(418,429): info: domain unit$  {
 
   unique function unit$element(): unit$
 }
