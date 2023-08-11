@@ -13,14 +13,14 @@ import org.jetbrains.kotlin.formver.scala.silicon.ast.Exp
 import org.jetbrains.kotlin.formver.scala.silicon.ast.Type
 import org.jetbrains.kotlin.formver.scala.silicon.ast.Exp.*
 
-class ContractDescriptionConversionVisitor : KtContractDescriptionVisitor<Exp, MethodConversionContext, ConeKotlinType, ConeDiagnostic>() {
-    private fun KtValueParameterReference<ConeKotlinType, ConeDiagnostic>.convertedName(data: MethodConversionContext): ConvertedName {
+class ContractDescriptionConversionVisitor : KtContractDescriptionVisitor<Exp, MethodConverter, ConeKotlinType, ConeDiagnostic>() {
+    private fun KtValueParameterReference<ConeKotlinType, ConeDiagnostic>.convertedName(data: MethodConverter): ConvertedName {
         return data.signature.params[parameterIndex].name
     }
 
     override fun visitBooleanConstantDescriptor(
         booleanConstantDescriptor: KtBooleanConstantReference<ConeKotlinType, ConeDiagnostic>,
-        data: MethodConversionContext
+        data: MethodConverter
     ): Exp {
         return when (booleanConstantDescriptor) {
             ConeContractConstantValues.TRUE -> BoolLit(true)
@@ -31,7 +31,7 @@ class ContractDescriptionConversionVisitor : KtContractDescriptionVisitor<Exp, M
 
     override fun visitReturnsEffectDeclaration(
         returnsEffect: KtReturnsEffectDeclaration<ConeKotlinType, ConeDiagnostic>,
-        data: MethodConversionContext
+        data: MethodConverter
     ): Exp {
         val retVar = data.returnVar.toLocalVar()
         return when (returnsEffect.value) {
@@ -46,7 +46,7 @@ class ContractDescriptionConversionVisitor : KtContractDescriptionVisitor<Exp, M
 
     override fun visitBooleanValueParameterReference(
         booleanValueParameterReference: KtBooleanValueParameterReference<ConeKotlinType, ConeDiagnostic>,
-        data: MethodConversionContext
+        data: MethodConverter
     ): Exp {
         val name = booleanValueParameterReference.convertedName(data).asString
         return LocalVar(name, Type.Bool)
@@ -54,7 +54,7 @@ class ContractDescriptionConversionVisitor : KtContractDescriptionVisitor<Exp, M
 
     override fun visitLogicalBinaryOperationContractExpression(
         binaryLogicExpression: KtBinaryLogicExpression<ConeKotlinType, ConeDiagnostic>,
-        data: MethodConversionContext
+        data: MethodConverter
     ): Exp {
         val left = binaryLogicExpression.left.accept(this, data)
         val right = binaryLogicExpression.right.accept(this, data)
@@ -66,7 +66,7 @@ class ContractDescriptionConversionVisitor : KtContractDescriptionVisitor<Exp, M
 
     override fun visitConditionalEffectDeclaration(
         conditionalEffect: KtConditionalEffectDeclaration<ConeKotlinType, ConeDiagnostic>,
-        data: MethodConversionContext
+        data: MethodConverter
     ): Exp {
         val effect = conditionalEffect.effect.accept(this, data)
         val cond = conditionalEffect.condition.accept(this, data)

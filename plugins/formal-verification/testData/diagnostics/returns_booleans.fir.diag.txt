@@ -3,8 +3,6 @@
   unique function unit$element(): unit$
 }
 
-field backing_int: Int
-
 method global$pkg_$returns_true() returns (ret$: Bool)
   ensures true
   ensures ret$ == true
@@ -17,8 +15,6 @@ method global$pkg_$returns_true() returns (ret$: Bool)
   unique function unit$element(): unit$
 }
 
-field backing_int: Int
-
 method global$pkg_$returns_false() returns (ret$: Bool)
   ensures true
   ensures ret$ == false
@@ -30,8 +26,6 @@ method global$pkg_$returns_false() returns (ret$: Bool)
 
   unique function unit$element(): unit$
 }
-
-field backing_int: Int
 
 method global$pkg_$conditional(local$a: Bool, local$b: Bool)
   returns (ret$: Bool)

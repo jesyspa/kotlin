@@ -5,8 +5,10 @@
 
 package org.jetbrains.kotlin.formver.conversion
 
+import org.jetbrains.kotlin.fir.contracts.FirResolvedContractDescription
 import org.jetbrains.kotlin.fir.expressions.FirBlock
 import org.jetbrains.kotlin.formver.scala.silicon.ast.Stmt
+import org.jetbrains.kotlin.formver.scala.silicon.ast.Exp
 import viper.silver.ast.Method
 
 /**
@@ -16,7 +18,12 @@ import viper.silver.ast.Method
  * only need the signature in most methods, as we verify methods one at a
  * time.
  */
-class MethodConverter(private val programCtx: ProgramConversionContext, signature: ConvertedMethodSignature, body: FirBlock?) :
+class MethodConverter(
+    private val programCtx: ProgramConversionContext,
+    val signature: ConvertedMethodSignature,
+    body: FirBlock?,
+    val contractDescription: FirResolvedContractDescription? = null
+) :
     MethodConversionContext, ProgramConversionContext by programCtx {
     override val returnVar: ConvertedVar = signature.returnVar
 
@@ -30,12 +37,19 @@ class MethodConverter(private val programCtx: ProgramConversionContext, signatur
 
     // Converting the body here would be too late; we want this to be a pure method, while
     // converting the body may involve the program context.
-    override val toMethod: Method = signature.toMethod(listOf(), listOf(), convertedBody)
+    override val toMethod: Method = signature.toMethod(listOf(), convertEffects(contractDescription), convertedBody)
 
     private fun convertBody(body: FirBlock): Stmt.Seqn {
         val ctx = StmtConverter(this)
         ctx.convertAndAppend(body)
         return ctx.block
+    }
+
+    private fun convertEffects(contractDescription: FirResolvedContractDescription?): List<Exp> {
+        return contractDescription?.effects?.map {
+            it.effect.accept(ContractDescriptionConversionVisitor(), this)
+        }
+            ?: listOf()
     }
 
 }
