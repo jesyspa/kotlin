@@ -7,6 +7,8 @@ package org.jetbrains.kotlin.formver.conversion
 
 import org.jetbrains.kotlin.formver.scala.silicon.ast.Exp
 import org.jetbrains.kotlin.formver.scala.silicon.ast.Exp.*
+import org.jetbrains.kotlin.formver.scala.silicon.ast.Stmt
+import org.jetbrains.kotlin.formver.scala.toScalaBigInt
 import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
@@ -46,6 +48,15 @@ object KotlinIntTimesFunctionImplementation : SpecialFunctionImplementation {
         Mul(args[0], args[1])
 }
 
+object KotlinIntDivFunctionImplementation : SpecialFunctionImplementation {
+    override val callableId = CallableId(FqName("kotlin"), FqName("Int"), Name.identifier("div"))
+
+    override fun convertCall(args: List<Exp>, ctx: StmtConversionContext): Exp {
+        ctx.addStatement(Stmt.Inhale(NeCmp(args[1], IntLit(0.toScalaBigInt()))))
+        return Div(args[0], args[1])
+    }
+}
+
 object KotlinBooleanNotFunctionImplementation : SpecialFunctionImplementation {
     override val callableId = CallableId(FqName("kotlin"), FqName("Boolean"), Name.identifier("not"))
 
@@ -59,6 +70,7 @@ object SpecialFunctions {
         KotlinIntPlusFunctionImplementation,
         KotlinIntMinusFunctionImplementation,
         KotlinIntTimesFunctionImplementation,
+        KotlinIntDivFunctionImplementation,
         KotlinBooleanNotFunctionImplementation,
     ).associateBy { it.callableId }
 }
