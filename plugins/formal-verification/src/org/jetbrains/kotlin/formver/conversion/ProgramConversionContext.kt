@@ -19,8 +19,6 @@ import org.jetbrains.kotlin.utils.addToStdlib.getOrPut
 import viper.silver.ast.Method
 import viper.silver.ast.Program
 
-const val INT_BACKING_FIELD = "backing_int"
-
 /**
  * Tracks the top-level information about the program.
  * Conversions for global entities like types should generally be
@@ -32,7 +30,7 @@ class ProgramConversionContext {
     val program: Program
         get() = Program(
             seqOf(UnitDomain.toViper()), /* Domains */
-            seqOf(field(INT_BACKING_FIELD, Type.Int)), /* Fields */
+            seqOf(), /* Fields */
             emptySeq(), /* Functions */
             emptySeq(), /* Predicates */
             methods.values.map { it.toMethod }.toList().toScalaSeq(), /* Functions */
