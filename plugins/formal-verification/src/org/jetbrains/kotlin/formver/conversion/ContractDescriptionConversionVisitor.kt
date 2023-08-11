@@ -64,11 +64,4 @@ class ContractDescriptionConversionVisitor : KtContractDescriptionVisitor<Exp, S
         return Exp.Implies(effect, cond)
     }
 
-//    override fun visitEffectDeclaration(
-//        effectDeclaration: KtEffectDeclaration<ConeKotlinType, ConeDiagnostic>,
-//        data: StmtConversionContext
-//    ): Exp {
-//        return effectDeclaration.accept(this, data)
-//    }
-
 }
