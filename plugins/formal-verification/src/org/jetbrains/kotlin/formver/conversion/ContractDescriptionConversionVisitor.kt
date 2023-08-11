@@ -13,18 +13,14 @@ import org.jetbrains.kotlin.formver.scala.silicon.ast.Exp
 import org.jetbrains.kotlin.formver.scala.silicon.ast.Type
 
 class ContractDescriptionConversionVisitor : KtContractDescriptionVisitor<Exp, MethodConversionContext, ConeKotlinType, ConeDiagnostic>() {
-    override fun visitConstantDescriptor(
-        constantReference: KtConstantReference<ConeKotlinType, ConeDiagnostic>,
+    override fun visitBooleanConstantDescriptor(
+        booleanConstantDescriptor: KtBooleanConstantReference<ConeKotlinType, ConeDiagnostic>,
         data: MethodConversionContext
     ): Exp {
-        val retVar = data.returnVar.toLocalVar()
-        return when (constantReference) {
-            ConeContractConstantValues.WILDCARD -> Exp.BoolLit(true)
-            ConeContractConstantValues.NULL -> Exp.EqCmp(retVar, Exp.NullLit())
-            ConeContractConstantValues.NOT_NULL -> Exp.NeCmp(retVar, Exp.NullLit())
-            ConeContractConstantValues.TRUE -> Exp.EqCmp(retVar, Exp.BoolLit(true))
-            ConeContractConstantValues.FALSE -> Exp.EqCmp(retVar, Exp.BoolLit(false))
-            else -> throw Exception("Unexpected constant: $constantReference")
+        return when (booleanConstantDescriptor) {
+            ConeContractConstantValues.TRUE -> Exp.BoolLit(true)
+            ConeContractConstantValues.FALSE -> Exp.BoolLit(false)
+            else -> throw Exception("Unexpected boolean constant: $booleanConstantDescriptor")
         }
     }
 
@@ -32,7 +28,15 @@ class ContractDescriptionConversionVisitor : KtContractDescriptionVisitor<Exp, M
         returnsEffect: KtReturnsEffectDeclaration<ConeKotlinType, ConeDiagnostic>,
         data: MethodConversionContext
     ): Exp {
-        return returnsEffect.value.accept(this, data)
+        val retVar = data.returnVar.toLocalVar()
+        return when (returnsEffect.value) {
+            ConeContractConstantValues.WILDCARD -> Exp.BoolLit(true)
+            ConeContractConstantValues.NULL -> Exp.EqCmp(retVar, Exp.NullLit())
+            ConeContractConstantValues.NOT_NULL -> Exp.NeCmp(retVar, Exp.NullLit())
+            ConeContractConstantValues.TRUE -> Exp.EqCmp(retVar, Exp.BoolLit(true))
+            ConeContractConstantValues.FALSE -> Exp.EqCmp(retVar, Exp.BoolLit(false))
+            else -> throw Exception("Unexpected constant: $returnsEffect.value")
+        }
     }
 
     override fun visitBooleanValueParameterReference(

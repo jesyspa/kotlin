@@ -35,10 +35,9 @@ field backing_int: Int
 
 method global$pkg_$conditional(local$a: Bool, local$b: Bool)
   returns (ret$: Bool)
-  ensures ret$ == true ==> ret$ == true
-  ensures ret$ == false ==> local$b && ret$ == false
-  ensures ret$ == true ==>
-    (ret$ == true || local$a) && (local$b || ret$ == true)
+  ensures ret$ == true ==> true
+  ensures ret$ == false ==> local$b && false
+  ensures ret$ == true ==> (true || local$a) && (local$b || true)
 {
   ret$ := true
 }
