@@ -17,13 +17,13 @@ class ContractDescriptionConversionVisitor : KtContractDescriptionVisitor<Exp, S
         constantReference: KtConstantReference<ConeKotlinType, ConeDiagnostic>,
         data: StmtConversionContext
     ): Exp {
-        val retType = data.methodCtx.returnVar.type.viperType
+        val retVar = data.methodCtx.returnVar.toLocalVar()
         return when (constantReference) {
             ConeContractConstantValues.WILDCARD -> Exp.BoolLit(true)
-            ConeContractConstantValues.NULL -> Exp.EqCmp(Exp.LocalVar("ret\$", retType), Exp.NullLit())
-            ConeContractConstantValues.NOT_NULL -> Exp.NeCmp(Exp.LocalVar("ret\$", retType), Exp.NullLit())
-            ConeContractConstantValues.TRUE -> Exp.EqCmp(Exp.LocalVar("ret\$", retType), Exp.BoolLit(true))
-            ConeContractConstantValues.FALSE -> Exp.EqCmp(Exp.LocalVar("ret\$", retType), Exp.BoolLit(false))
+            ConeContractConstantValues.NULL -> Exp.EqCmp(retVar, Exp.NullLit())
+            ConeContractConstantValues.NOT_NULL -> Exp.NeCmp(retVar, Exp.NullLit())
+            ConeContractConstantValues.TRUE -> Exp.EqCmp(retVar, Exp.BoolLit(true))
+            ConeContractConstantValues.FALSE -> Exp.EqCmp(retVar, Exp.BoolLit(false))
             else -> throw Exception("Unexpected constant: $constantReference")
         }
     }
@@ -64,11 +64,11 @@ class ContractDescriptionConversionVisitor : KtContractDescriptionVisitor<Exp, S
         return Exp.Implies(effect, cond)
     }
 
-    override fun visitEffectDeclaration(
-        effectDeclaration: KtEffectDeclaration<ConeKotlinType, ConeDiagnostic>,
-        data: StmtConversionContext
-    ): Exp {
-        return effectDeclaration.accept(this, data)
-    }
+//    override fun visitEffectDeclaration(
+//        effectDeclaration: KtEffectDeclaration<ConeKotlinType, ConeDiagnostic>,
+//        data: StmtConversionContext
+//    ): Exp {
+//        return effectDeclaration.accept(this, data)
+//    }
 
 }
