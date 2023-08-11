@@ -7,10 +7,6 @@ package org.jetbrains.kotlin.formver.conversion
 
 import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.contracts.FirEffectDeclaration
-import org.jetbrains.kotlin.fir.contracts.description.ConeCallsEffectDeclaration
-import org.jetbrains.kotlin.fir.contracts.description.ConeConditionalEffectDeclaration
-import org.jetbrains.kotlin.fir.contracts.description.ConeContractConstantValues
-import org.jetbrains.kotlin.fir.contracts.description.ConeReturnsEffectDeclaration
 import org.jetbrains.kotlin.fir.declarations.FirProperty
 import org.jetbrains.kotlin.fir.expressions.*
 import org.jetbrains.kotlin.fir.expressions.impl.FirNoReceiverExpression
