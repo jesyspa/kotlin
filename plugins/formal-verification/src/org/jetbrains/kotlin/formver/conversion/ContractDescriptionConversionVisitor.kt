@@ -14,6 +14,10 @@ import org.jetbrains.kotlin.formver.scala.silicon.ast.Type
 import org.jetbrains.kotlin.formver.scala.silicon.ast.Exp.*
 
 class ContractDescriptionConversionVisitor : KtContractDescriptionVisitor<Exp, MethodConversionContext, ConeKotlinType, ConeDiagnostic>() {
+    private fun KtValueParameterReference<ConeKotlinType, ConeDiagnostic>.convertedName(data: MethodConversionContext): ConvertedName {
+        return data.signature.params[parameterIndex].name
+    }
+
     override fun visitBooleanConstantDescriptor(
         booleanConstantDescriptor: KtBooleanConstantReference<ConeKotlinType, ConeDiagnostic>,
         data: MethodConversionContext
@@ -44,8 +48,8 @@ class ContractDescriptionConversionVisitor : KtContractDescriptionVisitor<Exp, M
         booleanValueParameterReference: KtBooleanValueParameterReference<ConeKotlinType, ConeDiagnostic>,
         data: MethodConversionContext
     ): Exp {
-        // TODO: find a better way to do that
-        return LocalVar("local\$${booleanValueParameterReference.name}", Type.Bool)
+        val name = booleanValueParameterReference.convertedName(data).asString
+        return LocalVar(name, Type.Bool)
     }
 
     override fun visitLogicalBinaryOperationContractExpression(
