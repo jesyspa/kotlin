@@ -11,6 +11,7 @@ import org.jetbrains.kotlin.fir.diagnostics.ConeDiagnostic
 import org.jetbrains.kotlin.fir.types.ConeKotlinType
 import org.jetbrains.kotlin.formver.scala.silicon.ast.Exp
 import org.jetbrains.kotlin.formver.scala.silicon.ast.Type
+import org.jetbrains.kotlin.formver.scala.silicon.ast.Exp.*
 
 class ContractDescriptionConversionVisitor : KtContractDescriptionVisitor<Exp, MethodConversionContext, ConeKotlinType, ConeDiagnostic>() {
     override fun visitBooleanConstantDescriptor(
@@ -18,8 +19,8 @@ class ContractDescriptionConversionVisitor : KtContractDescriptionVisitor<Exp, M
         data: MethodConversionContext
     ): Exp {
         return when (booleanConstantDescriptor) {
-            ConeContractConstantValues.TRUE -> Exp.BoolLit(true)
-            ConeContractConstantValues.FALSE -> Exp.BoolLit(false)
+            ConeContractConstantValues.TRUE -> BoolLit(true)
+            ConeContractConstantValues.FALSE -> BoolLit(false)
             else -> throw Exception("Unexpected boolean constant: $booleanConstantDescriptor")
         }
     }
@@ -30,11 +31,11 @@ class ContractDescriptionConversionVisitor : KtContractDescriptionVisitor<Exp, M
     ): Exp {
         val retVar = data.returnVar.toLocalVar()
         return when (returnsEffect.value) {
-            ConeContractConstantValues.WILDCARD -> Exp.BoolLit(true)
-            ConeContractConstantValues.NULL -> Exp.EqCmp(retVar, Exp.NullLit())
-            ConeContractConstantValues.NOT_NULL -> Exp.NeCmp(retVar, Exp.NullLit())
-            ConeContractConstantValues.TRUE -> Exp.EqCmp(retVar, Exp.BoolLit(true))
-            ConeContractConstantValues.FALSE -> Exp.EqCmp(retVar, Exp.BoolLit(false))
+            ConeContractConstantValues.WILDCARD -> BoolLit(true)
+            ConeContractConstantValues.NULL -> EqCmp(retVar, NullLit())
+            ConeContractConstantValues.NOT_NULL -> NeCmp(retVar, NullLit())
+            ConeContractConstantValues.TRUE -> EqCmp(retVar, BoolLit(true))
+            ConeContractConstantValues.FALSE -> EqCmp(retVar, BoolLit(false))
             else -> throw Exception("Unexpected constant: $returnsEffect.value")
         }
     }
@@ -44,7 +45,7 @@ class ContractDescriptionConversionVisitor : KtContractDescriptionVisitor<Exp, M
         data: MethodConversionContext
     ): Exp {
         // TODO: find a better way to do that
-        return Exp.LocalVar("local\$${booleanValueParameterReference.name}", Type.Bool)
+        return LocalVar("local\$${booleanValueParameterReference.name}", Type.Bool)
     }
 
     override fun visitLogicalBinaryOperationContractExpression(
@@ -54,8 +55,8 @@ class ContractDescriptionConversionVisitor : KtContractDescriptionVisitor<Exp, M
         val left = binaryLogicExpression.left.accept(this, data)
         val right = binaryLogicExpression.right.accept(this, data)
         return when (binaryLogicExpression.kind) {
-            LogicOperationKind.AND -> Exp.And(left, right)
-            LogicOperationKind.OR -> Exp.Or(left, right)
+            LogicOperationKind.AND -> And(left, right)
+            LogicOperationKind.OR -> Or(left, right)
         }
     }
 
@@ -65,6 +66,6 @@ class ContractDescriptionConversionVisitor : KtContractDescriptionVisitor<Exp, M
     ): Exp {
         val effect = conditionalEffect.effect.accept(this, data)
         val cond = conditionalEffect.condition.accept(this, data)
-        return Exp.Implies(effect, cond)
+        return Implies(effect, cond)
     }
 }
