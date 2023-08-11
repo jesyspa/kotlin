@@ -167,8 +167,4 @@ class StmtConversionVisitor : FirVisitor<Exp, StmtConversionContext>() {
         data.addStatement(Stmt.assign(convertedLValue, convertedRValue))
         return UnitDomain.element
     }
-
-    override fun visitEffectDeclaration(effectDeclaration: FirEffectDeclaration, data: StmtConversionContext): Exp {
-        return effectDeclaration.effect.accept(ContractDescriptionConversionVisitor(), data)
-    }
 }
