@@ -8,6 +8,7 @@ package org.jetbrains.kotlin.formver.scala.silicon.ast
 import org.jetbrains.kotlin.formver.scala.IntoViper
 import org.jetbrains.kotlin.formver.scala.emptyScalaMap
 import org.jetbrains.kotlin.formver.scala.toScalaSeq
+import org.jetbrains.kotlin.formver.scala.toViper
 import scala.math.BigInt
 import viper.silver.ast.*
 
@@ -191,7 +192,7 @@ sealed class Exp : IntoViper<viper.silver.ast.Exp> {
         val trafos: Trafos = Trafos.NoTrafos,
     ) : IntoViper<viper.silver.ast.Trigger> {
         override fun toViper(): viper.silver.ast.Trigger =
-            Trigger(exps.map { it.toViper() }.toScalaSeq(), pos.toViper(), info.toViper(), trafos.toViper())
+            Trigger(exps.toViper().toScalaSeq(), pos.toViper(), info.toViper(), trafos.toViper())
     }
 
     data class Forall(
@@ -205,7 +206,7 @@ sealed class Exp : IntoViper<viper.silver.ast.Exp> {
         override fun toViper(): viper.silver.ast.Exp =
             Forall(
                 variables.toScalaSeq(),
-                triggers.map { it.toViper() }.toScalaSeq(),
+                triggers.toViper().toScalaSeq(),
                 exp.toViper(),
                 pos.toViper(),
                 info.toViper(),
@@ -224,7 +225,7 @@ sealed class Exp : IntoViper<viper.silver.ast.Exp> {
         override fun toViper(): viper.silver.ast.Exp =
             Exists(
                 variables.toScalaSeq(),
-                triggers.map { it.toViper() }.toScalaSeq(),
+                triggers.toViper().toScalaSeq(),
                 exp.toViper(),
                 pos.toViper(),
                 info.toViper(),
@@ -301,7 +302,7 @@ sealed class Exp : IntoViper<viper.silver.ast.Exp> {
         override fun toViper(): viper.silver.ast.Exp =
             DomainFuncApp(
                 funcname,
-                args.map { it.toViper() }.toScalaSeq(),
+                args.toViper().toScalaSeq(),
                 emptyScalaMap(),
                 pos.toViper(),
                 info.toViper(),

@@ -11,9 +11,12 @@ fun smart_cast(x: Int?): Int {
 }
 
 fun use_nullable_twice(x: Int?): Int? {
-    if (x == null) {
-        return null
-    } else {
-        return (x - 1) * (x + 1)
-    }
+    val a = x
+    val b = x
+    return a
+}
+
+fun pass_nullable_parameter(x: Int?): Int? {
+    use_nullable_twice(x)
+    return x
 }

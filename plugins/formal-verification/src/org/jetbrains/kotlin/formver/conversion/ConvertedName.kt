@@ -57,7 +57,7 @@ data object ReturnVariableName : ConvertedName {
  */
 data class ConvertedDomainName(val name: String) : ConvertedName {
     // Info: Can't use 'domain' as prefix as Viper recognizes it as a keyword
-    override val asString: String = "dom\$${name}"
+    override val asString: String = "dom\$$name"
 }
 
 data class ConvertedDomainFuncName(val domainName: ConvertedDomainName, val funcName: String) : ConvertedName {

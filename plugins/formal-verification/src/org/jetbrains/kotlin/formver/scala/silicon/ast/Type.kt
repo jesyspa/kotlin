@@ -53,7 +53,7 @@ sealed class Type : IntoViper<viper.silver.ast.Type> {
     data class Domain(
         val domainName: String,
         val typeParams: List<TypeVar> = emptyList(),
-        val typeSubstitutions: kotlin.collections.Map<TypeVar, Type>
+        val typeSubstitutions: kotlin.collections.Map<TypeVar, Type> = emptyMap()
     ) : Type() {
         override fun toViper(): DomainType =
             DomainType(
