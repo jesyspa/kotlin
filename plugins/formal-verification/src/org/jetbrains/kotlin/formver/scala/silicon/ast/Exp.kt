@@ -5,10 +5,7 @@
 
 package org.jetbrains.kotlin.formver.scala.silicon.ast
 
-import org.jetbrains.kotlin.formver.scala.IntoViper
-import org.jetbrains.kotlin.formver.scala.emptyScalaMap
-import org.jetbrains.kotlin.formver.scala.toScalaSeq
-import org.jetbrains.kotlin.formver.scala.toViper
+import org.jetbrains.kotlin.formver.scala.*
 import scala.math.BigInt
 import viper.silver.ast.*
 
@@ -290,23 +287,33 @@ sealed class Exp : IntoViper<viper.silver.ast.Exp> {
         override fun toViper(): viper.silver.ast.Exp = Result(type.toViper(), pos.toViper(), info.toViper(), trafos.toViper())
     }
 
+    /**
+     * IMPORTANT: typeVarMap needs to be set even when the type variables are
+     * not instantiated. In that case map the generic type variables to themselves.
+     * Example: x is of type T, f(x: T) -> Int is a domain function, and you want to
+     * make the generic domain function call f(x) then a Map from T -> T needs to be
+     * supplied.
+     */
     data class DomainFuncApp(
         val domainName: String,
         val funcname: String,
         val args: List<Exp>,
+        val typeVarMap: Map<Type.TypeVar, Type>,
         val typ: Type,
         val pos: Position = Position.NoPosition,
         val info: Info = Info.NoInfo,
         val trafos: Trafos = Trafos.NoTrafos,
     ) : Exp() {
+
+        val scalaTypeVarMap = typeVarMap.mapKeys { it.key.toViper() }.mapValues { it.value.toViper() }.toScalaMap()
         override fun toViper(): viper.silver.ast.Exp =
             DomainFuncApp(
                 funcname,
                 args.toViper().toScalaSeq(),
-                emptyScalaMap(),
+                scalaTypeVarMap,
                 pos.toViper(),
                 info.toViper(),
-                typ.toViper(),
+                typ.toViper().substitute(scalaTypeVarMap),
                 domainName,
                 trafos.toViper()
             )

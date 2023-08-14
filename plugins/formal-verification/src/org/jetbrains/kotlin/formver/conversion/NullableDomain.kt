@@ -38,10 +38,21 @@ object NullableDomain : Domain(ConvertedDomainName("Nullable")) {
 
     val nullFunc = createDomainFunc("null", emptyList(), Nullable)
     val nullableOf = createDomainFunc("nullable_of", listOf(localVarDecl("x", T)), Nullable)
-    val valOf = createDomainFunc("val_of_nullable", listOf(localVarDecl("x", Nullable)), T)
+    val valOf = createDomainFunc("val_of", listOf(localVarDecl("x", Nullable)), T)
     override val functions: List<DomainFunc> = listOf(nullFunc, nullableOf, valOf)
 
-    val nullVal = funcApp(nullFunc, emptyList())
+    // You need to specify the type if the expression expects a certain nullable type,
+    // e.g. in the expression x == null_val(), if x is of type type Nullable[Int], then
+    // null_val() also needs to of type Nullable[Int] and can't be of type Nullable[T].
+    fun nullVal(elemType: Type): DomainFuncApp =
+        funcApp(nullFunc, emptyList(), mapOf(T to elemType))
+
+    // elemType can also be the generic T but most of the time, the type needs to be refined.
+    fun nullableOfApp(elem: Exp, elemType: Type): DomainFuncApp =
+        funcApp(nullableOf, listOf(elem), mapOf(T to elemType))
+
+    fun valOfApp(nullable: Exp, elemType: Type): DomainFuncApp =
+        funcApp(valOf, listOf(nullable), mapOf(T to elemType))
 
     val someNotNull =
         createDomainAxiom(
@@ -49,7 +60,7 @@ object NullableDomain : Domain(ConvertedDomainName("Nullable")) {
             Forall(
                 listOf(localVarDecl("x", T)),
                 listOf(Trigger(listOf(funcApp(nullableOf, listOf(LocalVar("x", T)))))),
-                NeCmp(funcApp(nullableOf, listOf(LocalVar("x", T))), nullVal)
+                NeCmp(funcApp(nullableOf, listOf(LocalVar("x", T))), nullVal(T))
             )
         )
     val valOfNullableOfVal =
@@ -68,7 +79,7 @@ object NullableDomain : Domain(ConvertedDomainName("Nullable")) {
                 listOf(localVarDecl("x", Nullable)),
                 listOf(Trigger(listOf(funcApp(nullableOf, listOf(funcApp(valOf, listOf(LocalVar("x", Nullable)))))))),
                 Implies(
-                    NeCmp(LocalVar("x", Nullable), nullVal),
+                    NeCmp(LocalVar("x", Nullable), nullVal(T)),
                     EqCmp(
                         funcApp(nullableOf, listOf(funcApp(valOf, listOf(LocalVar("x", Nullable))))),
                         LocalVar("x", Nullable)

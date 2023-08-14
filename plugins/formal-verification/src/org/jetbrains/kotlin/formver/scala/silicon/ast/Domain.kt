@@ -88,8 +88,9 @@ abstract class Domain(
     fun funcApp(
         func: DomainFunc,
         args: List<Exp>,
+        typeVarMap: Map<Type.TypeVar, Type> = typeVars.associateWith { it },
         pos: Position = Position.NoPosition,
         info: Info = Info.NoInfo,
         trafos: Trafos = Trafos.NoTrafos,
-    ): Exp.DomainFuncApp = Exp.DomainFuncApp(name.asString, func.name.asString, args, func.typ, pos, info, trafos)
+    ): Exp.DomainFuncApp = Exp.DomainFuncApp(name.asString, func.name.asString, args, typeVarMap, func.typ, pos, info, trafos)
 }

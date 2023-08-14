@@ -22,6 +22,7 @@ import org.jetbrains.kotlin.fir.types.isNullable
 import org.jetbrains.kotlin.fir.visitors.FirVisitor
 import org.jetbrains.kotlin.formver.scala.silicon.ast.Exp
 import org.jetbrains.kotlin.formver.scala.silicon.ast.Stmt
+import org.jetbrains.kotlin.formver.scala.silicon.ast.Type
 import org.jetbrains.kotlin.formver.scala.toScalaBigInt
 import org.jetbrains.kotlin.text
 import org.jetbrains.kotlin.types.ConstantValueKind
@@ -61,7 +62,11 @@ class StmtConversionVisitor : FirVisitor<Exp, StmtConversionContext>() {
         when (constExpression.kind) {
             ConstantValueKind.Int -> Exp.IntLit((constExpression.value as Long).toInt().toScalaBigInt())
             ConstantValueKind.Boolean -> Exp.BoolLit(constExpression.value as Boolean)
-            ConstantValueKind.Null -> NullableDomain.nullVal
+            /* TODO: For now null is always hard-coded to be of type Nullable[Int].
+             * This needs to be generalized and for this the type of the return expressions needs to be known.
+             * This type should maybe be passed as function argument.
+             */
+            ConstantValueKind.Null -> NullableDomain.nullVal(Type.Int)
             else -> TODO("Constant Expression of type ${constExpression.kind} is not yet implemented.")
         }
 
@@ -195,9 +200,11 @@ class StmtConversionVisitor : FirVisitor<Exp, StmtConversionContext>() {
     }
 
     override fun visitSmartCastExpression(smartCastExpression: FirSmartCastExpression, data: StmtConversionContext): Exp {
-        if (smartCastExpression.originalExpression.typeRef.coneType.isNullable && !smartCastExpression.smartcastType.coneType.isNullable) {
+        val oldType = smartCastExpression.originalExpression.typeRef.coneType
+        val newType = smartCastExpression.smartcastType.coneType
+        if (oldType.isNullable && !newType.isNullable) {
             val exp = smartCastExpression.originalExpression.accept(this, data)
-            return NullableDomain.funcApp(NullableDomain.valOf, listOf(exp))
+            return NullableDomain.valOfApp(exp, data.convertType(newType).viperType)
         }
         TODO("Handle other kinds of smart casts.")
     }
