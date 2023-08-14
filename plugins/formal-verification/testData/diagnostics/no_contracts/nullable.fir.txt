@@ -1,4 +1,9 @@
 FILE: nullable.kt
+    public final fun return_nullable(): R|kotlin/Int?| {
+        ^return_nullable Int(0)
+    }
+    public final fun return_unit(): R|kotlin/Unit| {
+    }
     public final fun smart_cast(x: R|kotlin/Int?|): R|kotlin/Int| {
         when () {
             ==(R|<local>/x|, Null(null)) ->  {
