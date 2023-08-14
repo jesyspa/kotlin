@@ -40,17 +40,14 @@ class ContractDescriptionConversionVisitor : KtContractDescriptionVisitor<Exp, M
             ConeContractConstantValues.NOT_NULL -> NeCmp(retVar, NullLit())
             ConeContractConstantValues.TRUE -> EqCmp(retVar, BoolLit(true))
             ConeContractConstantValues.FALSE -> EqCmp(retVar, BoolLit(false))
-            else -> throw Exception("Unexpected constant: $returnsEffect.value")
+            else -> throw Exception("Unexpected constant: ${returnsEffect.value}")
         }
     }
 
     override fun visitBooleanValueParameterReference(
         booleanValueParameterReference: KtBooleanValueParameterReference<ConeKotlinType, ConeDiagnostic>,
         data: MethodConverter
-    ): Exp {
-        val name = booleanValueParameterReference.convertedName(data).asString
-        return LocalVar(name, Type.Bool)
-    }
+    ): Exp = ConvertedVar(booleanValueParameterReference.convertedName(data), ConvertedBoolean).toLocalVar()
 
     override fun visitLogicalBinaryOperationContractExpression(
         binaryLogicExpression: KtBinaryLogicExpression<ConeKotlinType, ConeDiagnostic>,

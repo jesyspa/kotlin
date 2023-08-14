@@ -45,11 +45,9 @@ class MethodConverter(
         return ctx.block
     }
 
-    private fun convertEffects(contractDescription: FirResolvedContractDescription?): List<Exp> {
-        return contractDescription?.effects?.map {
-            it.effect.accept(ContractDescriptionConversionVisitor(), this)
-        }
-            ?: listOf()
+    private fun convertEffects(contractDescription: FirResolvedContractDescription?): List<Exp> = contractDescription?.effects?.map {
+        it.effect.accept(ContractDescriptionConversionVisitor(), this)
     }
+        ?: listOf()
 
 }
