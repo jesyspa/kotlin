@@ -17,12 +17,15 @@ import viper.silver.ast.Method
  * Note that by default we do not convert the whole method: we expect to
  * only need the signature in most methods, as we verify methods one at a
  * time.
+ * NOTE: since functions without contracts have not a contract description of
+ * type FirResolvedContractDescription, we handle those cases by making
+ * contractDescription null
  */
 class MethodConverter(
     private val programCtx: ProgramConversionContext,
-    val signature: ConvertedMethodSignature,
+    override val signature: ConvertedMethodSignature,
     body: FirBlock?,
-    val contractDescription: FirResolvedContractDescription? = null
+    contractDescription: FirResolvedContractDescription?
 ) :
     MethodConversionContext, ProgramConversionContext by programCtx {
     override val returnVar: ConvertedVar = signature.returnVar
@@ -35,9 +38,11 @@ class MethodConverter(
     // We need to make sure everything else is initialised by the time we get here.
     private val convertedBody = body?.let { convertBody(it) }
 
+    private val convertedEffects = convertEffects(contractDescription)
+
     // Converting the body here would be too late; we want this to be a pure method, while
     // converting the body may involve the program context.
-    override val toMethod: Method = signature.toMethod(listOf(), convertEffects(contractDescription), convertedBody)
+    override val toMethod: Method = signature.toMethod(listOf(), convertedEffects, convertedBody)
 
     private fun convertBody(body: FirBlock): Stmt.Seqn {
         val ctx = StmtConverter(this)

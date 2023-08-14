@@ -50,7 +50,7 @@ class ProgramConverter : ProgramConversionContext {
     override fun add(symbol: FirNamedFunctionSymbol): ConvertedMethodSignature {
         val signature = convertSignature(symbol)
         methods.getOrPut(signature.name) {
-            MethodConverter(this, signature, null)
+            MethodConverter(this, signature, null, null)
         }
         return signature
     }
