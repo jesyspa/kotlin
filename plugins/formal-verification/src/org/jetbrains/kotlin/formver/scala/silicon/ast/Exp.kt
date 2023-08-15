@@ -350,4 +350,24 @@ sealed interface Exp : IntoViper<viper.silver.ast.Exp> {
                 trafos.toViper()
             )
     }
+
+    fun fieldAccess(
+        field: Field,
+        pos: Position = Position.NoPosition,
+        info: Info = Info.NoInfo,
+        trafos: Trafos = Trafos.NoTrafos,
+    ): FieldAccess =
+        FieldAccess(this, field, pos, info, trafos)
+
+    // We can't pass all the available position, info, and trafos information here.
+    // Living with that seems fine for the moment.
+    fun fieldAccessPredicate(
+        field: Field,
+        permission: PermExp,
+        pos: Position = Position.NoPosition,
+        info: Info = Info.NoInfo,
+        trafos: Trafos = Trafos.NoTrafos,
+    ): AccessPredicate.FieldAccessPredicate =
+        AccessPredicate.FieldAccessPredicate(fieldAccess(field), permission, pos, info, trafos)
+
 }

@@ -5,9 +5,11 @@
 
 package org.jetbrains.kotlin.formver.embeddings
 
+import org.jetbrains.kotlin.formver.conversion.SpecialFields
 import org.jetbrains.kotlin.formver.domains.NullableDomain
 import org.jetbrains.kotlin.formver.domains.UnitDomain
 import org.jetbrains.kotlin.formver.scala.silicon.ast.Exp
+import org.jetbrains.kotlin.formver.scala.silicon.ast.PermExp
 import org.jetbrains.kotlin.formver.scala.silicon.ast.Type
 
 interface TypeEmbedding {
@@ -39,4 +41,11 @@ class TypeVarEmbedding(val name: String) : TypeEmbedding {
 
 class NullableTypeEmbedding(val elementType: TypeEmbedding) : TypeEmbedding {
     override val type: Type = NullableDomain.toType(mapOf(NullableDomain.T to elementType.type))
+}
+
+object FunctionTypeEmbedding : TypeEmbedding {
+    override val type: Type = Type.Ref
+
+    override fun invariants(v: Exp): List<Exp> =
+        listOf(v.fieldAccessPredicate(SpecialFields.FunctionObjectCallCounterField, PermExp.FullPerm()))
 }
