@@ -15,6 +15,14 @@ import org.jetbrains.kotlin.formver.scala.silicon.ast.Type
 interface TypeEmbedding {
     val type: Type
     fun invariants(v: Exp): List<Exp> = emptyList()
+
+    /**
+     * Invariants that should correlate the old and new value of a value of this type
+     * over a function call.  This is exclusively necessary for CallsInPlace.
+     *
+     * TODO: add support for these in loops, too.
+     */
+    fun dynamicInvariants(v: Exp): List<Exp> = emptyList()
 }
 
 object UnitTypeEmbedding : TypeEmbedding {
@@ -48,4 +56,13 @@ object FunctionTypeEmbedding : TypeEmbedding {
 
     override fun invariants(v: Exp): List<Exp> =
         listOf(v.fieldAccessPredicate(SpecialFields.FunctionObjectCallCounterField, PermExp.FullPerm()))
+
+    override fun dynamicInvariants(v: Exp): List<Exp> =
+        listOf(
+            Exp.LeCmp(
+                Exp.Old(v.fieldAccess(SpecialFields.FunctionObjectCallCounterField)),
+                v.fieldAccess(SpecialFields.FunctionObjectCallCounterField)
+            )
+        )
 }
+

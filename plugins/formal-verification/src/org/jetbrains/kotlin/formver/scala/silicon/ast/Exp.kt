@@ -351,6 +351,17 @@ sealed interface Exp : IntoViper<viper.silver.ast.Exp> {
             )
     }
 
+    data class Old(
+        val exp: Exp,
+        val pos: Position = Position.NoPosition,
+        val info: Info = Info.NoInfo,
+        val trafos: Trafos = Trafos.NoTrafos,
+    ) : Exp {
+        override fun toViper(): viper.silver.ast.Old = Old(exp.toViper(), pos.toViper(), info.toViper(), trafos.toViper())
+    }
+
+    // We can't pass all the available position, info, and trafos information here.
+    // Living with that seems fine for the moment.
     fun fieldAccess(
         field: Field,
         pos: Position = Position.NoPosition,
@@ -369,5 +380,4 @@ sealed interface Exp : IntoViper<viper.silver.ast.Exp> {
         trafos: Trafos = Trafos.NoTrafos,
     ): AccessPredicate.FieldAccessPredicate =
         AccessPredicate.FieldAccessPredicate(fieldAccess(field), permission, pos, info, trafos)
-
 }
