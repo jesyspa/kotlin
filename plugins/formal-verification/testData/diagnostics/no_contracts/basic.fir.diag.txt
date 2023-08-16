@@ -3,6 +3,37 @@
   function dom$Unit$element(): dom$Unit
 }
 
+domain dom$Nullable[T]  {
+
+  function dom$Nullable$null(): dom$Nullable[T]
+
+  function dom$Nullable$nullable_of(x: T): dom$Nullable[T]
+
+  function dom$Nullable$val_of(x: dom$Nullable[T]): T
+
+  axiom dom$Nullable$some_not_null {
+    (forall x: T ::
+      { (dom$Nullable$nullable_of(x): dom$Nullable[T]) }
+      (dom$Nullable$nullable_of(x): dom$Nullable[T]) !=
+      (dom$Nullable$null(): dom$Nullable[T]))
+  }
+
+  axiom dom$Nullable$val_of_nullable_of_val {
+    (forall x: T ::
+      { (dom$Nullable$val_of((dom$Nullable$nullable_of(x): dom$Nullable[T])): T) }
+      (dom$Nullable$val_of((dom$Nullable$nullable_of(x): dom$Nullable[T])): T) ==
+      x)
+  }
+
+  axiom dom$Nullable$nullable_of_val_of_nullable {
+    (forall x: dom$Nullable[T] ::
+      { (dom$Nullable$nullable_of((dom$Nullable$val_of(x): T)): dom$Nullable[T]) }
+      x != (dom$Nullable$null(): dom$Nullable[T]) ==>
+      (dom$Nullable$nullable_of((dom$Nullable$val_of(x): T)): dom$Nullable[T]) ==
+      x)
+  }
+}
+
 method global$pkg_$return_unit() returns (ret$: dom$Unit)
 {
 }
@@ -10,6 +41,37 @@ method global$pkg_$return_unit() returns (ret$: dom$Unit)
 /basic.kt:(25,35): info: domain dom$Unit  {
 
   function dom$Unit$element(): dom$Unit
+}
+
+domain dom$Nullable[T]  {
+
+  function dom$Nullable$null(): dom$Nullable[T]
+
+  function dom$Nullable$nullable_of(x: T): dom$Nullable[T]
+
+  function dom$Nullable$val_of(x: dom$Nullable[T]): T
+
+  axiom dom$Nullable$some_not_null {
+    (forall x: T ::
+      { (dom$Nullable$nullable_of(x): dom$Nullable[T]) }
+      (dom$Nullable$nullable_of(x): dom$Nullable[T]) !=
+      (dom$Nullable$null(): dom$Nullable[T]))
+  }
+
+  axiom dom$Nullable$val_of_nullable_of_val {
+    (forall x: T ::
+      { (dom$Nullable$val_of((dom$Nullable$nullable_of(x): dom$Nullable[T])): T) }
+      (dom$Nullable$val_of((dom$Nullable$nullable_of(x): dom$Nullable[T])): T) ==
+      x)
+  }
+
+  axiom dom$Nullable$nullable_of_val_of_nullable {
+    (forall x: dom$Nullable[T] ::
+      { (dom$Nullable$nullable_of((dom$Nullable$val_of(x): T)): dom$Nullable[T]) }
+      x != (dom$Nullable$null(): dom$Nullable[T]) ==>
+      (dom$Nullable$nullable_of((dom$Nullable$val_of(x): T)): dom$Nullable[T]) ==
+      x)
+  }
 }
 
 method global$pkg_$return_int() returns (ret$: Int)
@@ -22,6 +84,37 @@ method global$pkg_$return_int() returns (ret$: Int)
   function dom$Unit$element(): dom$Unit
 }
 
+domain dom$Nullable[T]  {
+
+  function dom$Nullable$null(): dom$Nullable[T]
+
+  function dom$Nullable$nullable_of(x: T): dom$Nullable[T]
+
+  function dom$Nullable$val_of(x: dom$Nullable[T]): T
+
+  axiom dom$Nullable$some_not_null {
+    (forall x: T ::
+      { (dom$Nullable$nullable_of(x): dom$Nullable[T]) }
+      (dom$Nullable$nullable_of(x): dom$Nullable[T]) !=
+      (dom$Nullable$null(): dom$Nullable[T]))
+  }
+
+  axiom dom$Nullable$val_of_nullable_of_val {
+    (forall x: T ::
+      { (dom$Nullable$val_of((dom$Nullable$nullable_of(x): dom$Nullable[T])): T) }
+      (dom$Nullable$val_of((dom$Nullable$nullable_of(x): dom$Nullable[T])): T) ==
+      x)
+  }
+
+  axiom dom$Nullable$nullable_of_val_of_nullable {
+    (forall x: dom$Nullable[T] ::
+      { (dom$Nullable$nullable_of((dom$Nullable$val_of(x): T)): dom$Nullable[T]) }
+      x != (dom$Nullable$null(): dom$Nullable[T]) ==>
+      (dom$Nullable$nullable_of((dom$Nullable$val_of(x): T)): dom$Nullable[T]) ==
+      x)
+  }
+}
+
 method global$pkg_$take_int_return_unit(local$x: Int)
   returns (ret$: dom$Unit)
 {
@@ -32,6 +125,37 @@ method global$pkg_$take_int_return_unit(local$x: Int)
   function dom$Unit$element(): dom$Unit
 }
 
+domain dom$Nullable[T]  {
+
+  function dom$Nullable$null(): dom$Nullable[T]
+
+  function dom$Nullable$nullable_of(x: T): dom$Nullable[T]
+
+  function dom$Nullable$val_of(x: dom$Nullable[T]): T
+
+  axiom dom$Nullable$some_not_null {
+    (forall x: T ::
+      { (dom$Nullable$nullable_of(x): dom$Nullable[T]) }
+      (dom$Nullable$nullable_of(x): dom$Nullable[T]) !=
+      (dom$Nullable$null(): dom$Nullable[T]))
+  }
+
+  axiom dom$Nullable$val_of_nullable_of_val {
+    (forall x: T ::
+      { (dom$Nullable$val_of((dom$Nullable$nullable_of(x): dom$Nullable[T])): T) }
+      (dom$Nullable$val_of((dom$Nullable$nullable_of(x): dom$Nullable[T])): T) ==
+      x)
+  }
+
+  axiom dom$Nullable$nullable_of_val_of_nullable {
+    (forall x: dom$Nullable[T] ::
+      { (dom$Nullable$nullable_of((dom$Nullable$val_of(x): T)): dom$Nullable[T]) }
+      x != (dom$Nullable$null(): dom$Nullable[T]) ==>
+      (dom$Nullable$nullable_of((dom$Nullable$val_of(x): T)): dom$Nullable[T]) ==
+      x)
+  }
+}
+
 method global$pkg_$take_int_return_int(local$x: Int) returns (ret$: Int)
 {
   ret$ := local$x
@@ -40,6 +164,37 @@ method global$pkg_$take_int_return_int(local$x: Int) returns (ret$: Int)
 /basic.kt:(176,200): info: domain dom$Unit  {
 
   function dom$Unit$element(): dom$Unit
+}
+
+domain dom$Nullable[T]  {
+
+  function dom$Nullable$null(): dom$Nullable[T]
+
+  function dom$Nullable$nullable_of(x: T): dom$Nullable[T]
+
+  function dom$Nullable$val_of(x: dom$Nullable[T]): T
+
+  axiom dom$Nullable$some_not_null {
+    (forall x: T ::
+      { (dom$Nullable$nullable_of(x): dom$Nullable[T]) }
+      (dom$Nullable$nullable_of(x): dom$Nullable[T]) !=
+      (dom$Nullable$null(): dom$Nullable[T]))
+  }
+
+  axiom dom$Nullable$val_of_nullable_of_val {
+    (forall x: T ::
+      { (dom$Nullable$val_of((dom$Nullable$nullable_of(x): dom$Nullable[T])): T) }
+      (dom$Nullable$val_of((dom$Nullable$nullable_of(x): dom$Nullable[T])): T) ==
+      x)
+  }
+
+  axiom dom$Nullable$nullable_of_val_of_nullable {
+    (forall x: dom$Nullable[T] ::
+      { (dom$Nullable$nullable_of((dom$Nullable$val_of(x): T)): dom$Nullable[T]) }
+      x != (dom$Nullable$null(): dom$Nullable[T]) ==>
+      (dom$Nullable$nullable_of((dom$Nullable$val_of(x): T)): dom$Nullable[T]) ==
+      x)
+  }
 }
 
 method global$pkg_$take_int_return_int_expr(local$x: Int)
@@ -53,6 +208,37 @@ method global$pkg_$take_int_return_int_expr(local$x: Int)
   function dom$Unit$element(): dom$Unit
 }
 
+domain dom$Nullable[T]  {
+
+  function dom$Nullable$null(): dom$Nullable[T]
+
+  function dom$Nullable$nullable_of(x: T): dom$Nullable[T]
+
+  function dom$Nullable$val_of(x: dom$Nullable[T]): T
+
+  axiom dom$Nullable$some_not_null {
+    (forall x: T ::
+      { (dom$Nullable$nullable_of(x): dom$Nullable[T]) }
+      (dom$Nullable$nullable_of(x): dom$Nullable[T]) !=
+      (dom$Nullable$null(): dom$Nullable[T]))
+  }
+
+  axiom dom$Nullable$val_of_nullable_of_val {
+    (forall x: T ::
+      { (dom$Nullable$val_of((dom$Nullable$nullable_of(x): dom$Nullable[T])): T) }
+      (dom$Nullable$val_of((dom$Nullable$nullable_of(x): dom$Nullable[T])): T) ==
+      x)
+  }
+
+  axiom dom$Nullable$nullable_of_val_of_nullable {
+    (forall x: dom$Nullable[T] ::
+      { (dom$Nullable$nullable_of((dom$Nullable$val_of(x): T)): dom$Nullable[T]) }
+      x != (dom$Nullable$null(): dom$Nullable[T]) ==>
+      (dom$Nullable$nullable_of((dom$Nullable$val_of(x): T)): dom$Nullable[T]) ==
+      x)
+  }
+}
+
 method global$pkg_$with_int_declaration() returns (ret$: Int)
 {
   var local$x: Int
@@ -63,6 +249,37 @@ method global$pkg_$with_int_declaration() returns (ret$: Int)
 /basic.kt:(285,299): info: domain dom$Unit  {
 
   function dom$Unit$element(): dom$Unit
+}
+
+domain dom$Nullable[T]  {
+
+  function dom$Nullable$null(): dom$Nullable[T]
+
+  function dom$Nullable$nullable_of(x: T): dom$Nullable[T]
+
+  function dom$Nullable$val_of(x: dom$Nullable[T]): T
+
+  axiom dom$Nullable$some_not_null {
+    (forall x: T ::
+      { (dom$Nullable$nullable_of(x): dom$Nullable[T]) }
+      (dom$Nullable$nullable_of(x): dom$Nullable[T]) !=
+      (dom$Nullable$null(): dom$Nullable[T]))
+  }
+
+  axiom dom$Nullable$val_of_nullable_of_val {
+    (forall x: T ::
+      { (dom$Nullable$val_of((dom$Nullable$nullable_of(x): dom$Nullable[T])): T) }
+      (dom$Nullable$val_of((dom$Nullable$nullable_of(x): dom$Nullable[T])): T) ==
+      x)
+  }
+
+  axiom dom$Nullable$nullable_of_val_of_nullable {
+    (forall x: dom$Nullable[T] ::
+      { (dom$Nullable$nullable_of((dom$Nullable$val_of(x): T)): dom$Nullable[T]) }
+      x != (dom$Nullable$null(): dom$Nullable[T]) ==>
+      (dom$Nullable$nullable_of((dom$Nullable$val_of(x): T)): dom$Nullable[T]) ==
+      x)
+  }
 }
 
 method global$pkg_$int_assignment() returns (ret$: dom$Unit)
