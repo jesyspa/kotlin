@@ -11,10 +11,13 @@ import org.jetbrains.kotlin.fir.diagnostics.ConeDiagnostic
 import org.jetbrains.kotlin.fir.types.ConeKotlinType
 import org.jetbrains.kotlin.formver.scala.silicon.ast.Exp
 import org.jetbrains.kotlin.formver.scala.silicon.ast.Exp.*
+import org.jetbrains.kotlin.formver.scala.silicon.ast.Type
 
 class ContractDescriptionConversionVisitor : KtContractDescriptionVisitor<Exp, MethodConversionContext, ConeKotlinType, ConeDiagnostic>() {
-    private fun KtValueParameterReference<ConeKotlinType, ConeDiagnostic>.convertedName(data: MethodConversionContext): ConvertedName {
-        return data.signature.params[parameterIndex].name
+    private fun KtValueParameterReference<ConeKotlinType, ConeDiagnostic>.convertedVar(data: MethodConversionContext): ConvertedVar {
+        val name = data.signature.params[parameterIndex].name
+        val type = data.signature.params[parameterIndex].type
+        return ConvertedVar(name, type)
     }
 
     override fun visitBooleanConstantDescriptor(
@@ -35,18 +38,32 @@ class ContractDescriptionConversionVisitor : KtContractDescriptionVisitor<Exp, M
         val retVar = data.returnVar.toLocalVar()
         return when (returnsEffect.value) {
             ConeContractConstantValues.WILDCARD -> BoolLit(true)
-            ConeContractConstantValues.NULL -> EqCmp(retVar, NullLit())
-            ConeContractConstantValues.NOT_NULL -> NeCmp(retVar, NullLit())
+            // TODO: extend null comparisons to other types (also non-nullable), I think it is better waiting for null to work with more types
+            ConeContractConstantValues.NULL -> EqCmp(retVar, NullableDomain.nullVal(Type.Int))
+            ConeContractConstantValues.NOT_NULL -> NeCmp(retVar, NullableDomain.nullVal(Type.Int))
             ConeContractConstantValues.TRUE -> EqCmp(retVar, BoolLit(true))
             ConeContractConstantValues.FALSE -> EqCmp(retVar, BoolLit(false))
             else -> throw Exception("Unexpected constant: ${returnsEffect.value}")
         }
     }
 
-    override fun visitBooleanValueParameterReference(
-        booleanValueParameterReference: KtBooleanValueParameterReference<ConeKotlinType, ConeDiagnostic>,
+    override fun visitValueParameterReference(
+        valueParameterReference: KtValueParameterReference<ConeKotlinType, ConeDiagnostic>,
         data: MethodConversionContext
-    ): Exp = ConvertedVar(booleanValueParameterReference.convertedName(data), ConvertedBoolean).toLocalVar()
+    ): Exp = valueParameterReference.convertedVar(data).toLocalVar()
+
+    override fun visitIsNullPredicate(
+        isNullPredicate: KtIsNullPredicate<ConeKotlinType, ConeDiagnostic>,
+        data: MethodConversionContext
+    ): Exp {
+        val arg = isNullPredicate.arg.accept(this, data)
+        // TODO: extend null comparisons to other types (also non-nullable), I think it is better waiting for null to work with more types
+        return if (isNullPredicate.isNegated) {
+            NeCmp(arg, NullableDomain.nullVal(Type.Int))
+        } else {
+            EqCmp(arg, NullableDomain.nullVal(Type.Int))
+        }
+    }
 
     override fun visitLogicalBinaryOperationContractExpression(
         binaryLogicExpression: KtBinaryLogicExpression<ConeKotlinType, ConeDiagnostic>,
