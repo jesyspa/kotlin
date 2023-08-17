@@ -33,3 +33,19 @@ fun <!VIPER_TEXT!>no_else_when<!>(a: Boolean, b: Boolean, c: Boolean): Int {
     }
     return y
 }
+
+fun <!VIPER_TEXT!>when_with_subject_var<!>(x: Int): Int {
+    return when (x) {
+        1 -> 2
+        2 -> 3
+        else -> 42
+    }
+}
+
+fun <!VIPER_TEXT!>when_with_subject_call<!>(x: Int): Int {
+    return when (when_with_subject_var(x)) {
+        1 -> 2
+        2 -> 3
+        else -> 42
+    }
+}

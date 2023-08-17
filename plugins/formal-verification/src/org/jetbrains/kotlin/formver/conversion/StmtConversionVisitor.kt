@@ -76,7 +76,13 @@ class StmtConversionVisitor : FirVisitor<Exp, StmtConversionContext>() {
             else -> TODO("Constant Expression of type ${constExpression.kind} is not yet implemented.")
         }
 
+    override fun visitWhenSubjectExpression(whenSubjectExpression: FirWhenSubjectExpression, data: StmtConversionContext): Exp {
+        return whenSubjectExpression.whenRef.value.subject?.accept(this, data)
+            ?: throw Exception("FirWhenSubjectExpression $whenSubjectExpression has a null subject")
+    }
+
     private fun visitWhenBranches(whenBranches: List<FirWhenBranch>, data: StmtConversionContext, cvar: ConvertedVar): Exp {
+        // NOTE: I think that this will also work with "in" or "is" conditions when implemented, but I'm not 100% sure
         val cond = whenBranches[0].condition.accept(this, data)
         val thenCtx = StmtConverter(data)
         val thenResult = whenBranches[0].result.accept(this, thenCtx)
@@ -107,14 +113,9 @@ class StmtConversionVisitor : FirVisitor<Exp, StmtConversionContext>() {
         if (whenExpression.branches.isEmpty()) {
             throw Exception("When expression $whenExpression has no branches")
         }
-        return when (whenExpression.subject) {
-            null -> {
-                val cvar = data.newAnonVar(data.convertType(whenExpression.typeRef.coneTypeOrNull!!))
-                data.addDeclaration(cvar.toLocalVarDecl())
-                visitWhenBranches(whenExpression.branches, data, cvar)
-            }
-            else -> TODO("Can't embed $whenExpression since when expressions with a subject other than null are not yet supported.")
-        }
+        val cvar = data.newAnonVar(data.convertType(whenExpression.typeRef.coneTypeOrNull!!))
+        data.addDeclaration(cvar.toLocalVarDecl())
+        return visitWhenBranches(whenExpression.branches, data, cvar)
     }
 
     override fun visitPropertyAccessExpression(
