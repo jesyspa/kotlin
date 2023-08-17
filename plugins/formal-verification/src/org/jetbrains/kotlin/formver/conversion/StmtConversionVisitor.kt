@@ -9,6 +9,7 @@ import org.jetbrains.kotlin.contracts.description.LogicOperationKind
 import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.declarations.FirProperty
 import org.jetbrains.kotlin.fir.expressions.*
+import org.jetbrains.kotlin.fir.expressions.impl.FirElseIfTrueCondition
 import org.jetbrains.kotlin.fir.expressions.impl.FirNoReceiverExpression
 import org.jetbrains.kotlin.fir.references.resolved
 import org.jetbrains.kotlin.fir.references.toResolvedBaseSymbol
@@ -75,33 +76,42 @@ class StmtConversionVisitor : FirVisitor<Exp, StmtConversionContext>() {
             else -> TODO("Constant Expression of type ${constExpression.kind} is not yet implemented.")
         }
 
-    override fun visitWhenExpression(whenExpression: FirWhenExpression, data: StmtConversionContext): Exp {
-        if (whenExpression.branches.size != 2) {
-            // For now only when expressions with 2 branches are supported so if statements can be encoded.
-            // When expressions with more than 2 branches can be embedded as nested if-else chains.
-            TODO("When expressions with more that two branches are not yet implemented")
-        }
+    private fun visitWhenBranches(whenBranches: List<FirWhenBranch>, data: StmtConversionContext, cvar: ConvertedVar): Exp {
+        val cond = whenBranches[0].condition.accept(this, data)
+        val thenCtx = StmtConverter(data)
+        val thenResult = whenBranches[0].result.accept(this, thenCtx)
+        thenCtx.addStatement(Stmt.LocalVarAssign(cvar.toLocalVar(), thenResult))
+        val elseBranch =
+            when {
+                // When last branch is not an else
+                whenBranches.size == 1 -> Stmt.Seqn(listOf(), listOf())
+                // When last branch is an else
+                whenBranches.size == 2 && whenBranches[1].condition is FirElseIfTrueCondition -> {
+                    val elseCtx = StmtConverter(data)
+                    val elseResult = whenBranches[1].result.accept(this, elseCtx)
+                    elseCtx.addStatement(Stmt.LocalVarAssign(cvar.toLocalVar(), elseResult))
+                    elseCtx.block
+                }
+                // Recursive case
+                else -> {
+                    val elseCtx = StmtConverter(data)
+                    visitWhenBranches(whenBranches.drop(1), elseCtx, cvar)
+                    elseCtx.block
+                }
+            }
+        data.addStatement(Stmt.If(cond, thenCtx.block, elseBranch))
+        return cvar.toLocalVar()
+    }
 
+    override fun visitWhenExpression(whenExpression: FirWhenExpression, data: StmtConversionContext): Exp {
+        if (whenExpression.branches.isEmpty()) {
+            throw Exception("When expression $whenExpression has no branches")
+        }
         return when (whenExpression.subject) {
             null -> {
-                val cvar = data.newAnonVar(data.embedType(whenExpression.typeRef.coneTypeOrNull!!))
-                val cond = whenExpression.branches[0].condition.accept(this, data)
-                // TODO: tidy this up and split it into helper functions.
-                val thenCtx = StmtConverter(data)
-                val thenResult = whenExpression.branches[0].result.accept(this, thenCtx)
-                thenCtx.addStatement(Stmt.LocalVarAssign(cvar.toLocalVar(), thenResult))
-                val elseCtx = StmtConverter(data)
-                val elseResult = whenExpression.branches[1].result.accept(this, elseCtx)
-                elseCtx.addStatement(Stmt.LocalVarAssign(cvar.toLocalVar(), elseResult))
+                val cvar = data.newAnonVar(data.convertType(whenExpression.typeRef.coneTypeOrNull!!))
                 data.addDeclaration(cvar.toLocalVarDecl())
-                data.addStatement(
-                    Stmt.If(
-                        cond,
-                        thenCtx.block,
-                        elseCtx.block
-                    )
-                )
-                cvar.toLocalVar()
+                visitWhenBranches(whenExpression.branches, data, cvar)
             }
             else -> TODO("Can't embed $whenExpression since when expressions with a subject other than null are not yet supported.")
         }
