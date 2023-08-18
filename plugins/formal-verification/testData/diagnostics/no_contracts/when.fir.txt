@@ -93,9 +93,3 @@ FILE: when.kt
 
         ^empty_when Int(1)
     }
-    public final fun empty_when_expression(n: R|kotlin/Nothing|): R|kotlin/Int| {
-        lval x: R|kotlin/Unit| = when (R|<local>/n|) {
-        }
-
-        ^empty_when_expression Int(1)
-    }

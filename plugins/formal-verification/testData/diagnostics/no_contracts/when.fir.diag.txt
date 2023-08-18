@@ -94,20 +94,14 @@ field special$function_object_call_counter: Int
 method global$pkg_$when_return(local$a: Bool, local$b: Bool, local$c: Bool)
   returns (ret$: Int)
 {
-  var anonymous$1: dom$Unit
   if (local$a) {
     ret$ := 0
-    anonymous$1 := dom$Unit$element()
   } elseif (local$b) {
     ret$ := 1
-    anonymous$1 := dom$Unit$element()
   } elseif (local$c) {
     ret$ := 2
-    anonymous$1 := dom$Unit$element()
   } else {
-    ret$ := 3
-    anonymous$1 := dom$Unit$element()
-  }
+    ret$ := 3}
 }
 
 /when.kt:(323,341): info: Generated Viper text for single_branch_when:
@@ -152,11 +146,9 @@ field special$function_object_call_counter: Int
 method global$pkg_$single_branch_when(local$a: Bool) returns (ret$: Int)
 {
   var local$x: Int
-  var anonymous$1: dom$Unit
   local$x := 1
   if (local$a) {
     local$x := 2
-    anonymous$1 := dom$Unit$element()
   }
   ret$ := local$x
 }
@@ -204,17 +196,13 @@ method global$pkg_$no_else_when(local$a: Bool, local$b: Bool, local$c: Bool)
   returns (ret$: Int)
 {
   var local$y: Int
-  var anonymous$1: dom$Unit
   local$y := 0
   if (local$a) {
     local$y := 1
-    anonymous$1 := dom$Unit$element()
   } elseif (local$b) {
     local$y := 2
-    anonymous$1 := dom$Unit$element()
   } elseif (local$c) {
     local$y := 3
-    anonymous$1 := dom$Unit$element()
   }
   ret$ := local$y
 }
@@ -371,56 +359,5 @@ field special$function_object_call_counter: Int
 
 method global$pkg_$empty_when() returns (ret$: Int)
 {
-  var anonymous$1: dom$Unit
-  ret$ := 1
-}
-
-/when.kt:(914,935): info: Generated Viper text for empty_when_expression:
-domain dom$Unit  {
-
-  function dom$Unit$element(): dom$Unit
-}
-
-domain dom$Nullable[T]  {
-
-  function dom$Nullable$null(): dom$Nullable[T]
-
-  function dom$Nullable$nullable_of(x: T): dom$Nullable[T]
-
-  function dom$Nullable$val_of(nx: dom$Nullable[T]): T
-
-  axiom dom$Nullable$some_not_null {
-    (forall x: T ::
-      { (dom$Nullable$nullable_of(x): dom$Nullable[T]) }
-      (dom$Nullable$nullable_of(x): dom$Nullable[T]) !=
-      (dom$Nullable$null(): dom$Nullable[T]))
-  }
-
-  axiom dom$Nullable$val_of_nullable_of_val {
-    (forall x: T ::
-      { (dom$Nullable$val_of((dom$Nullable$nullable_of(x): dom$Nullable[T])): T) }
-      (dom$Nullable$val_of((dom$Nullable$nullable_of(x): dom$Nullable[T])): T) ==
-      x)
-  }
-
-  axiom dom$Nullable$nullable_of_val_of_nullable {
-    (forall nx: dom$Nullable[T] ::
-      { (dom$Nullable$nullable_of((dom$Nullable$val_of(nx): T)): dom$Nullable[T]) }
-      nx != (dom$Nullable$null(): dom$Nullable[T]) ==>
-      (dom$Nullable$nullable_of((dom$Nullable$val_of(nx): T)): dom$Nullable[T]) ==
-      nx)
-  }
-}
-
-field special$function_object_call_counter: Int
-
-method global$pkg_$empty_when_expression(local$n: dom$Unit)
-  returns (ret$: Int)
-  requires false
-  ensures false
-{
-  var anonymous$1: dom$Unit
-  var local$x: dom$Unit
-  local$x := anonymous$1
   ret$ := 1
 }
