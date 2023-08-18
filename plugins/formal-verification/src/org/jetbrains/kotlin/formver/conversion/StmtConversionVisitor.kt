@@ -80,7 +80,7 @@ class StmtConversionVisitor : FirVisitor<Exp, StmtConversionContext>() {
         whenSubjectExpression.whenRef.value.subject?.accept(this, data)
             ?: throw Exception("FirWhenSubjectExpression $whenSubjectExpression has a null subject")
 
-    private fun convertWhenBranches(whenBranches: List<FirWhenBranch>, data: StmtConversionContext, cvar: ConvertedVar) {
+    private fun convertWhenBranches(whenBranches: List<FirWhenBranch>, data: StmtConversionContext, cvar: VariableEmbedding) {
         // NOTE: I think that this will also work with "in" or "is" conditions when implemented, but I'm not 100% sure
         if (whenBranches.isEmpty()) return // base case, there are no branches
 
@@ -102,7 +102,7 @@ class StmtConversionVisitor : FirVisitor<Exp, StmtConversionContext>() {
     }
 
     override fun visitWhenExpression(whenExpression: FirWhenExpression, data: StmtConversionContext): Exp {
-        val cvar = data.newAnonVar(data.convertType(whenExpression.typeRef.coneTypeOrNull!!))
+        val cvar = data.newAnonVar(data.embedType(whenExpression.typeRef.coneTypeOrNull!!))
         data.addDeclaration(cvar.toLocalVarDecl())
         convertWhenBranches(whenExpression.branches, data, cvar)
         return cvar.toLocalVar()

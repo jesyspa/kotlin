@@ -10,7 +10,7 @@ domain dom$Nullable[T]  {
 
   function dom$Nullable$nullable_of(x: T): dom$Nullable[T]
 
-  function dom$Nullable$val_of(x: dom$Nullable[T]): T
+  function dom$Nullable$val_of(nx: dom$Nullable[T]): T
 
   axiom dom$Nullable$some_not_null {
     (forall x: T ::
@@ -27,13 +27,15 @@ domain dom$Nullable[T]  {
   }
 
   axiom dom$Nullable$nullable_of_val_of_nullable {
-    (forall x: dom$Nullable[T] ::
-      { (dom$Nullable$nullable_of((dom$Nullable$val_of(x): T)): dom$Nullable[T]) }
-      x != (dom$Nullable$null(): dom$Nullable[T]) ==>
-      (dom$Nullable$nullable_of((dom$Nullable$val_of(x): T)): dom$Nullable[T]) ==
-      x)
+    (forall nx: dom$Nullable[T] ::
+      { (dom$Nullable$nullable_of((dom$Nullable$val_of(nx): T)): dom$Nullable[T]) }
+      nx != (dom$Nullable$null(): dom$Nullable[T]) ==>
+      (dom$Nullable$nullable_of((dom$Nullable$val_of(nx): T)): dom$Nullable[T]) ==
+      nx)
   }
 }
+
+field special$function_object_call_counter: Int
 
 method global$pkg_$return_when(local$a: Bool, local$b: Bool, local$c: Bool)
   returns (ret$: Int)
@@ -229,7 +231,7 @@ domain dom$Nullable[T]  {
 
   function dom$Nullable$nullable_of(x: T): dom$Nullable[T]
 
-  function dom$Nullable$val_of(x: dom$Nullable[T]): T
+  function dom$Nullable$val_of(nx: dom$Nullable[T]): T
 
   axiom dom$Nullable$some_not_null {
     (forall x: T ::
@@ -246,13 +248,15 @@ domain dom$Nullable[T]  {
   }
 
   axiom dom$Nullable$nullable_of_val_of_nullable {
-    (forall x: dom$Nullable[T] ::
-      { (dom$Nullable$nullable_of((dom$Nullable$val_of(x): T)): dom$Nullable[T]) }
-      x != (dom$Nullable$null(): dom$Nullable[T]) ==>
-      (dom$Nullable$nullable_of((dom$Nullable$val_of(x): T)): dom$Nullable[T]) ==
-      x)
+    (forall nx: dom$Nullable[T] ::
+      { (dom$Nullable$nullable_of((dom$Nullable$val_of(nx): T)): dom$Nullable[T]) }
+      nx != (dom$Nullable$null(): dom$Nullable[T]) ==>
+      (dom$Nullable$nullable_of((dom$Nullable$val_of(nx): T)): dom$Nullable[T]) ==
+      nx)
   }
 }
+
+field special$function_object_call_counter: Int
 
 method global$pkg_$when_with_subject_var(local$x: Int) returns (ret$: Int)
 {
@@ -278,7 +282,7 @@ domain dom$Nullable[T]  {
 
   function dom$Nullable$nullable_of(x: T): dom$Nullable[T]
 
-  function dom$Nullable$val_of(x: dom$Nullable[T]): T
+  function dom$Nullable$val_of(nx: dom$Nullable[T]): T
 
   axiom dom$Nullable$some_not_null {
     (forall x: T ::
@@ -295,13 +299,15 @@ domain dom$Nullable[T]  {
   }
 
   axiom dom$Nullable$nullable_of_val_of_nullable {
-    (forall x: dom$Nullable[T] ::
-      { (dom$Nullable$nullable_of((dom$Nullable$val_of(x): T)): dom$Nullable[T]) }
-      x != (dom$Nullable$null(): dom$Nullable[T]) ==>
-      (dom$Nullable$nullable_of((dom$Nullable$val_of(x): T)): dom$Nullable[T]) ==
-      x)
+    (forall nx: dom$Nullable[T] ::
+      { (dom$Nullable$nullable_of((dom$Nullable$val_of(nx): T)): dom$Nullable[T]) }
+      nx != (dom$Nullable$null(): dom$Nullable[T]) ==>
+      (dom$Nullable$nullable_of((dom$Nullable$val_of(nx): T)): dom$Nullable[T]) ==
+      nx)
   }
 }
+
+field special$function_object_call_counter: Int
 
 method global$pkg_$when_with_subject_var(local$x: Int) returns (ret$: Int)
 
@@ -336,7 +342,7 @@ domain dom$Nullable[T]  {
 
   function dom$Nullable$nullable_of(x: T): dom$Nullable[T]
 
-  function dom$Nullable$val_of(x: dom$Nullable[T]): T
+  function dom$Nullable$val_of(nx: dom$Nullable[T]): T
 
   axiom dom$Nullable$some_not_null {
     (forall x: T ::
@@ -353,13 +359,15 @@ domain dom$Nullable[T]  {
   }
 
   axiom dom$Nullable$nullable_of_val_of_nullable {
-    (forall x: dom$Nullable[T] ::
-      { (dom$Nullable$nullable_of((dom$Nullable$val_of(x): T)): dom$Nullable[T]) }
-      x != (dom$Nullable$null(): dom$Nullable[T]) ==>
-      (dom$Nullable$nullable_of((dom$Nullable$val_of(x): T)): dom$Nullable[T]) ==
-      x)
+    (forall nx: dom$Nullable[T] ::
+      { (dom$Nullable$nullable_of((dom$Nullable$val_of(nx): T)): dom$Nullable[T]) }
+      nx != (dom$Nullable$null(): dom$Nullable[T]) ==>
+      (dom$Nullable$nullable_of((dom$Nullable$val_of(nx): T)): dom$Nullable[T]) ==
+      nx)
   }
 }
+
+field special$function_object_call_counter: Int
 
 method global$pkg_$empty_when() returns (ret$: Int)
 {
@@ -379,7 +387,7 @@ domain dom$Nullable[T]  {
 
   function dom$Nullable$nullable_of(x: T): dom$Nullable[T]
 
-  function dom$Nullable$val_of(x: dom$Nullable[T]): T
+  function dom$Nullable$val_of(nx: dom$Nullable[T]): T
 
   axiom dom$Nullable$some_not_null {
     (forall x: T ::
@@ -396,13 +404,15 @@ domain dom$Nullable[T]  {
   }
 
   axiom dom$Nullable$nullable_of_val_of_nullable {
-    (forall x: dom$Nullable[T] ::
-      { (dom$Nullable$nullable_of((dom$Nullable$val_of(x): T)): dom$Nullable[T]) }
-      x != (dom$Nullable$null(): dom$Nullable[T]) ==>
-      (dom$Nullable$nullable_of((dom$Nullable$val_of(x): T)): dom$Nullable[T]) ==
-      x)
+    (forall nx: dom$Nullable[T] ::
+      { (dom$Nullable$nullable_of((dom$Nullable$val_of(nx): T)): dom$Nullable[T]) }
+      nx != (dom$Nullable$null(): dom$Nullable[T]) ==>
+      (dom$Nullable$nullable_of((dom$Nullable$val_of(nx): T)): dom$Nullable[T]) ==
+      nx)
   }
 }
+
+field special$function_object_call_counter: Int
 
 method global$pkg_$empty_when_expression(local$n: dom$Unit)
   returns (ret$: Int)
