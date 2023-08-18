@@ -76,46 +76,36 @@ class StmtConversionVisitor : FirVisitor<Exp, StmtConversionContext>() {
             else -> TODO("Constant Expression of type ${constExpression.kind} is not yet implemented.")
         }
 
-    override fun visitWhenSubjectExpression(whenSubjectExpression: FirWhenSubjectExpression, data: StmtConversionContext): Exp {
-        return whenSubjectExpression.whenRef.value.subject?.accept(this, data)
+    override fun visitWhenSubjectExpression(whenSubjectExpression: FirWhenSubjectExpression, data: StmtConversionContext): Exp =
+        whenSubjectExpression.whenRef.value.subject?.accept(this, data)
             ?: throw Exception("FirWhenSubjectExpression $whenSubjectExpression has a null subject")
-    }
 
-    private fun visitWhenBranches(whenBranches: List<FirWhenBranch>, data: StmtConversionContext, cvar: ConvertedVar): Exp {
+    private fun convertWhenBranches(whenBranches: List<FirWhenBranch>, data: StmtConversionContext, cvar: ConvertedVar) {
         // NOTE: I think that this will also work with "in" or "is" conditions when implemented, but I'm not 100% sure
+        if (whenBranches.isEmpty()) return // base case, there are no branches
+
         val cond = whenBranches[0].condition.accept(this, data)
         val thenCtx = StmtConverter(data)
+        val elseCtx = StmtConverter(data)
         val thenResult = whenBranches[0].result.accept(this, thenCtx)
         thenCtx.addStatement(Stmt.LocalVarAssign(cvar.toLocalVar(), thenResult))
-        val elseBranch =
-            when {
-                // When last branch is not an else
-                whenBranches.size == 1 -> Stmt.Seqn(listOf(), listOf())
-                // When last branch is an else
-                whenBranches.size == 2 && whenBranches[1].condition is FirElseIfTrueCondition -> {
-                    val elseCtx = StmtConverter(data)
-                    val elseResult = whenBranches[1].result.accept(this, elseCtx)
-                    elseCtx.addStatement(Stmt.LocalVarAssign(cvar.toLocalVar(), elseResult))
-                    elseCtx.block
-                }
-                // Recursive case
-                else -> {
-                    val elseCtx = StmtConverter(data)
-                    visitWhenBranches(whenBranches.drop(1), elseCtx, cvar)
-                    elseCtx.block
-                }
-            }
-        data.addStatement(Stmt.If(cond, thenCtx.block, elseBranch))
-        return cvar.toLocalVar()
+
+        if (whenBranches.size == 2 && whenBranches[1].condition is FirElseIfTrueCondition) {
+            // When last branch is an else
+            val elseResult = whenBranches[1].result.accept(this, elseCtx)
+            elseCtx.addStatement(Stmt.LocalVarAssign(cvar.toLocalVar(), elseResult))
+        } else {
+            // Recursive case
+            convertWhenBranches(whenBranches.drop(1), elseCtx, cvar)
+        }
+        data.addStatement(Stmt.If(cond, thenCtx.block, elseCtx.block))
     }
 
     override fun visitWhenExpression(whenExpression: FirWhenExpression, data: StmtConversionContext): Exp {
-        if (whenExpression.branches.isEmpty()) {
-            throw Exception("When expression $whenExpression has no branches")
-        }
         val cvar = data.newAnonVar(data.convertType(whenExpression.typeRef.coneTypeOrNull!!))
         data.addDeclaration(cvar.toLocalVarDecl())
-        return visitWhenBranches(whenExpression.branches, data, cvar)
+        convertWhenBranches(whenExpression.branches, data, cvar)
+        return cvar.toLocalVar()
     }
 
     override fun visitPropertyAccessExpression(

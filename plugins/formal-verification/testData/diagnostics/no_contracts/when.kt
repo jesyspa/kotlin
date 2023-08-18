@@ -49,3 +49,13 @@ fun <!VIPER_TEXT!>when_with_subject_call<!>(x: Int): Int {
         else -> 42
     }
 }
+
+fun <!VIPER_TEXT!>empty_when<!>(): Int {
+    when { }
+    return 1
+}
+
+fun <!VIPER_TEXT!>empty_when_expression<!>(n: Nothing): Int {
+    val x = when(n){ }
+    return 1
+}

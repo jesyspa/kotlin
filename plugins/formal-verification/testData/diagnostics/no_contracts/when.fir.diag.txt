@@ -323,3 +323,94 @@ method global$pkg_$when_with_subject_call(local$x: Int) returns (ret$: Int)
   }
   ret$ := anonymous$1
 }
+
+/when.kt:(861,871): info: Generated Viper text for empty_when:
+domain dom$Unit  {
+
+  function dom$Unit$element(): dom$Unit
+}
+
+domain dom$Nullable[T]  {
+
+  function dom$Nullable$null(): dom$Nullable[T]
+
+  function dom$Nullable$nullable_of(x: T): dom$Nullable[T]
+
+  function dom$Nullable$val_of(x: dom$Nullable[T]): T
+
+  axiom dom$Nullable$some_not_null {
+    (forall x: T ::
+      { (dom$Nullable$nullable_of(x): dom$Nullable[T]) }
+      (dom$Nullable$nullable_of(x): dom$Nullable[T]) !=
+      (dom$Nullable$null(): dom$Nullable[T]))
+  }
+
+  axiom dom$Nullable$val_of_nullable_of_val {
+    (forall x: T ::
+      { (dom$Nullable$val_of((dom$Nullable$nullable_of(x): dom$Nullable[T])): T) }
+      (dom$Nullable$val_of((dom$Nullable$nullable_of(x): dom$Nullable[T])): T) ==
+      x)
+  }
+
+  axiom dom$Nullable$nullable_of_val_of_nullable {
+    (forall x: dom$Nullable[T] ::
+      { (dom$Nullable$nullable_of((dom$Nullable$val_of(x): T)): dom$Nullable[T]) }
+      x != (dom$Nullable$null(): dom$Nullable[T]) ==>
+      (dom$Nullable$nullable_of((dom$Nullable$val_of(x): T)): dom$Nullable[T]) ==
+      x)
+  }
+}
+
+method global$pkg_$empty_when() returns (ret$: Int)
+{
+  var anonymous$1: dom$Unit
+  ret$ := 1
+}
+
+/when.kt:(914,935): info: Generated Viper text for empty_when_expression:
+domain dom$Unit  {
+
+  function dom$Unit$element(): dom$Unit
+}
+
+domain dom$Nullable[T]  {
+
+  function dom$Nullable$null(): dom$Nullable[T]
+
+  function dom$Nullable$nullable_of(x: T): dom$Nullable[T]
+
+  function dom$Nullable$val_of(x: dom$Nullable[T]): T
+
+  axiom dom$Nullable$some_not_null {
+    (forall x: T ::
+      { (dom$Nullable$nullable_of(x): dom$Nullable[T]) }
+      (dom$Nullable$nullable_of(x): dom$Nullable[T]) !=
+      (dom$Nullable$null(): dom$Nullable[T]))
+  }
+
+  axiom dom$Nullable$val_of_nullable_of_val {
+    (forall x: T ::
+      { (dom$Nullable$val_of((dom$Nullable$nullable_of(x): dom$Nullable[T])): T) }
+      (dom$Nullable$val_of((dom$Nullable$nullable_of(x): dom$Nullable[T])): T) ==
+      x)
+  }
+
+  axiom dom$Nullable$nullable_of_val_of_nullable {
+    (forall x: dom$Nullable[T] ::
+      { (dom$Nullable$nullable_of((dom$Nullable$val_of(x): T)): dom$Nullable[T]) }
+      x != (dom$Nullable$null(): dom$Nullable[T]) ==>
+      (dom$Nullable$nullable_of((dom$Nullable$val_of(x): T)): dom$Nullable[T]) ==
+      x)
+  }
+}
+
+method global$pkg_$empty_when_expression(local$n: dom$Unit)
+  returns (ret$: Int)
+  requires false
+  ensures false
+{
+  var anonymous$1: dom$Unit
+  var local$x: dom$Unit
+  local$x := anonymous$1
+  ret$ := 1
+}
