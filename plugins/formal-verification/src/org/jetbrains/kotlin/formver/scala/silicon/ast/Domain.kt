@@ -61,7 +61,7 @@ class DomainFunc(
         )
 
     operator fun invoke(vararg args: Exp): Exp.DomainFuncApp =
-        Exp.DomainFuncApp(name, args.toList(), typeArgs.associateWith { it }, typ)
+        Exp.DomainFuncApp(this, args.toList(), typeArgs.associateWith { it })
 }
 
 class DomainAxiom(
@@ -117,7 +117,7 @@ abstract class Domain(
             trafos.toViper()
         )
 
-    fun toType(typeParamSubst: Map<Type.TypeVar, Type> = typeVars.associateWith { it }): Type.Domain =
+    fun toType(typeParamSubst: Map<Type.TypeVar, Type> = emptyMap()): Type.Domain =
         Type.Domain(name.mangled, typeVars, typeParamSubst)
 
     fun createDomainFunc(funcName: String, args: List<Declaration.LocalVarDecl>, type: Type, unique: Boolean = false) =
@@ -129,11 +129,11 @@ abstract class Domain(
     fun funcApp(
         func: DomainFunc,
         args: List<Exp>,
-        typeVarMap: Map<Type.TypeVar, Type> = typeVars.associateWith { it },
+        typeVarMap: Map<Type.TypeVar, Type>,
         pos: Position = Position.NoPosition,
         info: Info = Info.NoInfo,
         trafos: Trafos = Trafos.NoTrafos,
-    ): Exp.DomainFuncApp = Exp.DomainFuncApp(func.name, args, typeVarMap, func.typ, pos, info, trafos)
+    ): Exp.DomainFuncApp = Exp.DomainFuncApp(func, args, typeVarMap, pos, info, trafos)
 }
 
 abstract class BuiltinDomain(

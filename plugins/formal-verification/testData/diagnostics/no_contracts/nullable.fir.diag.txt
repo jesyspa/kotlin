@@ -1,4 +1,14 @@
-/nullable.kt:(4,22): info: Generated Viper text for use_nullable_twice:
+/nullable.kt:(4,14): info: Generated Viper text for smart_cast:
+method global$pkg_$smart_cast(local$x: dom$Nullable[Int])
+  returns (ret$: Int)
+{
+  if (local$x == (dom$Nullable$null(): dom$Nullable[Int])) {
+    ret$ := 0
+  } else {
+    ret$ := (dom$Nullable$val_of(local$x): Int)}
+}
+
+/nullable.kt:(112,130): info: Generated Viper text for use_nullable_twice:
 method global$pkg_$use_nullable_twice(local$x: dom$Nullable[Int])
   returns (ret$: dom$Nullable[Int])
 {
@@ -9,7 +19,7 @@ method global$pkg_$use_nullable_twice(local$x: dom$Nullable[Int])
   ret$ := local$a
 }
 
-/nullable.kt:(88,111): info: Generated Viper text for pass_nullable_parameter:
+/nullable.kt:(196,219): info: Generated Viper text for pass_nullable_parameter:
 method global$pkg_$use_nullable_twice(local$x: dom$Nullable[Int])
   returns (ret$: dom$Nullable[Int])
 

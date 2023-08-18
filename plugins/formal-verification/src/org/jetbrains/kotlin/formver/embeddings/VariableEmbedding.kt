@@ -7,8 +7,9 @@ package org.jetbrains.kotlin.formver.embeddings
 
 import org.jetbrains.kotlin.formver.scala.MangledName
 import org.jetbrains.kotlin.formver.scala.silicon.ast.*
+import org.jetbrains.kotlin.formver.scala.silicon.ast.Exp
 
-class VariableEmbedding(val name: MangledName, val type: TypeEmbedding) {
+class VariableEmbedding(val name: MangledName, override val type: TypeEmbedding) : ExpEmbedding {
     fun toLocalVarDecl(
         pos: Position = Position.NoPosition,
         info: Info = Info.NoInfo,
@@ -20,6 +21,8 @@ class VariableEmbedding(val name: MangledName, val type: TypeEmbedding) {
         info: Info = Info.NoInfo,
         trafos: Trafos = Trafos.NoTrafos,
     ): Exp.LocalVar = Exp.LocalVar(name, type.type, pos, info, trafos)
+
+    override val viperExp: Exp.LocalVar = toLocalVar()
 
     fun invariants(): List<Exp> = type.invariants(toLocalVar())
     fun dynamicInvariants(): List<Exp> = type.dynamicInvariants(toLocalVar())

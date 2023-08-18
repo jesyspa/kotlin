@@ -329,24 +329,21 @@ sealed interface Exp : IntoViper<viper.silver.ast.Exp> {
      * supplied.
      */
     data class DomainFuncApp(
-        val funcname: DomainFuncName,
+        val function: DomainFunc,
         val args: List<Exp>,
         val typeVarMap: Map<Type.TypeVar, Type>,
-        val typ: Type,
         val pos: Position = Position.NoPosition,
         val info: Info = Info.NoInfo,
         val trafos: Trafos = Trafos.NoTrafos,
     ) : Exp {
         private val scalaTypeVarMap = typeVarMap.mapKeys { it.key.toViper() }.mapValues { it.value.toViper() }.toScalaMap()
         override fun toViper(): viper.silver.ast.Exp =
-            DomainFuncApp(
-                funcname.mangled,
+            viper.silver.ast.DomainFuncApp.apply(
+                function.toViper(),
                 args.toViper().toScalaSeq(),
                 scalaTypeVarMap,
                 pos.toViper(),
                 info.toViper(),
-                typ.toViper().substitute(scalaTypeVarMap),
-                funcname.domainName.mangled,
                 trafos.toViper()
             )
     }

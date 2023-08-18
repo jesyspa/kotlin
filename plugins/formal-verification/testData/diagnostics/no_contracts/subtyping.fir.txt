@@ -1,0 +1,8 @@
+FILE: subtyping.kt
+    public final fun return_subtyping(): R|kotlin/Int?| {
+        ^return_subtyping Int(0)
+    }
+    public final fun assignment_subtyping(): R|kotlin/Unit| {
+        lvar x: R|kotlin/Boolean?| = Boolean(false)
+        R|<local>/x| = Boolean(true)
+    }

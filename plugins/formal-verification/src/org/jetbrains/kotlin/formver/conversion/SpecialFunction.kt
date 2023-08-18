@@ -5,10 +5,8 @@
 
 package org.jetbrains.kotlin.formver.conversion
 
-import org.jetbrains.kotlin.formver.scala.silicon.ast.Exp
-import org.jetbrains.kotlin.formver.scala.silicon.ast.Exp.*
+import org.jetbrains.kotlin.formver.embeddings.*
 import org.jetbrains.kotlin.formver.scala.silicon.ast.Stmt
-import org.jetbrains.kotlin.formver.scala.toScalaBigInt
 import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
@@ -24,35 +22,35 @@ object KotlinContractFunction : SpecialFunction {
 }
 
 interface SpecialFunctionImplementation : SpecialFunction {
-    fun convertCall(args: List<Exp>, ctx: StmtConversionContext): Exp
+    fun convertCall(args: List<ExpEmbedding>, ctx: StmtConversionContext): ExpEmbedding
 }
 
 object KotlinIntPlusFunctionImplementation : SpecialFunctionImplementation {
     override val callableId = CallableId(FqName("kotlin"), FqName("Int"), Name.identifier("plus"))
 
-    override fun convertCall(args: List<Exp>, ctx: StmtConversionContext): Exp =
+    override fun convertCall(args: List<ExpEmbedding>, ctx: StmtConversionContext): ExpEmbedding =
         Add(args[0], args[1])
 }
 
 object KotlinIntMinusFunctionImplementation : SpecialFunctionImplementation {
     override val callableId = CallableId(FqName("kotlin"), FqName("Int"), Name.identifier("minus"))
 
-    override fun convertCall(args: List<Exp>, ctx: StmtConversionContext): Exp =
+    override fun convertCall(args: List<ExpEmbedding>, ctx: StmtConversionContext): ExpEmbedding =
         Sub(args[0], args[1])
 }
 
 object KotlinIntTimesFunctionImplementation : SpecialFunctionImplementation {
     override val callableId = CallableId(FqName("kotlin"), FqName("Int"), Name.identifier("times"))
 
-    override fun convertCall(args: List<Exp>, ctx: StmtConversionContext): Exp =
+    override fun convertCall(args: List<ExpEmbedding>, ctx: StmtConversionContext): ExpEmbedding =
         Mul(args[0], args[1])
 }
 
 object KotlinIntDivFunctionImplementation : SpecialFunctionImplementation {
     override val callableId = CallableId(FqName("kotlin"), FqName("Int"), Name.identifier("div"))
 
-    override fun convertCall(args: List<Exp>, ctx: StmtConversionContext): Exp {
-        ctx.addStatement(Stmt.Inhale(NeCmp(args[1], IntLit(0.toScalaBigInt()))))
+    override fun convertCall(args: List<ExpEmbedding>, ctx: StmtConversionContext): ExpEmbedding {
+        ctx.addStatement(Stmt.Inhale(NeCmp(args[1], IntLit(0)).viperExp))
         return Div(args[0], args[1])
     }
 }
@@ -60,7 +58,7 @@ object KotlinIntDivFunctionImplementation : SpecialFunctionImplementation {
 object KotlinBooleanNotFunctionImplementation : SpecialFunctionImplementation {
     override val callableId = CallableId(FqName("kotlin"), FqName("Boolean"), Name.identifier("not"))
 
-    override fun convertCall(args: List<Exp>, ctx: StmtConversionContext): Exp =
+    override fun convertCall(args: List<ExpEmbedding>, ctx: StmtConversionContext): ExpEmbedding =
         Not(args[0])
 }
 

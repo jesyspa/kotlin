@@ -23,35 +23,63 @@ interface TypeEmbedding {
      * TODO: add support for these in loops, too.
      */
     fun dynamicInvariants(v: Exp): List<Exp> = emptyList()
+
+    fun isSubTypeOf(otherType: TypeEmbedding): Boolean
 }
 
-object UnitTypeEmbedding : TypeEmbedding {
+fun commonSuperType(type1: TypeEmbedding, type2: TypeEmbedding): TypeEmbedding =
+    when {
+        // Info: There are more nuanced situations like finding the common super type of Nothing? and Int which is Int?.
+        // These situations are not handled here
+        type1.isSubTypeOf(type2) -> type2
+        type2.isSubTypeOf(type1) -> type1
+        else -> throw IllegalArgumentException("Cannot find common super type of $type1 and $type2.")
+    }
+
+data object UnitTypeEmbedding : TypeEmbedding {
     override val type: Type = UnitDomain.toType()
+
+    override fun isSubTypeOf(otherType: TypeEmbedding): Boolean =
+        otherType is UnitTypeEmbedding || otherType is NullableTypeEmbedding && this.isSubTypeOf(otherType.elementType)
 }
 
-object NothingTypeEmbedding : TypeEmbedding {
+data object NothingTypeEmbedding : TypeEmbedding {
     override val type: Type = UnitDomain.toType()
 
     override fun invariants(v: Exp): List<Exp> = listOf(Exp.BoolLit(false))
+
+    override fun isSubTypeOf(otherType: TypeEmbedding): Boolean = true
 }
 
-object IntTypeEmbedding : TypeEmbedding {
+data object IntTypeEmbedding : TypeEmbedding {
     override val type: Type = Type.Int
+
+    override fun isSubTypeOf(otherType: TypeEmbedding): Boolean =
+        otherType is IntTypeEmbedding || otherType is NullableTypeEmbedding && this.isSubTypeOf(otherType.elementType)
 }
 
-object BooleanTypeEmbedding : TypeEmbedding {
+data object BooleanTypeEmbedding : TypeEmbedding {
     override val type: Type = Type.Bool
+
+    override fun isSubTypeOf(otherType: TypeEmbedding): Boolean =
+        otherType is BooleanTypeEmbedding || otherType is NullableTypeEmbedding && this.isSubTypeOf(otherType.elementType)
 }
 
-class TypeVarEmbedding(val name: String) : TypeEmbedding {
-    override val type: Type = Type.TypeVar(name)
+data class TypeVarEmbedding(val name: String) : TypeEmbedding {
+    override val type: Type.TypeVar = Type.TypeVar(name)
+
+    override fun isSubTypeOf(otherType: TypeEmbedding): Boolean =
+        otherType == this || otherType is NullableTypeEmbedding && this.isSubTypeOf(otherType.elementType)
 }
 
-class NullableTypeEmbedding(val elementType: TypeEmbedding) : TypeEmbedding {
-    override val type: Type = NullableDomain.toType(mapOf(NullableDomain.T to elementType.type))
+data class NullableTypeEmbedding(val elementType: TypeEmbedding) : TypeEmbedding {
+    override val type: Type = NullableDomain.nullableType(elementType.type)
+
+    override fun isSubTypeOf(otherType: TypeEmbedding): Boolean =
+        otherType is NullableTypeEmbedding && this.elementType.isSubTypeOf(otherType.elementType)
 }
 
-object FunctionTypeEmbedding : TypeEmbedding {
+data object FunctionTypeEmbedding : TypeEmbedding {
     override val type: Type = Type.Ref
 
     override fun invariants(v: Exp): List<Exp> =
@@ -64,5 +92,6 @@ object FunctionTypeEmbedding : TypeEmbedding {
                 v.fieldAccess(SpecialFields.FunctionObjectCallCounterField)
             )
         )
-}
 
+    override fun isSubTypeOf(otherType: TypeEmbedding): Boolean = false
+}
