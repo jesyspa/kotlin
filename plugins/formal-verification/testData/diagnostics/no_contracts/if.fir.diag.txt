@@ -39,14 +39,10 @@ field special$function_object_call_counter: Int
 
 method global$pkg_$simple_if() returns (ret$: Int)
 {
-  var anonymous$1: dom$Unit
   if (true) {
     ret$ := 0
-    anonymous$1 := dom$Unit$element()
   } else {
-    ret$ := 1
-    anonymous$1 := dom$Unit$element()
-  }
+    ret$ := 1}
 }
 
 /if.kt:(98,113): info: Generated Viper text for if_on_parameter:
@@ -90,14 +86,10 @@ field special$function_object_call_counter: Int
 
 method global$pkg_$if_on_parameter(local$b: Bool) returns (ret$: Int)
 {
-  var anonymous$1: dom$Unit
   if (local$b) {
     ret$ := 0
-    anonymous$1 := dom$Unit$element()
   } else {
-    ret$ := 1
-    anonymous$1 := dom$Unit$element()
-  }
+    ret$ := 1}
 }
 
 /if.kt:(205,221): info: Generated Viper text for if_as_expression:
