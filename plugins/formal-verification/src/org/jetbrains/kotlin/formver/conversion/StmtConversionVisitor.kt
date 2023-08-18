@@ -77,8 +77,8 @@ class StmtConversionVisitor : FirVisitor<Exp, StmtConversionContext>() {
         }
 
     override fun visitWhenSubjectExpression(whenSubjectExpression: FirWhenSubjectExpression, data: StmtConversionContext): Exp =
-        whenSubjectExpression.whenRef.value.subject?.accept(this, data)
-            ?: throw Exception("FirWhenSubjectExpression $whenSubjectExpression has a null subject")
+        // TODO: find a way to not evaluate subject multiple times if it is a function call
+        whenSubjectExpression.whenRef.value.subject!!.accept(this, data)
 
     private fun convertWhenBranches(whenBranches: List<FirWhenBranch>, data: StmtConversionContext, cvar: VariableEmbedding?) {
         // NOTE: I think that this will also work with "in" or "is" conditions when implemented, but I'm not 100% sure
@@ -90,6 +90,7 @@ class StmtConversionVisitor : FirVisitor<Exp, StmtConversionContext>() {
         val thenResult = whenBranches[0].result.accept(this, thenCtx)
         cvar?.let { thenCtx.addStatement(Stmt.LocalVarAssign(cvar.toLocalVar(), thenResult)) }
 
+        // TODO: probably there is a simpler way to do this
         if (whenBranches.size == 2 && whenBranches[1].condition is FirElseIfTrueCondition) {
             // When last branch is an else
             val elseResult = whenBranches[1].result.accept(this, elseCtx)
