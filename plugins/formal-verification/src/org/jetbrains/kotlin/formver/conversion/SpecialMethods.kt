@@ -19,7 +19,7 @@ object SpecialMethods {
         Add(Old(thisArg.fieldAccess(SpecialFields.FunctionObjectCallCounterField)), IntLit(1.toScalaBigInt())),
         thisArg.fieldAccess(SpecialFields.FunctionObjectCallCounterField)
     )
-    val invokeFunctionObject = Method(
+    val invokeFunctionObject = BuiltInMethod(
         FunctionObjectName,
         listOf(Declaration.LocalVarDecl(ThisVariableName, Type.Ref)),
         listOf(),
