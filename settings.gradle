@@ -138,6 +138,7 @@ include ":kotlin-allopen-compiler-plugin",
         ":kotlin-allopen-compiler-plugin.cli"
 
 include ":kotlin-formver-compiler-plugin",
+        ":kotlin-formver-compiler-plugin.embeddable",
         ":kotlin-formver-compiler-plugin.cli",
         ":kotlin-formver-compiler-plugin.common",
         ":kotlin-formver-compiler-plugin.core",
@@ -226,6 +227,7 @@ include ":kotlin-imports-dumper-compiler-plugin",
         ":kotlin-tooling-metadata",
         ":kotlin-tooling-core",
         ":kotlin-allopen",
+        ":kotlin-formver",
         ":kotlin-noarg",
         ":kotlin-sam-with-receiver",
         ":kotlin-assignment",
@@ -714,6 +716,7 @@ project(':kotlin-allopen-compiler-plugin.k2').projectDir = "$rootDir/plugins/all
 project(':kotlin-allopen-compiler-plugin.cli').projectDir = "$rootDir/plugins/allopen/allopen.cli" as File
 
 project(':kotlin-formver-compiler-plugin').projectDir = "$rootDir/plugins/formal-verification" as File
+project(':kotlin-formver-compiler-plugin.embeddable').projectDir = "$rootDir/plugins/formal-verification/formver.embeddable" as File
 project(':kotlin-formver-compiler-plugin.cli').projectDir = "$rootDir/plugins/formal-verification/formver.cli" as File
 project(':kotlin-formver-compiler-plugin.common').projectDir = "$rootDir/plugins/formal-verification/formver.common" as File
 project(':kotlin-formver-compiler-plugin.core').projectDir = "$rootDir/plugins/formal-verification/formver.core" as File
@@ -778,6 +781,7 @@ project(":gradle:regression-benchmarks").projectDir = "$rootDir/libraries/tools/
 project(':kotlin-tooling-metadata').projectDir = "$rootDir/libraries/tools/kotlin-tooling-metadata" as File
 project(':kotlin-tooling-core').projectDir = "$rootDir/libraries/tools/kotlin-tooling-core" as File
 project(':kotlin-allopen').projectDir = "$rootDir/libraries/tools/kotlin-allopen" as File
+project(':kotlin-formver').projectDir = "$rootDir/libraries/tools/kotlin-formver" as File
 project(':kotlin-noarg').projectDir = "$rootDir/libraries/tools/kotlin-noarg" as File
 project(':kotlin-sam-with-receiver').projectDir = "$rootDir/libraries/tools/kotlin-sam-with-receiver" as File
 project(':kotlin-assignment').projectDir = "$rootDir/libraries/tools/kotlin-assignment" as File
