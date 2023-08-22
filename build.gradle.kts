@@ -412,6 +412,7 @@ val gradlePluginProjects = listOf(
     ":kotlin-gradle-plugin-model",
     ":kotlin-gradle-plugin-tcs-android",
     ":kotlin-allopen",
+    ":kotlin-formver",
     ":kotlin-noarg",
     ":kotlin-sam-with-receiver",
     ":kotlin-parcelize-compiler",
