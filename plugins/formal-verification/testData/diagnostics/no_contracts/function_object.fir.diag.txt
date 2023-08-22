@@ -1,8 +1,71 @@
 /function_object.kt:(4,17): info: Generated Viper text for unit_function:
+method invoke$global$pkg_$unit_function$f(this: Ref)
+  returns (ret$: dom$Unit)
+  requires acc(this.special$function_object_call_counter, write)
+  ensures acc(this.special$function_object_call_counter, write)
+  ensures old(this.special$function_object_call_counter) + 1 ==
+    this.special$function_object_call_counter
+
+
 method global$pkg_$unit_function(local$f: Ref) returns (ret$: dom$Unit)
   requires acc(local$f.special$function_object_call_counter, write)
   ensures acc(local$f.special$function_object_call_counter, write)
   ensures old(local$f.special$function_object_call_counter) <=
     local$f.special$function_object_call_counter
 {
+}
+
+/function_object.kt:(72,92): info: Generated Viper text for function_object_call:
+method invoke$global$pkg_$function_object_call$g(this: Ref, arg$0: Bool, arg$1: Int)
+  returns (ret$: Int)
+  requires acc(this.special$function_object_call_counter, write)
+  ensures acc(this.special$function_object_call_counter, write)
+  ensures old(this.special$function_object_call_counter) + 1 ==
+    this.special$function_object_call_counter
+
+
+method global$pkg_$function_object_call(local$g: Ref) returns (ret$: Int)
+  requires acc(local$g.special$function_object_call_counter, write)
+  ensures acc(local$g.special$function_object_call_counter, write)
+  ensures old(local$g.special$function_object_call_counter) <=
+    local$g.special$function_object_call_counter
+{
+  var anonymous$1: Int
+  anonymous$1 := invoke$global$pkg_$function_object_call$g(local$g, true, 0)
+  ret$ := anonymous$1
+}
+
+/function_object.kt:(155,182): info: Generated Viper text for function_object_nested_call:
+method invoke$global$pkg_$function_object_nested_call$f(this: Ref, arg$0: Int)
+  returns (ret$: Int)
+  requires acc(this.special$function_object_call_counter, write)
+  ensures acc(this.special$function_object_call_counter, write)
+  ensures old(this.special$function_object_call_counter) + 1 ==
+    this.special$function_object_call_counter
+
+
+method invoke$global$pkg_$function_object_nested_call$g(this: Ref, arg$0: Bool)
+  returns (ret$: Int)
+  requires acc(this.special$function_object_call_counter, write)
+  ensures acc(this.special$function_object_call_counter, write)
+  ensures old(this.special$function_object_call_counter) + 1 ==
+    this.special$function_object_call_counter
+
+
+method global$pkg_$function_object_nested_call(local$f: Ref, local$g: Ref)
+  returns (ret$: Int)
+  requires acc(local$f.special$function_object_call_counter, write)
+  requires acc(local$g.special$function_object_call_counter, write)
+  ensures acc(local$f.special$function_object_call_counter, write)
+  ensures acc(local$g.special$function_object_call_counter, write)
+  ensures old(local$f.special$function_object_call_counter) <=
+    local$f.special$function_object_call_counter
+  ensures old(local$g.special$function_object_call_counter) <=
+    local$g.special$function_object_call_counter
+{
+  var anonymous$1: Int
+  var anonymous$2: Int
+  anonymous$1 := invoke$global$pkg_$function_object_nested_call$g(local$g, false)
+  anonymous$2 := invoke$global$pkg_$function_object_nested_call$f(local$f, anonymous$1)
+  ret$ := anonymous$2
 }

@@ -164,9 +164,21 @@ class StmtConversionVisitor : FirVisitor<Exp, StmtConversionContext>() {
         return returnExp
     }
 
+    override fun visitImplicitInvokeCall(implicitInvokeCall: FirImplicitInvokeCall, data: StmtConversionContext): Exp {
+        val args = getFunctionCallArguments(implicitInvokeCall).map { it.accept(this, data) }
+        val retType = implicitInvokeCall.calleeReference.toResolvedCallableSymbol()!!.resolvedReturnType
+        val returnVar = data.newAnonVar(data.embedType(retType))
+        val returnExp = returnVar.toLocalVar()
+        data.addDeclaration(returnVar.toLocalVarDecl())
+        val name = FunctionObjectName(
+            data.signature.name.mangled,
+            implicitInvokeCall.calleeReference.name.asString()
+        )
+        data.addStatement(Stmt.MethodCall(name.mangled, args, listOf(returnExp)))
+        return returnExp
+    }
+
     private fun getFunctionCallArguments(functionCall: FirFunctionCall): List<FirExpression> {
-        // I'm sure there's a nicer and more functional way of writing this, feel free to
-        // refactor if you know how. :)
         val receiver = if (functionCall.dispatchReceiver !is FirNoReceiverExpression) {
             listOf(functionCall.dispatchReceiver)
         } else {

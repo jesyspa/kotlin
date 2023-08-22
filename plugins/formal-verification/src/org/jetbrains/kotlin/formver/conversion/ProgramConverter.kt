@@ -54,6 +54,14 @@ class ProgramConverter(val session: FirSession) : ProgramConversionContext {
     private fun embedSignature(symbol: FirNamedFunctionSymbol): MethodSignatureEmbedding {
         val retType = symbol.resolvedReturnTypeRef.type
 
+        symbol.valueParameterSymbols.forEach {
+            if (it.resolvedReturnType.isSomeFunctionType(session)) {
+                val name = FunctionObjectName(symbol.callableId.embedName().mangled, it.name.asString())
+                // TODO: understand if there is a way to avoid the cast to ConeKotlinType
+                processFunctionObject(name, it.resolvedReturnType.typeArguments.map { x -> x as ConeKotlinType })
+            }
+        }
+
         val params = symbol.valueParameterSymbols.map {
             VariableEmbedding(it.embedName(), embedType(it.resolvedReturnType))
         }
@@ -92,4 +100,11 @@ class ProgramConverter(val session: FirSession) : ProgramConversionContext {
         }
         return signature
     }
+
+    private fun processFunctionObject(name: FunctionObjectName, arrowType: List<ConeKotlinType>) {
+        val args = arrowType.dropLast(1).map { embedType(it).type }
+        val returns = embedType(arrowType.last()).type
+        methods.getOrPut(name) { invokeFunctionObject(name, args, returns) }
+    }
+
 }

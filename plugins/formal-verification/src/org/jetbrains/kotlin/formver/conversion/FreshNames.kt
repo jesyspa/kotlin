@@ -26,3 +26,17 @@ data class SpecialFieldName(val name: String) : MangledName {
         get() = "special\$$name"
 }
 
+data class FunctionObjectName(val methodName: String, val functionName: String) : MangledName {
+    override val mangled: String
+        get() = "invoke\$$methodName\$$functionName"
+}
+
+data class FunctionObjectArgName(val n: Int) : MangledName {
+    override val mangled: String
+        get() = "arg\$$n"
+}
+
+data object ThisVariableName : MangledName {
+    override val mangled: String
+        get() = "this"
+}
