@@ -552,6 +552,7 @@ val gradlePluginProjects = listOf(
     ":kotlin-gradle-plugin-tcs-android",
     ":compose-compiler-gradle-plugin",
     ":kotlin-allopen",
+    ":kotlin-formver",
     ":kotlin-noarg",
     ":kotlin-power-assert",
     ":kotlin-sam-with-receiver",

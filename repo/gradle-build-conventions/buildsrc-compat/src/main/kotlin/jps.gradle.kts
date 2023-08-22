@@ -24,6 +24,7 @@ fun updateCompilerXml() {
         "libraries/tools/gradle",
         "libraries/tools/jdk-api-validator",
         "libraries/tools/kotlin-allopen",
+        "libraries/tools/kotlin-formver",
         "libraries/tools/kotlin-annotation-processing",
         "libraries/tools/kotlin-assignment",
         "libraries/tools/kotlin-bom",
