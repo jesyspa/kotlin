@@ -9,23 +9,26 @@ import org.jetbrains.kotlin.formver.scala.silicon.ast.*
 import org.jetbrains.kotlin.formver.scala.silicon.ast.Exp.*
 import org.jetbrains.kotlin.formver.scala.toScalaBigInt
 
-object SpecialMethods {
-    private val thisArg = LocalVar(ThisVariableName, Type.Ref)
-    private val acc = AccessPredicate.FieldAccessPredicate(
+private fun invokeFunctionObject(): BuiltInMethod {
+    val thisArg = LocalVar(AnonymousName(0), Type.Ref)
+    val acc = AccessPredicate.FieldAccessPredicate(
         thisArg.fieldAccess(SpecialFields.FunctionObjectCallCounterField),
         PermExp.FullPerm()
     )
-    private val calls = EqCmp(
+    val calls = EqCmp(
         Add(Old(thisArg.fieldAccess(SpecialFields.FunctionObjectCallCounterField)), IntLit(1.toScalaBigInt())),
         thisArg.fieldAccess(SpecialFields.FunctionObjectCallCounterField)
     )
-    val invokeFunctionObject = BuiltInMethod(
-        FunctionObjectName,
-        listOf(Declaration.LocalVarDecl(ThisVariableName, Type.Ref)),
+    return BuiltInMethod(
+        InvokeFunctionObjectName,
+        listOf(Declaration.LocalVarDecl(AnonymousName(0), Type.Ref)),
         listOf(),
         listOf(acc),
         listOf(acc, calls),
         null
     )
-    val all = listOf(invokeFunctionObject)
+}
+
+object SpecialMethods {
+    val all = listOf(invokeFunctionObject())
 }

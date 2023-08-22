@@ -26,12 +26,7 @@ data class SpecialFieldName(val name: String) : MangledName {
         get() = "special\$$name"
 }
 
-data object FunctionObjectName : MangledName {
+data object InvokeFunctionObjectName : MangledName {
     override val mangled: String
         get() = "special\$invoke_function_object"
-}
-
-data object ThisVariableName : MangledName {
-    override val mangled: String
-        get() = "this"
 }

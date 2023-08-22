@@ -170,7 +170,9 @@ class StmtConversionVisitor : FirVisitor<Exp, StmtConversionContext>() {
         val returnVar = data.newAnonVar(data.embedType(retType))
         val returnExp = returnVar.toLocalVar()
         data.addDeclaration(returnVar.toLocalVarDecl())
-        data.addStatement(Stmt.MethodCall(FunctionObjectName.mangled, args.take(1), listOf()))
+        // NOTE: Since it is only relevant to update the number of times that a function object is called,
+        // the function call invocation is intentionally not assigned to the return variable
+        data.addStatement(Stmt.MethodCall(InvokeFunctionObjectName.mangled, args.take(1), listOf()))
         return returnExp
     }
 
