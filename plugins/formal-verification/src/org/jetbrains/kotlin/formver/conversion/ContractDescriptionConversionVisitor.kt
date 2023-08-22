@@ -15,6 +15,7 @@ import org.jetbrains.kotlin.formver.embeddings.VariableEmbedding
 import org.jetbrains.kotlin.formver.scala.MangledName
 import org.jetbrains.kotlin.formver.scala.silicon.ast.Exp
 import org.jetbrains.kotlin.formver.scala.silicon.ast.Exp.*
+import org.jetbrains.kotlin.formver.scala.toScalaBigInt
 
 class ContractDescriptionConversionVisitor : KtContractDescriptionVisitor<Exp, MethodConversionContext, ConeKotlinType, ConeDiagnostic>() {
     private fun KtValueParameterReference<ConeKotlinType, ConeDiagnostic>.embeddedVar(data: MethodConversionContext): VariableEmbedding {
@@ -111,5 +112,20 @@ class ContractDescriptionConversionVisitor : KtContractDescriptionVisitor<Exp, M
         val effect = conditionalEffect.effect.accept(this, data)
         val cond = conditionalEffect.condition.accept(this, data)
         return Implies(effect, cond)
+    }
+
+    override fun visitCallsEffectDeclaration(
+        callsEffect: KtCallsEffectDeclaration<ConeKotlinType, ConeDiagnostic>,
+        data: MethodConversionContext
+    ): Exp {
+        val param = callsEffect.valueParameterReference.accept(this, data)
+        val fa = FieldAccess(param, SpecialFields.FunctionObjectCallCounterField)
+        return when (callsEffect.kind) {
+            EventOccurrencesRange.EXACTLY_ONCE -> EqCmp(
+                fa,
+                Add(Old(fa), IntLit(1.toScalaBigInt()))
+            )
+            else -> TODO("calls in place effect not implemented")
+        }
     }
 }

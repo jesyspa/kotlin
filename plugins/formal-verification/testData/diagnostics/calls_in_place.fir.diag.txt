@@ -1,0 +1,13 @@
+/calls_in_place.kt:(162,173): info: Generated Viper text for exactly_one:
+method global$pkg_$exactly_one(local$f: Ref) returns (ret$: Int)
+  requires acc(local$f.special$function_object_call_counter, write)
+  ensures acc(local$f.special$function_object_call_counter, write)
+  ensures old(local$f.special$function_object_call_counter) <=
+    local$f.special$function_object_call_counter
+  ensures local$f.special$function_object_call_counter ==
+    old(local$f.special$function_object_call_counter) + 1
+{
+  var anonymous$1: Int
+  special$invoke_function_object(local$f)
+  ret$ := anonymous$1
+}
