@@ -170,11 +170,7 @@ class StmtConversionVisitor : FirVisitor<Exp, StmtConversionContext>() {
         val returnVar = data.newAnonVar(data.embedType(retType))
         val returnExp = returnVar.toLocalVar()
         data.addDeclaration(returnVar.toLocalVarDecl())
-        val name = FunctionObjectName(
-            data.signature.name.mangled,
-            implicitInvokeCall.calleeReference.name.asString()
-        )
-        data.addStatement(Stmt.MethodCall(name.mangled, args, listOf(returnExp)))
+        data.addStatement(Stmt.MethodCall(FunctionObjectName.mangled, args.take(1), listOf()))
         return returnExp
     }
 

@@ -5,5 +5,5 @@ FILE: function_object.kt
         ^function_object_call R|<local>/g|.R|SubstitutionOverride<kotlin/Function2.invoke: R|kotlin/Int|>|(Boolean(true), Int(0))
     }
     public final fun function_object_nested_call(f: R|(kotlin/Int) -> kotlin/Int|, g: R|(kotlin/Boolean) -> kotlin/Int|): R|kotlin/Int| {
-        ^function_object_nested_call R|<local>/f|.R|SubstitutionOverride<kotlin/Function1.invoke: R|kotlin/Int|>|(R|<local>/g|.R|SubstitutionOverride<kotlin/Function1.invoke: R|kotlin/Int|>|(Boolean(false)))
+        ^function_object_nested_call R|<local>/f|.R|SubstitutionOverride<kotlin/Function1.invoke: R|kotlin/Int|>|(R|<local>/f|.R|SubstitutionOverride<kotlin/Function1.invoke: R|kotlin/Int|>|(R|<local>/g|.R|SubstitutionOverride<kotlin/Function1.invoke: R|kotlin/Int|>|(Boolean(false))))
     }

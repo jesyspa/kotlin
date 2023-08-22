@@ -6,5 +6,5 @@ fun <!VIPER_TEXT!>function_object_call<!>(g: (Boolean, Int) -> Int): Int {
 }
 
 fun <!VIPER_TEXT!>function_object_nested_call<!>(f: (Int) -> Int, g: (Boolean) -> Int): Int {
-    return f(g(false))
+    return f(f(g(false)))
 }
