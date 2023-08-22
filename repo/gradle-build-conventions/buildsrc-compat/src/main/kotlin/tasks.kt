@@ -31,6 +31,7 @@ import java.nio.file.Path
 val kotlinGradlePluginAndItsRequired = arrayOf(
     ":kotlin-assignment",
     ":kotlin-allopen",
+    ":kotlin-formver",
     ":kotlin-noarg",
     ":kotlin-sam-with-receiver",
     ":kotlin-lombok",
@@ -66,6 +67,7 @@ val kotlinGradlePluginAndItsRequired = arrayOf(
     ":examples:annotation-processor-example",
     ":kotlin-assignment-compiler-plugin.embeddable",
     ":kotlin-allopen-compiler-plugin.embeddable",
+    ":kotlin-formver-compiler-plugin.embeddable",
     ":kotlin-noarg-compiler-plugin.embeddable",
     ":kotlin-sam-with-receiver-compiler-plugin.embeddable",
     ":kotlin-lombok-compiler-plugin.embeddable",
