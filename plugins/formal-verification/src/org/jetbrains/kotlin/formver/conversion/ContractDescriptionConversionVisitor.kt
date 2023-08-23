@@ -119,13 +119,31 @@ class ContractDescriptionConversionVisitor : KtContractDescriptionVisitor<Exp, M
         data: MethodConversionContext
     ): Exp {
         val param = callsEffect.valueParameterReference.accept(this, data)
-        val fa = FieldAccess(param, SpecialFields.FunctionObjectCallCounterField)
+        val callsFieldAccess = FieldAccess(param, SpecialFields.FunctionObjectCallCounterField)
         return when (callsEffect.kind) {
-            EventOccurrencesRange.EXACTLY_ONCE -> EqCmp(
-                fa,
-                Add(Old(fa), IntLit(1.toScalaBigInt()))
+            // NOTE: case not supported for contracts
+            EventOccurrencesRange.ZERO -> EqCmp(
+                callsFieldAccess,
+                Old(callsFieldAccess)
             )
-            else -> TODO("calls in place effect not implemented")
+            EventOccurrencesRange.AT_MOST_ONCE -> LeCmp(
+                callsFieldAccess,
+                Add(Old(callsFieldAccess), IntLit(1.toScalaBigInt()))
+            )
+            EventOccurrencesRange.EXACTLY_ONCE -> EqCmp(
+                callsFieldAccess,
+                Add(Old(callsFieldAccess), IntLit(1.toScalaBigInt()))
+            )
+            EventOccurrencesRange.AT_LEAST_ONCE -> GtCmp(
+                callsFieldAccess,
+                Old(callsFieldAccess)
+            )
+            // NOTE: case not supported for contracts
+            EventOccurrencesRange.MORE_THAN_ONCE -> GtCmp(
+                callsFieldAccess,
+                Add(Old(callsFieldAccess), IntLit(1.toScalaBigInt()))
+            )
+            EventOccurrencesRange.UNKNOWN -> BoolLit(true)
         }
     }
 }
