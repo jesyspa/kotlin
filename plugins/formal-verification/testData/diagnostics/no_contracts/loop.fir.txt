@@ -7,3 +7,11 @@ FILE: loop.kt
 
         ^while_loop Int(0)
     }
+    public final fun returns_bool(): R|kotlin/Boolean| {
+        ^returns_bool Boolean(false)
+    }
+    public final fun while_function_condition(): R|kotlin/Unit| {
+        while(R|/returns_bool|()) {
+        }
+
+    }
