@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.formver.scala.silicon.ast
 
+import org.jetbrains.kotlin.formver.embeddings.TypeEmbedding
 import org.jetbrains.kotlin.formver.scala.MangledName
 
 /** Utility class to simplify writing domain functions and axioms.
@@ -15,11 +16,11 @@ import org.jetbrains.kotlin.formver.scala.MangledName
  * Note that we do not mangle the name here: it is assumed that these variables are only
  * used in very controlled scopes.
  */
-data class Var(val name: String, val type: Type) {
+data class Var(val name: String, val type: TypeEmbedding) {
     val mangledName = object : MangledName {
         override val mangled: String = name
     }
 
     fun use(): Exp.LocalVar = Exp.LocalVar(mangledName, type)
-    fun decl(): Declaration.LocalVarDecl = Declaration.LocalVarDecl(mangledName, type)
+    fun decl(): Declaration.LocalVarDecl = Declaration.LocalVarDecl(mangledName, type.type)
 }

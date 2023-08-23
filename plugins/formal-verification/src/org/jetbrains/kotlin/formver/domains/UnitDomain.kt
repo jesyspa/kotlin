@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.formver.domains
 
+import org.jetbrains.kotlin.formver.embeddings.UnitTypeEmbedding
 import org.jetbrains.kotlin.formver.scala.silicon.ast.*
 
 /** A representation of the unit type as a Viper domain.
@@ -17,7 +18,7 @@ import org.jetbrains.kotlin.formver.scala.silicon.ast.*
 object UnitDomain : BuiltinDomain("Unit") {
     override val typeVars: List<Type.TypeVar> = emptyList()
 
-    val elementFunc = createDomainFunc("element", emptyList(), toType())
+    val elementFunc = createDomainFunc("element", emptyList(), UnitTypeEmbedding)
     val element: Exp = elementFunc()
 
     override val functions: List<DomainFunc> = listOf(elementFunc)

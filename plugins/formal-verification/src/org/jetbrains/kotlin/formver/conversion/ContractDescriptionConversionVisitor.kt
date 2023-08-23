@@ -26,9 +26,9 @@ class ContractDescriptionConversionVisitor : KtContractDescriptionVisitor<Exp, M
     private fun VariableEmbedding.nullCmp(isNegated: Boolean): Exp {
         return if (type is NullableTypeEmbedding) {
             if (isNegated) {
-                NeCmp(toLocalVar(), NullableDomain.nullVal(type.elementType.type))
+                NeCmp(toLocalVar(), NullableDomain.nullVal(type.elementType))
             } else {
-                EqCmp(toLocalVar(), NullableDomain.nullVal(type.elementType.type))
+                EqCmp(toLocalVar(), NullableDomain.nullVal(type.elementType))
             }
         } else {
             BoolLit(isNegated)

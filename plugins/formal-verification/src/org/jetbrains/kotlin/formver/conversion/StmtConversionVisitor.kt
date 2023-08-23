@@ -19,16 +19,15 @@ import org.jetbrains.kotlin.fir.symbols.impl.FirPropertySymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirValueParameterSymbol
 import org.jetbrains.kotlin.fir.types.coneType
 import org.jetbrains.kotlin.fir.types.coneTypeOrNull
-import org.jetbrains.kotlin.fir.types.isNullable
 import org.jetbrains.kotlin.fir.visitors.FirVisitor
 import org.jetbrains.kotlin.formver.domains.NullableDomain
 import org.jetbrains.kotlin.formver.domains.UnitDomain
 import org.jetbrains.kotlin.formver.embeddings.BooleanTypeEmbedding
+import org.jetbrains.kotlin.formver.embeddings.NullableTypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.VariableEmbedding
 import org.jetbrains.kotlin.formver.embeddings.embedName
 import org.jetbrains.kotlin.formver.scala.silicon.ast.Exp
 import org.jetbrains.kotlin.formver.scala.silicon.ast.Stmt
-import org.jetbrains.kotlin.formver.scala.silicon.ast.Type
 import org.jetbrains.kotlin.formver.scala.toScalaBigInt
 import org.jetbrains.kotlin.text
 import org.jetbrains.kotlin.types.ConstantValueKind
@@ -68,11 +67,7 @@ class StmtConversionVisitor : FirVisitor<Exp, StmtConversionContext>() {
         when (constExpression.kind) {
             ConstantValueKind.Int -> Exp.IntLit((constExpression.value as Long).toInt().toScalaBigInt())
             ConstantValueKind.Boolean -> Exp.BoolLit(constExpression.value as Boolean)
-            /* TODO: For now null is always hard-coded to be of type Nullable[Int].
-             * This needs to be generalized and for this the type of the return expressions needs to be known.
-             * This type should maybe be passed as function argument.
-             */
-            ConstantValueKind.Null -> NullableDomain.nullVal(Type.Int)
+            ConstantValueKind.Null -> NullableDomain.nullVal((data.embedType(constExpression.typeRef.coneType) as NullableTypeEmbedding).elementType)
             else -> TODO("Constant Expression of type ${constExpression.kind} is not yet implemented.")
         }
 

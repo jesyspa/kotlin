@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.formver.scala.silicon.ast
 
+import org.jetbrains.kotlin.formver.embeddings.TypeEmbedding
 import org.jetbrains.kotlin.formver.scala.*
 import viper.silver.ast.AnonymousDomainAxiom
 import viper.silver.ast.NamedDomainAxiom
@@ -41,7 +42,7 @@ class DomainFunc(
     val name: DomainFuncName,
     val formalArgs: List<Declaration.LocalVarDecl>,
     val typeArgs: List<Type.TypeVar>,
-    val typ: Type,
+    val type: TypeEmbedding,
     val unique: Boolean,
     val pos: Position = Position.NoPosition,
     val info: Info = Info.NoInfo,
@@ -51,7 +52,7 @@ class DomainFunc(
         viper.silver.ast.DomainFunc(
             name.mangled,
             formalArgs.map { it.toViper() }.toScalaSeq(),
-            typ.toViper(),
+            type.type.toViper(),
             unique,
             null.toScalaOption(),
             pos.toViper(),
@@ -61,7 +62,7 @@ class DomainFunc(
         )
 
     operator fun invoke(vararg args: Exp): Exp.DomainFuncApp =
-        Exp.DomainFuncApp(name, args.toList(), typeArgs.associateWith { it }, typ)
+        Exp.DomainFuncApp(this, args.toList(), typeArgs.associateWith { it }, type)
 }
 
 class DomainAxiom(
@@ -120,7 +121,7 @@ abstract class Domain(
     fun toType(typeParamSubst: Map<Type.TypeVar, Type> = typeVars.associateWith { it }): Type.Domain =
         Type.Domain(name.mangled, typeVars, typeParamSubst)
 
-    fun createDomainFunc(funcName: String, args: List<Declaration.LocalVarDecl>, type: Type, unique: Boolean = false) =
+    fun createDomainFunc(funcName: String, args: List<Declaration.LocalVarDecl>, type: TypeEmbedding, unique: Boolean = false) =
         DomainFunc(DomainFuncName(this.name, funcName), args, typeVars, type, unique)
 
     fun createNamedDomainAxiom(axiomName: String, exp: Exp): DomainAxiom = DomainAxiom(NamedDomainAxiomLabel(this.name, axiomName), exp)
@@ -129,11 +130,12 @@ abstract class Domain(
     fun funcApp(
         func: DomainFunc,
         args: List<Exp>,
+        type: TypeEmbedding,
         typeVarMap: Map<Type.TypeVar, Type> = typeVars.associateWith { it },
         pos: Position = Position.NoPosition,
         info: Info = Info.NoInfo,
         trafos: Trafos = Trafos.NoTrafos,
-    ): Exp.DomainFuncApp = Exp.DomainFuncApp(func.name, args, typeVarMap, func.typ, pos, info, trafos)
+    ): Exp.DomainFuncApp = Exp.DomainFuncApp(func, args, typeVarMap, type, pos, info, trafos)
 }
 
 abstract class BuiltinDomain(

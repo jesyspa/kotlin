@@ -5,11 +5,11 @@
 
 package org.jetbrains.kotlin.formver.conversion
 
+import org.jetbrains.kotlin.formver.embeddings.IntTypeEmbedding
 import org.jetbrains.kotlin.formver.scala.silicon.ast.BuiltinField
-import org.jetbrains.kotlin.formver.scala.silicon.ast.Type
 
 object SpecialFields {
-    val FunctionObjectCallCounterField = BuiltinField(SpecialFieldName("function_object_call_counter"), Type.Int)
+    val FunctionObjectCallCounterField = BuiltinField(SpecialFieldName("function_object_call_counter"), IntTypeEmbedding)
     val all = listOf(
         FunctionObjectCallCounterField
     )

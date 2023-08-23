@@ -5,24 +5,25 @@
 
 package org.jetbrains.kotlin.formver.scala.silicon.ast
 
+import org.jetbrains.kotlin.formver.embeddings.TypeEmbedding
 import org.jetbrains.kotlin.formver.scala.IntoViper
 import org.jetbrains.kotlin.formver.scala.MangledName
 
 open class Field(
     val name: MangledName,
-    val type: Type,
+    val type: TypeEmbedding,
     val pos: Position = Position.NoPosition,
     val info: Info = Info.NoInfo,
     val trafos: Trafos = Trafos.NoTrafos,
 ) : IntoViper<viper.silver.ast.Field> {
     open val includeInShortDump: Boolean = true
     override fun toViper(): viper.silver.ast.Field =
-        viper.silver.ast.Field(name.mangled, type.toViper(), pos.toViper(), info.toViper(), trafos.toViper())
+        viper.silver.ast.Field(name.mangled, type.type.toViper(), pos.toViper(), info.toViper(), trafos.toViper())
 }
 
 class BuiltinField(
     name: MangledName,
-    type: Type,
+    type: TypeEmbedding,
     pos: Position = Position.NoPosition,
     info: Info = Info.NoInfo,
     trafos: Trafos = Trafos.NoTrafos,

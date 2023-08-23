@@ -19,7 +19,7 @@ class VariableEmbedding(val name: MangledName, val type: TypeEmbedding) {
         pos: Position = Position.NoPosition,
         info: Info = Info.NoInfo,
         trafos: Trafos = Trafos.NoTrafos,
-    ): Exp.LocalVar = Exp.LocalVar(name, type.type, pos, info, trafos)
+    ): Exp.LocalVar = Exp.LocalVar(name, type, pos, info, trafos)
 
     fun invariants(): List<Exp> = type.invariants(toLocalVar())
     fun dynamicInvariants(): List<Exp> = type.dynamicInvariants(toLocalVar())

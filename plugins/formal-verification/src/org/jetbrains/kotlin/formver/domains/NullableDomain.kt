@@ -6,6 +6,9 @@
 package org.jetbrains.kotlin.formver.domains
 
 import org.jetbrains.kotlin.formver.domains.NullableDomain.T
+import org.jetbrains.kotlin.formver.embeddings.NullableTypeEmbedding
+import org.jetbrains.kotlin.formver.embeddings.TypeEmbedding
+import org.jetbrains.kotlin.formver.embeddings.TypeVarEmbedding
 import org.jetbrains.kotlin.formver.scala.silicon.ast.*
 import org.jetbrains.kotlin.formver.scala.silicon.ast.Exp.*
 import org.jetbrains.kotlin.formver.scala.silicon.ast.Exp.Companion.Forall1
@@ -35,30 +38,29 @@ import org.jetbrains.kotlin.formver.scala.silicon.ast.Exp.Companion.Trigger1
  */
 
 object NullableDomain : BuiltinDomain("Nullable") {
-    val T = Type.TypeVar("T")
-    override val typeVars: List<Type.TypeVar> = listOf(T)
-    val Nullable: Type = this.toType()
+    val T = TypeVarEmbedding("T")
+    override val typeVars: List<Type.TypeVar> = listOf(T.type)
 
     private val xVar = Var("x", T)
-    private val nxVar = Var("nx", Nullable)
+    private val nxVar = Var("nx", NullableTypeEmbedding(T))
 
-    val nullFunc = createDomainFunc("null", emptyList(), Nullable)
-    val nullableOf = createDomainFunc("nullable_of", listOf(xVar.decl()), Nullable)
+    val nullFunc = createDomainFunc("null", emptyList(), NullableTypeEmbedding(T))
+    val nullableOf = createDomainFunc("nullable_of", listOf(xVar.decl()), NullableTypeEmbedding(T))
     val valOf = createDomainFunc("val_of", listOf(nxVar.decl()), T)
     override val functions: List<DomainFunc> = listOf(nullFunc, nullableOf, valOf)
 
     // You need to specify the type if the expression expects a certain nullable type,
     // e.g. in the expression x == null_val(), if x is of type type Nullable[Int], then
     // null_val() also needs to of type Nullable[Int] and can't be of type Nullable[T].
-    fun nullVal(elemType: Type): DomainFuncApp =
-        funcApp(nullFunc, emptyList(), mapOf(T to elemType))
+    fun nullVal(elemType: TypeEmbedding): DomainFuncApp =
+        funcApp(nullFunc, emptyList(), NullableTypeEmbedding(elemType), mapOf(T.type to elemType.type))
 
     // elemType can also be the generic T but most of the time, the type needs to be refined.
-    fun nullableOfApp(elem: Exp, elemType: Type): DomainFuncApp =
-        funcApp(nullableOf, listOf(elem), mapOf(T to elemType))
+    fun nullableOfApp(elem: Exp, elemType: TypeEmbedding): DomainFuncApp =
+        funcApp(nullableOf, listOf(elem), NullableTypeEmbedding(elemType), mapOf(T.type to elemType.type))
 
-    fun valOfApp(nullable: Exp, elemType: Type): DomainFuncApp =
-        funcApp(valOf, listOf(nullable), mapOf(T to elemType))
+    fun valOfApp(nullable: Exp, elemType: TypeEmbedding): DomainFuncApp =
+        funcApp(valOf, listOf(nullable), T, mapOf(T.type to elemType.type))
 
     val someNotNull =
         createNamedDomainAxiom(
