@@ -5,7 +5,9 @@
 
 package org.jetbrains.kotlin.formver.conversion
 
+import org.jetbrains.kotlin.formver.embeddings.ClassName
 import org.jetbrains.kotlin.formver.viper.MangledName
+import org.jetbrains.kotlin.name.Name
 
 /**
  * Representation for names not present in the original source,
@@ -16,19 +18,7 @@ data class AnonymousName(val n: Int) : MangledName {
         get() = "anonymous\$$n"
 }
 
-data class ClassName(val name: String) : MangledName {
-    /**
-     * Example of mangled class' name:
-     * ```kotlin
-     * val cn = ClassName("Foo")
-     * assert(cf.mangled == "class\$Foo"
-     * ```
-     */
-    override val mangled: String
-        get() = "class\$$name"
-}
-
-data class ClassFieldName(val className: ClassName, val name: String) : MangledName {
+data class ClassFieldName(val className: ClassName, val name: Name) : MangledName {
 
     /**
      * Example of mangled class' field name:
@@ -38,7 +28,7 @@ data class ClassFieldName(val className: ClassName, val name: String) : MangledN
      * ```
      */
     override val mangled: String
-        get() = "$className\$field\$$name"
+        get() = "${className.mangled}\$field\$${name.asString()}"
 }
 
 data object ReturnVariableName : MangledName {

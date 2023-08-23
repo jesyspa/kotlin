@@ -6,7 +6,8 @@
 package org.jetbrains.kotlin.formver.embeddings
 
 import org.jetbrains.kotlin.fir.symbols.impl.FirValueParameterSymbol
-import org.jetbrains.kotlin.formver.viper.MangledName
+import org.jetbrains.kotlin.formver.conversion.ClassFieldName
+import org.jetbrains.kotlin.formver.scala.MangledName
 import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
@@ -19,6 +20,18 @@ data class LocalName(val name: Name) : MangledName {
         get() = "local\$${name.asStringStripSpecialMarkers()}"
 }
 
+data class ClassName(val packageName: FqName, val name: Name) : MangledName {
+    /**
+     * Example of mangled class' name:
+     * ```kotlin
+     * val cn = ClassName("test", "Foo")
+     * assert(cf.mangled == "\$pkg_test\$class\$Foo"
+     * ```
+     */
+    override val mangled: String
+        get() = "\$pkg_${packageName.asString()}\$class\$${name.asString()}"
+}
+
 /**
  * This is a barebones representation of global names.  We'll need to
  * expand it to include classes, but let's keep things simple for now.
@@ -29,4 +42,11 @@ data class GlobalName(val packageName: FqName, val name: Name) : MangledName {
 }
 
 fun FirValueParameterSymbol.embedName(): LocalName = LocalName(name)
-fun CallableId.embedName(): MangledName = if (isLocal) LocalName(callableName) else GlobalName(packageName, callableName)
+fun CallableId.embedName(): MangledName = if (isLocal) {
+    LocalName(callableName)
+} else if (!isLocal && className != null) {
+    val className = ClassName(packageName, className!!.shortName())
+    ClassFieldName(className, callableName)
+} else {
+    GlobalName(packageName, callableName)
+}

@@ -112,8 +112,18 @@ class StmtConversionVisitor : FirVisitor<Exp, StmtConversionContext>() {
         val symbol = propertyAccessExpression.calleeReference.toResolvedBaseSymbol()!!
         val type = data.embedType(propertyAccessExpression)
         return when (symbol) {
-            is FirValueParameterSymbol -> VariableEmbedding(symbol.callableId.embedName(), type).toLocalVar()
-            is FirPropertySymbol -> VariableEmbedding(symbol.callableId.embedName(), type).toLocalVar()
+            is FirValueParameterSymbol -> VariableEmbedding(
+                symbol.callableId.embedName(),
+                data.embedType(type)
+            ).toLocalVar()
+            is FirPropertySymbol -> {
+                val varEmbedding = VariableEmbedding(symbol.callableId.embedName(), data.embedType(type))
+                if (symbol.isLocal) {
+                    varEmbedding.toLocalVar()
+                } else {
+                    TODO("Handle classes field accesses")
+                }
+            }
             else -> TODO("Implement other property accesses")
         }
     }

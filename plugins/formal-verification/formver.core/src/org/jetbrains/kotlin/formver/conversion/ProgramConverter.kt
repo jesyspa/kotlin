@@ -9,7 +9,6 @@ import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.declarations.FirFunction
 import org.jetbrains.kotlin.fir.declarations.FirSimpleFunction
 import org.jetbrains.kotlin.fir.expressions.FirBlock
-import org.jetbrains.kotlin.fir.resolve.providers.symbolProvider
 import org.jetbrains.kotlin.fir.symbols.impl.FirFunctionSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirRegularClassSymbol
 import org.jetbrains.kotlin.fir.types.*
@@ -48,7 +47,7 @@ class ProgramConverter(val session: FirSession) : ProgramConversionContext {
     }
 
     override fun add(symbol: FirRegularClassSymbol): ClassEmbedding {
-        val className = ClassName(symbol.name.asString())
+        val className = ClassName(symbol.classId.packageFqName, symbol.classId.shortClassName)
         return classes[className]!!
     }
 
@@ -61,8 +60,7 @@ class ProgramConverter(val session: FirSession) : ProgramConversionContext {
         type.isNullable -> NullableTypeEmbedding(embedType(type.withNullability(ConeNullability.NOT_NULL, session.typeContext)))
         else -> {
             val classId = type.classId!!
-            val classType = session.symbolProvider.getClassLikeSymbolByClassId(classId)!!
-            val className = ClassName(classType.name.asString())
+            val className = ClassName(classId.packageFqName, classId.shortClassName)
             // If the class name is not contained in the classes hashmap, then add a new embedding.
             classes.getOrPut(className) {
                 ClassEmbedding(className, mutableListOf(), mutableListOf())
