@@ -14,6 +14,7 @@ import org.jetbrains.kotlin.fir.expressions.impl.FirNoReceiverExpression
 import org.jetbrains.kotlin.fir.references.resolved
 import org.jetbrains.kotlin.fir.references.toResolvedBaseSymbol
 import org.jetbrains.kotlin.fir.references.toResolvedCallableSymbol
+import org.jetbrains.kotlin.fir.symbols.impl.FirConstructorSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirNamedFunctionSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirPropertySymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirValueParameterSymbol
@@ -164,13 +165,18 @@ class StmtConversionVisitor : FirVisitor<Exp, StmtConversionContext>() {
             return specialFunc.convertCall(getArgs(), data)
         }
 
-        val symbol = functionCall.calleeReference.resolved!!.resolvedSymbol as FirNamedFunctionSymbol
-        val calleeSig = data.add(symbol)
+        val calleeSig = when (val symbol = functionCall.calleeReference.resolved!!.resolvedSymbol) {
+            is FirNamedFunctionSymbol -> data.add(symbol)
+            is FirConstructorSymbol -> data.add(symbol)
+            else -> TODO("Are there any other possible cases?")
+        }
+
         val returnVar = data.newAnonVar(calleeSig.returnType)
         val returnExp = returnVar.toLocalVar()
         val args = getArgs().zip(calleeSig.params).map { (arg, param) -> arg.withType(param.viperType) }
         data.addDeclaration(returnVar.toLocalVarDecl())
         data.addStatement(Stmt.MethodCall(calleeSig.name.mangled, args, listOf(returnExp)))
+
         return returnExp
     }
 

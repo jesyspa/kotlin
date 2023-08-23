@@ -7,6 +7,8 @@ package org.jetbrains.kotlin.formver.conversion
 
 import org.jetbrains.kotlin.fir.expressions.FirExpression
 import org.jetbrains.kotlin.fir.symbols.impl.FirNamedFunctionSymbol
+import org.jetbrains.kotlin.fir.declarations.FirFunction
+import org.jetbrains.kotlin.fir.symbols.impl.FirFunctionSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirRegularClassSymbol
 import org.jetbrains.kotlin.fir.types.ConeKotlinType
 import org.jetbrains.kotlin.formver.embeddings.ClassEmbedding
@@ -16,7 +18,7 @@ import org.jetbrains.kotlin.formver.embeddings.TypeEmbedding
 
 interface ProgramConversionContext {
 
-    fun add(symbol: FirNamedFunctionSymbol): MethodSignatureEmbedding
+    fun <D : FirFunction> add(symbol: FirFunctionSymbol<D>): MethodSignatureEmbedding
 
     fun add(symbol: FirRegularClassSymbol): ClassEmbedding
 

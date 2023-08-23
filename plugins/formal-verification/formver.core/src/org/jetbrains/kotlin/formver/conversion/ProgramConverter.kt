@@ -6,10 +6,11 @@
 package org.jetbrains.kotlin.formver.conversion
 
 import org.jetbrains.kotlin.fir.FirSession
+import org.jetbrains.kotlin.fir.declarations.FirFunction
 import org.jetbrains.kotlin.fir.declarations.FirSimpleFunction
 import org.jetbrains.kotlin.fir.expressions.FirBlock
 import org.jetbrains.kotlin.fir.resolve.providers.symbolProvider
-import org.jetbrains.kotlin.fir.symbols.impl.FirNamedFunctionSymbol
+import org.jetbrains.kotlin.fir.symbols.impl.FirFunctionSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirRegularClassSymbol
 import org.jetbrains.kotlin.fir.types.*
 import org.jetbrains.kotlin.formver.viper.domains.NullableDomain
@@ -42,7 +43,7 @@ class ProgramConverter(val session: FirSession) : ProgramConversionContext {
         processFunction(declaration.symbol, declaration.body)
     }
 
-    override fun add(symbol: FirNamedFunctionSymbol): MethodSignatureEmbedding {
+    override fun <D : FirFunction> add(symbol: FirFunctionSymbol<D>): MethodSignatureEmbedding {
         return processFunction(symbol, null)
     }
 
@@ -69,7 +70,7 @@ class ProgramConverter(val session: FirSession) : ProgramConversionContext {
         }
     }
 
-    private fun embedSignature(symbol: FirNamedFunctionSymbol): MethodSignatureEmbedding {
+    private fun <D : FirFunction> embedSignature(symbol: FirFunctionSymbol<D>): MethodSignatureEmbedding {
         val retType = symbol.resolvedReturnTypeRef.type
         val params = symbol.valueParameterSymbols.map {
             VariableEmbedding(it.embedName(), embedType(it.resolvedReturnType))
@@ -81,7 +82,7 @@ class ProgramConverter(val session: FirSession) : ProgramConversionContext {
         )
     }
 
-    private fun processFunction(symbol: FirNamedFunctionSymbol, body: FirBlock?): MethodSignatureEmbedding {
+    private fun <D : FirFunction> processFunction(symbol: FirFunctionSymbol<D>, body: FirBlock?): MethodSignatureEmbedding {
         val signature = embedSignature(symbol)
         // NOTE: we have a problem here if we initially specify a method without a body,
         // and then later decide to add a body anyway.  It's not a problem for now, but
