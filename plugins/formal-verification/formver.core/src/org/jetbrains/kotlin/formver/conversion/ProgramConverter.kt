@@ -8,7 +8,9 @@ package org.jetbrains.kotlin.formver.conversion
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.declarations.FirSimpleFunction
 import org.jetbrains.kotlin.fir.expressions.FirBlock
+import org.jetbrains.kotlin.fir.resolve.providers.symbolProvider
 import org.jetbrains.kotlin.fir.symbols.impl.FirNamedFunctionSymbol
+import org.jetbrains.kotlin.fir.symbols.impl.FirRegularClassSymbol
 import org.jetbrains.kotlin.fir.types.*
 import org.jetbrains.kotlin.formver.viper.domains.NullableDomain
 import org.jetbrains.kotlin.formver.viper.domains.UnitDomain
@@ -25,7 +27,9 @@ import org.jetbrains.kotlin.formver.viper.domains.CastingDomain
  * We need the FirSession to get access to the TypeContext.
  */
 class ProgramConverter(val session: FirSession) : ProgramConversionContext {
+
     private val methods: MutableMap<MangledName, Method> = mutableMapOf()
+    private val classes: MutableMap<ClassName, ClassEmbedding> = mutableMapOf()
 
     val program: Program
         get() = Program(
@@ -42,6 +46,11 @@ class ProgramConverter(val session: FirSession) : ProgramConversionContext {
         return processFunction(symbol, null)
     }
 
+    override fun add(symbol: FirRegularClassSymbol): ClassEmbedding {
+        val className = ClassName(symbol.name.asString())
+        return classes[className]!!
+    }
+
     override fun embedType(type: ConeKotlinType): TypeEmbedding = when {
         type.isUnit -> UnitTypeEmbedding
         type.isInt -> IntTypeEmbedding
@@ -49,7 +58,15 @@ class ProgramConverter(val session: FirSession) : ProgramConversionContext {
         type.isNothing -> NothingTypeEmbedding
         type.isSomeFunctionType(session) -> FunctionTypeEmbedding
         type.isNullable -> NullableTypeEmbedding(embedType(type.withNullability(ConeNullability.NOT_NULL, session.typeContext)))
-        else -> throw NotImplementedError("The embedding for type $type is not yet implemented.")
+        else -> {
+            val classId = type.classId!!
+            val classType = session.symbolProvider.getClassLikeSymbolByClassId(classId)!!
+            val className = ClassName(classType.name.asString())
+            // If the class name is not contained in the classes hashmap, then add a new embedding.
+            classes.getOrPut(className) {
+                ClassEmbedding(className, mutableListOf(), mutableListOf())
+            }
+        }
     }
 
     private fun embedSignature(symbol: FirNamedFunctionSymbol): MethodSignatureEmbedding {

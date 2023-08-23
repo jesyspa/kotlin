@@ -16,6 +16,31 @@ data class AnonymousName(val n: Int) : MangledName {
         get() = "anonymous\$$n"
 }
 
+data class ClassName(val name: String) : MangledName {
+    /**
+     * Example of mangled class' name:
+     * ```kotlin
+     * val cn = ClassName("Foo")
+     * assert(cf.mangled == "class\$Foo"
+     * ```
+     */
+    override val mangled: String
+        get() = "class\$$name"
+}
+
+data class ClassFieldName(val className: ClassName, val name: String) : MangledName {
+
+    /**
+     * Example of mangled class' field name:
+     * ```kotlin
+     * val cfn = ClassFieldName(ClassName("Foo"), "bar")
+     * assert(cfn.mangled == "class\$Foo\$field\$bar")
+     * ```
+     */
+    override val mangled: String
+        get() = "$className\$field\$$name"
+}
+
 data object ReturnVariableName : MangledName {
     override val mangled: String
         get() = "ret\$"
