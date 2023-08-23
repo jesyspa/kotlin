@@ -5,12 +5,13 @@
 
 package org.jetbrains.kotlin.formver.conversion
 
+import org.jetbrains.kotlin.formver.embeddings.FunctionTypeEmbedding
 import org.jetbrains.kotlin.formver.scala.silicon.ast.*
 import org.jetbrains.kotlin.formver.scala.silicon.ast.Exp.*
 import org.jetbrains.kotlin.formver.scala.toScalaBigInt
 
 private fun invokeFunctionObject(): BuiltInMethod {
-    val thisArg = LocalVar(AnonymousName(0), Type.Ref)
+    val thisArg = LocalVar(AnonymousName(0), FunctionTypeEmbedding)
     val acc = AccessPredicate.FieldAccessPredicate(
         thisArg.fieldAccess(SpecialFields.FunctionObjectCallCounterField),
         PermExp.FullPerm()

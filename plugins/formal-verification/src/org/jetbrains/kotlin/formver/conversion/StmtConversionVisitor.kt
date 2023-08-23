@@ -55,7 +55,7 @@ class StmtConversionVisitor : FirVisitor<Exp, StmtConversionContext>() {
         val expr = returnExpression.result.accept(this, data)
         // TODO: respect return-based control flow
         val returnVar = data.signature.returnVar
-        data.addStatement(Stmt.LocalVarAssign(returnVar.toLocalVar(), expr))
+        data.addStatement(Stmt.LocalVarAssign(returnVar.toLocalVar(), expr.withType(returnVar.type)))
         return UnitDomain.element
     }
 
@@ -84,12 +84,12 @@ class StmtConversionVisitor : FirVisitor<Exp, StmtConversionContext>() {
         // Note that only the last condition can be a FirElseIfTrue
         if (branch.condition is FirElseIfTrueCondition) {
             val result = branch.result.accept(this, data)
-            cvar?.let { data.addStatement(Stmt.LocalVarAssign(cvar.toLocalVar(), result)) }
+            cvar?.let { data.addStatement(Stmt.LocalVarAssign(cvar.toLocalVar(), result.withType(cvar.type))) }
         } else {
             val cond = branch.condition.accept(this, data)
             val thenCtx = StmtConverter(data)
             val thenResult = branch.result.accept(this, thenCtx)
-            cvar?.let { thenCtx.addStatement(Stmt.LocalVarAssign(cvar.toLocalVar(), thenResult)) }
+            cvar?.let { thenCtx.addStatement(Stmt.LocalVarAssign(cvar.toLocalVar(), thenResult.withType(cvar.type))) }
             val elseCtx = StmtConverter(data)
             convertWhenBranches(whenBranches, elseCtx, cvar)
             data.addStatement(Stmt.If(cond, thenCtx.block, elseCtx.block))
@@ -149,12 +149,14 @@ class StmtConversionVisitor : FirVisitor<Exp, StmtConversionContext>() {
             return specialFunc.convertCall(getArgs(), data)
         }
 
-        val args = getArgs()
+        var args = getArgs()
         val symbol = functionCall.calleeReference.resolved!!.resolvedSymbol as FirNamedFunctionSymbol
         val calleeSig = data.add(symbol)
         val returnVar = data.newAnonVar(calleeSig.returnType)
         val returnExp = returnVar.toLocalVar()
         data.addDeclaration(returnVar.toLocalVarDecl())
+        // Convert arguments to the types expected by the function
+        args = args.zip(calleeSig.params).map { (arg, param) -> arg.withType(param.type) }
         data.addStatement(Stmt.MethodCall(calleeSig.name.mangled, args, listOf(returnExp)))
         return returnExp
     }
@@ -190,7 +192,7 @@ class StmtConversionVisitor : FirVisitor<Exp, StmtConversionContext>() {
         val propInitializer = property.initializer
         val initializer = propInitializer?.accept(this, data)
         data.addDeclaration(cvar.toLocalVarDecl())
-        initializer?.let { data.addStatement(Stmt.LocalVarAssign(cvar.toLocalVar(), it)) }
+        initializer?.let { data.addStatement(Stmt.LocalVarAssign(cvar.toLocalVar(), it.withType(cvar.type))) }
         return UnitDomain.element
     }
 
@@ -210,18 +212,14 @@ class StmtConversionVisitor : FirVisitor<Exp, StmtConversionContext>() {
         // not to work.
         val convertedLValue = variableAssignment.lValue.accept(this, data)
         val convertedRValue = variableAssignment.rValue.accept(this, data)
-        data.addStatement(Stmt.assign(convertedLValue, convertedRValue))
+        data.addStatement(Stmt.assign(convertedLValue, convertedRValue.withType(convertedLValue.type)))
         return UnitDomain.element
     }
 
     override fun visitSmartCastExpression(smartCastExpression: FirSmartCastExpression, data: StmtConversionContext): Exp {
-        val oldType = smartCastExpression.originalExpression.typeRef.coneType
+        val exp = smartCastExpression.originalExpression.accept(this, data)
         val newType = smartCastExpression.smartcastType.coneType
-        if (oldType.isNullable && !newType.isNullable) {
-            val exp = smartCastExpression.originalExpression.accept(this, data)
-            return NullableDomain.valOfApp(exp, data.embedType(newType).type)
-        }
-        TODO("Handle other kinds of smart casts.")
+        return exp.withType(data.embedType(newType))
     }
 
     override fun visitBinaryLogicExpression(binaryLogicExpression: FirBinaryLogicExpression, data: StmtConversionContext): Exp {

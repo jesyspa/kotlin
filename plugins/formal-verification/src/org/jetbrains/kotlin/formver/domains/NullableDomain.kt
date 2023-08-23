@@ -5,7 +5,6 @@
 
 package org.jetbrains.kotlin.formver.domains
 
-import org.jetbrains.kotlin.formver.domains.NullableDomain.T
 import org.jetbrains.kotlin.formver.embeddings.NullableTypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.TypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.TypeVarEmbedding
@@ -17,26 +16,33 @@ import org.jetbrains.kotlin.formver.scala.silicon.ast.Exp.Companion.Trigger1
 /**
  * The domain in Viper code is as follows:
  *
- * domain Nullable[T] {
- *     function null_val(): Nullable[T]
- *     function nullable_of(val: T): Nullable[T]
- *     function val_of(x: Nullable[T]): T
+ * ```
+ * domain Nullable[T]  {
  *
- *     axiom some_not_null {
- *         forall x: T :: { nullable_of(x) }
- *             nullable_of(x) != null_val()
- *     }
- *     axiom val_of_nullable_of_val {
- *         forall x: T :: { val_of(nullable_of(x)) }
- *             val_of(nullable_of(x)) == x
- *     }
- *     axiom nullable_of_val_of_nullable {
- *         forall x: Nullable[T] :: { nullable_of(val_of(x)) }
- *             x != null_val() ==> nullable_of(val_of(x)) == x
- *     }
+ *   function null(): Nullable[T]
+ *
+ *   axiom some_not_null {
+ *     (forall x: T ::
+ *       { (cast(x): Nullable[T]) }
+ *       (cast(x): Nullable[T]) !=
+ *       (null(): Nullable[T]))
+ *   }
+ *
+ *   axiom val_of_nullable_of_val {
+ *     (forall x: T ::
+ *       { (cast((cast(x): Nullable[T])): T) }
+ *       (cast((cast(x): Nullable[T])): T) == x)
+ *   }
+ *
+ *   axiom nullable_of_val_of_nullable {
+ *     (forall nx: Nullable[T] ::
+ *       { (cast((cast(nx): T)): Nullable[T]) }
+ *       nx != (null(): Nullable[T]) ==>
+ *       (cast((cast(nx): T)): Nullable[T]) == nx)
+ *   }
  * }
+ * ```
  */
-
 object NullableDomain : BuiltinDomain("Nullable") {
     val T = TypeVarEmbedding("T")
     override val typeVars: List<Type.TypeVar> = listOf(T.type)
@@ -44,10 +50,8 @@ object NullableDomain : BuiltinDomain("Nullable") {
     private val xVar = Var("x", T)
     private val nxVar = Var("nx", NullableTypeEmbedding(T))
 
-    val nullFunc = createDomainFunc("null", emptyList(), NullableTypeEmbedding(T))
-    val nullableOf = createDomainFunc("nullable_of", listOf(xVar.decl()), NullableTypeEmbedding(T))
-    val valOf = createDomainFunc("val_of", listOf(nxVar.decl()), T)
-    override val functions: List<DomainFunc> = listOf(nullFunc, nullableOf, valOf)
+    private val nullFunc = createDomainFunc("null", emptyList(), NullableTypeEmbedding(T))
+    override val functions: List<DomainFunc> = listOf(nullFunc)
 
     // You need to specify the type if the expression expects a certain nullable type,
     // e.g. in the expression x == null_val(), if x is of type type Nullable[Int], then
@@ -55,20 +59,13 @@ object NullableDomain : BuiltinDomain("Nullable") {
     fun nullVal(elemType: TypeEmbedding): DomainFuncApp =
         funcApp(nullFunc, emptyList(), NullableTypeEmbedding(elemType), mapOf(T.type to elemType.type))
 
-    // elemType can also be the generic T but most of the time, the type needs to be refined.
-    fun nullableOfApp(elem: Exp, elemType: TypeEmbedding): DomainFuncApp =
-        funcApp(nullableOf, listOf(elem), NullableTypeEmbedding(elemType), mapOf(T.type to elemType.type))
-
-    fun valOfApp(nullable: Exp, elemType: TypeEmbedding): DomainFuncApp =
-        funcApp(valOf, listOf(nullable), T, mapOf(T.type to elemType.type))
-
     val someNotNull =
         createNamedDomainAxiom(
             "some_not_null",
             Forall1(
                 xVar.decl(),
-                Trigger1(nullableOf(xVar.use())),
-                NeCmp(nullableOf(xVar.use()), nullFunc())
+                Trigger1(CastingDomain.cast(xVar.use(), NullableTypeEmbedding(T))),
+                NeCmp(CastingDomain.cast(xVar.use(), NullableTypeEmbedding(T)), nullVal(T))
             )
         )
     val valOfNullableOfVal =
@@ -76,8 +73,8 @@ object NullableDomain : BuiltinDomain("Nullable") {
             "val_of_nullable_of_val",
             Forall1(
                 xVar.decl(),
-                Trigger1(valOf(nullableOf(xVar.use()))),
-                EqCmp(valOf(nullableOf(xVar.use())), xVar.use())
+                Trigger1(CastingDomain.cast(CastingDomain.cast(xVar.use(), NullableTypeEmbedding(T)), T)),
+                EqCmp(CastingDomain.cast(CastingDomain.cast(xVar.use(), NullableTypeEmbedding(T)), T), xVar.use())
             )
         )
     val nullableOfValOfNullable =
@@ -85,11 +82,11 @@ object NullableDomain : BuiltinDomain("Nullable") {
             "nullable_of_val_of_nullable",
             Forall1(
                 nxVar.decl(),
-                Trigger1(nullableOf(valOf(nxVar.use()))),
+                Trigger1(CastingDomain.cast(CastingDomain.cast(nxVar.use(), T), NullableTypeEmbedding(T))),
                 Implies(
                     NeCmp(nxVar.use(), nullVal(T)),
                     EqCmp(
-                        nullableOf(valOf(nxVar.use())),
+                        CastingDomain.cast(CastingDomain.cast(nxVar.use(), T), NullableTypeEmbedding(T)),
                         nxVar.use()
                     )
                 )

@@ -10,6 +10,7 @@ import org.jetbrains.kotlin.fir.declarations.FirSimpleFunction
 import org.jetbrains.kotlin.fir.expressions.FirBlock
 import org.jetbrains.kotlin.fir.symbols.impl.FirNamedFunctionSymbol
 import org.jetbrains.kotlin.fir.types.*
+import org.jetbrains.kotlin.formver.domains.CastingDomain
 import org.jetbrains.kotlin.formver.domains.NullableDomain
 import org.jetbrains.kotlin.formver.domains.UnitDomain
 import org.jetbrains.kotlin.formver.embeddings.*
@@ -28,7 +29,7 @@ class ProgramConverter(val session: FirSession) : ProgramConversionContext {
 
     val program: Program
         get() = Program(
-            listOf(UnitDomain, NullableDomain), /* Domains */
+            listOf(UnitDomain, NullableDomain, CastingDomain), /* Domains */
             SpecialFields.all, /* Fields */
             SpecialMethods.all + methods.values.toList(), /* Methods */
         )
