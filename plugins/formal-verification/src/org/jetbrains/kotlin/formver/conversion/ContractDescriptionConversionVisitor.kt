@@ -12,7 +12,6 @@ import org.jetbrains.kotlin.fir.types.ConeKotlinType
 import org.jetbrains.kotlin.formver.domains.NullableDomain
 import org.jetbrains.kotlin.formver.embeddings.NullableTypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.VariableEmbedding
-import org.jetbrains.kotlin.formver.scala.MangledName
 import org.jetbrains.kotlin.formver.scala.silicon.ast.Exp
 import org.jetbrains.kotlin.formver.scala.silicon.ast.Exp.*
 import org.jetbrains.kotlin.formver.scala.toScalaBigInt
@@ -34,10 +33,6 @@ class ContractDescriptionConversionVisitor : KtContractDescriptionVisitor<Exp, M
         } else {
             BoolLit(isNegated)
         }
-    }
-
-    private fun KtValueParameterReference<ConeKotlinType, ConeDiagnostic>.embeddedName(data: MethodConversionContext): MangledName {
-        return data.signature.params[parameterIndex].name
     }
 
     override fun visitBooleanConstantDescriptor(
