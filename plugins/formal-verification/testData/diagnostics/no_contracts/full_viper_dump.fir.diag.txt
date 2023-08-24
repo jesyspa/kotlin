@@ -35,6 +35,16 @@ domain dom$Nullable[T]  {
   }
 }
 
+domain dom$Casting[A, B]  {
+
+  function dom$Casting$cast(a: A): B
+
+  axiom dom$Casting$null_cast {
+    (dom$Casting$cast((dom$Nullable$null(): dom$Nullable[A])): dom$Nullable[B]) ==
+    (dom$Nullable$null(): dom$Nullable[B])
+  }
+}
+
 field special$function_object_call_counter: Int
 
 method special$invoke_function_object(anonymous$0: Ref)
