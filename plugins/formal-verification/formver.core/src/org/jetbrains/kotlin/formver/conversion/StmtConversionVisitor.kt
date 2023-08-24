@@ -61,7 +61,7 @@ class StmtConversionVisitor : FirVisitor<Exp, StmtConversionContext>() {
 
     override fun visitBlock(block: FirBlock, data: StmtConversionContext): Exp =
         // We ignore the accumulator: we just want to get the result of the last expression.
-        block.statements.fold(UnitDomain.element) { _, it -> it.accept(this, data) }
+        block.statements.fold<FirStatement, Exp>(UnitDomain.element) { _, it -> it.accept(this, data) }
 
     override fun <T> visitConstExpression(constExpression: FirConstExpression<T>, data: StmtConversionContext): Exp =
         when (constExpression.kind) {

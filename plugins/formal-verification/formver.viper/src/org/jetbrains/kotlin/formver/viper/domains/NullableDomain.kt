@@ -37,13 +37,15 @@ import org.jetbrains.kotlin.formver.viper.ast.Exp.Companion.Trigger1
 object NullableDomain : BuiltinDomain("Nullable") {
     val T = Type.TypeVar("T")
     override val typeVars: List<Type.TypeVar> = listOf(T)
-    val Nullable: Type = this.toType()
+
+    // Always use this instead of toType to make sure the element type variable is set corretly
+    fun nullableType(elemType: Type): Type.Domain = this.toType(mapOf(T to elemType))
 
     private val xVar = Var("x", T)
-    private val nxVar = Var("nx", Nullable)
+    private val nxVar = Var("nx", nullableType(T))
 
-    val nullFunc = createDomainFunc("null", emptyList(), Nullable)
-    val nullableOf = createDomainFunc("nullable_of", listOf(xVar.decl()), Nullable)
+    val nullFunc = createDomainFunc("null", emptyList(), nullableType(T))
+    val nullableOf = createDomainFunc("nullable_of", listOf(xVar.decl()), nullableType(T))
     val valOf = createDomainFunc("val_of", listOf(nxVar.decl()), T)
     override val functions: List<DomainFunc> = listOf(nullFunc, nullableOf, valOf)
 
