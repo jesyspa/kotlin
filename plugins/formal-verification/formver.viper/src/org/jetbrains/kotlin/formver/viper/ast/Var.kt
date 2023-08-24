@@ -15,7 +15,7 @@ import org.jetbrains.kotlin.formver.viper.MangledName
  * Note that we do not mangle the name here: it is assumed that these variables are only
  * used in very controlled scopes.
  */
-data class Var<T : Type>(val name: String, val type: T) {
+data class Var(val name: String, val type: Type) {
     val mangledName = object : MangledName {
         override val mangled: String = name
     }

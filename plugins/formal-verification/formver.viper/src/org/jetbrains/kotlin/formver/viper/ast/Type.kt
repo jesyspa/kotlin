@@ -6,6 +6,8 @@
 package org.jetbrains.kotlin.formver.viper.ast
 
 import org.jetbrains.kotlin.formver.viper.IntoViper
+import org.jetbrains.kotlin.formver.viper.domains.NullableDomain
+import org.jetbrains.kotlin.formver.viper.domains.UnitDomain
 import org.jetbrains.kotlin.formver.viper.toScalaMap
 import org.jetbrains.kotlin.formver.viper.toScalaSeq
 import viper.silver.ast.*
@@ -39,25 +41,26 @@ sealed interface Type : IntoViper<viper.silver.ast.Type> {
         override fun substitute(typeVarMap: kotlin.collections.Map<TypeVar, Type>): Wand = Wand
     }
 
-    data class Seq(val type: Type) : Type {
-        override fun toViper(): viper.silver.ast.Type = SeqType.apply(type.toViper())
-        override fun substitute(typeVarMap: kotlin.collections.Map<TypeVar, Type>): Seq = Seq(type.substitute(typeVarMap))
+    data class Seq(val elemType: Type) : Type {
+        override fun toViper(): viper.silver.ast.Type = SeqType.apply(elemType.toViper())
+        override fun substitute(typeVarMap: kotlin.collections.Map<TypeVar, Type>): Seq = Seq(elemType.substitute(typeVarMap))
     }
 
-    data class Set(val type: Type) : Type {
-        override fun toViper(): viper.silver.ast.Type = SetType.apply(type.toViper())
-        override fun substitute(typeVarMap: kotlin.collections.Map<TypeVar, Type>): Set = Set(type.substitute(typeVarMap))
+    data class Set(val elemType: Type) : Type {
+        override fun toViper(): viper.silver.ast.Type = SetType.apply(elemType.toViper())
+        override fun substitute(typeVarMap: kotlin.collections.Map<TypeVar, Type>): Set = Set(elemType.substitute(typeVarMap))
     }
 
-    data class Multiset(val type: Type) : Type {
-        override fun toViper(): viper.silver.ast.Type = MultisetType.apply(type.toViper())
-        override fun substitute(typeVarMap: kotlin.collections.Map<TypeVar, Type>): Multiset = Multiset(type.substitute(typeVarMap))
+    data class Multiset(val elemType: Type) : Type {
+        override fun toViper(): viper.silver.ast.Type = MultisetType.apply(elemType.toViper())
+        override fun substitute(typeVarMap: kotlin.collections.Map<TypeVar, Type>): Multiset = Multiset(elemType.substitute(typeVarMap))
     }
 
     data class Map(val keyType: Type, val valueType: Type) : Type {
         override fun toViper(): viper.silver.ast.Type = MapType.apply(keyType.toViper(), valueType.toViper())
         override fun substitute(typeVarMap: kotlin.collections.Map<TypeVar, Type>): Map =
             Map(keyType.substitute(typeVarMap), valueType.substitute(typeVarMap))
+
     }
 
     data class TypeVar(val name: String) : Type {
@@ -81,6 +84,7 @@ sealed interface Type : IntoViper<viper.silver.ast.Type> {
 
         override fun substitute(typeVarMap: kotlin.collections.Map<TypeVar, Type>): Domain =
             Domain(domainName, typeParams, typeParams.associateWith { typeSubstitutions.getOrDefault(it, it).substitute(typeVarMap) })
+
     }
 
 }

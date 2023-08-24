@@ -38,8 +38,8 @@ object NullableDomain : BuiltinDomain("Nullable") {
     val T = Type.TypeVar("T")
     override val typeVars: List<Type.TypeVar> = listOf(T)
 
-    // Always use this instead of toType to make sure the element type variable is set corretly
-    fun nullableType(elemType: Type): Type.Domain = this.toType(mapOf(T to elemType))
+    // Always use this instead of `toType` as it makes sure the type variables are mapped correctly.
+    fun nullableType(elemType: Type): Type.Domain = toType(mapOf(T to elemType))
 
     private val xVar = Var("x", T)
     private val nxVar = Var("nx", nullableType(T))

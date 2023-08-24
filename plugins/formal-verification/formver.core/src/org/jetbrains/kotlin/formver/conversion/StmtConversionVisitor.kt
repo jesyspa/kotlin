@@ -19,16 +19,16 @@ import org.jetbrains.kotlin.fir.symbols.impl.FirPropertySymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirValueParameterSymbol
 import org.jetbrains.kotlin.fir.types.coneType
 import org.jetbrains.kotlin.fir.types.coneTypeOrNull
-import org.jetbrains.kotlin.fir.types.isNullable
 import org.jetbrains.kotlin.fir.visitors.FirVisitor
 import org.jetbrains.kotlin.formver.viper.domains.NullableDomain
 import org.jetbrains.kotlin.formver.viper.domains.UnitDomain
 import org.jetbrains.kotlin.formver.embeddings.BooleanTypeEmbedding
+import org.jetbrains.kotlin.formver.embeddings.NullableTypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.VariableEmbedding
 import org.jetbrains.kotlin.formver.embeddings.embedName
 import org.jetbrains.kotlin.formver.viper.ast.Exp
 import org.jetbrains.kotlin.formver.viper.ast.Stmt
-import org.jetbrains.kotlin.formver.viper.ast.Type
+import org.jetbrains.kotlin.formver.viper.domains.CastingDomain
 import org.jetbrains.kotlin.text
 import org.jetbrains.kotlin.types.ConstantValueKind
 
@@ -55,7 +55,7 @@ class StmtConversionVisitor : FirVisitor<Exp, StmtConversionContext>() {
         val expr = returnExpression.result.accept(this, data)
         // TODO: respect return-based control flow
         val returnVar = data.signature.returnVar
-        data.addStatement(Stmt.LocalVarAssign(returnVar.toLocalVar(), expr))
+        data.addStatement(Stmt.LocalVarAssign(returnVar.toLocalVar(), expr.withType(returnVar.viperType)))
         return UnitDomain.element
     }
 
@@ -67,11 +67,7 @@ class StmtConversionVisitor : FirVisitor<Exp, StmtConversionContext>() {
         when (constExpression.kind) {
             ConstantValueKind.Int -> Exp.IntLit((constExpression.value as Long).toInt())
             ConstantValueKind.Boolean -> Exp.BoolLit(constExpression.value as Boolean)
-            /* TODO: For now null is always hard-coded to be of type Nullable[Int].
-             * This needs to be generalized and for this the type of the return expressions needs to be known.
-             * This type should maybe be passed as function argument.
-             */
-            ConstantValueKind.Null -> NullableDomain.nullVal(Type.Int)
+            ConstantValueKind.Null -> NullableDomain.nullVal((data.embedType(constExpression) as NullableTypeEmbedding).elementType.type)
             else -> TODO("Constant Expression of type ${constExpression.kind} is not yet implemented.")
         }
 
@@ -88,12 +84,12 @@ class StmtConversionVisitor : FirVisitor<Exp, StmtConversionContext>() {
         // Note that only the last condition can be a FirElseIfTrue
         if (branch.condition is FirElseIfTrueCondition) {
             val result = branch.result.accept(this, data)
-            cvar?.let { data.addStatement(Stmt.LocalVarAssign(cvar.toLocalVar(), result)) }
+            cvar?.let { data.addStatement(Stmt.LocalVarAssign(cvar.toLocalVar(), result.withType(cvar.viperType))) }
         } else {
             val cond = branch.condition.accept(this, data)
             val thenCtx = StmtConverter(data)
             val thenResult = branch.result.accept(this, thenCtx)
-            cvar?.let { thenCtx.addStatement(Stmt.LocalVarAssign(cvar.toLocalVar(), thenResult)) }
+            cvar?.let { thenCtx.addStatement(Stmt.LocalVarAssign(cvar.toLocalVar(), thenResult.withType(cvar.viperType))) }
             val elseCtx = StmtConverter(data)
             convertWhenBranches(whenBranches, elseCtx, cvar)
             data.addStatement(Stmt.If(cond, thenCtx.block, elseCtx.block))
@@ -102,7 +98,7 @@ class StmtConversionVisitor : FirVisitor<Exp, StmtConversionContext>() {
 
     override fun visitWhenExpression(whenExpression: FirWhenExpression, data: StmtConversionContext): Exp {
         val cvar = if (whenExpression.usedAsExpression) {
-            data.newAnonVar(data.embedType(whenExpression.typeRef.coneTypeOrNull!!))
+            data.newAnonVar(data.embedType(whenExpression))
         } else {
             null
         }
@@ -137,9 +133,52 @@ class StmtConversionVisitor : FirVisitor<Exp, StmtConversionContext>() {
         val left = equalityOperatorCall.arguments[0].accept(this, data)
         val right = equalityOperatorCall.arguments[1].accept(this, data)
 
+        val leftType = data.embedType(equalityOperatorCall.arguments[0])
+        val rightType = data.embedType(equalityOperatorCall.arguments[1])
+
         return when (equalityOperatorCall.operation) {
-            FirOperation.EQ -> Exp.EqCmp(left, right)
-            FirOperation.NOT_EQ -> Exp.NeCmp(left, right)
+            FirOperation.EQ -> {
+                if (leftType is NullableTypeEmbedding && rightType !is NullableTypeEmbedding) {
+                    Exp.And(
+                        Exp.NeCmp(left, NullableDomain.nullVal(leftType.elementType.type)),
+                        // TODO: Replace the Eq comparison with a member call function to `left.equals`
+                        Exp.EqCmp(CastingDomain.cast(left, leftType.elementType.type), right.withType(left.type))
+                    )
+                } else if (leftType is NullableTypeEmbedding && rightType is NullableTypeEmbedding) {
+                    Exp.Or(
+                        Exp.And(
+                            Exp.EqCmp(left, NullableDomain.nullVal(leftType.elementType.type)),
+                            Exp.EqCmp(right, NullableDomain.nullVal(rightType.elementType.type)),
+                        ),
+                        // TODO: Replace the Eq comparison with a member call function to `left.equals`
+                        Exp.EqCmp(left, right.withType(left.type))
+                    )
+                } else {
+                    // TODO: Replace the Eq comparison with a member call function to `left.equals`
+                    Exp.EqCmp(left, right.withType(left.type))
+                }
+            }
+            FirOperation.NOT_EQ -> {
+                if (leftType is NullableTypeEmbedding && rightType !is NullableTypeEmbedding) {
+                    Exp.And(
+                        Exp.EqCmp(left, NullableDomain.nullVal(leftType.elementType.type)),
+                        // TODO: Replace the Ne comparison with a member call function to `left.equals`
+                        Exp.NeCmp(left.withType(leftType.elementType.type), right.withType(leftType.elementType.type))
+                    )
+                } else if (leftType is NullableTypeEmbedding && rightType is NullableTypeEmbedding) {
+                    Exp.Or(
+                        Exp.And(
+                            Exp.NeCmp(left, NullableDomain.nullVal(leftType.elementType.type)),
+                            Exp.NeCmp(right, NullableDomain.nullVal(rightType.elementType.type)),
+                        ),
+                        // TODO: Replace the Ne comparison with a member call function to `left.equals`
+                        Exp.NeCmp(left, right.withType(left.type))
+                    )
+                } else {
+                    // TODO: Replace the Ne comparison with a member call function to `left.equals`
+                    Exp.NeCmp(left, right.withType(left.type))
+                }
+            }
             else -> TODO("Equality comparison operation ${equalityOperatorCall.operation} not yet implemented.")
         }
     }
@@ -153,11 +192,11 @@ class StmtConversionVisitor : FirVisitor<Exp, StmtConversionContext>() {
             return specialFunc.convertCall(getArgs(), data)
         }
 
-        val args = getArgs()
         val symbol = functionCall.calleeReference.resolved!!.resolvedSymbol as FirNamedFunctionSymbol
         val calleeSig = data.add(symbol)
         val returnVar = data.newAnonVar(calleeSig.returnType)
         val returnExp = returnVar.toLocalVar()
+        val args = getArgs().zip(calleeSig.params).map { (arg, param) -> arg.withType(param.viperType) }
         data.addDeclaration(returnVar.toLocalVarDecl())
         data.addStatement(Stmt.MethodCall(calleeSig.name.mangled, args, listOf(returnExp)))
         return returnExp
@@ -194,7 +233,7 @@ class StmtConversionVisitor : FirVisitor<Exp, StmtConversionContext>() {
         val propInitializer = property.initializer
         val initializer = propInitializer?.accept(this, data)
         data.addDeclaration(cvar.toLocalVarDecl())
-        initializer?.let { data.addStatement(Stmt.LocalVarAssign(cvar.toLocalVar(), it)) }
+        initializer?.let { data.addStatement(Stmt.LocalVarAssign(cvar.toLocalVar(), it.withType(cvar.viperType))) }
         return UnitDomain.element
     }
 
@@ -219,18 +258,14 @@ class StmtConversionVisitor : FirVisitor<Exp, StmtConversionContext>() {
         // not to work.
         val convertedLValue = variableAssignment.lValue.accept(this, data)
         val convertedRValue = variableAssignment.rValue.accept(this, data)
-        data.addStatement(Stmt.assign(convertedLValue, convertedRValue))
+        data.addStatement(Stmt.assign(convertedLValue, convertedRValue.withType(convertedLValue.type)))
         return UnitDomain.element
     }
 
     override fun visitSmartCastExpression(smartCastExpression: FirSmartCastExpression, data: StmtConversionContext): Exp {
-        val oldType = smartCastExpression.originalExpression.typeRef.coneType
+        val exp = smartCastExpression.originalExpression.accept(this, data)
         val newType = smartCastExpression.smartcastType.coneType
-        if (oldType.isNullable && !newType.isNullable) {
-            val exp = smartCastExpression.originalExpression.accept(this, data)
-            return NullableDomain.valOfApp(exp, data.embedType(newType).type)
-        }
-        TODO("Handle other kinds of smart casts.")
+        return exp.withType(data.embedType(newType).type)
     }
 
     override fun visitBinaryLogicExpression(binaryLogicExpression: FirBinaryLogicExpression, data: StmtConversionContext): Exp {

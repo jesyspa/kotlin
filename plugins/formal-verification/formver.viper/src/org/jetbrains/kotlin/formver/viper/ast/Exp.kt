@@ -6,11 +6,15 @@
 package org.jetbrains.kotlin.formver.viper.ast
 
 import org.jetbrains.kotlin.formver.viper.*
+import org.jetbrains.kotlin.formver.viper.domains.CastingDomain
 import viper.silver.ast.*
 
 sealed interface Exp : IntoViper<viper.silver.ast.Exp> {
 
     val type: Type
+
+    fun withType(newType: Type) =
+        if (type == newType) this else CastingDomain.cast(this, newType)
 
     //region Arithmetic Expressions
     data class Add(

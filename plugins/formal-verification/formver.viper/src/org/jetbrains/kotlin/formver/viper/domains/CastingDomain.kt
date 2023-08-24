@@ -29,8 +29,7 @@ object CastingDomain : BuiltinDomain("Casting") {
 
     private val castFunc = createDomainFunc("cast", listOf(Var("a", A).decl()), B)
 
-    fun cast(exp: Exp, newType: Type) =
-        funcApp(castFunc, listOf(exp), mapOf(A to exp.type, B to newType))
+    fun cast(exp: Exp, newType: Type) = funcApp(castFunc, listOf(exp), mapOf(A to exp.type, B to newType))
 
     override val functions: List<DomainFunc> = listOf(castFunc)
 

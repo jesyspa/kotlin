@@ -117,6 +117,7 @@ abstract class Domain(
             trafos.toViper()
         )
 
+    // Don't use this directly, instead, use the custom types defined in `org.jetbrains.kotlin.formver.viper.ast.Type` for specific domains.
     fun toType(typeParamSubst: Map<Type.TypeVar, Type> = typeVars.associateWith { it }): Type.Domain =
         Type.Domain(name.mangled, typeVars, typeParamSubst)
 
