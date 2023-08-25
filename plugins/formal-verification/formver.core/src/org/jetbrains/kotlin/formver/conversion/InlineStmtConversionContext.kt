@@ -7,7 +7,7 @@ package org.jetbrains.kotlin.formver.conversion
 
 import org.jetbrains.kotlin.formver.embeddings.TypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.VariableEmbedding
-import org.jetbrains.kotlin.formver.scala.MangledName
+import org.jetbrains.kotlin.formver.viper.MangledName
 
 class InlineStmtConversionContext(
     private val methodCtx: MethodConversionContext,
