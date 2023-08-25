@@ -45,9 +45,7 @@ object NullableDomain : BuiltinDomain("Nullable") {
     private val nxVar = Var("nx", nullableType(T))
 
     val nullFunc = createDomainFunc("null", emptyList(), nullableType(T))
-    val nullableOf = createDomainFunc("nullable_of", listOf(xVar.decl()), nullableType(T))
-    val valOf = createDomainFunc("val_of", listOf(nxVar.decl()), T)
-    override val functions: List<DomainFunc> = listOf(nullFunc, nullableOf, valOf)
+    override val functions: List<DomainFunc> = listOf(nullFunc)
 
     // You need to specify the type if the expression expects a certain nullable type,
     // e.g. in the expression x == null_val(), if x is of type type Nullable[Int], then
@@ -55,20 +53,13 @@ object NullableDomain : BuiltinDomain("Nullable") {
     fun nullVal(elemType: Type): DomainFuncApp =
         funcApp(nullFunc, emptyList(), mapOf(T to elemType))
 
-    // elemType can also be the generic T but most of the time, the type needs to be refined.
-    fun nullableOfApp(elem: Exp, elemType: Type): DomainFuncApp =
-        funcApp(nullableOf, listOf(elem), mapOf(T to elemType))
-
-    fun valOfApp(nullable: Exp, elemType: Type): DomainFuncApp =
-        funcApp(valOf, listOf(nullable), mapOf(T to elemType))
-
     val someNotNull =
         createNamedDomainAxiom(
             "some_not_null",
             Forall1(
                 xVar.decl(),
-                Trigger1(nullableOf(xVar.use())),
-                NeCmp(nullableOf(xVar.use()), nullFunc())
+                Trigger1(CastingDomain.cast(xVar.use(), nullableType(T))),
+                NeCmp(CastingDomain.cast(xVar.use(), nullableType(T)), nullVal(T))
             )
         )
     val valOfNullableOfVal =
@@ -76,8 +67,11 @@ object NullableDomain : BuiltinDomain("Nullable") {
             "val_of_nullable_of_val",
             Forall1(
                 xVar.decl(),
-                Trigger1(valOf(nullableOf(xVar.use()))),
-                EqCmp(valOf(nullableOf(xVar.use())), xVar.use())
+                Trigger1(CastingDomain.cast(CastingDomain.cast(xVar.use(), nullableType(T)), T)),
+                EqCmp(
+                    CastingDomain.cast(CastingDomain.cast(xVar.use(), nullableType(T)), T),
+                    xVar.use()
+                )
             )
         )
     val nullableOfValOfNullable =
@@ -85,11 +79,11 @@ object NullableDomain : BuiltinDomain("Nullable") {
             "nullable_of_val_of_nullable",
             Forall1(
                 nxVar.decl(),
-                Trigger1(nullableOf(valOf(nxVar.use()))),
+                Trigger1(CastingDomain.cast(CastingDomain.cast(nxVar.use(), T), nullableType(T))),
                 Implies(
                     NeCmp(nxVar.use(), nullVal(T)),
                     EqCmp(
-                        nullableOf(valOf(nxVar.use())),
+                        CastingDomain.cast(CastingDomain.cast(nxVar.use(), T), nullableType(T)),
                         nxVar.use()
                     )
                 )

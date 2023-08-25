@@ -20,15 +20,11 @@ import org.jetbrains.kotlin.fir.symbols.impl.FirValueParameterSymbol
 import org.jetbrains.kotlin.fir.types.coneType
 import org.jetbrains.kotlin.fir.types.coneTypeOrNull
 import org.jetbrains.kotlin.fir.visitors.FirVisitor
+import org.jetbrains.kotlin.formver.embeddings.*
 import org.jetbrains.kotlin.formver.viper.domains.NullableDomain
 import org.jetbrains.kotlin.formver.viper.domains.UnitDomain
-import org.jetbrains.kotlin.formver.embeddings.BooleanTypeEmbedding
-import org.jetbrains.kotlin.formver.embeddings.NullableTypeEmbedding
-import org.jetbrains.kotlin.formver.embeddings.VariableEmbedding
-import org.jetbrains.kotlin.formver.embeddings.embedName
 import org.jetbrains.kotlin.formver.viper.ast.Exp
 import org.jetbrains.kotlin.formver.viper.ast.Stmt
-import org.jetbrains.kotlin.formver.viper.domains.CastingDomain
 import org.jetbrains.kotlin.text
 import org.jetbrains.kotlin.types.ConstantValueKind
 
@@ -137,51 +133,32 @@ class StmtConversionVisitor : FirVisitor<Exp, StmtConversionContext>() {
         val rightType = data.embedType(equalityOperatorCall.arguments[1])
 
         return when (equalityOperatorCall.operation) {
-            FirOperation.EQ -> {
-                if (leftType is NullableTypeEmbedding && rightType !is NullableTypeEmbedding) {
-                    Exp.And(
-                        Exp.NeCmp(left, NullableDomain.nullVal(leftType.elementType.type)),
-                        // TODO: Replace the Eq comparison with a member call function to `left.equals`
-                        Exp.EqCmp(CastingDomain.cast(left, leftType.elementType.type), right.withType(left.type))
-                    )
-                } else if (leftType is NullableTypeEmbedding && rightType is NullableTypeEmbedding) {
-                    Exp.Or(
-                        Exp.And(
-                            Exp.EqCmp(left, NullableDomain.nullVal(leftType.elementType.type)),
-                            Exp.EqCmp(right, NullableDomain.nullVal(rightType.elementType.type)),
-                        ),
-                        // TODO: Replace the Eq comparison with a member call function to `left.equals`
-                        Exp.EqCmp(left, right.withType(left.type))
-                    )
-                } else {
-                    // TODO: Replace the Eq comparison with a member call function to `left.equals`
-                    Exp.EqCmp(left, right.withType(left.type))
-                }
-            }
-            FirOperation.NOT_EQ -> {
-                if (leftType is NullableTypeEmbedding && rightType !is NullableTypeEmbedding) {
-                    Exp.And(
-                        Exp.EqCmp(left, NullableDomain.nullVal(leftType.elementType.type)),
-                        // TODO: Replace the Ne comparison with a member call function to `left.equals`
-                        Exp.NeCmp(left.withType(leftType.elementType.type), right.withType(leftType.elementType.type))
-                    )
-                } else if (leftType is NullableTypeEmbedding && rightType is NullableTypeEmbedding) {
-                    Exp.Or(
-                        Exp.And(
-                            Exp.NeCmp(left, NullableDomain.nullVal(leftType.elementType.type)),
-                            Exp.NeCmp(right, NullableDomain.nullVal(rightType.elementType.type)),
-                        ),
-                        // TODO: Replace the Ne comparison with a member call function to `left.equals`
-                        Exp.NeCmp(left, right.withType(left.type))
-                    )
-                } else {
-                    // TODO: Replace the Ne comparison with a member call function to `left.equals`
-                    Exp.NeCmp(left, right.withType(left.type))
-                }
-            }
+            FirOperation.EQ -> convertEqCmp(left, leftType, right, rightType)
+            FirOperation.NOT_EQ -> Exp.Not(convertEqCmp(left, leftType, right, rightType))
             else -> TODO("Equality comparison operation ${equalityOperatorCall.operation} not yet implemented.")
         }
     }
+
+    private fun convertEqCmp(left: Exp, leftType: TypeEmbedding, right: Exp, rightType: TypeEmbedding): Exp =
+        if (leftType is NullableTypeEmbedding && rightType !is NullableTypeEmbedding) {
+            Exp.And(
+                Exp.NeCmp(left, NullableDomain.nullVal(leftType.elementType.type)),
+                // TODO: Replace the Eq comparison with a member call function to `left.equals`
+                Exp.EqCmp(left.withType(leftType.elementType.type), right.withType(leftType.elementType.type))
+            )
+        } else if (leftType is NullableTypeEmbedding && rightType is NullableTypeEmbedding) {
+            Exp.Or(
+                Exp.And(
+                    Exp.EqCmp(left, NullableDomain.nullVal(leftType.elementType.type)),
+                    Exp.EqCmp(right, NullableDomain.nullVal(rightType.elementType.type)),
+                ),
+                // TODO: Replace the Eq comparison with a member call function to `left.equals`
+                Exp.EqCmp(left.withType(leftType.elementType.type), right.withType(leftType.elementType.type))
+            )
+        } else {
+            // TODO: Replace the Eq comparison with a member call function to `left.equals`
+            Exp.EqCmp(left, right.withType(left.type))
+        }
 
     override fun visitFunctionCall(functionCall: FirFunctionCall, data: StmtConversionContext): Exp {
         val id = functionCall.calleeReference.toResolvedCallableSymbol()!!.callableId
