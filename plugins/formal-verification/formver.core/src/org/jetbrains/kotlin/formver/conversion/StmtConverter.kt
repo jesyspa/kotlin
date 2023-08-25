@@ -16,7 +16,8 @@ import org.jetbrains.kotlin.formver.viper.ast.Stmt
  * intermediate results, which requires introducing new names.  We thus need a
  * shared context for finding fresh variable names.
  */
-class StmtConverter(private val methodCtx: MethodConversionContext) : StmtConversionContext, MethodConversionContext by methodCtx {
+open class StmtConverter(private val methodCtx: MethodConversionContext) : StmtConversionContext,
+    MethodConversionContext by methodCtx {
     private val statements: MutableList<Stmt> = mutableListOf()
     private val declarations: MutableList<Declaration> = mutableListOf()
     override val block = Stmt.Seqn(statements, declarations)

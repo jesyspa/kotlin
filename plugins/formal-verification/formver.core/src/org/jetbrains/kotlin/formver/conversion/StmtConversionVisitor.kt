@@ -15,6 +15,7 @@ import org.jetbrains.kotlin.fir.references.resolved
 import org.jetbrains.kotlin.fir.references.toResolvedBaseSymbol
 import org.jetbrains.kotlin.fir.references.toResolvedCallableSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirConstructorSymbol
+import org.jetbrains.kotlin.fir.references.*
 import org.jetbrains.kotlin.fir.symbols.impl.FirNamedFunctionSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirPropertySymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirValueParameterSymbol
@@ -179,7 +180,25 @@ class StmtConversionVisitor : FirVisitor<Exp, StmtConversionContext>() {
             Exp.EqCmp(left, right.withType(left.type))
         }
 
+    @OptIn(SymbolInternals::class)
     override fun visitFunctionCall(functionCall: FirFunctionCall, data: StmtConversionContext): Exp {
+        val isInline = functionCall.calleeReference.toResolvedCallableSymbol()!!.resolvedStatus.isInline
+
+        val inlineBody = functionCall.calleeReference.toResolvedNamedFunctionSymbol()!!.fir.body
+        if (isInline && inlineBody != null) {
+            val retVar = data.newAnonVar(data.embedType(functionCall.typeRef.coneType))
+            data.addDeclaration(retVar.toLocalVarDecl())
+            val inlineArgs = functionCall.calleeReference.toResolvedNamedFunctionSymbol()!!.valueParameterSymbols.map {
+                VariableEmbedding(it.embedName(), data.embedType(it.resolvedReturnType)).toLocalVar().name
+            } + ReturnVariableName
+            val callArgs = getFunctionCallArguments(functionCall).map { (it.accept(this, data) as Exp.LocalVar).name } + retVar.name
+            val subs = inlineArgs.zip(callArgs).toMap()
+            val inlineCtx = InlineStmtConversionContext(data, subs, retVar)
+            inlineBody.accept(this, inlineCtx)
+            data.addStatement(Stmt.If(Exp.BoolLit(true), inlineCtx.block, Stmt.Seqn(listOf(), listOf())))
+            return retVar.toLocalVar()
+        }
+
         val id = functionCall.calleeReference.toResolvedCallableSymbol()!!.callableId
         val specialFunc = SpecialFunctions.byCallableId[id]
         val getArgs = { getFunctionCallArguments(functionCall).map { it.accept(this, data) } }

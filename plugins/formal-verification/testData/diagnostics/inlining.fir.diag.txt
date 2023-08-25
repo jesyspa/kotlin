@@ -1,0 +1,49 @@
+/inlining.kt:(132,138): info: Generated Viper text for invoke:
+method global$pkg_$invoke(local$f: Ref) returns (ret$: Int)
+  requires acc(local$f.special$function_object_call_counter, write)
+  ensures acc(local$f.special$function_object_call_counter, write)
+  ensures old(local$f.special$function_object_call_counter) <=
+    local$f.special$function_object_call_counter
+{
+  var anonymous$1: Int
+  var local$x: Int
+  var anonymous$2: Int
+  special$invoke_function_object(local$f)
+  local$x := anonymous$1
+  special$invoke_function_object(local$f)
+  ret$ := anonymous$2
+}
+
+/inlining.kt:(301,304): info: Generated Viper text for foo:
+method global$pkg_$foo(local$g: Ref) returns (ret$: Int)
+  requires acc(local$g.special$function_object_call_counter, write)
+  ensures acc(local$g.special$function_object_call_counter, write)
+  ensures old(local$g.special$function_object_call_counter) <=
+    local$g.special$function_object_call_counter
+  ensures local$g.special$function_object_call_counter >
+    old(local$g.special$function_object_call_counter)
+{
+  var anonymous$1: Int
+  var local$z: Int
+  var anonymous$2: Int
+  if (true) {
+    var inline$global$pkg_$foo$anonymous$1: Int
+    var inline$global$pkg_$foo$local$x: Int
+    var inline$global$pkg_$foo$anonymous$2: Int
+    special$invoke_function_object(local$g)
+    inline$global$pkg_$foo$local$x := inline$global$pkg_$foo$anonymous$1
+    special$invoke_function_object(local$g)
+    anonymous$1 := inline$global$pkg_$foo$anonymous$2
+  }
+  local$z := anonymous$1
+  if (true) {
+    var inline$global$pkg_$foo$anonymous$1: Int
+    var inline$global$pkg_$foo$local$x: Int
+    var inline$global$pkg_$foo$anonymous$2: Int
+    special$invoke_function_object(local$g)
+    inline$global$pkg_$foo$local$x := inline$global$pkg_$foo$anonymous$1
+    special$invoke_function_object(local$g)
+    anonymous$2 := inline$global$pkg_$foo$anonymous$2
+  }
+  ret$ := anonymous$2
+}
