@@ -16,11 +16,13 @@ import org.jetbrains.kotlin.fir.references.toResolvedBaseSymbol
 import org.jetbrains.kotlin.fir.references.toResolvedCallableSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirConstructorSymbol
 import org.jetbrains.kotlin.fir.references.*
+import org.jetbrains.kotlin.fir.symbols.SymbolInternals
 import org.jetbrains.kotlin.fir.symbols.impl.FirNamedFunctionSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirPropertySymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirValueParameterSymbol
 import org.jetbrains.kotlin.fir.types.coneType
 import org.jetbrains.kotlin.fir.types.coneTypeOrNull
+import org.jetbrains.kotlin.fir.types.resolvedType
 import org.jetbrains.kotlin.fir.visitors.FirVisitor
 import org.jetbrains.kotlin.formver.embeddings.*
 import org.jetbrains.kotlin.formver.viper.ast.AccessPredicate
@@ -186,7 +188,7 @@ class StmtConversionVisitor : FirVisitor<Exp, StmtConversionContext>() {
 
         val inlineBody = functionCall.calleeReference.toResolvedNamedFunctionSymbol()!!.fir.body
         if (isInline && inlineBody != null) {
-            val retVar = data.newAnonVar(data.embedType(functionCall.typeRef.coneType))
+            val retVar = data.newAnonVar(data.embedType(functionCall.resolvedType))
             data.addDeclaration(retVar.toLocalVarDecl())
             val inlineArgs = functionCall.calleeReference.toResolvedNamedFunctionSymbol()!!.valueParameterSymbols.map {
                 VariableEmbedding(it.embedName(), data.embedType(it.resolvedReturnType)).toLocalVar().name
