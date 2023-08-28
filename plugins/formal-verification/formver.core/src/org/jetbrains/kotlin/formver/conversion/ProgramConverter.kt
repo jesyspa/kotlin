@@ -37,7 +37,7 @@ class ProgramConverter(val session: FirSession) : ProgramConversionContext {
     val program: Program
         get() = Program(
             listOf(UnitDomain, NullableDomain, CastingDomain), /* Domains */
-            SpecialFields.all, /* Fields */
+            SpecialFields.all + + classes.values.flatMap { it.fields }.map { it.toField() }, /* Fields */
             SpecialMethods.all + methods.values.toList(), /* Methods */
         )
 
@@ -58,8 +58,10 @@ class ProgramConverter(val session: FirSession) : ProgramConversionContext {
             val concreteFields = symbol.declarationSymbols
                 .filterIsInstance<FirPropertySymbol>()
                 .filter { it.hasBackingField }
-            println(concreteFields)
-            return@l ClassEmbedding(className, mutableListOf(), mutableListOf())
+                .map { VariableEmbedding(it.callableId.embedName(), embedType(it.resolvedReturnType)) }
+                .toMutableList()
+
+            return@l ClassEmbedding(className, concreteFields, mutableListOf())
         }
 
         return classes[className]!!

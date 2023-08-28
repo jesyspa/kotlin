@@ -126,10 +126,16 @@ class StmtConversionVisitor : FirVisitor<Exp, StmtConversionContext>() {
                     val receiverType = receiver.resolvedReturnTypeRef.coneTypeOrNull!!
                     val cvar = VariableEmbedding(receiver.callableId.embedName(), data.embedType(receiverType))
                     val fieldAccess = Exp.FieldAccess(cvar.toLocalVar(), varEmbedding.toField())
+                    val accPred = AccessPredicate.FieldAccessPredicate(fieldAccess, PermExp.FullPerm())
+                    val anon = data.newAnonVar(varEmbedding.type)
+                    data.addDeclaration(anon.toLocalVarDecl())
                     // Inhale permission for the field before reading it.
-                    // Add inhale statement
-                    data.addStatement(Stmt.Inhale(fieldAccess))
-                    return fieldAccess
+                    data.addStatement(Stmt.Inhale(accPred))
+                    // Access the field and assign the value to a newly created anonymous variable.
+                    data.addStatement(Stmt.assign(anon.toLocalVar(), fieldAccess))
+                    // Exhale permission for the field and return the anonymous variable value
+                    data.addStatement(Stmt.Exhale(accPred))
+                    return anon.toLocalVar()
                 }
             }
             else -> TODO("Implement other property accesses")
