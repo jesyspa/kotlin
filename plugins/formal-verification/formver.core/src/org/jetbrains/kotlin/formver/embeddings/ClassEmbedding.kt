@@ -5,7 +5,7 @@
 
 package org.jetbrains.kotlin.formver.embeddings
 
-import org.jetbrains.kotlin.formver.scala.silicon.ast.Type
+import org.jetbrains.kotlin.formver.viper.ast.Type
 
 class ClassEmbedding(
     val name: ClassName,

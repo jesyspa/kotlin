@@ -15,13 +15,13 @@ import org.jetbrains.kotlin.fir.symbols.impl.FirFunctionSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirPropertySymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirRegularClassSymbol
 import org.jetbrains.kotlin.fir.types.*
-import org.jetbrains.kotlin.formver.viper.domains.NullableDomain
-import org.jetbrains.kotlin.formver.viper.domains.UnitDomain
 import org.jetbrains.kotlin.formver.embeddings.*
 import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.formver.viper.ast.Method
 import org.jetbrains.kotlin.formver.viper.ast.Program
 import org.jetbrains.kotlin.formver.viper.domains.CastingDomain
+import org.jetbrains.kotlin.formver.viper.domains.NullableDomain
+import org.jetbrains.kotlin.formver.viper.domains.UnitDomain
 
 /**
  * Tracks the top-level information about the program.
@@ -36,9 +36,9 @@ class ProgramConverter(val session: FirSession) : ProgramConversionContext {
 
     val program: Program
         get() = Program(
-            listOf(UnitDomain, NullableDomain, CastingDomain), /* Domains */
-            SpecialFields.all + + classes.values.flatMap { it.fields }.map { it.toField() }, /* Fields */
-            SpecialMethods.all + methods.values.toList(), /* Methods */
+            domains = listOf(UnitDomain, NullableDomain, CastingDomain), /* Domains */
+            fields = SpecialFields.all + classes.values.flatMap { it.fields }.map { it.toField() }, /* Fields */
+            methods = SpecialMethods.all + methods.values.toList(), /* Methods */
         )
 
     fun addWithBody(declaration: FirSimpleFunction) {

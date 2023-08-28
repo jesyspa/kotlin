@@ -20,13 +20,14 @@ import org.jetbrains.kotlin.fir.symbols.impl.FirPropertySymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirValueParameterSymbol
 import org.jetbrains.kotlin.fir.types.coneType
 import org.jetbrains.kotlin.fir.types.coneTypeOrNull
-import org.jetbrains.kotlin.fir.types.resolvedType
 import org.jetbrains.kotlin.fir.visitors.FirVisitor
 import org.jetbrains.kotlin.formver.embeddings.*
+import org.jetbrains.kotlin.formver.viper.ast.AccessPredicate
+import org.jetbrains.kotlin.formver.viper.ast.Exp
+import org.jetbrains.kotlin.formver.viper.ast.PermExp
+import org.jetbrains.kotlin.formver.viper.ast.Stmt
 import org.jetbrains.kotlin.formver.viper.domains.NullableDomain
 import org.jetbrains.kotlin.formver.viper.domains.UnitDomain
-import org.jetbrains.kotlin.formver.viper.ast.Exp
-import org.jetbrains.kotlin.formver.viper.ast.Stmt
 import org.jetbrains.kotlin.text
 import org.jetbrains.kotlin.types.ConstantValueKind
 
@@ -112,13 +113,10 @@ class StmtConversionVisitor : FirVisitor<Exp, StmtConversionContext>() {
         val symbol = propertyAccessExpression.calleeReference.toResolvedBaseSymbol()!!
         val type = data.embedType(propertyAccessExpression)
         return when (symbol) {
-            is FirValueParameterSymbol -> VariableEmbedding(
-                symbol.callableId.embedName(),
-                data.embedType(type)
-            ).toLocalVar()
+            is FirValueParameterSymbol -> VariableEmbedding(symbol.callableId.embedName(), type).toLocalVar()
 
             is FirPropertySymbol -> {
-                val varEmbedding = VariableEmbedding(symbol.callableId.embedName(), data.embedType(type))
+                val varEmbedding = VariableEmbedding(symbol.callableId.embedName(), type)
                 if (symbol.isLocal) {
                     return varEmbedding.toLocalVar()
                 } else {
