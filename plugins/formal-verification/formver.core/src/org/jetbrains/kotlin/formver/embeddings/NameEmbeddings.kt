@@ -6,11 +6,15 @@
 package org.jetbrains.kotlin.formver.embeddings
 
 import org.jetbrains.kotlin.fir.symbols.impl.FirValueParameterSymbol
-import org.jetbrains.kotlin.formver.conversion.ClassMemberName
 import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
+
+/**
+ * This file contains classes to mangle Kotlin names, such as variables,
+ * classes and so on.
+ */
 
 /**
  * Representation for Kotlin local variable names.
@@ -30,6 +34,19 @@ data class ClassName(val packageName: FqName, val className: Name) : MangledName
      */
     override val mangled: String
         get() = "\$pkg_${packageName.asString()}\$class\$${className.asString()}"
+}
+
+data class ClassMemberName(val className: ClassName, val name: Name) : MangledName {
+
+    /**
+     * Example of mangled class' member name:
+     * ```kotlin
+     * val cfn = ClassMemberName(ClassName("Foo"), "bar")
+     * assert(cfn.mangled == "class\$Foo\$member\$bar")
+     * ```
+     */
+    override val mangled: String
+        get() = "${className.mangled}\$member\$${name.asString()}"
 }
 
 /**

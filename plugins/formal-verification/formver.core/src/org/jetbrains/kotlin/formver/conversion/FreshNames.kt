@@ -5,9 +5,12 @@
 
 package org.jetbrains.kotlin.formver.conversion
 
-import org.jetbrains.kotlin.formver.embeddings.ClassName
 import org.jetbrains.kotlin.formver.viper.MangledName
-import org.jetbrains.kotlin.name.Name
+
+/**
+ * This file contains classes/objects representing new names
+ * for Viper's specific declaration and non.
+ */
 
 /**
  * Representation for names not present in the original source,
@@ -16,19 +19,6 @@ import org.jetbrains.kotlin.name.Name
 data class AnonymousName(val n: Int) : MangledName {
     override val mangled: String
         get() = "anonymous\$$n"
-}
-
-data class ClassMemberName(val className: ClassName, val name: Name) : MangledName {
-
-    /**
-     * Example of mangled class' member name:
-     * ```kotlin
-     * val cfn = ClassMemberName(ClassName("Foo"), "bar")
-     * assert(cfn.mangled == "class\$Foo\$member\$bar")
-     * ```
-     */
-    override val mangled: String
-        get() = "${className.mangled}\$member\$${name.asString()}"
 }
 
 data object ReturnVariableName : MangledName {
