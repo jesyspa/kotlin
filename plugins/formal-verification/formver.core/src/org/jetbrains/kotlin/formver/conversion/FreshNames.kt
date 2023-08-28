@@ -18,17 +18,17 @@ data class AnonymousName(val n: Int) : MangledName {
         get() = "anonymous\$$n"
 }
 
-data class ClassFieldName(val className: ClassName, val name: Name) : MangledName {
+data class ClassMemberName(val className: ClassName, val name: Name) : MangledName {
 
     /**
-     * Example of mangled class' field name:
+     * Example of mangled class' member name:
      * ```kotlin
-     * val cfn = ClassFieldName(ClassName("Foo"), "bar")
-     * assert(cfn.mangled == "class\$Foo\$field\$bar")
+     * val cfn = ClassMemberName(ClassName("Foo"), "bar")
+     * assert(cfn.mangled == "class\$Foo\$member\$bar")
      * ```
      */
     override val mangled: String
-        get() = "${className.mangled}\$field\$${name.asString()}"
+        get() = "${className.mangled}\$member\$${name.asString()}"
 }
 
 data object ReturnVariableName : MangledName {

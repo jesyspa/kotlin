@@ -6,7 +6,7 @@
 package org.jetbrains.kotlin.formver.embeddings
 
 import org.jetbrains.kotlin.fir.symbols.impl.FirValueParameterSymbol
-import org.jetbrains.kotlin.formver.conversion.ClassFieldName
+import org.jetbrains.kotlin.formver.conversion.ClassMemberName
 import org.jetbrains.kotlin.formver.scala.MangledName
 import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.FqName
@@ -20,7 +20,7 @@ data class LocalName(val name: Name) : MangledName {
         get() = "local\$${name.asStringStripSpecialMarkers()}"
 }
 
-data class ClassName(val packageName: FqName, val name: Name) : MangledName {
+data class ClassName(val packageName: FqName, val className: Name) : MangledName {
     /**
      * Example of mangled class' name:
      * ```kotlin
@@ -29,7 +29,7 @@ data class ClassName(val packageName: FqName, val name: Name) : MangledName {
      * ```
      */
     override val mangled: String
-        get() = "\$pkg_${packageName.asString()}\$class\$${name.asString()}"
+        get() = "\$pkg_${packageName.asString()}\$class\$${className.asString()}"
 }
 
 /**
@@ -45,8 +45,8 @@ fun FirValueParameterSymbol.embedName(): LocalName = LocalName(name)
 fun CallableId.embedName(): MangledName = if (isLocal) {
     LocalName(callableName)
 } else if (!isLocal && className != null) {
-    val className = ClassName(packageName, className!!.shortName())
-    ClassFieldName(className, callableName)
+    val name = ClassName(packageName, className!!.shortName())
+    ClassMemberName(name, callableName)
 } else {
     GlobalName(packageName, callableName)
 }

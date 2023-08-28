@@ -8,8 +8,11 @@ package org.jetbrains.kotlin.formver.conversion
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.declarations.FirFunction
 import org.jetbrains.kotlin.fir.declarations.FirSimpleFunction
+import org.jetbrains.kotlin.fir.declarations.utils.hasBackingField
 import org.jetbrains.kotlin.fir.expressions.FirBlock
+import org.jetbrains.kotlin.fir.resolve.providers.symbolProvider
 import org.jetbrains.kotlin.fir.symbols.impl.FirFunctionSymbol
+import org.jetbrains.kotlin.fir.symbols.impl.FirPropertySymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirRegularClassSymbol
 import org.jetbrains.kotlin.fir.types.*
 import org.jetbrains.kotlin.formver.viper.domains.NullableDomain
@@ -47,7 +50,18 @@ class ProgramConverter(val session: FirSession) : ProgramConversionContext {
     }
 
     override fun add(symbol: FirRegularClassSymbol): ClassEmbedding {
+
         val className = ClassName(symbol.classId.packageFqName, symbol.classId.shortClassName)
+        // If the class name is not contained in the classes hashmap, then add a new embedding.
+        classes.getOrPut(className) l@{
+            // Get classes fields
+            val concreteFields = symbol.declarationSymbols
+                .filterIsInstance<FirPropertySymbol>()
+                .filter { it.hasBackingField }
+            println(concreteFields)
+            return@l ClassEmbedding(className, mutableListOf(), mutableListOf())
+        }
+
         return classes[className]!!
     }
 
@@ -60,10 +74,11 @@ class ProgramConverter(val session: FirSession) : ProgramConversionContext {
         type.isNullable -> NullableTypeEmbedding(embedType(type.withNullability(ConeNullability.NOT_NULL, session.typeContext)))
         else -> {
             val classId = type.classId!!
-            val className = ClassName(classId.packageFqName, classId.shortClassName)
-            // If the class name is not contained in the classes hashmap, then add a new embedding.
-            classes.getOrPut(className) {
-                ClassEmbedding(className, mutableListOf(), mutableListOf())
+            val classLikeSymbol = session.symbolProvider.getClassLikeSymbolByClassId(classId)
+            if (classLikeSymbol is FirRegularClassSymbol) {
+                add(classLikeSymbol)
+            } else {
+                TODO("Implement other class symbols")
             }
         }
     }
