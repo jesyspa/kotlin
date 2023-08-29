@@ -9,7 +9,7 @@ import org.jetbrains.kotlin.formver.viper.MangledName
 
 /**
  * This file contains classes/objects representing new names
- * for Viper's specific declaration and non.
+ * for Viper's specific declarations.
  */
 
 /**
