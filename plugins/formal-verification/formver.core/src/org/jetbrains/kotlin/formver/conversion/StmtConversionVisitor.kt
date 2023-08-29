@@ -25,6 +25,7 @@ import org.jetbrains.kotlin.fir.types.coneTypeOrNull
 import org.jetbrains.kotlin.fir.types.resolvedType
 import org.jetbrains.kotlin.fir.visitors.FirVisitor
 import org.jetbrains.kotlin.formver.embeddings.*
+import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.formver.viper.ast.AccessPredicate
 import org.jetbrains.kotlin.formver.viper.ast.Exp
 import org.jetbrains.kotlin.formver.viper.ast.PermExp
@@ -182,23 +183,10 @@ class StmtConversionVisitor : FirVisitor<Exp, StmtConversionContext>() {
             Exp.EqCmp(left, right.withType(left.type))
         }
 
-    @OptIn(SymbolInternals::class)
     override fun visitFunctionCall(functionCall: FirFunctionCall, data: StmtConversionContext): Exp {
         val isInline = functionCall.calleeReference.toResolvedCallableSymbol()!!.resolvedStatus.isInline
-
-        val inlineBody = functionCall.calleeReference.toResolvedNamedFunctionSymbol()!!.fir.body
-        if (isInline && inlineBody != null) {
-            val retVar = data.newAnonVar(data.embedType(functionCall.resolvedType))
-            data.addDeclaration(retVar.toLocalVarDecl())
-            val inlineArgs = functionCall.calleeReference.toResolvedNamedFunctionSymbol()!!.valueParameterSymbols.map {
-                VariableEmbedding(it.embedName(), data.embedType(it.resolvedReturnType)).toLocalVar().name
-            } + ReturnVariableName
-            val callArgs = getFunctionCallArguments(functionCall).map { (it.accept(this, data) as Exp.LocalVar).name } + retVar.name
-            val subs = inlineArgs.zip(callArgs).toMap()
-            val inlineCtx = InlineStmtConversionContext(data, subs, retVar)
-            inlineBody.accept(this, inlineCtx)
-            data.addStatement(Stmt.If(Exp.BoolLit(true), inlineCtx.block, Stmt.Seqn(listOf(), listOf())))
-            return retVar.toLocalVar()
+        if (isInline) {
+            return processInlineFunctionCall(functionCall, data)
         }
 
         val id = functionCall.calleeReference.toResolvedCallableSymbol()!!.callableId
@@ -223,6 +211,38 @@ class StmtConversionVisitor : FirVisitor<Exp, StmtConversionContext>() {
         data.addStatement(Stmt.MethodCall(calleeSig.name.mangled, args, listOf(returnExp)))
 
         return returnExp
+    }
+
+    @OptIn(SymbolInternals::class)
+    private fun processInlineFunctionCall(functionCall: FirFunctionCall, data: StmtConversionContext): Exp {
+        val symbol = functionCall.calleeReference.toResolvedNamedFunctionSymbol()!!
+        val inlineBody =
+            symbol.fir.body ?: return UnitDomain.element
+
+        val retVar = data.newAnonVar(data.embedType(functionCall.resolvedType))
+        data.addDeclaration(retVar.toLocalVarDecl())
+        val inlineArgs: List<MangledName> = symbol.valueParameterSymbols.map { it.embedName() }
+        val callArgs = getFunctionCallArguments(functionCall).map {
+            if (it !is FirLambdaArgumentExpression) {
+                it.accept(this, data)
+            } else {
+                null
+            }
+        }
+        val substitutionParams = buildMap { for ((name, exp) in inlineArgs.zip(callArgs)) if (exp != null) put(name, exp) }
+        val substitutionInvoke = buildMap {
+            for ((name, exp) in inlineArgs.zip(getFunctionCallArguments(functionCall))) if (exp is FirLambdaArgumentExpression) {
+                val tempCtx = StmtConverter(data)
+                // TODO: are there cases in which exp.expression is not FirAnonymousFunctionExpression?
+                (exp.expression as FirAnonymousFunctionExpression).anonymousFunction.body?.accept(this@StmtConversionVisitor, tempCtx)
+                // for now, we are only interested in counting the number of calls so the rest can be ignored
+                put(name, tempCtx.block.stmts.filter { it is Stmt.MethodCall && it.methodName == InvokeFunctionObjectName.mangled })
+            }
+        }
+        val inlineCtx = InlineStmtConversionContext(data, substitutionParams, substitutionInvoke, retVar.name)
+        inlineBody.accept(this, inlineCtx)
+        data.addStatement(Stmt.If(Exp.BoolLit(true), inlineCtx.block, Stmt.Seqn(listOf(), listOf())))
+        return retVar.toLocalVar()
     }
 
     override fun visitImplicitInvokeCall(implicitInvokeCall: FirImplicitInvokeCall, data: StmtConversionContext): Exp {

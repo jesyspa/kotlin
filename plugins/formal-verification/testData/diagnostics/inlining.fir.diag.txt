@@ -47,3 +47,56 @@ method global$pkg_$foo(local$g: Ref) returns (ret$: Int)
   }
   ret$ := anonymous$2
 }
+
+/inlining.kt:(537,548): info: Generated Viper text for pass_lambda:
+method global$pkg_$pass_lambda(local$g: Ref) returns (ret$: Int)
+  requires acc(local$g.special$function_object_call_counter, write)
+  ensures acc(local$g.special$function_object_call_counter, write)
+  ensures old(local$g.special$function_object_call_counter) <=
+    local$g.special$function_object_call_counter
+  ensures local$g.special$function_object_call_counter >
+    old(local$g.special$function_object_call_counter)
+{
+  var anonymous$1: Int
+  if (true) {
+    var inline$global$pkg_$pass_lambda$anonymous$1: Int
+    var inline$global$pkg_$pass_lambda$local$x: Int
+    var inline$global$pkg_$pass_lambda$anonymous$2: Int
+    special$invoke_function_object(local$g)
+    special$invoke_function_object(local$g)
+    inline$global$pkg_$pass_lambda$local$x := inline$global$pkg_$pass_lambda$anonymous$1
+    special$invoke_function_object(local$g)
+    special$invoke_function_object(local$g)
+    anonymous$1 := inline$global$pkg_$pass_lambda$anonymous$2
+  }
+  ret$ := anonymous$1
+}
+
+/inlining.kt:(782,800): info: Generated Viper text for pass_lambda_nested:
+method global$pkg_$pass_lambda_nested(local$f: Ref, local$g: Ref)
+  returns (ret$: Int)
+  requires acc(local$f.special$function_object_call_counter, write)
+  requires acc(local$g.special$function_object_call_counter, write)
+  ensures acc(local$f.special$function_object_call_counter, write)
+  ensures acc(local$g.special$function_object_call_counter, write)
+  ensures old(local$f.special$function_object_call_counter) <=
+    local$f.special$function_object_call_counter
+  ensures old(local$g.special$function_object_call_counter) <=
+    local$g.special$function_object_call_counter
+  ensures local$g.special$function_object_call_counter >
+    old(local$g.special$function_object_call_counter)
+{
+  var anonymous$1: Int
+  if (true) {
+    var inline$global$pkg_$pass_lambda_nested$anonymous$1: Int
+    var inline$global$pkg_$pass_lambda_nested$local$x: Int
+    var inline$global$pkg_$pass_lambda_nested$anonymous$2: Int
+    special$invoke_function_object(local$g)
+    special$invoke_function_object(local$f)
+    inline$global$pkg_$pass_lambda_nested$local$x := inline$global$pkg_$pass_lambda_nested$anonymous$1
+    special$invoke_function_object(local$g)
+    special$invoke_function_object(local$f)
+    anonymous$1 := inline$global$pkg_$pass_lambda_nested$anonymous$2
+  }
+  ret$ := anonymous$1
+}
