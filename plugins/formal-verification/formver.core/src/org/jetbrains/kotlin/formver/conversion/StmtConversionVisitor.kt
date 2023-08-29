@@ -120,12 +120,13 @@ class StmtConversionVisitor : FirVisitor<Exp, StmtConversionContext>() {
                 if (symbol.isLocal) {
                     return varEmbedding.toLocalVar()
                 } else {
-                    val receiver = propertyAccessExpression.dispatchReceiver.toResolvedCallableSymbol()!!
-                    val receiverType = receiver.resolvedReturnTypeRef.coneTypeOrNull!!
-                    val cvar = VariableEmbedding(receiver.callableId.embedName(), data.embedType(receiverType))
-                    val fieldAccess = Exp.FieldAccess(cvar.toLocalVar(), varEmbedding.toField())
+
+                    val receiver = propertyAccessExpression.dispatchReceiver.accept(this, data)
+
+                    val fieldAccess = Exp.FieldAccess(receiver, varEmbedding.toField())
                     val accPred = AccessPredicate.FieldAccessPredicate(fieldAccess, PermExp.FullPerm())
                     val anon = data.newAnonVar(varEmbedding.type)
+
                     data.addDeclaration(anon.toLocalVarDecl())
                     // Inhale permission for the field before reading it.
                     data.addStatement(Stmt.Inhale(accPred))
@@ -187,7 +188,8 @@ class StmtConversionVisitor : FirVisitor<Exp, StmtConversionContext>() {
             return specialFunc.convertCall(getArgs(), data)
         }
 
-        val calleeSig = when (val symbol = functionCall.calleeReference.resolved!!.resolvedSymbol) {
+        val symbol = functionCall.calleeReference.resolved!!.resolvedSymbol
+        val calleeSig = when (symbol) {
             is FirNamedFunctionSymbol -> data.add(symbol)
             is FirConstructorSymbol -> data.add(symbol)
             else -> TODO("Are there any other possible cases?")
