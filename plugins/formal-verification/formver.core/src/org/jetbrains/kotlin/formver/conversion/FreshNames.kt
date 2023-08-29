@@ -36,7 +36,7 @@ data object InvokeFunctionObjectName : MangledName {
         get() = "special\$invoke_function_object"
 }
 
-data class InlineName(val inlineFunctionName: String, val name: String) : MangledName{
+data class InlineName(val inlineFunctionName: MangledName, val name: MangledName) : MangledName {
     override val mangled: String
-        get() = "inline\$$inlineFunctionName\$$name"
+        get() = "inline\$${inlineFunctionName.mangled}\$${name.mangled}"
 }

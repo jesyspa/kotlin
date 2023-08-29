@@ -22,7 +22,7 @@ class InlineStmtConversionContext(
 ) :
     StmtConverter(methodCtx) {
     private var nextAnonVarNumber = 0
-    private fun freshName(old: MangledName) = InlineName(methodCtx.signature.name.mangled, old.mangled)
+    private fun freshName(old: MangledName) = InlineName(methodCtx.signature.name, old)
 
     private fun substitute(decl: Declaration): Declaration {
         when (decl) {
