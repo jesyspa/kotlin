@@ -45,7 +45,7 @@ class ProgramConverter(val session: FirSession) : ProgramConversionContext {
         processFunction(declaration.symbol, declaration.body)
     }
 
-    override fun <D : FirFunction> add(symbol: FirFunctionSymbol<D>): MethodSignatureEmbedding {
+    override fun add(symbol: FirFunctionSymbol<*>): MethodSignatureEmbedding {
         return processFunction(symbol, null)
     }
 
