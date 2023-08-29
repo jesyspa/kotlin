@@ -114,8 +114,8 @@ class ProgramConverter(val session: FirSession) : ProgramConversionContext {
             }
 
             val seqn = body?.let {
-                val ctx = StmtConverter(methodCtx)
-                ctx.convertAndAppend(body)
+                val ctx = StmtConverter(methodCtx, SeqnBuilder())
+                ctx.convert(body)
                 ctx.block
             }
 
