@@ -59,9 +59,8 @@ class ProgramConverter(val session: FirSession) : ProgramConversionContext {
                 .filterIsInstance<FirPropertySymbol>()
                 .filter { it.hasBackingField }
                 .map { VariableEmbedding(it.callableId.embedName(), embedType(it.resolvedReturnType)) }
-                .toMutableList()
 
-            return@l ClassEmbedding(className, concreteFields)
+            ClassEmbedding(className, concreteFields)
         }
     }
 
