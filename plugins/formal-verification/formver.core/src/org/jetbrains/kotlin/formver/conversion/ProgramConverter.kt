@@ -53,7 +53,7 @@ class ProgramConverter(val session: FirSession) : ProgramConversionContext {
 
         val className = ClassName(symbol.classId.packageFqName, symbol.classId.shortClassName)
         // If the class name is not contained in the classes hashmap, then add a new embedding.
-        classes.getOrPut(className) l@{
+        return classes.getOrPut(className) l@{
             // Get classes fields
             val concreteFields = symbol.declarationSymbols
                 .filterIsInstance<FirPropertySymbol>()
@@ -63,8 +63,6 @@ class ProgramConverter(val session: FirSession) : ProgramConversionContext {
 
             return@l ClassEmbedding(className, concreteFields, mutableListOf())
         }
-
-        return classes[className]!!
     }
 
     override fun embedType(type: ConeKotlinType): TypeEmbedding = when {
@@ -75,6 +73,9 @@ class ProgramConverter(val session: FirSession) : ProgramConversionContext {
         type.isSomeFunctionType(session) -> FunctionTypeEmbedding
         type.isNullable -> NullableTypeEmbedding(embedType(type.withNullability(ConeNullability.NOT_NULL, session.typeContext)))
         else -> {
+            // For the moment, to create classes' embeddings, we fall
+            // back on the else branch. Notice that is not permanent,
+            // and it will be modified in the future to handle more cases (e.g., type variables)
             val classId = type.classId!!
             val classLikeSymbol = session.symbolProvider.getClassLikeSymbolByClassId(classId)
             if (classLikeSymbol is FirRegularClassSymbol) {
