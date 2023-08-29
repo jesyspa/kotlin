@@ -61,7 +61,7 @@ class ProgramConverter(val session: FirSession) : ProgramConversionContext {
                 .map { VariableEmbedding(it.callableId.embedName(), embedType(it.resolvedReturnType)) }
                 .toMutableList()
 
-            return@l ClassEmbedding(className, concreteFields, mutableListOf())
+            return@l ClassEmbedding(className, concreteFields)
         }
     }
 

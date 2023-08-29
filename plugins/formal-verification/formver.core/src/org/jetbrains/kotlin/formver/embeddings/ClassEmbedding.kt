@@ -9,8 +9,7 @@ import org.jetbrains.kotlin.formver.viper.ast.Type
 
 class ClassEmbedding(
     val name: ClassName,
-    val fields: MutableList<VariableEmbedding>,
-    val methods: MutableList<MethodSignatureEmbedding>
+    val fields: List<VariableEmbedding>,
 ) : TypeEmbedding {
 
     override val type: Type
