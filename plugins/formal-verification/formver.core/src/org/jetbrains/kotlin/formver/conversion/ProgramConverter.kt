@@ -53,7 +53,7 @@ class ProgramConverter(val session: FirSession) : ProgramConversionContext {
 
         val className = ClassName(symbol.classId.packageFqName, symbol.classId.shortClassName)
         // If the class name is not contained in the classes hashmap, then add a new embedding.
-        return classes.getOrPut(className) l@{
+        return classes.getOrPut(className) {
             // Get classes fields
             val concreteFields = symbol.declarationSymbols
                 .filterIsInstance<FirPropertySymbol>()
