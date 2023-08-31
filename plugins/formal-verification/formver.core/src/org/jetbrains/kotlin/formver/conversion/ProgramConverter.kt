@@ -37,9 +37,9 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
 
     val program: Program
         get() = Program(
-            domains = listOf(UnitDomain, NullableDomain, CastingDomain), /* Domains */
-            fields = SpecialFields.all + classes.values.flatMap { it.fields }.map { it.toField() }, /* Fields */
-            methods = SpecialMethods.all + methods.values.toList(), /* Methods */
+            domains = listOf(UnitDomain, NullableDomain, CastingDomain),
+            fields = SpecialFields.all + classes.values.flatMap { it.fields }.map { it.toField() },
+            methods = SpecialMethods.all + methods.values.toList(),
         )
 
     fun addWithBody(declaration: FirSimpleFunction) {
@@ -72,25 +72,15 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         type.isNothing -> NothingTypeEmbedding
         type.isSomeFunctionType(session) -> FunctionTypeEmbedding
         type.isNullable -> NullableTypeEmbedding(embedType(type.withNullability(ConeNullability.NOT_NULL, session.typeContext)))
-        else -> {
-            // For the moment, to create classes' embeddings, we fall
-            // back on the else branch. Notice that is not permanent,
-            // and it will be modified in the future to handle more cases (e.g., type variables)
-            val classId = type.classId!!
-            val classLikeSymbol = session.symbolProvider.getClassLikeSymbolByClassId(classId)
+        type is ConeClassLikeType -> {
+            val classLikeSymbol = type.toClassSymbol(session)
             if (classLikeSymbol is FirRegularClassSymbol) {
                 add(classLikeSymbol)
             } else {
-                when (config.behaviour) {
-                    UnsupportedFeatureBehaviour.THROW_EXCEPTION ->
-                        throw NotImplementedError("The embedding for type $type is not yet implemented.")
-                    UnsupportedFeatureBehaviour.ASSUME_UNREACHABLE -> {
-                        System.err.println("Requested type $type, for which we do not yet have an embedding.")
-                        UnitTypeEmbedding
-                    }
-                }
+                unimplementedTypeEmbedding(type)
             }
         }
+        else -> unimplementedTypeEmbedding(type)
     }
 
     private fun <D : FirFunction> embedSignature(symbol: FirFunctionSymbol<D>): MethodSignatureEmbedding {
@@ -128,11 +118,21 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
             }
 
             val postconditions = symbol.resolvedContractDescription?.effects?.map {
-                it.effect.accept(ContractDescriptionConversionVisitor(), methodCtx)
+                it.effect.accept(ContractDescriptionConversionVisitor, methodCtx)
             } ?: emptyList()
 
             signature.toMethod(listOf(), postconditions, seqn)
         }
         return signature
     }
+
+    private fun unimplementedTypeEmbedding(type: ConeKotlinType): TypeEmbedding =
+        when (config.behaviour) {
+            UnsupportedFeatureBehaviour.THROW_EXCEPTION ->
+                throw NotImplementedError("The embedding for type $type is not yet implemented.")
+            UnsupportedFeatureBehaviour.ASSUME_UNREACHABLE -> {
+                System.err.println("Requested type $type, for which we do not yet have an embedding.")
+                UnitTypeEmbedding
+            }
+        }
 }
