@@ -242,7 +242,7 @@ object StmtConversionVisitor : FirVisitor<Exp, StmtConversionContext>() {
         bodyCtx.convert(whileLoop.block)
         bodyCtx.convertAndCapture(whileLoop.condition)
 
-        data.addStatement(Stmt.While(condCtx.resultVar.toLocalVar(), invariants = emptyList(), bodyCtx.block))
+        data.addStatement(Stmt.While(condCtx.resultVar.toLocalVar(), invariants = data.signature.postConditions, bodyCtx.block))
         return UnitDomain.element
     }
 
