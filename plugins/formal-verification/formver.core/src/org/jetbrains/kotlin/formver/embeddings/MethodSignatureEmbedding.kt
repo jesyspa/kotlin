@@ -5,6 +5,9 @@
 
 package org.jetbrains.kotlin.formver.embeddings
 
+import org.jetbrains.kotlin.fir.symbols.impl.FirFunctionSymbol
+import org.jetbrains.kotlin.fir.symbols.impl.FirNamedFunctionSymbol
+import org.jetbrains.kotlin.formver.conversion.ContractDescriptionConversionVisitor
 import org.jetbrains.kotlin.formver.conversion.ReturnVariableName
 import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.formver.viper.ast.*
@@ -15,6 +18,7 @@ import org.jetbrains.kotlin.formver.viper.ast.*
  * Example: Foo.bar(x: Int) --> Foo$bar(this: Foo, x: Int)
  */
 class MethodSignatureEmbedding(
+    symbol: FirFunctionSymbol<*>,
     val name: MangledName,
     val receiver: VariableEmbedding?,
     val params: List<VariableEmbedding>,
@@ -24,8 +28,16 @@ class MethodSignatureEmbedding(
 
     val formalArgs: List<VariableEmbedding> = listOfNotNull(receiver) + params
 
+    val preConditions = formalArgs.flatMap { it.invariants() }
+
+    private val contractPostConditions = symbol.resolvedContractDescription?.effects?.map {
+        it.effect.accept(ContractDescriptionConversionVisitor, this)
+    } ?: emptyList()
+
+    val postConditions =
+        params.flatMap { it.invariants() } + params.flatMap { it.dynamicInvariants() } + returnVar.invariants() + contractPostConditions
+
     fun toMethod(
-        pres: List<Exp>, posts: List<Exp>,
         body: Stmt.Seqn?,
         pos: Position = Position.NoPosition,
         info: Info = Info.NoInfo,
@@ -34,10 +46,8 @@ class MethodSignatureEmbedding(
         name,
         formalArgs.map { it.toLocalVarDecl() },
         returnVar.toLocalVarDecl(),
-        formalArgs.flatMap { it.invariants() } + pres,
-        formalArgs.flatMap { it.invariants() } +
-                formalArgs.flatMap { it.dynamicInvariants() } +
-                returnVar.invariants() + posts,
+        preConditions,
+        postConditions,
         body, pos, info, trafos,
     )
 
