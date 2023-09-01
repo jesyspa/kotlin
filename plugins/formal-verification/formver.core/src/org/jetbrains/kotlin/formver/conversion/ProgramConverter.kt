@@ -10,7 +10,6 @@ import org.jetbrains.kotlin.fir.declarations.FirFunction
 import org.jetbrains.kotlin.fir.declarations.FirSimpleFunction
 import org.jetbrains.kotlin.fir.declarations.utils.hasBackingField
 import org.jetbrains.kotlin.fir.expressions.FirBlock
-import org.jetbrains.kotlin.fir.resolve.providers.symbolProvider
 import org.jetbrains.kotlin.fir.symbols.impl.FirFunctionSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirPropertySymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirRegularClassSymbol
@@ -42,15 +41,15 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
             methods = SpecialMethods.all + methods.values.toList(),
         )
 
-    fun addWithBody(declaration: FirSimpleFunction) {
+    fun registerForVerification(declaration: FirSimpleFunction) {
         processFunction(declaration.symbol, declaration.body)
     }
 
-    override fun add(symbol: FirFunctionSymbol<*>): MethodSignatureEmbedding {
+    override fun embedFunction(symbol: FirFunctionSymbol<*>): MethodSignatureEmbedding {
         return processFunction(symbol, null)
     }
 
-    override fun add(symbol: FirRegularClassSymbol): ClassEmbedding {
+    override fun embedClass(symbol: FirRegularClassSymbol): ClassEmbedding {
 
         val className = ClassName(symbol.classId.packageFqName, symbol.classId.shortClassName)
         // If the class name is not contained in the classes hashmap, then add a new embedding.
@@ -75,7 +74,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         type is ConeClassLikeType -> {
             val classLikeSymbol = type.toClassSymbol(session)
             if (classLikeSymbol is FirRegularClassSymbol) {
-                add(classLikeSymbol)
+                embedClass(classLikeSymbol)
             } else {
                 unimplementedTypeEmbedding(type)
             }

@@ -11,13 +11,10 @@ import org.jetbrains.kotlin.fir.declarations.FirProperty
 import org.jetbrains.kotlin.fir.expressions.*
 import org.jetbrains.kotlin.fir.expressions.impl.FirElseIfTrueCondition
 import org.jetbrains.kotlin.fir.expressions.impl.FirNoReceiverExpression
-import org.jetbrains.kotlin.fir.references.resolved
 import org.jetbrains.kotlin.fir.references.toResolvedBaseSymbol
 import org.jetbrains.kotlin.fir.references.toResolvedCallableSymbol
-import org.jetbrains.kotlin.fir.symbols.impl.FirConstructorSymbol
-import org.jetbrains.kotlin.fir.symbols.impl.FirNamedFunctionSymbol
-import org.jetbrains.kotlin.fir.symbols.impl.FirPropertySymbol
-import org.jetbrains.kotlin.fir.symbols.impl.FirValueParameterSymbol
+import org.jetbrains.kotlin.fir.symbols.FirBasedSymbol
+import org.jetbrains.kotlin.fir.symbols.impl.*
 import org.jetbrains.kotlin.fir.types.coneType
 import org.jetbrains.kotlin.fir.types.coneTypeOrNull
 import org.jetbrains.kotlin.fir.visitors.FirVisitor
@@ -27,7 +24,6 @@ import org.jetbrains.kotlin.formver.viper.ast.AccessPredicate
 import org.jetbrains.kotlin.formver.viper.ast.Exp
 import org.jetbrains.kotlin.formver.viper.ast.PermExp
 import org.jetbrains.kotlin.formver.viper.ast.Stmt
-import org.jetbrains.kotlin.formver.viper.domains.NullableDomain
 import org.jetbrains.kotlin.formver.viper.domains.UnitDomain
 import org.jetbrains.kotlin.text
 import org.jetbrains.kotlin.types.ConstantValueKind
@@ -109,9 +105,8 @@ object StmtConversionVisitor : FirVisitor<Exp, StmtConversionContext>() {
         propertyAccessExpression: FirPropertyAccessExpression,
         data: StmtConversionContext,
     ): Exp {
-        val symbol = propertyAccessExpression.calleeReference.toResolvedBaseSymbol()!!
         val type = data.embedType(propertyAccessExpression)
-        return when (symbol) {
+        return when (val symbol = propertyAccessExpression.calleeSymbol) {
             is FirValueParameterSymbol -> VariableEmbedding(symbol.callableId.embedName(), type).toLocalVar()
             is FirPropertySymbol -> {
                 val varEmbedding = VariableEmbedding(symbol.callableId.embedName(), type)
@@ -172,7 +167,8 @@ object StmtConversionVisitor : FirVisitor<Exp, StmtConversionContext>() {
         }
 
     override fun visitFunctionCall(functionCall: FirFunctionCall, data: StmtConversionContext): Exp {
-        val id = functionCall.calleeReference.toResolvedCallableSymbol()!!.callableId
+        val symbol = functionCall.calleeCallableSymbol
+        val id = symbol.callableId
         val specialFunc = SpecialFunctions.byCallableId[id]
         val getArgs = { getFunctionCallArguments(functionCall).map(data::convert) }
         if (specialFunc != null) {
@@ -180,11 +176,10 @@ object StmtConversionVisitor : FirVisitor<Exp, StmtConversionContext>() {
             return specialFunc.convertCall(getArgs(), data)
         }
 
-        val calleeSig = when (val symbol = functionCall.toResolvedCallableSymbol()) {
-            is FirNamedFunctionSymbol -> data.add(symbol)
-            is FirConstructorSymbol -> data.add(symbol)
-            null -> throw Exception("Expected ${functionCall.calleeReference} to be resolved, but it isn't.")
-            else -> TODO("Are there any other possible cases?")
+        val calleeSig = when (symbol) {
+            is FirNamedFunctionSymbol -> data.embedFunction(symbol)
+            is FirConstructorSymbol -> data.embedFunction(symbol)
+            else -> TODO("Identify and handle other cases")
         }
 
         return data.withResult(calleeSig.returnType) {
@@ -195,7 +190,7 @@ object StmtConversionVisitor : FirVisitor<Exp, StmtConversionContext>() {
 
     override fun visitImplicitInvokeCall(implicitInvokeCall: FirImplicitInvokeCall, data: StmtConversionContext): Exp {
         val args = getFunctionCallArguments(implicitInvokeCall).map(data::convert)
-        val retType = implicitInvokeCall.toResolvedCallableSymbol()!!.resolvedReturnType
+        val retType = implicitInvokeCall.calleeCallableSymbol.resolvedReturnType
         return data.withResult(data.embedType(retType)) {
             // NOTE: Since it is only relevant to update the number of times that a function object is called,
             // the function call invocation is intentionally not assigned to the return variable
@@ -278,6 +273,11 @@ object StmtConversionVisitor : FirVisitor<Exp, StmtConversionContext>() {
     override fun visitThisReceiverExpression(thisReceiverExpression: FirThisReceiverExpression, data: StmtConversionContext): Exp =
         data.signature.receiver?.toLocalVar()
             ?: throw IllegalArgumentException("Can't resolve the 'this' receiver since the function does not have one.")
+
+    private val FirResolvable.calleeSymbol: FirBasedSymbol<*>
+        get() = calleeReference.toResolvedBaseSymbol()!!
+    private val FirResolvable.calleeCallableSymbol: FirCallableSymbol<*>
+        get() = calleeReference.toResolvedCallableSymbol()!!
 
     private fun handleUnimplementedElement(msg: String, data: StmtConversionContext): Exp =
         when (data.config.behaviour) {
