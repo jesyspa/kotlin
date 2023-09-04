@@ -6,6 +6,7 @@
 package org.jetbrains.kotlin.formver.domains
 
 import org.jetbrains.kotlin.formver.embeddings.ClassEmbedding
+import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.formver.viper.ast.*
 import org.jetbrains.kotlin.formver.viper.ast.Type.Bool
 
@@ -126,8 +127,8 @@ class TypeDomain(classes: List<ClassEmbedding>) : BuiltinDomain(TYPE_DOMAIN_NAME
         val nothingType = createDomainFunc("Nothing", emptyList(), Type, true)
         val anyType = createDomainFunc("Any", emptyList(), Type, true)
         val functionType = createDomainFunc("Function", emptyList(), Type, true)
-        private fun classTypeFunc(cls: ClassEmbedding) = createDomainFunc(cls.name.mangled, emptyList(), Type, true)
-        fun classType(cls: ClassEmbedding) = classTypeFunc(cls)()
+        private fun classTypeFunc(name: MangledName) = createDomainFunc(name.mangled, emptyList(), Type, true)
+        fun classType(name: MangledName) = classTypeFunc(name)()
 
         private val t = Var("t", Type)
         private val isNullableTypeFunc = createDomainFunc("is_nullable_type", listOf(t.decl()), Bool)
@@ -136,7 +137,7 @@ class TypeDomain(classes: List<ClassEmbedding>) : BuiltinDomain(TYPE_DOMAIN_NAME
         val isSubtype = createDomainFunc("isSubtype", listOf(Var("a", Type).decl(), Var("b", Type).decl()), Bool)
     }
 
-    val classTypes = classes.map(::classTypeFunc)
+    val classTypes = classes.map { classTypeFunc(it.name) }
 
     val nonNullableTypes = listOf(intType, booleanType, unitType, nothingType, anyType, functionType) + classTypes
     val types = nonNullableTypes + nullableTypeFunc

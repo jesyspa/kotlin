@@ -10,10 +10,8 @@ import org.jetbrains.kotlin.formver.viper.ast.Type
 
 data class ClassEmbedding(
     val name: ClassName,
-    val fields: List<VariableEmbedding>,
 ) : TypeEmbedding {
-
-    override val kotlinType = TypeDomain.classType(this)
+    override val kotlinType = TypeDomain.classType(this.name)
 
     override val viperType = Type.Ref
 }
