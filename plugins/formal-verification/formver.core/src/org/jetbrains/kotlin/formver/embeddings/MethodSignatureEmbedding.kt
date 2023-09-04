@@ -6,10 +6,8 @@
 package org.jetbrains.kotlin.formver.embeddings
 
 import org.jetbrains.kotlin.fir.symbols.impl.FirFunctionSymbol
-import org.jetbrains.kotlin.fir.symbols.impl.FirNamedFunctionSymbol
 import org.jetbrains.kotlin.formver.conversion.ContractDescriptionConversionVisitor
 import org.jetbrains.kotlin.formver.conversion.ReturnVariableName
-import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.formver.viper.ast.*
 
 /**
@@ -19,23 +17,24 @@ import org.jetbrains.kotlin.formver.viper.ast.*
  */
 class MethodSignatureEmbedding(
     symbol: FirFunctionSymbol<*>,
-    val name: MangledName,
     val receiver: VariableEmbedding?,
     val params: List<VariableEmbedding>,
     val returnType: TypeEmbedding,
 ) {
+    val name = symbol.callableId.embedName()
+
     val returnVar = VariableEmbedding(ReturnVariableName, returnType)
 
     val formalArgs: List<VariableEmbedding> = listOfNotNull(receiver) + params
 
-    val preConditions = formalArgs.flatMap { it.invariants() }
+    val preconditions = formalArgs.flatMap { it.invariants() }
 
-    private val contractPostConditions = symbol.resolvedContractDescription?.effects?.map {
+    private val contractPostconditions = symbol.resolvedContractDescription?.effects?.map {
         it.effect.accept(ContractDescriptionConversionVisitor, this)
     } ?: emptyList()
 
-    val postConditions =
-        params.flatMap { it.invariants() } + params.flatMap { it.dynamicInvariants() } + returnVar.invariants() + contractPostConditions
+    val postconditions =
+        params.flatMap { it.invariants() } + params.flatMap { it.dynamicInvariants() } + returnVar.invariants() + contractPostconditions
 
     fun toMethod(
         body: Stmt.Seqn?,
@@ -46,8 +45,8 @@ class MethodSignatureEmbedding(
         name,
         formalArgs.map { it.toLocalVarDecl() },
         returnVar.toLocalVarDecl(),
-        preConditions,
-        postConditions,
+        preconditions,
+        postconditions,
         body, pos, info, trafos,
     )
 

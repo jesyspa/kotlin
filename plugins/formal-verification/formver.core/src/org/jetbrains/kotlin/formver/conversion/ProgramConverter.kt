@@ -88,7 +88,6 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         val receiver = symbol.dispatchReceiverType?.let { VariableEmbedding(ThisReceiverName, embedType(it)) }
         return MethodSignatureEmbedding(
             symbol,
-            symbol.callableId.embedName(),
             receiver,
             params,
             embedType(retType)
