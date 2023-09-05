@@ -10,12 +10,17 @@ import org.jetbrains.kotlin.fir.symbols.impl.FirFunctionSymbol
 import org.jetbrains.kotlin.fir.types.ConeKotlinType
 import org.jetbrains.kotlin.fir.types.resolvedType
 import org.jetbrains.kotlin.formver.PluginConfiguration
+import org.jetbrains.kotlin.formver.embeddings.FieldEmbedding
 import org.jetbrains.kotlin.formver.embeddings.MethodEmbedding
 import org.jetbrains.kotlin.formver.embeddings.TypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.VariableEmbedding
+import org.jetbrains.kotlin.formver.viper.MangledName
+import org.jetbrains.kotlin.formver.viper.ast.Field
 
 interface ProgramConversionContext {
     val config: PluginConfiguration
+
+    val fields: MutableMap<MangledName, FieldEmbedding>
 
     fun embedFunction(symbol: FirFunctionSymbol<*>): MethodEmbedding
     fun embedType(type: ConeKotlinType): TypeEmbedding

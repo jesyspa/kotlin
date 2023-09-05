@@ -12,6 +12,7 @@ import org.jetbrains.kotlin.fir.expressions.FirLambdaArgumentExpression
 import org.jetbrains.kotlin.fir.symbols.SymbolInternals
 import org.jetbrains.kotlin.fir.symbols.impl.FirFunctionSymbol
 import org.jetbrains.kotlin.formver.conversion.*
+import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.formver.viper.ast.Exp
 import org.jetbrains.kotlin.formver.viper.ast.Method
 import org.jetbrains.kotlin.formver.viper.ast.Stmt
@@ -58,6 +59,8 @@ class UserMethodEmbedding(
     override fun convertBody(ctx: ProgramConverter) {
         val methodCtx = object : MethodConversionContext, ProgramConversionContext by ctx {
             override val method: MethodEmbedding = this@UserMethodEmbedding
+            override val fields: MutableMap<MangledName, FieldEmbedding> = ctx.fields
+
             override val nameMangler = NoopNameMangler
             override fun getLambdaOrNull(name: Name): SubstitutionLambda? = null
         }

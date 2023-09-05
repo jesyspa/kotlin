@@ -30,12 +30,12 @@ import org.jetbrains.kotlin.formver.viper.ast.Program
 class ProgramConverter(val session: FirSession, override val config: PluginConfiguration) : ProgramConversionContext {
     private val methods: MutableMap<MangledName, MethodEmbedding> = mutableMapOf()
     private val classes: MutableMap<ClassName, ClassTypeEmbedding> = mutableMapOf()
-    private val fields: MutableList<Field> = mutableListOf()
+    override val fields: MutableMap<MangledName, FieldEmbedding> = mutableMapOf()
 
     val program: Program
         get() = Program(
             domains = listOf(UnitDomain, NullableDomain, CastingDomain, TypeOfDomain, TypeDomain(classes.values.toList()), AnyDomain),
-            fields = SpecialFields.all + fields,
+            fields = SpecialFields.all + fields.values.map { it.toViper() },
             functions = SpecialFunctions.all,
             methods = SpecialMethods.all + methods.values.filter { it.shouldIncludeInProgram }.map { it.viperMethod }.toList(),
         )
@@ -79,6 +79,8 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
     }
 
     override fun embedType(type: ConeKotlinType): TypeEmbedding = when {
+        type is ConeErrorType -> throw IllegalArgumentException("Encountered an erroneous type: $type")
+        type is ConeTypeParameterType -> NullableTypeEmbedding(AnyTypeEmbedding)
         type.isUnit -> UnitTypeEmbedding
         type.isInt -> IntTypeEmbedding
         type.isBoolean -> BooleanTypeEmbedding
@@ -125,11 +127,13 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         }
 
     private fun processClass(symbol: FirRegularClassSymbol) {
-        val concreteFields = symbol.declarationSymbols
+        symbol.declarationSymbols
             .filterIsInstance<FirPropertySymbol>()
             .filter { it.hasBackingField }
-            .map { Field(it.callableId.embedName(), embedType(it.resolvedReturnType).viperType) }
-        fields += concreteFields
+            .forEach {
+                val fieldName = it.callableId.embedName()
+                fields[fieldName] = FieldEmbedding(it.callableId.embedName(), embedType(it.resolvedReturnType))
+            }
     }
 
     private fun unimplementedTypeEmbedding(type: ConeKotlinType): TypeEmbedding =
