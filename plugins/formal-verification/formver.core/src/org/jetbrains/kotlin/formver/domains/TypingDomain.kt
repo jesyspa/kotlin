@@ -5,7 +5,7 @@
 
 package org.jetbrains.kotlin.formver.domains
 
-import org.jetbrains.kotlin.formver.embeddings.ClassEmbedding
+import org.jetbrains.kotlin.formver.embeddings.ClassTypeEmbedding
 import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.formver.viper.ast.*
 import org.jetbrains.kotlin.formver.viper.ast.Type.Bool
@@ -108,7 +108,7 @@ const val TYPE_DOMAIN_NAME = "Type"
  * }
  * ```
  */
-class TypeDomain(classes: List<ClassEmbedding>) : BuiltinDomain(TYPE_DOMAIN_NAME) {
+class TypeDomain(classes: List<ClassTypeEmbedding>) : BuiltinDomain(TYPE_DOMAIN_NAME) {
     override val typeVars: List<Type.TypeVar> = emptyList()
 
     // Define types that are not dependent on the user defined classes in a companion object.

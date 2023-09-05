@@ -31,7 +31,7 @@ import org.jetbrains.kotlin.formver.viper.ast.Program
  */
 class ProgramConverter(val session: FirSession, override val config: PluginConfiguration) : ProgramConversionContext {
     private val methods: MutableMap<MangledName, Method> = mutableMapOf()
-    private val classes: MutableMap<ClassName, ClassEmbedding> = mutableMapOf()
+    private val classes: MutableMap<ClassName, ClassTypeEmbedding> = mutableMapOf()
     private val fields: MutableList<Field> = mutableListOf()
 
     val program: Program
@@ -49,18 +49,17 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         return processFunction(symbol, null)
     }
 
-    private fun embedClass(symbol: FirRegularClassSymbol): ClassEmbedding {
+    private fun embedClass(symbol: FirRegularClassSymbol): ClassTypeEmbedding {
         val className = symbol.classId.embedName()
-        var newlyAdded = false
-        val embedding = classes.getOrPut(className) {
-            newlyAdded = true
-            ClassEmbedding(className)
+        return when (val existingEmbedding = classes[className]) {
+            null -> {
+                val newEmbedding = ClassTypeEmbedding(className)
+                classes[className] = newEmbedding
+                processClass(symbol)
+                newEmbedding
+            }
+            else -> existingEmbedding
         }
-
-        if (newlyAdded) {
-            processClass(symbol)
-        }
-        return embedding
     }
 
     override fun embedType(type: ConeKotlinType): TypeEmbedding = when {
