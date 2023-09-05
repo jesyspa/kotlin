@@ -216,16 +216,16 @@ object StmtConversionVisitor : FirVisitor<Exp, StmtConversionContext<ResultTrack
     }
 
     @OptIn(SymbolInternals::class)
-    private fun processInlineFunctionCall(functionCall: FirFunctionCall, data: StmtWithResultConversionContext) {
+    private fun processInlineFunctionCall(functionCall: FirFunctionCall, data: StmtConversionContext<VarResultTrackingContext>) {
         val symbol = functionCall.calleeNamedFunctionSymbol
         val inlineBody = symbol.fir.body ?: throw Exception("Function symbol $symbol has a null body")
-        val ctx = data.newBlockShareResult()
+        val ctx = data.newBlock()
         val inlineArgs: List<MangledName> = symbol.valueParameterSymbols.map { it.embedName() }
         val callArgs = getFunctionCallArguments(functionCall).map { ctx.convertAndStore(it).name }
         val substitutionParams = inlineArgs.zip(callArgs).toMap()
 
         val name = symbol.callableId.embedName()
-        val inlineCtx = ctx.withInlineResolver(name, substitutionParams)
+        val inlineCtx = ctx.withInlineResolver(name, ctx.resultCtx.resultVar, substitutionParams)
         inlineCtx.convert(inlineBody)
         // Note: Putting the block inside the then branch of an if-true statement is a little a hack to make Viper respect the scoping
         data.addStatement(Stmt.If(Exp.BoolLit(true), inlineCtx.block, Stmt.Seqn(listOf(), listOf())))

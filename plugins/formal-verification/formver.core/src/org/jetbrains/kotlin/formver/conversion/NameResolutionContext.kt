@@ -18,7 +18,7 @@ class SimpleNameResolver : NameResolutionContext {
 
 class InlineCallNameResolver(
     private val inlineFunctionName: MangledName,
-    private val resultVar: VariableEmbedding,
+    val resultVar: VariableEmbedding,
     private val substitutionParams: Map<MangledName, MangledName>
 ) :
     NameResolutionContext {
