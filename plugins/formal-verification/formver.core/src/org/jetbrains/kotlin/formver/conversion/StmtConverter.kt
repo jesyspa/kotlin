@@ -24,7 +24,9 @@ class StmtConverter<out RTC : ResultTrackingContext>(
     private val methodCtx: MethodConversionContext,
     private val seqnCtx: SeqnBuildContext,
     private val resultCtxFactory: ResultTrackerFactory<RTC>,
-) : StmtConversionContext<RTC>, SeqnBuildContext by seqnCtx, MethodConversionContext by methodCtx, ResultTrackingContext {
+    private val whileStack: WhileStack = WhileStack(mutableListOf(), 0)
+) : StmtConversionContext<RTC>, SeqnBuildContext by seqnCtx, MethodConversionContext by methodCtx, ResultTrackingContext,
+    WhileStackContext by whileStack {
     override val resultCtx: RTC
         get() = resultCtxFactory.build(this)
 
@@ -39,13 +41,14 @@ class StmtConverter<out RTC : ResultTrackingContext>(
         } as Exp.LocalVar
     }
 
-    override fun newBlock(): StmtConverter<RTC> = StmtConverter(this, SeqnBuilder(), resultCtxFactory)
-    override fun withoutResult(): StmtConversionContext<NoopResultTracker> = StmtConverter(this, this.seqnCtx, NoopResultTrackerFactory)
+    override fun newBlock(): StmtConverter<RTC> = StmtConverter(this, SeqnBuilder(), resultCtxFactory, whileStack)
+    override fun withoutResult(): StmtConversionContext<NoopResultTracker> =
+        StmtConverter(this, this.seqnCtx, NoopResultTrackerFactory, whileStack)
 
     override fun withResult(type: TypeEmbedding): StmtConverter<VarResultTrackingContext> {
         val newResultVar = newAnonVar(type)
         addDeclaration(newResultVar.toLocalVarDecl())
-        return StmtConverter(this, seqnCtx, VarResultTrackerFactory(newResultVar))
+        return StmtConverter(this, seqnCtx, VarResultTrackerFactory(newResultVar), whileStack)
     }
 
     override fun withInlineContext(
@@ -57,6 +60,7 @@ class StmtConverter<out RTC : ResultTrackingContext>(
             InlineMethodConverter(this, inlineFunctionSignature, returnVar, substitutionParams),
             seqnCtx,
             resultCtxFactory,
+            whileStack
         )
     }
 

@@ -30,10 +30,7 @@ import org.jetbrains.kotlin.formver.embeddings.NullableTypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.TypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.embedName
 import org.jetbrains.kotlin.formver.viper.MangledName
-import org.jetbrains.kotlin.formver.viper.ast.AccessPredicate
-import org.jetbrains.kotlin.formver.viper.ast.Exp
-import org.jetbrains.kotlin.formver.viper.ast.PermExp
-import org.jetbrains.kotlin.formver.viper.ast.Stmt
+import org.jetbrains.kotlin.formver.viper.ast.*
 import org.jetbrains.kotlin.text
 import org.jetbrains.kotlin.types.ConstantValueKind
 
@@ -283,11 +280,36 @@ object StmtConversionVisitor : FirVisitor<Exp, StmtConversionContext<ResultTrack
         val condCtx = data.withResult(BooleanTypeEmbedding)
         condCtx.convertAndCapture(whileLoop.condition)
 
-        val bodyCtx = condCtx.newBlock()
-        bodyCtx.convert(whileLoop.block)
-        bodyCtx.convertAndCapture(whileLoop.condition)
+//        val whileIndex = data.pushWhile()
+        data.inNewWhileBlock { whileIndex ->
+            val continueLabel = Label(ContinueLabelName(whileIndex), listOf())
+            val breakLabel = Label(BreakLabelName(whileIndex), listOf())
+            val bodyCtx = condCtx.newBlock()
+            bodyCtx.convert(whileLoop.block)
+            bodyCtx.convertAndCapture(whileLoop.condition)
 
-        data.addStatement(Stmt.While(condCtx.resultExp, invariants = data.postconditions, bodyCtx.block))
+            data.addDeclaration(continueLabel.toDecl())
+            data.addStatement(continueLabel.toStmt())
+            data.addStatement(Stmt.While(condCtx.resultExp, invariants = data.postconditions, bodyCtx.block))
+            data.addDeclaration(breakLabel.toDecl())
+            data.addStatement(breakLabel.toStmt())
+        }
+//        data.popWhile()
+        return UnitDomain.element
+    }
+
+    override fun visitBreakExpression(breakExpression: FirBreakExpression, data: StmtConversionContext<ResultTrackingContext>): Exp {
+        val whileIndex = data.getWhile()
+        data.addStatement(Label(BreakLabelName(whileIndex), listOf()).toGoto())
+        return UnitDomain.element
+    }
+
+    override fun visitContinueExpression(
+        continueExpression: FirContinueExpression,
+        data: StmtConversionContext<ResultTrackingContext>
+    ): Exp {
+        val whileIndex = data.getWhile()
+        data.addStatement(Label(ContinueLabelName(whileIndex), listOf()).toGoto())
         return UnitDomain.element
     }
 
