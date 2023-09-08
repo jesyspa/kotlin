@@ -289,8 +289,7 @@ object StmtConversionVisitor : FirVisitor<Exp, StmtConversionContext<ResultTrack
     }
 
     override fun visitBreakExpression(breakExpression: FirBreakExpression, data: StmtConversionContext<ResultTrackingContext>): Exp {
-        val whileIndex = data.whileIndex
-        data.addStatement(Label(BreakLabelName(whileIndex), listOf()).toGoto())
+        data.addStatement(data.breakLabel.toGoto())
         return UnitDomain.element
     }
 
@@ -298,8 +297,7 @@ object StmtConversionVisitor : FirVisitor<Exp, StmtConversionContext<ResultTrack
         continueExpression: FirContinueExpression,
         data: StmtConversionContext<ResultTrackingContext>
     ): Exp {
-        val whileIndex = data.whileIndex
-        data.addStatement(Label(ContinueLabelName(whileIndex), listOf()).toGoto())
+        data.addStatement(data.continueLabel.toGoto())
         return UnitDomain.element
     }
 

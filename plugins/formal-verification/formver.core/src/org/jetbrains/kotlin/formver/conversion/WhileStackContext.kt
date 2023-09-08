@@ -5,7 +5,10 @@
 
 package org.jetbrains.kotlin.formver.conversion
 
-interface WhileStackContext {
-    val whileIndex: Int
-    fun inNewWhileBlock(action: (StmtConversionContext<ResultTrackingContext>) -> Unit)
+import org.jetbrains.kotlin.formver.viper.ast.Label
+
+interface WhileStackContext<out RTC : ResultTrackingContext> {
+    val continueLabel: Label
+    val breakLabel: Label
+    fun inNewWhileBlock(action: (StmtConversionContext<RTC>) -> Unit)
 }

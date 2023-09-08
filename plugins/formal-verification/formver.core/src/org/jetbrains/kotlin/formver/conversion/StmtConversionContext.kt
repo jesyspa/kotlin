@@ -14,7 +14,7 @@ import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.formver.viper.ast.Exp
 
 interface StmtConversionContext<out RTC : ResultTrackingContext> : MethodConversionContext, SeqnBuildContext, ResultTrackingContext,
-    WhileStackContext {
+    WhileStackContext<RTC> {
     val resultCtx: RTC
 
     fun convert(stmt: FirStatement): Exp

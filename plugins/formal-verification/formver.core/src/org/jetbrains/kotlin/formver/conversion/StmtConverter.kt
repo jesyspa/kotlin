@@ -25,9 +25,9 @@ class StmtConverter<out RTC : ResultTrackingContext>(
     private val methodCtx: MethodConversionContext,
     private val seqnCtx: SeqnBuildContext,
     private val resultCtxFactory: ResultTrackerFactory<RTC>,
-    override val whileIndex: Int = 0
+    private val whileIndex: Int = 0
 ) : StmtConversionContext<RTC>, SeqnBuildContext by seqnCtx, MethodConversionContext by methodCtx, ResultTrackingContext,
-    WhileStackContext {
+    WhileStackContext<RTC> {
     override val resultCtx: RTC
         get() = resultCtxFactory.build(this)
 
@@ -71,15 +71,19 @@ class StmtConverter<out RTC : ResultTrackingContext>(
 
     override fun capture(exp: Exp, expType: TypeEmbedding) = resultCtx.capture(exp, expType)
 
-    override fun inNewWhileBlock(action: (StmtConversionContext<ResultTrackingContext>) -> Unit) {
+    override val breakLabel: Label
+        get() = Label(BreakLabelName(whileIndex), listOf())
+
+    override val continueLabel: Label
+        get() = Label(ContinueLabelName(whileIndex), listOf())
+
+    override fun inNewWhileBlock(action: (StmtConversionContext<RTC>) -> Unit) {
         val freshIndex = newWhileIndex()
-        val continueLabel = Label(ContinueLabelName(freshIndex), listOf())
-        val breakLabel = Label(BreakLabelName(freshIndex), listOf())
         val ctx = StmtConverter(methodCtx, seqnCtx, resultCtxFactory, freshIndex)
-        addDeclaration(continueLabel.toDecl())
-        addStatement(continueLabel.toStmt())
+        addDeclaration(ctx.continueLabel.toDecl())
+        addStatement(ctx.continueLabel.toStmt())
         action(ctx)
-        addDeclaration(breakLabel.toDecl())
-        addStatement(breakLabel.toStmt())
+        addDeclaration(ctx.breakLabel.toDecl())
+        addStatement(ctx.breakLabel.toStmt())
     }
 }
