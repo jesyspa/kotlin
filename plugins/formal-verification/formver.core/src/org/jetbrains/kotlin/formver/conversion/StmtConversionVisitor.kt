@@ -279,8 +279,6 @@ object StmtConversionVisitor : FirVisitor<Exp, StmtConversionContext<ResultTrack
     override fun visitWhileLoop(whileLoop: FirWhileLoop, data: StmtConversionContext<ResultTrackingContext>): Exp {
         val condCtx = data.withResult(BooleanTypeEmbedding)
         condCtx.convertAndCapture(whileLoop.condition)
-
-//        val whileIndex = data.pushWhile()
         data.inNewWhileBlock { whileIndex ->
             val continueLabel = Label(ContinueLabelName(whileIndex), listOf())
             val breakLabel = Label(BreakLabelName(whileIndex), listOf())
@@ -294,7 +292,6 @@ object StmtConversionVisitor : FirVisitor<Exp, StmtConversionContext<ResultTrack
             data.addDeclaration(breakLabel.toDecl())
             data.addStatement(breakLabel.toStmt())
         }
-//        data.popWhile()
         return UnitDomain.element
     }
 
