@@ -22,6 +22,7 @@ method pkg$$global$dynamic_lambda_invariant(local$f: Ref)
   inhale dom$Type$isSubtype((dom$TypeOf$typeOf(local$f): dom$Type), dom$Type$Function())
   anonymous$2 := pkg$$global$returns_boolean()
   anonymous$1 := anonymous$2
+  label label$continue$0
   while (anonymous$1)
     invariant acc(local$f.special$function_object_call_counter, write)
     invariant old(local$f.special$function_object_call_counter) <=
@@ -33,6 +34,7 @@ method pkg$$global$dynamic_lambda_invariant(local$f: Ref)
     anonymous$4 := pkg$$global$returns_boolean()
     anonymous$1 := anonymous$4
   }
+  label label$break$0
   label label$ret
 }
 
@@ -54,6 +56,7 @@ method pkg$$global$function_assignment(local$f: Ref)
   local$g := local$f
   anonymous$2 := pkg$$global$returns_boolean()
   anonymous$1 := anonymous$2
+  label label$continue$0
   while (anonymous$1)
     invariant acc(local$f.special$function_object_call_counter, write)
     invariant old(local$f.special$function_object_call_counter) <=
@@ -65,6 +68,7 @@ method pkg$$global$function_assignment(local$f: Ref)
     anonymous$4 := pkg$$global$returns_boolean()
     anonymous$1 := anonymous$4
   }
+  label label$break$0
   label label$ret
 }
 
@@ -97,6 +101,7 @@ method pkg$$global$conditional_function_assignment(local$b: Bool, local$f: Ref,
   local$g := anonymous$1
   anonymous$3 := pkg$$global$returns_boolean()
   anonymous$2 := anonymous$3
+  label label$continue$0
   while (anonymous$2)
     invariant acc(local$f.special$function_object_call_counter, write)
     invariant acc(local$h.special$function_object_call_counter, write)
@@ -111,5 +116,6 @@ method pkg$$global$conditional_function_assignment(local$b: Bool, local$f: Ref,
     anonymous$5 := pkg$$global$returns_boolean()
     anonymous$2 := anonymous$5
   }
+  label label$break$0
   label label$ret
 }
