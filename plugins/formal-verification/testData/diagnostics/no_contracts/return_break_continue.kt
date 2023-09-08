@@ -19,13 +19,12 @@ fun <!VIPER_TEXT!>while_break<!>(b: Boolean): Int {
     return i
 }
 
-fun <!VIPER_TEXT!>while_continue<!>(b: Boolean): Int {
-    var i = 0
+fun <!VIPER_TEXT!>while_continue<!>() {
+    var b = true
     while (b) {
-        i = 1
+        b = false
         continue
     }
-    return i
 }
 
 fun <!VIPER_TEXT!>while_nested<!>(b: Boolean) {

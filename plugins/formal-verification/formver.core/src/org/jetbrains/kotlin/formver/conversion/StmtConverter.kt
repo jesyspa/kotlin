@@ -12,6 +12,7 @@ import org.jetbrains.kotlin.formver.embeddings.TypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.VariableEmbedding
 import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.formver.viper.ast.Exp
+import org.jetbrains.kotlin.formver.viper.ast.Label
 
 /**
  * Tracks the results of converting a block of statements.
@@ -24,9 +25,9 @@ class StmtConverter<out RTC : ResultTrackingContext>(
     private val methodCtx: MethodConversionContext,
     private val seqnCtx: SeqnBuildContext,
     private val resultCtxFactory: ResultTrackerFactory<RTC>,
-    private val whileStack: WhileStack = WhileStack(mutableListOf(), 0)
+    override val whileIndex: Int = 0
 ) : StmtConversionContext<RTC>, SeqnBuildContext by seqnCtx, MethodConversionContext by methodCtx, ResultTrackingContext,
-    WhileStackContext by whileStack {
+    WhileStackContext {
     override val resultCtx: RTC
         get() = resultCtxFactory.build(this)
 
@@ -41,14 +42,14 @@ class StmtConverter<out RTC : ResultTrackingContext>(
         } as Exp.LocalVar
     }
 
-    override fun newBlock(): StmtConverter<RTC> = StmtConverter(this, SeqnBuilder(), resultCtxFactory, whileStack)
+    override fun newBlock(): StmtConverter<RTC> = StmtConverter(this, SeqnBuilder(), resultCtxFactory, whileIndex)
     override fun withoutResult(): StmtConversionContext<NoopResultTracker> =
-        StmtConverter(this, this.seqnCtx, NoopResultTrackerFactory, whileStack)
+        StmtConverter(this, this.seqnCtx, NoopResultTrackerFactory, whileIndex)
 
     override fun withResult(type: TypeEmbedding): StmtConverter<VarResultTrackingContext> {
         val newResultVar = newAnonVar(type)
         addDeclaration(newResultVar.toLocalVarDecl())
-        return StmtConverter(this, seqnCtx, VarResultTrackerFactory(newResultVar), whileStack)
+        return StmtConverter(this, seqnCtx, VarResultTrackerFactory(newResultVar), whileIndex)
     }
 
     override fun withInlineContext(
@@ -60,7 +61,7 @@ class StmtConverter<out RTC : ResultTrackingContext>(
             InlineMethodConverter(this, inlineFunctionSignature, returnVar, substitutionParams),
             seqnCtx,
             resultCtxFactory,
-            whileStack
+            whileIndex
         )
     }
 
@@ -69,4 +70,16 @@ class StmtConverter<out RTC : ResultTrackingContext>(
         get() = resultCtx.resultExp
 
     override fun capture(exp: Exp, expType: TypeEmbedding) = resultCtx.capture(exp, expType)
+
+    override fun inNewWhileBlock(action: (StmtConversionContext<ResultTrackingContext>) -> Unit) {
+        val freshIndex = newWhileIndex()
+        val continueLabel = Label(ContinueLabelName(freshIndex), listOf())
+        val breakLabel = Label(BreakLabelName(freshIndex), listOf())
+        val ctx = StmtConverter(methodCtx, seqnCtx, resultCtxFactory, freshIndex)
+        addDeclaration(continueLabel.toDecl())
+        addStatement(continueLabel.toStmt())
+        action(ctx)
+        addDeclaration(breakLabel.toDecl())
+        addStatement(breakLabel.toStmt())
+    }
 }

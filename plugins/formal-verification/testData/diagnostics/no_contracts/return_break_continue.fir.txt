@@ -19,14 +19,13 @@ FILE: return_break_continue.kt
 
         ^while_break R|<local>/i|
     }
-    public final fun while_continue(b: R|kotlin/Boolean|): R|kotlin/Int| {
-        lvar i: R|kotlin/Int| = Int(0)
+    public final fun while_continue(): R|kotlin/Unit| {
+        lvar b: R|kotlin/Boolean| = Boolean(true)
         while(R|<local>/b|) {
-            R|<local>/i| = Int(1)
+            R|<local>/b| = Boolean(false)
             continue@@@[R|<local>/b|]
         }
 
-        ^while_continue R|<local>/i|
     }
     public final fun while_nested(b: R|kotlin/Boolean|): R|kotlin/Unit| {
         while(R|<local>/b|) {

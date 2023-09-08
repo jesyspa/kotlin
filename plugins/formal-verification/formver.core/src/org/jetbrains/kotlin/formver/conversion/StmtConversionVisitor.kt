@@ -277,26 +277,19 @@ object StmtConversionVisitor : FirVisitor<Exp, StmtConversionContext<ResultTrack
     }
 
     override fun visitWhileLoop(whileLoop: FirWhileLoop, data: StmtConversionContext<ResultTrackingContext>): Exp {
-        val condCtx = data.withResult(BooleanTypeEmbedding)
-        condCtx.convertAndCapture(whileLoop.condition)
-        data.inNewWhileBlock { whileIndex ->
-            val continueLabel = Label(ContinueLabelName(whileIndex), listOf())
-            val breakLabel = Label(BreakLabelName(whileIndex), listOf())
+        data.inNewWhileBlock { newWhileContext ->
+            val condCtx = newWhileContext.withResult(BooleanTypeEmbedding)
             val bodyCtx = condCtx.newBlock()
+            condCtx.convertAndCapture(whileLoop.condition)
             bodyCtx.convert(whileLoop.block)
             bodyCtx.convertAndCapture(whileLoop.condition)
-
-            data.addDeclaration(continueLabel.toDecl())
-            data.addStatement(continueLabel.toStmt())
             data.addStatement(Stmt.While(condCtx.resultExp, invariants = data.postconditions, bodyCtx.block))
-            data.addDeclaration(breakLabel.toDecl())
-            data.addStatement(breakLabel.toStmt())
         }
         return UnitDomain.element
     }
 
     override fun visitBreakExpression(breakExpression: FirBreakExpression, data: StmtConversionContext<ResultTrackingContext>): Exp {
-        val whileIndex = data.getWhile()
+        val whileIndex = data.whileIndex
         data.addStatement(Label(BreakLabelName(whileIndex), listOf()).toGoto())
         return UnitDomain.element
     }
@@ -305,7 +298,7 @@ object StmtConversionVisitor : FirVisitor<Exp, StmtConversionContext<ResultTrack
         continueExpression: FirContinueExpression,
         data: StmtConversionContext<ResultTrackingContext>
     ): Exp {
-        val whileIndex = data.getWhile()
+        val whileIndex = data.whileIndex
         data.addStatement(Label(ContinueLabelName(whileIndex), listOf()).toGoto())
         return UnitDomain.element
     }
