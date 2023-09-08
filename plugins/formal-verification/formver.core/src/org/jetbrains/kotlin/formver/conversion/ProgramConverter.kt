@@ -39,6 +39,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         get() = Program(
             domains = listOf(UnitDomain, NullableDomain, CastingDomain, TypeOfDomain, TypeDomain(classes.values.toList()), AnyDomain),
             fields = SpecialFields.all + fields,
+            functions = SpecialFunctions.all,
             methods = SpecialMethods.all + methods.values.filter { it.shouldIncludeInProgram }.map { it.viperMethod }.toList(),
         )
 
@@ -112,6 +113,12 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         // and then later decide to add a body anyway.  It's not a problem for now, but
         // worth being aware of.
         return methods.getOrPut(signature.name) {
+            val contractVisitor = ContractDescriptionConversionVisitor(this@ProgramConverter, signature)
+            val contractPostconditions =
+                symbol.resolvedContractDescription?.effects?.map {
+                    it.effect.accept(contractVisitor, Unit)
+                } ?: emptyList()
+
             val methodCtx = object : MethodConversionContext, ProgramConversionContext by this {
                 override val signature: MethodSignatureEmbedding = signature
 
@@ -121,11 +128,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
                 override val returnVar: VariableEmbedding = VariableEmbedding(ReturnVariableName, signature.returnType)
 
                 override val preconditions =
-                    signature.formalArgs.flatMap { it.invariants() } + signature.formalArgs.flatMap { it.accessInvariants() }
-
-                private val contractPostconditions = symbol.resolvedContractDescription?.effects?.map {
-                    it.effect.accept(ContractDescriptionConversionVisitor, this)
-                } ?: emptyList()
+                    signature.formalArgs.flatMap { it.invariants() } + signature.formalArgs.flatMap { it.accessInvariants() } + contractVisitor.duplicabilityPreconditions
 
                 override val postconditions = signature.formalArgs.flatMap { it.accessInvariants() } +
                         signature.params.flatMap { it.dynamicInvariants() } +

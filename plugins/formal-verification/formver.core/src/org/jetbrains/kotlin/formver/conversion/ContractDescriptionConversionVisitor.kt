@@ -11,29 +11,26 @@ import org.jetbrains.kotlin.fir.diagnostics.ConeDiagnostic
 import org.jetbrains.kotlin.fir.types.ConeKotlinType
 import org.jetbrains.kotlin.formver.domains.TypeDomain
 import org.jetbrains.kotlin.formver.domains.TypeOfDomain
+import org.jetbrains.kotlin.formver.embeddings.FunctionTypeEmbedding
+import org.jetbrains.kotlin.formver.embeddings.MethodSignatureEmbedding
 import org.jetbrains.kotlin.formver.embeddings.NullableTypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.VariableEmbedding
 import org.jetbrains.kotlin.formver.viper.ast.Exp
 import org.jetbrains.kotlin.formver.viper.ast.Exp.*
 
-object ContractDescriptionConversionVisitor : KtContractDescriptionVisitor<Exp, MethodConversionContext, ConeKotlinType, ConeDiagnostic>() {
-    private fun KtValueParameterReference<ConeKotlinType, ConeDiagnostic>.embeddedVar(data: MethodConversionContext): VariableEmbedding =
-        if (parameterIndex == -1) data.signature.receiver!! else data.signature.params[parameterIndex]
+class ContractDescriptionConversionVisitor(
+    private val ctx: ProgramConversionContext,
+    private val signature: MethodSignatureEmbedding,
+) : KtContractDescriptionVisitor<Exp, Unit, ConeKotlinType, ConeDiagnostic>() {
+    private val duplicableParameters = (signature.params.indices.toSet() + setOfNotNull(signature.receiver?.let { -1 })).toMutableSet()
 
-    private fun VariableEmbedding.nullCmp(isNegated: Boolean): Exp =
-        if (type is NullableTypeEmbedding) {
-            if (isNegated) {
-                NeCmp(toLocalVar(), type.nullVal)
-            } else {
-                EqCmp(toLocalVar(), type.nullVal)
-            }
-        } else {
-            BoolLit(isNegated)
-        }
+    val duplicabilityPreconditions: List<Exp>
+        get() = duplicableParameters.map { embeddedVarByIndex(it) }.filter { it.type is FunctionTypeEmbedding }
+            .map { DuplicableFunction.toFuncApp(listOf(it.toLocalVar())) }
 
     override fun visitBooleanConstantDescriptor(
         booleanConstantDescriptor: KtBooleanConstantReference<ConeKotlinType, ConeDiagnostic>,
-        data: MethodConversionContext,
+        data: Unit,
     ): Exp = when (booleanConstantDescriptor) {
         ConeContractConstantValues.TRUE -> BoolLit(true)
         ConeContractConstantValues.FALSE -> BoolLit(false)
@@ -42,9 +39,9 @@ object ContractDescriptionConversionVisitor : KtContractDescriptionVisitor<Exp, 
 
     override fun visitReturnsEffectDeclaration(
         returnsEffect: KtReturnsEffectDeclaration<ConeKotlinType, ConeDiagnostic>,
-        data: MethodConversionContext,
+        data: Unit,
     ): Exp {
-        val retVar = data.signature.returnVar.toLocalVar()
+        val retVar = signature.returnVar.toLocalVar()
         return when (returnsEffect.value) {
             ConeContractConstantValues.WILDCARD -> BoolLit(true)
             /* NOTE: in a function that has a non-nullable return type, the compiler will not complain if there is an effect like
@@ -52,8 +49,8 @@ object ContractDescriptionConversionVisitor : KtContractDescriptionVisitor<Exp, 
              * values and null. In a function that has a non-nullable return type, returnsNotNull() is mapped to true and returns(null)
              * is mapped to false
              */
-            ConeContractConstantValues.NULL -> data.signature.returnVar.nullCmp(false)
-            ConeContractConstantValues.NOT_NULL -> data.signature.returnVar.nullCmp(true)
+            ConeContractConstantValues.NULL -> signature.returnVar.nullCmp(false)
+            ConeContractConstantValues.NOT_NULL -> signature.returnVar.nullCmp(true)
             ConeContractConstantValues.TRUE -> EqCmp(retVar, BoolLit(true))
             ConeContractConstantValues.FALSE -> EqCmp(retVar, BoolLit(false))
             else -> throw Exception("Unexpected constant: ${returnsEffect.value}")
@@ -62,24 +59,24 @@ object ContractDescriptionConversionVisitor : KtContractDescriptionVisitor<Exp, 
 
     override fun visitValueParameterReference(
         valueParameterReference: KtValueParameterReference<ConeKotlinType, ConeDiagnostic>,
-        data: MethodConversionContext,
-    ): Exp = valueParameterReference.embeddedVar(data).toLocalVar()
+        data: Unit,
+    ): Exp = valueParameterReference.embeddedVar().toLocalVar()
 
     override fun visitIsNullPredicate(
         isNullPredicate: KtIsNullPredicate<ConeKotlinType, ConeDiagnostic>,
-        data: MethodConversionContext,
+        data: Unit,
     ): Exp {
         /* NOTE: useless comparisons like x != null with x non-nullable will compile with just a warning.
          * So it is necessary to take care of these cases in order to avoid comparison between non-nullable
          * values and null. Let x be a non-nullable variable, then x == null is mapped to false and x != null is mapped to true
          */
-        val param = isNullPredicate.arg.embeddedVar(data)
+        val param = isNullPredicate.arg.embeddedVar()
         return param.nullCmp(isNullPredicate.isNegated)
     }
 
     override fun visitLogicalBinaryOperationContractExpression(
         binaryLogicExpression: KtBinaryLogicExpression<ConeKotlinType, ConeDiagnostic>,
-        data: MethodConversionContext,
+        data: Unit,
     ): Exp {
         val left = binaryLogicExpression.left.accept(this, data)
         val right = binaryLogicExpression.right.accept(this, data)
@@ -89,14 +86,14 @@ object ContractDescriptionConversionVisitor : KtContractDescriptionVisitor<Exp, 
         }
     }
 
-    override fun visitLogicalNot(logicalNot: KtLogicalNot<ConeKotlinType, ConeDiagnostic>, data: MethodConversionContext): Exp {
+    override fun visitLogicalNot(logicalNot: KtLogicalNot<ConeKotlinType, ConeDiagnostic>, data: Unit): Exp {
         val arg = logicalNot.arg.accept(this, data)
         return Not(arg)
     }
 
     override fun visitConditionalEffectDeclaration(
         conditionalEffect: KtConditionalEffectDeclaration<ConeKotlinType, ConeDiagnostic>,
-        data: MethodConversionContext,
+        data: Unit,
     ): Exp {
         val effect = conditionalEffect.effect.accept(this, data)
         val cond = conditionalEffect.condition.accept(this, data)
@@ -105,9 +102,10 @@ object ContractDescriptionConversionVisitor : KtContractDescriptionVisitor<Exp, 
 
     override fun visitCallsEffectDeclaration(
         callsEffect: KtCallsEffectDeclaration<ConeKotlinType, ConeDiagnostic>,
-        data: MethodConversionContext,
+        data: Unit,
     ): Exp {
         val param = callsEffect.valueParameterReference.accept(this, data)
+        duplicableParameters.remove(callsEffect.valueParameterReference.parameterIndex)
         val callsFieldAccess = FieldAccess(param, SpecialFields.FunctionObjectCallCounterField)
         return when (callsEffect.kind) {
             // NOTE: case not supported for contracts
@@ -138,9 +136,26 @@ object ContractDescriptionConversionVisitor : KtContractDescriptionVisitor<Exp, 
 
     override fun visitIsInstancePredicate(
         isInstancePredicate: KtIsInstancePredicate<ConeKotlinType, ConeDiagnostic>,
-        data: MethodConversionContext
+        data: Unit,
     ): Exp {
-        val argVar = isInstancePredicate.arg.embeddedVar(data)
-        return TypeDomain.isSubtype(TypeOfDomain.typeOf(argVar.toLocalVar()), data.embedType(isInstancePredicate.type).kotlinType)
+        val argVar = isInstancePredicate.arg.embeddedVar()
+        return TypeDomain.isSubtype(TypeOfDomain.typeOf(argVar.toLocalVar()), ctx.embedType(isInstancePredicate.type).kotlinType)
     }
+
+    private fun KtValueParameterReference<ConeKotlinType, ConeDiagnostic>.embeddedVar(): VariableEmbedding =
+        embeddedVarByIndex(parameterIndex)
+
+    private fun embeddedVarByIndex(ix: Int): VariableEmbedding =
+        if (ix == -1) signature.receiver!! else signature.params[ix]
+
+    private fun VariableEmbedding.nullCmp(isNegated: Boolean): Exp =
+        if (type is NullableTypeEmbedding) {
+            if (isNegated) {
+                NeCmp(toLocalVar(), type.nullVal)
+            } else {
+                EqCmp(toLocalVar(), type.nullVal)
+            }
+        } else {
+            BoolLit(isNegated)
+        }
 }
