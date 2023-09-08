@@ -11,7 +11,6 @@ import org.jetbrains.kotlin.fir.diagnostics.ConeDiagnostic
 import org.jetbrains.kotlin.fir.types.ConeKotlinType
 import org.jetbrains.kotlin.formver.domains.TypeDomain
 import org.jetbrains.kotlin.formver.domains.TypeOfDomain
-import org.jetbrains.kotlin.formver.embeddings.FunctionTypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.MethodSignatureEmbedding
 import org.jetbrains.kotlin.formver.embeddings.NullableTypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.VariableEmbedding
@@ -22,12 +21,6 @@ class ContractDescriptionConversionVisitor(
     private val ctx: ProgramConversionContext,
     private val signature: MethodSignatureEmbedding,
 ) : KtContractDescriptionVisitor<Exp, Unit, ConeKotlinType, ConeDiagnostic>() {
-    private val duplicableParameters = (signature.params.indices.toSet() + setOfNotNull(signature.receiver?.let { -1 })).toMutableSet()
-
-    val duplicabilityPreconditions: List<Exp>
-        get() = duplicableParameters.map { embeddedVarByIndex(it) }.filter { it.type is FunctionTypeEmbedding }
-            .map { DuplicableFunction.toFuncApp(listOf(it.toLocalVar())) }
-
     override fun visitBooleanConstantDescriptor(
         booleanConstantDescriptor: KtBooleanConstantReference<ConeKotlinType, ConeDiagnostic>,
         data: Unit,
@@ -105,7 +98,6 @@ class ContractDescriptionConversionVisitor(
         data: Unit,
     ): Exp {
         val param = callsEffect.valueParameterReference.accept(this, data)
-        duplicableParameters.remove(callsEffect.valueParameterReference.parameterIndex)
         val callsFieldAccess = FieldAccess(param, SpecialFields.FunctionObjectCallCounterField)
         return when (callsEffect.kind) {
             // NOTE: case not supported for contracts
@@ -145,7 +137,7 @@ class ContractDescriptionConversionVisitor(
     private fun KtValueParameterReference<ConeKotlinType, ConeDiagnostic>.embeddedVar(): VariableEmbedding =
         embeddedVarByIndex(parameterIndex)
 
-    private fun embeddedVarByIndex(ix: Int): VariableEmbedding =
+    fun embeddedVarByIndex(ix: Int): VariableEmbedding =
         if (ix == -1) signature.receiver!! else signature.params[ix]
 
     private fun VariableEmbedding.nullCmp(isNegated: Boolean): Exp =
