@@ -21,12 +21,15 @@ interface MethodEmbedding : MethodSignatureEmbedding {
     fun insertCall(argsFir: List<FirExpression>, ctx: StmtConversionContext<ResultTrackingContext>): Exp.LocalVar
 }
 
-abstract class BaseMethodEmbedding(
+class UserMethodEmbedding(
     val signature: MethodSignatureEmbedding,
+    val preconditions: List<Exp>,
+    val postconditions: List<Exp>,
+    val symbol: FirFunctionSymbol<*>,
 ) : MethodEmbedding, MethodSignatureEmbedding by signature {
-    abstract val preconditions: List<Exp>
-    abstract val postconditions: List<Exp>
-    abstract val body: Stmt.Seqn?
+    var body: Stmt.Seqn? = null
+    override val shouldIncludeInProgram
+        get() = !symbol.isInline || body != null
 
     override val viperMethod
         get() = UserMethod(
@@ -37,17 +40,6 @@ abstract class BaseMethodEmbedding(
             postconditions,
             body
         )
-}
-
-class UserMethodEmbedding(
-    signature: MethodSignatureEmbedding,
-    override val preconditions: List<Exp>,
-    override val postconditions: List<Exp>,
-    val symbol: FirFunctionSymbol<*>,
-) : BaseMethodEmbedding(signature) {
-    override var body: Stmt.Seqn? = null
-    override val shouldIncludeInProgram
-        get() = !symbol.isInline || body != null
 
     @OptIn(SymbolInternals::class)
     override fun convertBody(ctx: ProgramConverter) {

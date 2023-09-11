@@ -28,7 +28,6 @@ import org.jetbrains.kotlin.formver.viper.ast.*
  */
 class ProgramConverter(val session: FirSession, override val config: PluginConfiguration) : ProgramConversionContext {
     private val methods: MutableMap<MangledName, MethodEmbedding> = mutableMapOf()
-    private val methodsToVerify: MutableList<FirFunctionSymbol<*>> = mutableListOf()
     private val classes: MutableMap<ClassName, ClassTypeEmbedding> = mutableMapOf()
     private val fields: MutableList<Field> = mutableListOf()
 
@@ -40,15 +39,9 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
             methods = SpecialMethods.all + methods.values.filter { it.shouldIncludeInProgram }.map { it.viperMethod }.toList(),
         )
 
-    fun processRegisteredMethods() {
-        for (method in methodsToVerify) {
-            val embedding = embedFunction(method)
-            embedding.convertBody(this)
-        }
-    }
-
     fun registerForVerification(declaration: FirSimpleFunction) {
-        methodsToVerify.add(declaration.symbol)
+        val embedding = embedFunction(declaration.symbol)
+        embedding.convertBody(this)
     }
 
     override fun embedFunction(symbol: FirFunctionSymbol<*>): MethodEmbedding {

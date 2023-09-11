@@ -27,11 +27,12 @@ class ContractDescriptionConversionVisitor(
     private val parameterIndices = signature.params.indices.toSet() + setOfNotNull(signature.receiver?.let { -1 })
 
     fun getPreconditions(symbol: FirFunctionSymbol<*>): List<Exp> {
-        val nonDuplicableIndices = symbol.effects
+        val callsInPlaceIndices = symbol.effects
             .mapNotNull { (it.effect as? KtCallsEffectDeclaration<*, *>)?.valueParameterReference?.parameterIndex }
             .toSet()
 
-        return (parameterIndices - nonDuplicableIndices)
+        // All parameters of function type that are not callsInPlace should be marked duplicable.
+        return (parameterIndices - callsInPlaceIndices)
             .map { embeddedVarByIndex(it) }
             .filter { it.type is FunctionTypeEmbedding }
             .map { DuplicableFunction.toFuncApp(listOf(it.toLocalVar())) }
