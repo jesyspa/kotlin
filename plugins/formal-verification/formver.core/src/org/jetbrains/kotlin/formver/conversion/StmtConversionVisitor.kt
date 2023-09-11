@@ -10,15 +10,15 @@ import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.declarations.FirProperty
 import org.jetbrains.kotlin.fir.expressions.*
 import org.jetbrains.kotlin.fir.expressions.impl.FirElseIfTrueCondition
-import org.jetbrains.kotlin.fir.references.toResolvedBaseSymbol
-import org.jetbrains.kotlin.fir.references.toResolvedCallableSymbol
-import org.jetbrains.kotlin.fir.references.toResolvedNamedFunctionSymbol
-import org.jetbrains.kotlin.fir.symbols.FirBasedSymbol
-import org.jetbrains.kotlin.fir.symbols.impl.*
+import org.jetbrains.kotlin.fir.symbols.impl.FirFunctionSymbol
+import org.jetbrains.kotlin.fir.symbols.impl.FirPropertySymbol
+import org.jetbrains.kotlin.fir.symbols.impl.FirValueParameterSymbol
 import org.jetbrains.kotlin.fir.types.coneType
 import org.jetbrains.kotlin.fir.types.coneTypeOrNull
 import org.jetbrains.kotlin.fir.visitors.FirVisitor
 import org.jetbrains.kotlin.formver.UnsupportedFeatureBehaviour
+import org.jetbrains.kotlin.formver.calleeCallableSymbol
+import org.jetbrains.kotlin.formver.calleeSymbol
 import org.jetbrains.kotlin.formver.domains.TypeDomain
 import org.jetbrains.kotlin.formver.domains.TypeOfDomain
 import org.jetbrains.kotlin.formver.domains.UnitDomain
@@ -27,6 +27,7 @@ import org.jetbrains.kotlin.formver.embeddings.BooleanTypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.NullableTypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.TypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.embedName
+import org.jetbrains.kotlin.formver.functionCallArguments
 import org.jetbrains.kotlin.formver.viper.ast.AccessPredicate
 import org.jetbrains.kotlin.formver.viper.ast.Exp
 import org.jetbrains.kotlin.formver.viper.ast.PermExp
@@ -191,7 +192,7 @@ object StmtConversionVisitor : FirVisitor<Exp, StmtConversionContext<ResultTrack
         val symbol = functionCall.calleeCallableSymbol
         val id = symbol.callableId
         val specialFunc = SpecialKotlinFunctions.byCallableId[id]
-        val argsFir = functionCall.getFunctionCallArguments()
+        val argsFir = functionCall.functionCallArguments
         if (specialFunc != null) {
             if (specialFunc !is SpecialKotlinFunctionImplementation) return UnitDomain.element
             return specialFunc.convertCall(argsFir.map(data::convert), data)
@@ -205,7 +206,7 @@ object StmtConversionVisitor : FirVisitor<Exp, StmtConversionContext<ResultTrack
         implicitInvokeCall: FirImplicitInvokeCall,
         data: StmtConversionContext<ResultTrackingContext>,
     ): Exp {
-        val args = implicitInvokeCall.getFunctionCallArguments().map(data::convert)
+        val args = implicitInvokeCall.functionCallArguments.map(data::convert)
         val retType = implicitInvokeCall.calleeCallableSymbol.resolvedReturnType
         return data.withResult(data.embedType(retType)) {
             // NOTE: Since it is only relevant to update the number of times that a function object is called,
@@ -320,13 +321,6 @@ object StmtConversionVisitor : FirVisitor<Exp, StmtConversionContext<ResultTrack
         }
     }
 
-    private val FirResolvable.calleeSymbol: FirBasedSymbol<*>
-        get() = calleeReference.toResolvedBaseSymbol()!!
-    private val FirResolvable.calleeCallableSymbol: FirCallableSymbol<*>
-        get() = calleeReference.toResolvedCallableSymbol()!!
-    private val FirResolvable.calleeNamedFunctionSymbol: FirNamedFunctionSymbol
-        get() = calleeReference.toResolvedNamedFunctionSymbol()!!
-
     private fun handleUnimplementedElement(msg: String, data: StmtConversionContext<ResultTrackingContext>): Exp =
         when (data.config.behaviour) {
             UnsupportedFeatureBehaviour.THROW_EXCEPTION ->
@@ -349,6 +343,3 @@ object StmtConversionVisitorExceptionWrapper : FirVisitor<Exp, StmtConversionCon
         }
     }
 }
-
-fun FirFunctionCall.getFunctionCallArguments(): List<FirExpression> =
-    listOfNotNull(dispatchReceiver) + argumentList.arguments

@@ -6,13 +6,13 @@
 package org.jetbrains.kotlin.formver.conversion
 
 import org.jetbrains.kotlin.contracts.description.*
-import org.jetbrains.kotlin.fir.contracts.FirEffectDeclaration
 import org.jetbrains.kotlin.fir.contracts.description.ConeContractConstantValues
 import org.jetbrains.kotlin.fir.diagnostics.ConeDiagnostic
 import org.jetbrains.kotlin.fir.symbols.impl.FirFunctionSymbol
 import org.jetbrains.kotlin.fir.types.ConeKotlinType
 import org.jetbrains.kotlin.formver.domains.TypeDomain
 import org.jetbrains.kotlin.formver.domains.TypeOfDomain
+import org.jetbrains.kotlin.formver.effects
 import org.jetbrains.kotlin.formver.embeddings.FunctionTypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.MethodSignatureEmbedding
 import org.jetbrains.kotlin.formver.embeddings.NullableTypeEmbedding
@@ -172,6 +172,4 @@ class ContractDescriptionConversionVisitor(
         }
 }
 
-val FirFunctionSymbol<*>.effects: List<FirEffectDeclaration>
-    get() = this.resolvedContractDescription?.effects ?: emptyList()
 
