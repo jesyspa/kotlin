@@ -88,14 +88,13 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
     private var nextWhileIndex = 0
     override fun newWhileIndex() = ++nextWhileIndex
 
-    private fun embedSignature(symbol: FirFunctionSymbol<*>): MethodSignatureEmbedding {
+    private fun embedUserSignature(symbol: FirFunctionSymbol<*>): UserMethodSignatureEmbedding {
         val retType = symbol.resolvedReturnTypeRef.type
         val params = symbol.valueParameterSymbols.map {
             VariableEmbedding(it.embedName(), embedType(it.resolvedReturnType))
         }
-        val receiverType = symbol.receiverType
-        val receiver = receiverType?.let { VariableEmbedding(ThisReceiverName, embedType(it)) }
-        return object : MethodSignatureEmbedding {
+        val receiver = symbol.receiverType?.let { VariableEmbedding(ThisReceiverName, embedType(it)) }
+        return object : UserMethodSignatureEmbedding {
             override val name = symbol.embedName()
             override val receiver = receiver
             override val params = params
@@ -104,8 +103,8 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
     }
 
     private fun embedNewUserFunction(symbol: FirFunctionSymbol<*>): UserMethodEmbedding {
-        val signature = embedSignature(symbol)
-        val contractVisitor = ContractDescriptionConversionVisitor(this@ProgramConverter, signature)
+        val signature = embedUserSignature(symbol)
+        val contractVisitor = ContractDescriptionConversionVisitor(this, signature)
 
         val preconditions = signature.formalArgs.flatMap { it.invariants() } +
                 signature.formalArgs.flatMap { it.accessInvariants() } +

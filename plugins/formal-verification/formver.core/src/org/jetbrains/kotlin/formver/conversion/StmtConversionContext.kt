@@ -7,8 +7,8 @@ package org.jetbrains.kotlin.formver.conversion
 
 import org.jetbrains.kotlin.fir.expressions.FirExpression
 import org.jetbrains.kotlin.fir.expressions.FirStatement
-import org.jetbrains.kotlin.formver.embeddings.MethodEmbedding
 import org.jetbrains.kotlin.formver.embeddings.TypeEmbedding
+import org.jetbrains.kotlin.formver.embeddings.UserMethodEmbedding
 import org.jetbrains.kotlin.formver.embeddings.VariableEmbedding
 import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.formver.viper.ast.Exp
@@ -29,7 +29,7 @@ interface StmtConversionContext<out RTC : ResultTrackingContext> : MethodConvers
     fun withResult(type: TypeEmbedding): StmtConversionContext<VarResultTrackingContext>
 
     fun withInlineContext(
-        inlineMethod: MethodEmbedding,
+        inlineMethod: UserMethodEmbedding,
         returnVar: VariableEmbedding,
         substitutionParams: Map<MangledName, SubstitutionItem>,
     ): StmtConversionContext<RTC>

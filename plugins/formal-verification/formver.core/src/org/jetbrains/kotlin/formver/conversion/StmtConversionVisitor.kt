@@ -123,10 +123,9 @@ object StmtConversionVisitor : FirVisitor<Exp, StmtConversionContext<ResultTrack
                     return varEmbedding.toLocalVar()
                 }
 
-                val receiver = data.convert(propertyAccessExpression.dispatchReceiver!!)
-
-                return when (val getter = symbol.getter) {
+                when (val getter = symbol.getter) {
                     is FirDefaultPropertyGetter -> {
+                        val receiver = data.convert(propertyAccessExpression.dispatchReceiver!!)
                         val fieldAccess = Exp.FieldAccess(receiver, varEmbedding.toField())
                         val accPred = AccessPredicate.FieldAccessPredicate(fieldAccess, PermExp.FullPerm())
 
@@ -142,10 +141,7 @@ object StmtConversionVisitor : FirVisitor<Exp, StmtConversionContext<ResultTrack
                     }
                     else -> {
                         val method = data.embedFunction(getter.symbol)
-                        data.withResult(varEmbedding.type) {
-                            val methodCall = method.toMethodCall(listOf(receiver), resultCtx.resultVar)
-                            data.addStatement(methodCall)
-                        }
+                        method.insertCall(listOf(propertyAccessExpression.dispatchReceiver!!), data)
                     }
                 }
             }
@@ -276,20 +272,20 @@ object StmtConversionVisitor : FirVisitor<Exp, StmtConversionContext<ResultTrack
         data: StmtConversionContext<ResultTrackingContext>,
     ): Exp {
         val lValueType = data.embedType(variableAssignment.lValue)
-        val convertedRValue = data.convert(variableAssignment.rValue)
         val rValueType = data.embedType(variableAssignment.rValue)
 
         if (variableAssignment.lValue.isClassPropertyAccess) {
             val lValue = variableAssignment.lValue as FirPropertyAccessExpression
             val lValueSymbol = lValue.calleeSymbol as FirPropertySymbol
-            val receiver = data.convert(lValue.dispatchReceiver!!)
 
             when (val setter = lValueSymbol.setter) {
                 is FirDefaultPropertySetter -> {
                     // No custom setters have been defined, we can assign the fields normally.
+                    val receiver = data.convert(lValue.dispatchReceiver!!)
                     val varEmbedding = VariableEmbedding(lValueSymbol.callableId.embedName(), lValueType)
                     val fieldAccess = Exp.FieldAccess(receiver, varEmbedding.toField())
                     val accPred = AccessPredicate.FieldAccessPredicate(fieldAccess, PermExp.FullPerm())
+                    val convertedRValue = data.convert(variableAssignment.rValue)
                     data.addStatement(Stmt.Inhale(accPred))
                     data.addStatement(Stmt.assign(fieldAccess, convertedRValue.convertType(rValueType, lValueType)))
                     data.addStatement(Stmt.Exhale(accPred))
@@ -297,13 +293,12 @@ object StmtConversionVisitor : FirVisitor<Exp, StmtConversionContext<ResultTrack
                 else -> {
                     // Since a custom setter has been defined, we should generate a statement to invoke a method call
                     val method = data.embedFunction(setter.symbol)
-                    data.withResult(UnitTypeEmbedding) {
-                        data.addStatement(method.toMethodCall(listOf(receiver, convertedRValue), this.resultCtx.resultVar))
-                    }
+                    method.insertCall(listOf(lValue.dispatchReceiver!!, variableAssignment.rValue), data)
                 }
             }
         } else {
             val convertedLValue = data.convert(variableAssignment.lValue)
+            val convertedRValue = data.convert(variableAssignment.rValue)
             data.addStatement(Stmt.assign(convertedLValue, convertedRValue.convertType(rValueType, lValueType)))
         }
 

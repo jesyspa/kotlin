@@ -7,35 +7,24 @@ package org.jetbrains.kotlin.formver.embeddings
 
 import org.jetbrains.kotlin.fir.expressions.FirExpression
 import org.jetbrains.kotlin.formver.conversion.ResultTrackingContext
-import org.jetbrains.kotlin.formver.conversion.ReturnVariableName
 import org.jetbrains.kotlin.formver.conversion.StmtConversionContext
 import org.jetbrains.kotlin.formver.domains.convertType
 import org.jetbrains.kotlin.formver.viper.MangledName
-import org.jetbrains.kotlin.formver.viper.ast.*
+import org.jetbrains.kotlin.formver.viper.ast.Exp
 
 /**
- * This embedding represents a method signature.
+ * This embedding represents a method signature without parameter names.
  * In case the method has a receiver it becomes the first argument of the function.
  * Example: Foo.bar(x: Int) --> Foo$bar(this: Foo, x: Int)
  */
 interface MethodSignatureEmbedding {
     val name: MangledName
-    val receiver: VariableEmbedding?
-    val params: List<VariableEmbedding>
+    val receiverType: TypeEmbedding?
+    val paramTypes: List<TypeEmbedding>
     val returnType: TypeEmbedding
 
-    val returnVar
-        get() = VariableEmbedding(ReturnVariableName, returnType)
-    val formalArgs: List<VariableEmbedding>
-        get() = listOfNotNull(receiver) + params
-
-    fun toMethodCall(
-        parameters: List<Exp>,
-        targetVar: VariableEmbedding,
-        pos: Position = Position.NoPosition,
-        info: Info = Info.NoInfo,
-        trafos: Trafos = Trafos.NoTrafos,
-    ) = Stmt.MethodCall(name, parameters, listOf(targetVar.toLocalVar()), pos, info, trafos)
+    val formalArgTypes: List<TypeEmbedding>
+        get() = listOfNotNull(receiverType) + paramTypes
 }
 
 // This is pretty much a mess, but will get better when we have typed expression embeddings.
@@ -44,7 +33,7 @@ fun MethodSignatureEmbedding.callWithConversions(
     ctx: StmtConversionContext<ResultTrackingContext>,
     call: (List<Exp>) -> Pair<Exp, TypeEmbedding>,
 ): Exp =
-    args.zip(formalArgs)
-        .map { (arg, param) -> ctx.convert(arg).convertType(ctx.embedType(arg), param.type) }
+    args.zip(formalArgTypes)
+        .map { (arg, paramType) -> ctx.convert(arg).convertType(ctx.embedType(arg), paramType) }
         .let(call)
         .let { (resultExp, resultType) -> resultExp.convertType(resultType, returnType) }

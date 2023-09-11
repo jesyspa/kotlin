@@ -14,15 +14,15 @@ import org.jetbrains.kotlin.formver.domains.TypeDomain
 import org.jetbrains.kotlin.formver.domains.TypeOfDomain
 import org.jetbrains.kotlin.formver.effects
 import org.jetbrains.kotlin.formver.embeddings.FunctionTypeEmbedding
-import org.jetbrains.kotlin.formver.embeddings.MethodSignatureEmbedding
 import org.jetbrains.kotlin.formver.embeddings.NullableTypeEmbedding
+import org.jetbrains.kotlin.formver.embeddings.UserMethodSignatureEmbedding
 import org.jetbrains.kotlin.formver.embeddings.VariableEmbedding
 import org.jetbrains.kotlin.formver.viper.ast.Exp
 import org.jetbrains.kotlin.formver.viper.ast.Exp.*
 
 class ContractDescriptionConversionVisitor(
     private val ctx: ProgramConversionContext,
-    private val signature: MethodSignatureEmbedding,
+    private val signature: UserMethodSignatureEmbedding,
 ) : KtContractDescriptionVisitor<Exp, Unit, ConeKotlinType, ConeDiagnostic>() {
     private val parameterIndices = signature.params.indices.toSet() + setOfNotNull(signature.receiver?.let { -1 })
 

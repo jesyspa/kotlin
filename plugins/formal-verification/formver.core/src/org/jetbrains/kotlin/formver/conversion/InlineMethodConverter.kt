@@ -7,7 +7,7 @@ package org.jetbrains.kotlin.formver.conversion
 
 import org.jetbrains.kotlin.fir.expressions.FirBlock
 import org.jetbrains.kotlin.formver.embeddings.LocalName
-import org.jetbrains.kotlin.formver.embeddings.MethodEmbedding
+import org.jetbrains.kotlin.formver.embeddings.UserMethodEmbedding
 import org.jetbrains.kotlin.formver.embeddings.VariableEmbedding
 import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.formver.viper.ast.Label
@@ -28,7 +28,7 @@ data class SubstitutionLambda(val body: FirBlock, val args: List<LocalName>) : S
 
 class InlineMethodConverter(
     private val programCtx: ProgramConversionContext,
-    override val method: MethodEmbedding,
+    override val method: UserMethodEmbedding,
     override val returnVar: VariableEmbedding,
     private val substitutionParams: Map<MangledName, SubstitutionItem>,
 ) : MethodConversionContext, ProgramConversionContext by programCtx {

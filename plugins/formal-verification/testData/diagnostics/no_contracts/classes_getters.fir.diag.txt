@@ -115,17 +115,17 @@ method pkg$$global$testCascadeCustomGetters() returns (ret: dom$Unit)
   var anonymous$1: Ref
   var anonymous$2: Ref
   var local$succ: Int
-  var anonymous$3: Ref
-  var anonymous$4: Int
+  var anonymous$3: Int
+  var anonymous$4: Ref
   anonymous$2 := pkg$$class_IntWrapper$member_IntWrapper(42)
   anonymous$1 := pkg$$class_IntWrapperContainer$member_IntWrapperContainer(anonymous$2)
   local$wrapper := anonymous$1
   inhale acc(local$wrapper.pkg$$class_IntWrapperContainer$member_i, write)
-  anonymous$3 := local$wrapper.pkg$$class_IntWrapperContainer$member_i
-  inhale dom$Type$isSubtype((dom$TypeOf$typeOf(anonymous$3): dom$Type), dom$Type$pkg$$class_IntWrapper())
+  anonymous$4 := local$wrapper.pkg$$class_IntWrapperContainer$member_i
+  inhale dom$Type$isSubtype((dom$TypeOf$typeOf(anonymous$4): dom$Type), dom$Type$pkg$$class_IntWrapper())
   exhale acc(local$wrapper.pkg$$class_IntWrapperContainer$member_i, write)
-  anonymous$4 := pkg$$class_IntWrapper$getter_succ(anonymous$3)
-  local$succ := anonymous$4
+  anonymous$3 := pkg$$class_IntWrapper$getter_succ(anonymous$4)
+  local$succ := anonymous$3
   label label$ret
 }
 

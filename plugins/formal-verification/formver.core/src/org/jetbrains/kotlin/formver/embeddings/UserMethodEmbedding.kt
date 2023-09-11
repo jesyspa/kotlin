@@ -21,11 +21,11 @@ import org.jetbrains.kotlin.formver.viper.ast.UserMethod
 import org.jetbrains.kotlin.utils.addToStdlib.ifTrue
 
 class UserMethodEmbedding(
-    val signature: MethodSignatureEmbedding,
+    val signature: UserMethodSignatureEmbedding,
     override val preconditions: List<Exp>,
     override val postconditions: List<Exp>,
     val symbol: FirFunctionSymbol<*>,
-) : MethodEmbedding, MethodSignatureEmbedding by signature {
+) : MethodEmbedding, UserMethodSignatureEmbedding by signature {
     private var body: Stmt.Seqn? = null
     private val shouldIncludeInProgram
         get() = !symbol.isInline || body != null
@@ -45,7 +45,7 @@ class UserMethodEmbedding(
     @OptIn(SymbolInternals::class)
     fun convertBody(ctx: ProgramConverter) {
         val methodCtx = object : MethodConversionContext, ProgramConversionContext by ctx {
-            override val method: MethodEmbedding = this@UserMethodEmbedding
+            override val method: UserMethodEmbedding = this@UserMethodEmbedding
 
             // It seems like Viper will propagate the weakest precondition through the label correctly even in the absence of
             // explicit invariants; we only need to add those if we want to make a stronger claim.

@@ -34,8 +34,8 @@ object KotlinContractMethodEmbedding : SpecialKotlinMethodEmbedding() {
 
     override fun insertCall(argsFir: List<FirExpression>, ctx: StmtConversionContext<ResultTrackingContext>): Exp = UnitDomain.element
 
-    override val receiver: VariableEmbedding? = null
-    override val params: List<VariableEmbedding> = listOf(VariableEmbedding(AnonymousName(0), FunctionTypeEmbedding))
+    override val receiverType: TypeEmbedding? = null
+    override val paramTypes: List<TypeEmbedding> = listOf(FunctionTypeEmbedding)
     override val returnType: TypeEmbedding = UnitTypeEmbedding
 }
 
@@ -52,8 +52,8 @@ abstract class BaseBinaryIntMethodEmbedding : ExpressionShapedMethodEmbedding() 
     override val packageSegments: List<String> = listOf("kotlin")
     override val className: String = "Int"
 
-    override val receiver: VariableEmbedding = VariableEmbedding(AnonymousName(0), IntTypeEmbedding)
-    override val params: List<VariableEmbedding> = listOf(VariableEmbedding(AnonymousName(1), IntTypeEmbedding))
+    override val receiverType: TypeEmbedding = IntTypeEmbedding
+    override val paramTypes: List<TypeEmbedding> = listOf(IntTypeEmbedding)
     override val returnType: TypeEmbedding = IntTypeEmbedding
 }
 
@@ -77,8 +77,8 @@ object KotlinIntDivMethodEmbedding : SpecialKotlinMethodEmbedding() {
     override val className: String = "Int"
     override val methodName: String = "div"
 
-    override val receiver: VariableEmbedding = VariableEmbedding(AnonymousName(0), IntTypeEmbedding)
-    override val params: List<VariableEmbedding> = listOf(VariableEmbedding(AnonymousName(1), IntTypeEmbedding))
+    override val receiverType: TypeEmbedding = IntTypeEmbedding
+    override val paramTypes: List<TypeEmbedding> = listOf(IntTypeEmbedding)
     override val returnType: TypeEmbedding = IntTypeEmbedding
 
     override fun insertCall(argsFir: List<FirExpression>, ctx: StmtConversionContext<ResultTrackingContext>): Exp {
@@ -95,8 +95,8 @@ object KotlinBooleanNotMethodEmbedding : ExpressionShapedMethodEmbedding() {
     override val className: String = "Boolean"
     override val methodName: String = "not"
 
-    override val receiver: VariableEmbedding = VariableEmbedding(AnonymousName(0), BooleanTypeEmbedding)
-    override val params: List<VariableEmbedding> = listOf()
+    override val receiverType: TypeEmbedding = BooleanTypeEmbedding
+    override val paramTypes: List<TypeEmbedding> = listOf()
     override val returnType: TypeEmbedding = BooleanTypeEmbedding
 
     override fun callExpression(args: List<Exp>): Exp = Exp.Not(args[0])
