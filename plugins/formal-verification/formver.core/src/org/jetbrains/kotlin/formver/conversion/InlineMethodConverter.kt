@@ -42,5 +42,5 @@ class InlineMethodConverter(
         }
     }
 
-    override fun getLambdaOrNull(name: MangledName): SubstitutionLambda? = substitutionParams[name] as? SubstitutionLambda
+    override fun getAsMethodEmbedding(name: MangledName): SubstitutionLambda? = substitutionParams[name] as? SubstitutionLambda
 }

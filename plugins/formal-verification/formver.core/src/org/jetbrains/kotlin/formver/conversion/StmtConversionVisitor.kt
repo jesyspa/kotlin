@@ -31,8 +31,6 @@ import org.jetbrains.kotlin.formver.viper.ast.AccessPredicate
 import org.jetbrains.kotlin.formver.viper.ast.Exp
 import org.jetbrains.kotlin.formver.viper.ast.PermExp
 import org.jetbrains.kotlin.formver.viper.ast.Stmt
-import org.jetbrains.kotlin.formver.embeddings.*
-import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.text
 import org.jetbrains.kotlin.types.ConstantValueKind
 
@@ -204,14 +202,7 @@ object StmtConversionVisitor : FirVisitor<Exp, StmtConversionContext<ResultTrack
 
     override fun visitFunctionCall(functionCall: FirFunctionCall, data: StmtConversionContext<ResultTrackingContext>): Exp {
         val symbol = functionCall.calleeCallableSymbol
-        val id = symbol.callableId
-        val specialFunc = SpecialKotlinFunctions.byCallableId[id]
         val argsFir = functionCall.functionCallArguments
-        if (specialFunc != null) {
-            if (specialFunc !is SpecialKotlinFunctionImplementation) return UnitDomain.element
-            return specialFunc.convertCall(argsFir.map(data::convert), data)
-        }
-
         val callee = data.embedFunction(symbol as FirFunctionSymbol<*>)
         return callee.insertCall(argsFir, data)
     }
@@ -220,11 +211,10 @@ object StmtConversionVisitor : FirVisitor<Exp, StmtConversionContext<ResultTrack
         implicitInvokeCall: FirImplicitInvokeCall,
         data: StmtConversionContext<ResultTrackingContext>,
     ): Exp {
-        val args = implicitInvokeCall.functionCallArguments.map(data::convert)
-        val retType = implicitInvokeCall.calleeCallableSymbol.resolvedReturnType
-        val calleeName = LocalName(implicitInvokeCall.calleeReference.name)
-        val lambda = data.getLambdaOrNull(calleeName)
-        if (lambda != null) {
+        val calleeName = implicitInvokeCall.calleeCallableSymbol.callableId.embedName()
+        val lambda = data.embedCallable(implicitInvokeCall.calleeCallableSymbol)
+        return lambda.insertCall(implicitInvokeCall.functionCallArguments, data)
+            /*
             return data.withResult(data.embedType(retType)) {
                 // NOTE: it is not needed to make distinction between implicit or explicit parameters
                 val lambdaArgs = lambda.lambdaArgs()
@@ -237,13 +227,7 @@ object StmtConversionVisitor : FirVisitor<Exp, StmtConversionContext<ResultTrack
                 sqn.scopedStmtsDeclaration.forEach(data::addDeclaration)
                 sqn.stmts.forEach(data::addStatement)
             }
-        }
-
-        return data.withResult(data.embedType(retType)) {
-            // NOTE: Since it is only relevant to update the number of times that a function object is called,
-            // the function call invocation is intentionally not assigned to the return variable
-            data.addStatement(InvokeFunctionObjectMethod.toMethodCall(args.take(1), listOf()))
-        }
+             */
     }
 
     override fun visitProperty(property: FirProperty, data: StmtConversionContext<ResultTrackingContext>): Exp {

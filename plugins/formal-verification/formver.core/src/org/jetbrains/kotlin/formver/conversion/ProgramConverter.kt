@@ -28,7 +28,7 @@ import org.jetbrains.kotlin.formver.viper.ast.Program
  * We need the FirSession to get access to the TypeContext.
  */
 class ProgramConverter(val session: FirSession, override val config: PluginConfiguration) : ProgramConversionContext {
-    private val methods: MutableMap<MangledName, MethodEmbedding> = mutableMapOf()
+    private val methods: MutableMap<MangledName, MethodEmbedding> = SpecialKotlinMethodEmbeddings.byName.toMutableMap()
     private val classes: MutableMap<ClassName, ClassTypeEmbedding> = mutableMapOf()
     private val fields: MutableList<Field> = mutableListOf()
 
@@ -37,31 +37,16 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
             domains = listOf(UnitDomain, NullableDomain, CastingDomain, TypeOfDomain, TypeDomain(classes.values.toList()), AnyDomain),
             fields = SpecialFields.all + fields,
             functions = SpecialFunctions.all,
-            methods = SpecialMethods.all + methods.values.filter { it.shouldIncludeInProgram }.map { it.viperMethod }.toList(),
+            methods = SpecialMethods.all + methods.values.mapNotNull { it.viperMethod }.toList(),
         )
 
     fun registerForVerification(declaration: FirSimpleFunction) {
-        val embedding = embedFunction(declaration.symbol)
+        val embedding = embedNewUserFunction(declaration.symbol)
         embedding.convertBody(this)
     }
 
     override fun embedFunction(symbol: FirFunctionSymbol<*>): MethodEmbedding {
-        val signature = embedSignature(symbol)
-        return methods.getOrPut(signature.name) {
-            val contractVisitor = ContractDescriptionConversionVisitor(this@ProgramConverter, signature)
-
-            val preconditions = signature.formalArgs.flatMap { it.invariants() } +
-                    signature.formalArgs.flatMap { it.accessInvariants() } +
-                    contractVisitor.getPreconditions(symbol)
-
-            val postconditions = signature.formalArgs.flatMap { it.accessInvariants() } +
-                    signature.params.flatMap { it.dynamicInvariants() } +
-                    signature.returnVar.invariants() +
-                    signature.returnVar.provenInvariants() +
-                    contractVisitor.getPostconditions(symbol)
-
-            UserMethodEmbedding(signature, preconditions, postconditions, symbol)
-        }
+        return methods[symbol.embedName()] ?: embedNewUserFunction(symbol)
     }
 
     private fun embedClass(symbol: FirRegularClassSymbol): ClassTypeEmbedding {
@@ -116,6 +101,24 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
             override val params = params
             override val returnType = embedType(retType)
         }
+    }
+
+    private fun embedNewUserFunction(symbol: FirFunctionSymbol<*>): UserMethodEmbedding {
+        val signature = embedSignature(symbol)
+        val contractVisitor = ContractDescriptionConversionVisitor(this@ProgramConverter, signature)
+
+        val preconditions = signature.formalArgs.flatMap { it.invariants() } +
+                signature.formalArgs.flatMap { it.accessInvariants() } +
+                contractVisitor.getPreconditions(symbol)
+
+        val postconditions = signature.formalArgs.flatMap { it.accessInvariants() } +
+                signature.params.flatMap { it.dynamicInvariants() } +
+                signature.returnVar.invariants() +
+                signature.returnVar.provenInvariants() +
+                contractVisitor.getPostconditions(symbol)
+        val embedding = UserMethodEmbedding(signature, preconditions, postconditions, symbol)
+        methods[signature.name] = embedding
+        return embedding
     }
 
     private val FirFunctionSymbol<*>.receiverType: ConeKotlinType?
