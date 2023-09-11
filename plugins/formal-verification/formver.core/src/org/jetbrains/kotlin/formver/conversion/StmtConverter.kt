@@ -21,7 +21,7 @@ import org.jetbrains.kotlin.formver.viper.ast.Label
  * intermediate results, which requires introducing new names.  We thus need a
  * shared context for finding fresh variable names.
  */
-class StmtConverter<out RTC : ResultTrackingContext>(
+data class StmtConverter<out RTC : ResultTrackingContext>(
     private val methodCtx: MethodConversionContext,
     private val seqnCtx: SeqnBuildContext,
     private val resultCtxFactory: ResultTrackerFactory<RTC>,
@@ -42,28 +42,25 @@ class StmtConverter<out RTC : ResultTrackingContext>(
         } as Exp.LocalVar
     }
 
-    override fun newBlock(): StmtConverter<RTC> = StmtConverter(this, SeqnBuilder(), resultCtxFactory, whileIndex)
+    override fun newBlock(): StmtConverter<RTC> = copy(seqnCtx = SeqnBuilder())
+
     override fun withoutResult(): StmtConversionContext<NoopResultTracker> =
         StmtConverter(this, this.seqnCtx, NoopResultTrackerFactory, whileIndex)
+//        copy(resultCtxFactory = NoopResultTrackerFactory)
 
     override fun withResult(type: TypeEmbedding): StmtConverter<VarResultTrackingContext> {
         val newResultVar = newAnonVar(type)
         addDeclaration(newResultVar.toLocalVarDecl())
         return StmtConverter(this, seqnCtx, VarResultTrackerFactory(newResultVar), whileIndex)
+//        copy(resultCtxFactory = VarResultTrackerFactory(newResultVar))
     }
 
     override fun withInlineContext(
         inlineFunctionSignature: MethodSignatureEmbedding,
         returnVar: VariableEmbedding,
         substitutionParams: Map<MangledName, MangledName>,
-    ): StmtConversionContext<RTC> {
-        return StmtConverter(
-            InlineMethodConverter(this, inlineFunctionSignature, returnVar, substitutionParams),
-            seqnCtx,
-            resultCtxFactory,
-            whileIndex
-        )
-    }
+    ): StmtConversionContext<RTC> =
+        copy(methodCtx = InlineMethodConverter(this, inlineFunctionSignature, returnVar, substitutionParams))
 
     // We can't implement these members using `by` due to Kotlin shenanigans.
     override val resultExp: Exp
@@ -79,7 +76,7 @@ class StmtConverter<out RTC : ResultTrackingContext>(
 
     override fun inNewWhileBlock(action: (StmtConversionContext<RTC>) -> Unit) {
         val freshIndex = newWhileIndex()
-        val ctx = StmtConverter(methodCtx, seqnCtx, resultCtxFactory, freshIndex)
+        val ctx = copy(whileIndex = freshIndex)
         addDeclaration(ctx.continueLabel.toDecl())
         addStatement(ctx.continueLabel.toStmt())
         action(ctx)
