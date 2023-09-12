@@ -14,12 +14,16 @@ import org.jetbrains.kotlin.fir.analysis.checkers.declaration.FirSimpleFunctionC
 import org.jetbrains.kotlin.fir.contracts.FirResolvedContractDescription
 import org.jetbrains.kotlin.fir.declarations.FirContractDescriptionOwner
 import org.jetbrains.kotlin.fir.declarations.FirSimpleFunction
+import org.jetbrains.kotlin.fir.declarations.hasAnnotation
 import org.jetbrains.kotlin.formver.conversion.ProgramConverter
 import org.jetbrains.kotlin.formver.viper.ConsistencyError
 import org.jetbrains.kotlin.formver.viper.VerificationError
 import org.jetbrains.kotlin.formver.viper.Verifier
 import org.jetbrains.kotlin.formver.viper.VerifierError
 import org.jetbrains.kotlin.formver.viper.ast.Program
+import org.jetbrains.kotlin.name.ClassId
+import org.jetbrains.kotlin.name.FqName
+import org.jetbrains.kotlin.name.Name
 
 private val VerifierError.error: KtDiagnosticFactory1<String>
     get() = when (this) {
@@ -42,7 +46,7 @@ private fun TargetsSelection.applicable(declaration: FirSimpleFunction): Boolean
 class ViperPoweredDeclarationChecker(private val session: FirSession, private val config: PluginConfiguration) :
     FirSimpleFunctionChecker() {
     override fun check(declaration: FirSimpleFunction, context: CheckerContext, reporter: DiagnosticReporter) {
-        if (!config.conversionSelection.applicable(declaration)) return
+        if (!config.shouldConvert(declaration)) return
         config.clearMinorErrors()
         var program: Program? = null
         try {
@@ -61,7 +65,7 @@ class ViperPoweredDeclarationChecker(private val session: FirSession, private va
 
             val consistent = verifier.checkConsistency(program, onFailure)
             // If the Viper program is not consistent, that's our error; we shouldn't surface it to the user as an unverified contract.
-            if (!consistent || !config.verificationSelection.applicable(declaration)) return
+            if (!consistent || !config.shouldVerify(declaration)) return
 
             val success = verifier.verify(program, onFailure)
             if (!success) {
@@ -85,5 +89,24 @@ class ViperPoweredDeclarationChecker(private val session: FirSession, private va
         LogLevel.ONLY_WARNINGS -> null
         LogLevel.SHORT_VIPER_DUMP -> program.toShort()
         LogLevel.FULL_VIPER_DUMP -> program
+    }
+
+    private fun getAnnotationId(name: String): ClassId =
+        ClassId(FqName.fromSegments(listOf("org", "jetbrains", "kotlin", "formver", "plugin")), Name.identifier(name))
+
+    private val neverConvertId: ClassId = getAnnotationId("NeverConvert")
+    private val neverVerifyId: ClassId = getAnnotationId("NeverVerify")
+    private val alwaysVerifyId: ClassId = getAnnotationId("AlwaysVerify")
+
+    private fun PluginConfiguration.shouldConvert(declaration: FirSimpleFunction): Boolean = when {
+        declaration.hasAnnotation(neverConvertId, session) -> false
+        else -> conversionSelection.applicable(declaration)
+    }
+
+    private fun PluginConfiguration.shouldVerify(declaration: FirSimpleFunction): Boolean = when {
+        declaration.hasAnnotation(neverConvertId, session) -> false
+        declaration.hasAnnotation(neverVerifyId, session) -> false
+        declaration.hasAnnotation(alwaysVerifyId, session) -> true
+        else -> verificationSelection.applicable(declaration)
     }
 }
