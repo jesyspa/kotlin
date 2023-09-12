@@ -10,7 +10,7 @@ import org.jetbrains.kotlin.formver.conversion.ResultTrackingContext
 import org.jetbrains.kotlin.formver.conversion.StmtConversionContext
 import org.jetbrains.kotlin.formver.domains.convertType
 import org.jetbrains.kotlin.formver.viper.MangledName
-import org.jetbrains.kotlin.formver.viper.ast.Exp
+import org.jetbrains.kotlin.formver.viper.ast.*
 
 /**
  * This embedding represents a method signature without parameter names.
@@ -26,6 +26,14 @@ interface MethodSignatureEmbedding {
     val formalArgTypes: List<TypeEmbedding>
         get() = listOfNotNull(receiverType) + paramTypes
 }
+
+fun MethodSignatureEmbedding.toMethodCall(
+    parameters: List<Exp>,
+    targetVar: VariableEmbedding,
+    pos: Position = Position.NoPosition,
+    info: Info = Info.NoInfo,
+    trafos: Trafos = Trafos.NoTrafos,
+) = Stmt.MethodCall(name, parameters, listOf(targetVar.toLocalVar()), pos, info, trafos)
 
 // This is pretty much a mess, but will get better when we have typed expression embeddings.
 fun MethodSignatureEmbedding.callWithConversions(

@@ -6,7 +6,6 @@
 package org.jetbrains.kotlin.formver.embeddings
 
 import org.jetbrains.kotlin.formver.conversion.ReturnVariableName
-import org.jetbrains.kotlin.formver.viper.ast.*
 
 interface UserMethodSignatureEmbedding : MethodSignatureEmbedding {
     val receiver: VariableEmbedding?
@@ -22,12 +21,3 @@ interface UserMethodSignatureEmbedding : MethodSignatureEmbedding {
     override val paramTypes: List<TypeEmbedding>
         get() = params.map { it.type }
 }
-
-fun UserMethodSignatureEmbedding.toMethodCall(
-    parameters: List<Exp>,
-    targetVar: VariableEmbedding,
-    pos: Position = Position.NoPosition,
-    info: Info = Info.NoInfo,
-    trafos: Trafos = Trafos.NoTrafos,
-) = Stmt.MethodCall(name, parameters, listOf(targetVar.toLocalVar()), pos, info, trafos)
-
