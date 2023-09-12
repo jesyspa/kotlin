@@ -3,11 +3,6 @@ field pkg$$class_Foo$member_a: Int
 
 field pkg$$class_Foo$member_b: Int
 
-method pkg$$class_Foo$member_Foo(local$a: Int, local$b: Int)
-  returns (ret: Ref)
-  ensures dom$Type$isSubtype((dom$TypeOf$typeOf(ret): dom$Type), dom$Type$pkg$$class_Foo())
-
-
 method pkg$$global$createFoo() returns (ret: dom$Unit)
 {
   var local$f: Ref
@@ -29,16 +24,13 @@ method pkg$$global$createFoo() returns (ret: dom$Unit)
   label label$ret
 }
 
+method pkg$$class_Foo$member_Foo(local$a: Int, local$b: Int)
+  returns (ret: Ref)
+  ensures dom$Type$isSubtype((dom$TypeOf$typeOf(ret): dom$Type), dom$Type$pkg$$class_Foo())
+
+
 /classes_getters.kt:(280,290): info: Generated Viper text for testGetter:
 field pkg$$class_IntWrapper$member_n: Int
-
-method pkg$$class_IntWrapper$member_IntWrapper(local$n: Int)
-  returns (ret: Ref)
-  ensures dom$Type$isSubtype((dom$TypeOf$typeOf(ret): dom$Type), dom$Type$pkg$$class_IntWrapper())
-
-
-method pkg$$class_IntWrapper$getter_succ(this: Ref) returns (ret: Int)
-
 
 method pkg$$global$testGetter() returns (ret: dom$Unit)
 {
@@ -53,21 +45,20 @@ method pkg$$global$testGetter() returns (ret: dom$Unit)
   label label$ret
 }
 
+method pkg$$class_IntWrapper$member_IntWrapper(local$n: Int)
+  returns (ret: Ref)
+  ensures dom$Type$isSubtype((dom$TypeOf$typeOf(ret): dom$Type), dom$Type$pkg$$class_IntWrapper())
+
+
+method pkg$$class_IntWrapper$getter_succ(this: Ref) returns (ret: Int)
+
+
 /classes_getters.kt:(363,380): info: Generated Viper text for testCascadeGetter:
 field pkg$$class_Foo$member_a: Int
 
 field pkg$$class_Foo$member_b: Int
 
 field pkg$$class_Bar$member_f: Ref
-
-method pkg$$class_Foo$member_Foo(local$a: Int, local$b: Int)
-  returns (ret: Ref)
-  ensures dom$Type$isSubtype((dom$TypeOf$typeOf(ret): dom$Type), dom$Type$pkg$$class_Foo())
-
-
-method pkg$$class_Bar$member_Bar(local$f: Ref) returns (ret: Ref)
-  ensures dom$Type$isSubtype((dom$TypeOf$typeOf(ret): dom$Type), dom$Type$pkg$$class_Bar())
-
 
 method pkg$$global$testCascadeGetter() returns (ret: dom$Unit)
 {
@@ -104,23 +95,19 @@ method pkg$$global$testCascadeGetter() returns (ret: dom$Unit)
   label label$ret
 }
 
+method pkg$$class_Foo$member_Foo(local$a: Int, local$b: Int)
+  returns (ret: Ref)
+  ensures dom$Type$isSubtype((dom$TypeOf$typeOf(ret): dom$Type), dom$Type$pkg$$class_Foo())
+
+
+method pkg$$class_Bar$member_Bar(local$f: Ref) returns (ret: Ref)
+  ensures dom$Type$isSubtype((dom$TypeOf$typeOf(ret): dom$Type), dom$Type$pkg$$class_Bar())
+
+
 /classes_getters.kt:(486,510): info: Generated Viper text for testCascadeCustomGetters:
 field pkg$$class_IntWrapper$member_n: Int
 
 field pkg$$class_IntWrapperContainer$member_i: Ref
-
-method pkg$$class_IntWrapperContainer$member_IntWrapperContainer(local$i: Ref)
-  returns (ret: Ref)
-  ensures dom$Type$isSubtype((dom$TypeOf$typeOf(ret): dom$Type), dom$Type$pkg$$class_IntWrapperContainer())
-
-
-method pkg$$class_IntWrapper$member_IntWrapper(local$n: Int)
-  returns (ret: Ref)
-  ensures dom$Type$isSubtype((dom$TypeOf$typeOf(ret): dom$Type), dom$Type$pkg$$class_IntWrapper())
-
-
-method pkg$$class_IntWrapper$getter_succ(this: Ref) returns (ret: Int)
-
 
 method pkg$$global$testCascadeCustomGetters() returns (ret: dom$Unit)
 {
@@ -141,3 +128,16 @@ method pkg$$global$testCascadeCustomGetters() returns (ret: dom$Unit)
   local$succ := anonymous$4
   label label$ret
 }
+
+method pkg$$class_IntWrapperContainer$member_IntWrapperContainer(local$i: Ref)
+  returns (ret: Ref)
+  ensures dom$Type$isSubtype((dom$TypeOf$typeOf(ret): dom$Type), dom$Type$pkg$$class_IntWrapperContainer())
+
+
+method pkg$$class_IntWrapper$member_IntWrapper(local$n: Int)
+  returns (ret: Ref)
+  ensures dom$Type$isSubtype((dom$TypeOf$typeOf(ret): dom$Type), dom$Type$pkg$$class_IntWrapper())
+
+
+method pkg$$class_IntWrapper$getter_succ(this: Ref) returns (ret: Int)
+

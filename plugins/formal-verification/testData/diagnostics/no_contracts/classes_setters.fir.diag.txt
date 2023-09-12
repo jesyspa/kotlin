@@ -3,14 +3,6 @@ field pkg$$class_AlwaysPlusOne$member_b: Int
 
 field pkg$$class_AlwaysPlusOne$member_num: Int
 
-method pkg$$class_AlwaysPlusOne$member_AlwaysPlusOne() returns (ret: Ref)
-  ensures dom$Type$isSubtype((dom$TypeOf$typeOf(ret): dom$Type), dom$Type$pkg$$class_AlwaysPlusOne())
-
-
-method pkg$$class_AlwaysPlusOne$setter_num(this: Ref, local$value: Int)
-  returns (ret: dom$Unit)
-
-
 method pkg$$global$testCustomSetter() returns (ret: dom$Unit)
 {
   var local$f: Ref
@@ -25,12 +17,16 @@ method pkg$$global$testCustomSetter() returns (ret: dom$Unit)
   label label$ret
 }
 
+method pkg$$class_AlwaysPlusOne$member_AlwaysPlusOne() returns (ret: Ref)
+  ensures dom$Type$isSubtype((dom$TypeOf$typeOf(ret): dom$Type), dom$Type$pkg$$class_AlwaysPlusOne())
+
+
+method pkg$$class_AlwaysPlusOne$setter_num(this: Ref, local$value: Int)
+  returns (ret: dom$Unit)
+
+
 /classes_setters.kt:(434,444): info: Generated Viper text for testSetter:
 field pkg$$class_Person$member_age: Int
-
-method pkg$$class_Person$member_Person(local$age: Int) returns (ret: Ref)
-  ensures dom$Type$isSubtype((dom$TypeOf$typeOf(ret): dom$Type), dom$Type$pkg$$class_Person())
-
 
 method pkg$$global$testSetter() returns (ret: dom$Unit)
 {
@@ -48,18 +44,14 @@ method pkg$$global$testSetter() returns (ret: dom$Unit)
   label label$ret
 }
 
+method pkg$$class_Person$member_Person(local$age: Int) returns (ret: Ref)
+  ensures dom$Type$isSubtype((dom$TypeOf$typeOf(ret): dom$Type), dom$Type$pkg$$class_Person())
+
+
 /classes_setters.kt:(516,533): info: Generated Viper text for testSetterCascade:
 field pkg$$class_Bar$member_a: Int
 
 field pkg$$class_Foo$member_b: Ref
-
-method pkg$$class_Foo$member_Foo(local$b: Ref) returns (ret: Ref)
-  ensures dom$Type$isSubtype((dom$TypeOf$typeOf(ret): dom$Type), dom$Type$pkg$$class_Foo())
-
-
-method pkg$$class_Bar$member_Bar(local$a: Int) returns (ret: Ref)
-  ensures dom$Type$isSubtype((dom$TypeOf$typeOf(ret): dom$Type), dom$Type$pkg$$class_Bar())
-
 
 method pkg$$global$testSetterCascade() returns (ret: dom$Unit)
 {
@@ -80,16 +72,16 @@ method pkg$$global$testSetterCascade() returns (ret: dom$Unit)
   label label$ret
 }
 
+method pkg$$class_Foo$member_Foo(local$b: Ref) returns (ret: Ref)
+  ensures dom$Type$isSubtype((dom$TypeOf$typeOf(ret): dom$Type), dom$Type$pkg$$class_Foo())
+
+
+method pkg$$class_Bar$member_Bar(local$a: Int) returns (ret: Ref)
+  ensures dom$Type$isSubtype((dom$TypeOf$typeOf(ret): dom$Type), dom$Type$pkg$$class_Bar())
+
+
 /classes_setters.kt:(585,609): info: Generated Viper text for testSetterNoBackingField:
 field pkg$$class_Baz$member__a: Int
-
-method pkg$$class_Baz$member_Baz() returns (ret: Ref)
-  ensures dom$Type$isSubtype((dom$TypeOf$typeOf(ret): dom$Type), dom$Type$pkg$$class_Baz())
-
-
-method pkg$$class_Baz$setter_a(this: Ref, local$value: Int)
-  returns (ret: dom$Unit)
-
 
 method pkg$$global$testSetterNoBackingField() returns (ret: dom$Unit)
 {
@@ -101,6 +93,14 @@ method pkg$$global$testSetterNoBackingField() returns (ret: dom$Unit)
   anonymous$2 := pkg$$class_Baz$setter_a(local$baz, 42)
   label label$ret
 }
+
+method pkg$$class_Baz$member_Baz() returns (ret: Ref)
+  ensures dom$Type$isSubtype((dom$TypeOf$typeOf(ret): dom$Type), dom$Type$pkg$$class_Baz())
+
+
+method pkg$$class_Baz$setter_a(this: Ref, local$value: Int)
+  returns (ret: dom$Unit)
+
 
 /classes_setters.kt:(694,704): info: Generated Viper text for mockInline:
 field pkg$$class_Bar$member_a: Int
@@ -117,10 +117,6 @@ method pkg$$global$mockInline(local$b: Ref) returns (ret: dom$Unit)
 /classes_setters.kt:(735,751): info: Generated Viper text for testSetterLambda:
 field pkg$$class_Bar$member_a: Int
 
-method pkg$$class_Bar$member_Bar(local$a: Int) returns (ret: Ref)
-  ensures dom$Type$isSubtype((dom$TypeOf$typeOf(ret): dom$Type), dom$Type$pkg$$class_Bar())
-
-
 method pkg$$global$testSetterLambda() returns (ret: dom$Unit)
 {
   var anonymous$1: dom$Unit
@@ -134,3 +130,7 @@ method pkg$$global$testSetterLambda() returns (ret: dom$Unit)
   }
   label label$ret
 }
+
+method pkg$$class_Bar$member_Bar(local$a: Int) returns (ret: Ref)
+  ensures dom$Type$isSubtype((dom$TypeOf$typeOf(ret): dom$Type), dom$Type$pkg$$class_Bar())
+
