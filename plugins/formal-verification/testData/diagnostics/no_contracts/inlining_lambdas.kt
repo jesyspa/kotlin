@@ -23,3 +23,23 @@ fun <!VIPER_TEXT!>lambda_if<!>(): Int {
 fun <!VIPER_TEXT!>return_value_not_used<!>(): Unit {
     invoke { it }
 }
+
+fun <!VIPER_TEXT!>shadowing<!>(): Int {
+    val x = 1
+    val y = 1
+    return invoke { x ->
+        val y = 0
+        x + y
+    }
+}
+
+@Suppress("NOTHING_TO_INLINE")
+inline fun <!VIPER_TEXT!>foo<!>(): Int {
+    val x = 2
+    return invoke { x -> x + 1 }
+}
+
+fun <!VIPER_TEXT!>nested<!>(): Int {
+    val x = 2
+    return foo()
+}
