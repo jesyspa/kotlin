@@ -20,8 +20,6 @@ import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.testing.Test
 import org.gradle.kotlin.dsl.*
 import org.gradle.kotlin.dsl.support.serviceOf
-import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinUsages
 import java.io.File
 import java.lang.Character.isLowerCase
 import java.lang.Character.isUpperCase
@@ -399,6 +397,22 @@ fun Project.confugureFirPluginAnnotationsDependency(testTask: TaskProvider<Test>
         doFirst {
             systemProperty("firPluginAnnotations.jvm.path", localFirPluginJvmAnnotations.singleFile.canonicalPath)
             systemProperty("firPluginAnnotations.js.path", localFirPluginJsAnnotations.singleFile.canonicalPath)
+        }
+    }
+}
+
+fun Project.configureFormVerPluginAnnotationsDependency(testTask: TaskProvider<Test>) {
+    val formverPluginJvmAnnotations: Configuration by configurations.creating
+
+    dependencies {
+        formverPluginJvmAnnotations(project(":kotlin-formver-compiler-plugin.annotations")) { isTransitive = false }
+    }
+
+    testTask.configure {
+        dependsOn(formverPluginJvmAnnotations)
+        val localFormverPluginJvmAnnotations: FileCollection = formverPluginJvmAnnotations
+        doFirst {
+            systemProperty("formverPluginAnnotations.jvm.path", localFormverPluginJvmAnnotations.singleFile.canonicalPath)
         }
     }
 }
