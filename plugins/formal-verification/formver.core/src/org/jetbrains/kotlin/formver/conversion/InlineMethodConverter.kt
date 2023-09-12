@@ -5,22 +5,45 @@
 
 package org.jetbrains.kotlin.formver.conversion
 
+import org.jetbrains.kotlin.fir.expressions.FirBlock
+import org.jetbrains.kotlin.fir.expressions.FirLambdaArgumentExpression
+import org.jetbrains.kotlin.formver.embeddings.LocalName
+import org.jetbrains.kotlin.formver.embeddings.MethodSignatureEmbedding
 import org.jetbrains.kotlin.formver.embeddings.MethodEmbedding
 import org.jetbrains.kotlin.formver.embeddings.VariableEmbedding
 import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.formver.viper.ast.Label
 
+sealed interface SubstitutionItem {
+    fun substitutionName(): MangledName? = null
+    fun lambdaBody(): FirBlock? = null
+    fun lambdaArgs(): List<LocalName>? = null
+}
+
+data class SubstitutionName(val name: MangledName) : SubstitutionItem {
+    override fun substitutionName(): MangledName = name
+}
+
+data class SubstitutionLambda(val body: FirBlock, val args: List<LocalName>) : SubstitutionItem {
+    override fun lambdaBody(): FirBlock = body
+    override fun lambdaArgs(): List<LocalName> = args
+}
+
 class InlineMethodConverter(
     private val programCtx: ProgramConversionContext,
     override val method: MethodEmbedding,
     override val returnVar: VariableEmbedding,
-    private val substitutionParams: Map<MangledName, MangledName>,
+    private val substitutionParams: Map<MangledName, SubstitutionItem>,
 ) : MethodConversionContext, ProgramConversionContext by programCtx {
     override val returnLabel: Label = Label(InlineReturnLabelName(method.name), listOf())
 
-    override fun resolveName(name: MangledName): MangledName =
-        when {
+    override fun resolveName(name: MangledName): MangledName {
+        val sub = substitutionParams[name]
+        return when {
             name == ReturnVariableName -> returnVar.name
-            else -> substitutionParams[name] ?: InlineName(method.name, name)
+            else -> sub?.substitutionName() ?: InlineName(method.name, name)
         }
+    }
+
+    override fun getLambdaOrNull(name: MangledName): SubstitutionLambda? = substitutionParams[name] as? SubstitutionLambda
 }

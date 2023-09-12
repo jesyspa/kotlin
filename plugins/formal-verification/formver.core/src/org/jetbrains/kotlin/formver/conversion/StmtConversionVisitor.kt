@@ -14,9 +14,7 @@ import org.jetbrains.kotlin.fir.declarations.impl.FirDefaultPropertySetter
 import org.jetbrains.kotlin.fir.expressions.*
 import org.jetbrains.kotlin.fir.expressions.impl.FirElseIfTrueCondition
 import org.jetbrains.kotlin.fir.symbols.SymbolInternals
-import org.jetbrains.kotlin.fir.symbols.impl.FirFunctionSymbol
-import org.jetbrains.kotlin.fir.symbols.impl.FirPropertySymbol
-import org.jetbrains.kotlin.fir.symbols.impl.FirValueParameterSymbol
+import org.jetbrains.kotlin.fir.symbols.impl.*
 import org.jetbrains.kotlin.fir.types.coneType
 import org.jetbrains.kotlin.fir.types.coneTypeOrNull
 import org.jetbrains.kotlin.fir.visitors.FirVisitor
@@ -27,16 +25,14 @@ import org.jetbrains.kotlin.formver.domains.TypeDomain
 import org.jetbrains.kotlin.formver.domains.TypeOfDomain
 import org.jetbrains.kotlin.formver.domains.UnitDomain
 import org.jetbrains.kotlin.formver.domains.convertType
-import org.jetbrains.kotlin.formver.embeddings.BooleanTypeEmbedding
-import org.jetbrains.kotlin.formver.embeddings.NullableTypeEmbedding
-import org.jetbrains.kotlin.formver.embeddings.TypeEmbedding
-import org.jetbrains.kotlin.formver.embeddings.embedName
+import org.jetbrains.kotlin.formver.embeddings.*
 import org.jetbrains.kotlin.formver.functionCallArguments
 import org.jetbrains.kotlin.formver.viper.ast.AccessPredicate
 import org.jetbrains.kotlin.formver.viper.ast.Exp
 import org.jetbrains.kotlin.formver.viper.ast.PermExp
 import org.jetbrains.kotlin.formver.viper.ast.Stmt
 import org.jetbrains.kotlin.formver.embeddings.*
+import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.text
 import org.jetbrains.kotlin.types.ConstantValueKind
 
@@ -218,7 +214,48 @@ object StmtConversionVisitor : FirVisitor<Exp, StmtConversionContext<ResultTrack
 
         val callee = data.embedFunction(symbol as FirFunctionSymbol<*>)
         return callee.insertCall(argsFir, data)
-    }
+
+//        val isInline = functionCall.calleeCallableSymbol.resolvedStatus.isInline
+//        if (isInline) {
+//            return data.withResult(data.embedType(functionCall)) {
+//                processInlineFunctionCall(functionCall, this)
+//            }
+//        }
+//
+//        val calleeSig = when (symbol) {
+//            is FirNamedFunctionSymbol -> data.embedFunction(symbol)
+//            is FirConstructorSymbol -> data.embedFunction(symbol)
+//            else -> TODO("Identify and handle other cases")
+//        }
+//
+//        return data.withResult(calleeSig.returnType) {
+//            val args = argsFir
+//                .zip(calleeSig.formalArgs)
+//                .map { (arg, formalArg) -> data.convert(arg).convertType(data.embedType(arg), formalArg.type) }
+//
+//            data.addStatement(calleeSig.toMethodCall(args, this.resultCtx.resultVar))
+//        }
+//    }
+
+}
+
+//    @OptIn(SymbolInternals::class)
+//    private fun processInlineFunctionCall(functionCall: FirFunctionCall, data: StmtConversionContext<VarResultTrackingContext>) {
+//        val symbol = functionCall.calleeNamedFunctionSymbol
+//        val signature = data.embedFunction(symbol)
+//        val inlineBody = symbol.fir.body ?: throw Exception("Function symbol $symbol has a null body")
+//        val ctx = data.newBlock()
+//        val inlineArgs: List<MangledName> = symbol.valueParameterSymbols.map { it.embedName() }
+//        val callArgs = getFunctionCallSubstitutionItems(functionCall, ctx)
+//        val substitutionParams = inlineArgs.zip(callArgs).toMap()
+//        val inlineCtx = ctx.withInlineContext(signature, ctx.resultCtx.resultVar, substitutionParams)
+//        inlineCtx.convert(inlineBody)
+//        // TODO: add these labels automatically.
+//        inlineCtx.addDeclaration(inlineCtx.returnLabel.toDecl())
+//        inlineCtx.addStatement(inlineCtx.returnLabel.toStmt())
+//        // Note: Putting the block inside the then branch of an if-true statement is a little a hack to make Viper respect the scoping
+//        data.addStatement(Stmt.If(Exp.BoolLit(true), inlineCtx.block, Stmt.Seqn(listOf(), listOf())))
+//    }
 
     override fun visitImplicitInvokeCall(
         implicitInvokeCall: FirImplicitInvokeCall,
@@ -226,12 +263,54 @@ object StmtConversionVisitor : FirVisitor<Exp, StmtConversionContext<ResultTrack
     ): Exp {
         val args = implicitInvokeCall.functionCallArguments.map(data::convert)
         val retType = implicitInvokeCall.calleeCallableSymbol.resolvedReturnType
+        val calleeName = LocalName(implicitInvokeCall.calleeReference.name)
+        val lambda = data.getLambdaOrNull(calleeName)
+        if (lambda != null) {
+            return data.withResult(data.embedType(retType)) {
+                // NOTE: it is not needed to make distinction between implicit or explicit parameters
+                val lambdaArgs = lambda.lambdaArgs()
+                val callArgs = getFunctionCallSubstitutionItems(implicitInvokeCall, data)
+                // NOTE: The first element of callArgs is the callee and has to be dropped
+                val subs: Map<MangledName, SubstitutionItem> = lambdaArgs.zip(callArgs.drop(1)).toMap()
+                val lambdaCtx = this.newBlock().withInlineContext(this.signature, this.resultCtx.resultVar, subs)
+                lambdaCtx.convert(lambda.lambdaBody())
+                // NOTE: It is necessary to drop the last stmt because is a wrong goto
+                val sqn = lambdaCtx.block.copy(stmts = lambdaCtx.block.stmts.dropLast(1))
+                sqn.scopedStmtsDeclaration.forEach(data::addDeclaration)
+                sqn.stmts.forEach(data::addStatement)
+            }
+        }
+
+        val args = getFunctionCallArguments(implicitInvokeCall).map(data::convert)
         return data.withResult(data.embedType(retType)) {
             // NOTE: Since it is only relevant to update the number of times that a function object is called,
             // the function call invocation is intentionally not assigned to the return variable
             data.addStatement(InvokeFunctionObjectMethod.toMethodCall(args.take(1), listOf()))
         }
     }
+
+//    private fun getFunctionCallArguments(functionCall: FirFunctionCall): List<FirExpression> =
+//        listOfNotNull(functionCall.dispatchReceiver) + functionCall.argumentList.arguments
+//
+//    private fun getFunctionCallSubstitutionItems(
+//        functionCall: FirFunctionCall,
+//        data: StmtConversionContext<ResultTrackingContext>
+//    ): List<SubstitutionItem> = getFunctionCallArguments(functionCall).map { exp ->
+//        when (exp) {
+//            is FirLambdaArgumentExpression -> {
+//                val anonExpr = exp.expression
+//                if (anonExpr is FirAnonymousFunctionExpression) {
+//                    val lambdaBody = anonExpr.anonymousFunction.body!!
+//                    val lambdaArs = anonExpr.anonymousFunction.valueParameters.map { LocalName(it.name) }
+//                    SubstitutionLambda(lambdaBody, lambdaArs)
+//                } else {
+//                    TODO("are there any other cases?")
+//                }
+//            }
+//            else -> SubstitutionName(data.convertAndStore(exp).name)
+//        }
+//    }
+
 
     override fun visitProperty(property: FirProperty, data: StmtConversionContext<ResultTrackingContext>): Exp {
         val symbol = property.symbol

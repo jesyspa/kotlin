@@ -1,0 +1,36 @@
+FILE: inlining_lambdas.kt
+    public final inline fun invoke(f: R|(kotlin/Int) -> kotlin/Int|): R|kotlin/Int| {
+        ^invoke R|<local>/f|.R|SubstitutionOverride<kotlin/Function1.invoke: R|kotlin/Int|>|(Int(0))
+    }
+    public final fun explicit_arg(): R|kotlin/Int| {
+        ^explicit_arg R|/invoke|(<L> = invoke@fun <anonymous>(x: R|kotlin/Int|): R|kotlin/Int| <inline=Inline, kind=UNKNOWN>  {
+            ^ R|<local>/x|.R|kotlin/Int.plus|(R|<local>/x|)
+        }
+        )
+    }
+    public final fun implicit_arg(): R|kotlin/Int| {
+        ^implicit_arg R|/invoke|(<L> = invoke@fun <anonymous>(it: R|kotlin/Int|): R|kotlin/Int| <inline=Inline, kind=UNKNOWN>  {
+            ^ R|<local>/it|.R|kotlin/Int.times|(Int(2))
+        }
+        )
+    }
+    public final fun lambda_if(): R|kotlin/Int| {
+        ^lambda_if R|/invoke|(<L> = invoke@fun <anonymous>(it: R|kotlin/Int|): R|kotlin/Int| <inline=Inline, kind=UNKNOWN>  {
+            ^ when () {
+                ==(R|<local>/it|, Int(0)) ->  {
+                    R|<local>/it|.R|kotlin/Int.plus|(Int(1))
+                }
+                else ->  {
+                    R|<local>/it|.R|kotlin/Int.plus|(Int(2))
+                }
+            }
+
+        }
+        )
+    }
+    public final fun return_value_not_used(): R|kotlin/Unit| {
+        R|/invoke|(<L> = invoke@fun <anonymous>(it: R|kotlin/Int|): R|kotlin/Int| <inline=Inline, kind=UNKNOWN>  {
+            ^ R|<local>/it|
+        }
+        )
+    }
