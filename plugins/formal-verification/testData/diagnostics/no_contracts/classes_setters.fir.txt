@@ -1,0 +1,90 @@
+FILE: classes_setters.kt
+    public final class Bar : R|kotlin/Any| {
+        public constructor(a: R|kotlin/Int|): R|Bar| {
+            super<R|kotlin/Any|>()
+        }
+
+        public final var a: R|kotlin/Int| = R|<local>/a|
+            public get(): R|kotlin/Int|
+            public set(value: R|kotlin/Int|): R|kotlin/Unit|
+
+    }
+    public final class Foo : R|kotlin/Any| {
+        public constructor(b: R|Bar|): R|Foo| {
+            super<R|kotlin/Any|>()
+        }
+
+        public final var b: R|Bar| = R|<local>/b|
+            public get(): R|Bar|
+            public set(value: R|Bar|): R|kotlin/Unit|
+
+    }
+    public final class Person : R|kotlin/Any| {
+        public constructor(age: R|kotlin/Int|): R|Person| {
+            super<R|kotlin/Any|>()
+        }
+
+        public final var age: R|kotlin/Int| = R|<local>/age|
+            public get(): R|kotlin/Int|
+            public set(value: R|kotlin/Int|): R|kotlin/Unit|
+
+    }
+    public final class Baz : R|kotlin/Any| {
+        public constructor(): R|Baz| {
+            super<R|kotlin/Any|>()
+        }
+
+        private final var _a: R|kotlin/Int| = Int(0)
+            private get(): R|kotlin/Int|
+            private set(value: R|kotlin/Int|): R|kotlin/Unit|
+
+        public final var a: R|kotlin/Int|
+            public get(): R|kotlin/Int| {
+                ^ this@R|/Baz|.R|/Baz._a|
+            }
+            public set(value: R|kotlin/Int|): R|kotlin/Unit| {
+                this@R|/Baz|.R|/Baz._a| = R|<local>/value|
+            }
+
+    }
+    public final class AlwaysPlusOne : R|kotlin/Any| {
+        public constructor(): R|AlwaysPlusOne| {
+            super<R|kotlin/Any|>()
+        }
+
+        public final var b: R|kotlin/Int| = Int(0)
+            public get(): R|kotlin/Int|
+            public set(value: R|kotlin/Int|): R|kotlin/Unit|
+
+        public final var num: R|kotlin/Int| = Int(0)
+            public get(): R|kotlin/Int| {
+                ^ this@R|/AlwaysPlusOne|.F|/AlwaysPlusOne.num|
+            }
+            public set(value: R|kotlin/Int|): R|kotlin/Unit| {
+                this@R|/AlwaysPlusOne|.F|/AlwaysPlusOne.num| = R|<local>/value|.R|kotlin/Int.plus|(Int(1))
+            }
+
+    }
+    public final fun testCustomSetter(): R|kotlin/Unit| {
+        lval f: R|AlwaysPlusOne| = R|/AlwaysPlusOne.AlwaysPlusOne|()
+        R|<local>/f|.R|/AlwaysPlusOne.b| = Int(1)
+        R|<local>/f|.R|/AlwaysPlusOne.num| = Int(1)
+    }
+    public final fun testSetter(): R|kotlin/Unit| {
+        lval person: R|Person| = R|/Person.Person|(Int(19))
+        R|<local>/person|.R|/Person.age| = R|<local>/person|.R|/Person.age|.R|kotlin/Int.plus|(Int(1))
+    }
+    public final fun testSetterCascade(): R|kotlin/Unit| {
+        lval f: R|Foo| = R|/Foo.Foo|(R|/Bar.Bar|(Int(10)))
+        R|<local>/f|.R|/Foo.b|.R|/Bar.a| = Int(42)
+    }
+    public final fun testSetterNoBackingField(): R|kotlin/Unit| {
+        lval baz: R|Baz| = R|/Baz.Baz|()
+        R|<local>/baz|.R|/Baz.a| = Int(42)
+    }
+    @R|kotlin/Suppress|(names = vararg(String(NOTHING_TO_INLINE))) public final inline fun mockInline(b: R|Bar|): R|kotlin/Unit| {
+        R|<local>/b|.R|/Bar.a| = Int(42)
+    }
+    public final fun testSetterLambda(): R|kotlin/Unit| {
+        R|/mockInline|(R|/Bar.Bar|(Int(0)))
+    }

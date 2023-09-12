@@ -1,0 +1,64 @@
+FILE: class_constructors.kt
+    public final class Foo : R|kotlin/Any| {
+        public final val a: R|kotlin/Int|
+            public get(): R|kotlin/Int|
+
+        public constructor(n: R|kotlin/Int|): R|Foo| {
+            super<R|kotlin/Any|>()
+            this@R|/Foo|.R|/Foo.a| = R|<local>/n|
+        }
+
+        public constructor(b: R|kotlin/Boolean|): R|Foo| {
+            super<R|kotlin/Any|>()
+            this@R|/Foo|.R|/Foo.a| = when (R|<local>/b|) {
+                ==($subj$, Boolean(true)) ->  {
+                    Int(1)
+                }
+                ==($subj$, Boolean(false)) ->  {
+                    Int(0)
+                }
+            }
+
+        }
+
+        public constructor(x1: R|kotlin/Int|, x2: R|kotlin/Int|): R|Foo| {
+            super<R|kotlin/Any|>()
+            this@R|/Foo|.R|/Foo.a| = R|<local>/x1|.R|kotlin/Int.plus|(R|<local>/x2|)
+        }
+
+    }
+    public final class Bar : R|kotlin/Any| {
+        public constructor(a: R|kotlin/Int|): R|Bar| {
+            super<R|kotlin/Any|>()
+        }
+
+        public final val a: R|kotlin/Int| = R|<local>/a|
+            public get(): R|kotlin/Int|
+
+        public constructor(b: R|kotlin/Boolean|): R|Bar| {
+            this<R|Bar|>(when (R|<local>/b|) {
+                ==($subj$, Boolean(true)) ->  {
+                    Int(1)
+                }
+                ==($subj$, Boolean(false)) ->  {
+                    Int(0)
+                }
+            }
+            )
+        }
+
+    }
+    public final fun onlySecondConstructors(): R|kotlin/Unit| {
+        lval f1: R|Foo| = R|/Foo.Foo|(Boolean(true))
+        lval shouldBeOne: R|kotlin/Int| = R|<local>/f1|.R|/Foo.a|
+        lval f2: R|Foo| = R|/Foo.Foo|(Int(42))
+        lval shouldBeAnswer: R|kotlin/Int| = R|<local>/f2|.R|/Foo.a|
+        lval f3: R|Foo| = R|/Foo.Foo|(Int(10), Int(32))
+        lval test: R|kotlin/Int| = R|<local>/f3|.R|/Foo.a|
+    }
+    public final fun primaryAndSecondConstructor(): R|kotlin/Unit| {
+        lval b1: R|Bar| = R|/Bar.Bar|(Boolean(false))
+        lval shouldBeZero: R|kotlin/Int| = R|<local>/b1|.R|/Bar.a|
+        lval b2: R|Bar| = R|/Bar.Bar|(Int(42))
+        lval shouldBeAnswer: R|kotlin/Int| = R|<local>/b2|.R|/Bar.a|
+    }
