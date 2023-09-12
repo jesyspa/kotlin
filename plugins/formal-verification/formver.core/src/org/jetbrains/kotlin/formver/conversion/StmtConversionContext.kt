@@ -26,7 +26,9 @@ interface StmtConversionContext<out RTC : ResultTrackingContext> : MethodConvers
     fun convertAndStore(exp: FirExpression): Exp.LocalVar
 
     fun newBlock(): StmtConversionContext<RTC>
+
     fun withoutResult(): StmtConversionContext<NoopResultTracker>
+
     fun withResult(type: TypeEmbedding): StmtConversionContext<VarResultTrackingContext>
 
     fun withInlineContext(

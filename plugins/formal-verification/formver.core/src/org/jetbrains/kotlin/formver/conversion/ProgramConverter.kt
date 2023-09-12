@@ -10,6 +10,7 @@ import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.declarations.FirSimpleFunction
 import org.jetbrains.kotlin.fir.declarations.utils.hasBackingField
 import org.jetbrains.kotlin.fir.symbols.impl.FirFunctionSymbol
+import org.jetbrains.kotlin.fir.symbols.impl.FirPropertyAccessorSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirPropertySymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirRegularClassSymbol
 import org.jetbrains.kotlin.fir.types.*
@@ -107,9 +108,13 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         val params = symbol.valueParameterSymbols.map {
             VariableEmbedding(it.embedName(), embedType(it.resolvedReturnType))
         }
-        val receiver = symbol.receiverType?.let { VariableEmbedding(ThisReceiverName, embedType(it)) }
+        val receiverType = when (symbol) {
+            is FirPropertyAccessorSymbol -> symbol.propertySymbol.dispatchReceiverType
+            else -> symbol.receiverType
+        }
+        val receiver = receiverType?.let { VariableEmbedding(ThisReceiverName, embedType(it)) }
         return object : MethodSignatureEmbedding {
-            override val name = symbol.callableId.embedName()
+            override val name = symbol.embedName()
             override val receiver = receiver
             override val params = params
             override val returnType = embedType(retType)
