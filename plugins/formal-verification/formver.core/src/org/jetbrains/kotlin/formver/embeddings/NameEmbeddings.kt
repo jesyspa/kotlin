@@ -5,9 +5,12 @@
 
 package org.jetbrains.kotlin.formver.embeddings
 
+import org.jetbrains.kotlin.fir.symbols.impl.FirConstructorSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirFunctionSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirPropertyAccessorSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirValueParameterSymbol
+import org.jetbrains.kotlin.fir.types.ConeKotlinType
+import org.jetbrains.kotlin.fir.types.isNullable
 import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.ClassId
@@ -41,6 +44,11 @@ data class ClassName(override val packageName: FqName, val className: Name) : Fq
     override val postfix: String = "class_${className.asString()}"
 }
 
+data class ClassConstructorName(val className: ClassName, val paramsTypeSignature: String) : MangledName {
+    override val mangled: String
+        get() = "${className.mangled}\$constructor\$${paramsTypeSignature}"
+}
+
 data class ClassMemberName(val className: ClassName, val name: Name) : MangledName {
     override val mangled: String
         get() = "${className.mangled}\$member_${name.asString()}"
@@ -63,6 +71,14 @@ data class GlobalName(override val packageName: FqName, val name: Name) : FqMang
     override val postfix: String = "global$${name.asStringStripSpecialMarkers()}"
 }
 
+fun FirConstructorSymbol.embedName(): MangledName {
+    val className = ClassName(this.callableId.packageName, this.callableId.className!!.shortName())
+    val typeSignature = this.valueParameterSymbols.joinToString("$") { param ->
+        param.resolvedReturnType.mangledName
+    }
+    return ClassConstructorName(className, typeSignature)
+}
+
 fun FirValueParameterSymbol.embedName(): LocalName = LocalName(name)
 
 fun FirPropertyAccessorSymbol.embedName(): MangledName {
@@ -78,8 +94,18 @@ fun FirPropertyAccessorSymbol.embedName(): MangledName {
 
 fun FirFunctionSymbol<*>.embedName(): MangledName = when (this) {
     is FirPropertyAccessorSymbol -> embedName()
+    is FirConstructorSymbol -> embedName()
     else -> callableId.embedName()
 }
+
+val ConeKotlinType.mangledName: String
+    get() {
+        val prefix = when (this.isNullable) {
+            true -> "NT" // Nullable Type
+            false -> "T" // Type
+        }
+        return prefix + toString().replace("/", "_").replace("?", "")
+    }
 
 fun CallableId.embedName(): MangledName = when {
     isLocal -> {

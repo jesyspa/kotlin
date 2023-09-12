@@ -41,13 +41,13 @@ method pkg$$global$constructorReturnType() returns (ret: Bool)
   ensures ret == true
 {
   var anonymous$1: Ref
-  anonymous$1 := pkg$$class_Foo$member_Foo()
+  anonymous$1 := pkg$$class_Foo$constructor$()
   ret := dom$Type$isSubtype((dom$TypeOf$typeOf(anonymous$1): dom$Type), dom$Type$pkg$$class_Foo())
   goto label$ret
   label label$ret
 }
 
-method pkg$$class_Foo$member_Foo() returns (ret: Ref)
+method pkg$$class_Foo$constructor$() returns (ret: Ref)
   ensures dom$Type$isSubtype((dom$TypeOf$typeOf(ret): dom$Type), dom$Type$pkg$$class_Foo())
 
 

@@ -52,13 +52,14 @@ method pkg$$global$outer_member_fun_call() returns (ret: dom$Unit)
   var local$f: Ref
   var anonymous$1: Ref
   var anonymous$2: Int
-  anonymous$1 := pkg$$class_Foo$member_Foo(3)
+  anonymous$1 := pkg$$class_Foo$constructor$Tkotlin_Int(3)
   local$f := anonymous$1
   anonymous$2 := pkg$$class_Foo$member_member_fun(local$f)
   label label$ret
 }
 
-method pkg$$class_Foo$member_Foo(local$x: Int) returns (ret: Ref)
+method pkg$$class_Foo$constructor$Tkotlin_Int(local$x: Int)
+  returns (ret: Ref)
   ensures dom$Type$isSubtype((dom$TypeOf$typeOf(ret): dom$Type), dom$Type$pkg$$class_Foo())
 
 
