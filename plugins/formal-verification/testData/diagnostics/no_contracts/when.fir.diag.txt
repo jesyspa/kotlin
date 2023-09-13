@@ -1,5 +1,6 @@
 /when.kt:(4,15): info: Generated Viper text for return_when:
-method pkg$$global$return_when(local$a: Bool, local$b: Bool, local$c: Bool)
+method pkg$$global$return_when$Tkotlin_Boolean$Tkotlin_Boolean$Tkotlin_Boolean(local$a: Bool,
+  local$b: Bool, local$c: Bool)
   returns (ret: Int)
 {
   var anonymous$1: Int
@@ -17,7 +18,8 @@ method pkg$$global$return_when(local$a: Bool, local$b: Bool, local$c: Bool)
 }
 
 /when.kt:(153,164): info: Generated Viper text for when_return:
-method pkg$$global$when_return(local$a: Bool, local$b: Bool, local$c: Bool)
+method pkg$$global$when_return$Tkotlin_Boolean$Tkotlin_Boolean$Tkotlin_Boolean(local$a: Bool,
+  local$b: Bool, local$c: Bool)
   returns (ret: Int)
 {
   if (local$a) {
@@ -37,7 +39,8 @@ method pkg$$global$when_return(local$a: Bool, local$b: Bool, local$c: Bool)
 }
 
 /when.kt:(323,341): info: Generated Viper text for single_branch_when:
-method pkg$$global$single_branch_when(local$a: Bool) returns (ret: Int)
+method pkg$$global$single_branch_when$Tkotlin_Boolean(local$a: Bool)
+  returns (ret: Int)
 {
   var local$x: Int
   local$x := 1
@@ -50,7 +53,8 @@ method pkg$$global$single_branch_when(local$a: Bool) returns (ret: Int)
 }
 
 /when.kt:(431,443): info: Generated Viper text for no_else_when:
-method pkg$$global$no_else_when(local$a: Bool, local$b: Bool, local$c: Bool)
+method pkg$$global$no_else_when$Tkotlin_Boolean$Tkotlin_Boolean$Tkotlin_Boolean(local$a: Bool,
+  local$b: Bool, local$c: Bool)
   returns (ret: Int)
 {
   var local$y: Int
@@ -68,7 +72,8 @@ method pkg$$global$no_else_when(local$a: Bool, local$b: Bool, local$c: Bool)
 }
 
 /when.kt:(595,616): info: Generated Viper text for when_with_subject_var:
-method pkg$$global$when_with_subject_var(local$x: Int) returns (ret: Int)
+method pkg$$global$when_with_subject_var$Tkotlin_Int(local$x: Int)
+  returns (ret: Int)
 {
   var anonymous$1: Int
   if (local$x == 1) {
@@ -83,7 +88,8 @@ method pkg$$global$when_with_subject_var(local$x: Int) returns (ret: Int)
 }
 
 /when.kt:(716,738): info: Generated Viper text for when_with_subject_call:
-method pkg$$global$when_with_subject_call(local$x: Int) returns (ret: Int)
+method pkg$$global$when_with_subject_call$Tkotlin_Int(local$x: Int)
+  returns (ret: Int)
 {
   var anonymous$1: Int
   var anonymous$2: Int
@@ -109,7 +115,8 @@ method pkg$$global$when_with_subject_call(local$x: Int) returns (ret: Int)
   label label$ret
 }
 
-method pkg$$global$when_with_subject_var(local$x: Int) returns (ret: Int)
+method pkg$$global$when_with_subject_var$Tkotlin_Int(local$x: Int)
+  returns (ret: Int)
 
 
 /when.kt:(962,972): info: Generated Viper text for empty_when:

@@ -3,7 +3,7 @@ field pkg$$class_Foo$member_a: Int
 
 field pkg$$class_Foo$member_b: Int
 
-method pkg$$global$createFoo() returns (ret: dom$Unit)
+method pkg$$global$createFoo$() returns (ret: dom$Unit)
 {
   var local$f: Ref
   var anonymous$1: Ref
@@ -32,7 +32,7 @@ method pkg$$class_Foo$constructor$Tkotlin_Int$Tkotlin_Int(local$a: Int, local$b:
 /classes_getters.kt:(280,290): info: Generated Viper text for testGetter:
 field pkg$$class_IntWrapper$member_n: Int
 
-method pkg$$global$testGetter() returns (ret: dom$Unit)
+method pkg$$global$testGetter$() returns (ret: dom$Unit)
 {
   var local$wrapper: Ref
   var anonymous$1: Ref
@@ -60,7 +60,7 @@ field pkg$$class_Foo$member_b: Int
 
 field pkg$$class_Bar$member_f: Ref
 
-method pkg$$global$testCascadeGetter() returns (ret: dom$Unit)
+method pkg$$global$testCascadeGetter$() returns (ret: dom$Unit)
 {
   var local$foo: Ref
   var anonymous$1: Ref
@@ -109,7 +109,7 @@ field pkg$$class_IntWrapper$member_n: Int
 
 field pkg$$class_IntWrapperContainer$member_i: Ref
 
-method pkg$$global$testCascadeCustomGetters() returns (ret: dom$Unit)
+method pkg$$global$testCascadeCustomGetters$() returns (ret: dom$Unit)
 {
   var local$wrapper: Ref
   var anonymous$1: Ref

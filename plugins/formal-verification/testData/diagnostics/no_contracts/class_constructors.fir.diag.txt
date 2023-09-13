@@ -1,7 +1,7 @@
 /class_constructors.kt:(389,411): info: Generated Viper text for onlySecondConstructors:
 field pkg$$class_Foo$member_a: Int
 
-method pkg$$global$onlySecondConstructors() returns (ret: dom$Unit)
+method pkg$$global$onlySecondConstructors$() returns (ret: dom$Unit)
 {
   var local$f1: Ref
   var anonymous$1: Ref
@@ -54,7 +54,7 @@ method pkg$$class_Foo$constructor$Tkotlin_Int$Tkotlin_Int(local$x1: Int, local$x
 /class_constructors.kt:(590,617): info: Generated Viper text for primaryAndSecondConstructor:
 field pkg$$class_Bar$member_a: Int
 
-method pkg$$global$primaryAndSecondConstructor() returns (ret: dom$Unit)
+method pkg$$global$primaryAndSecondConstructor$() returns (ret: dom$Unit)
 {
   var local$b1: Ref
   var anonymous$1: Ref

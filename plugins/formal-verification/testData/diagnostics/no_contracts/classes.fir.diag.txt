@@ -3,7 +3,7 @@ field pkg$$class_Foo$member_a: Int
 
 field pkg$$class_Foo$member_b: Int
 
-method pkg$$global$createFoo() returns (ret: dom$Unit)
+method pkg$$global$createFoo$() returns (ret: dom$Unit)
 {
   var local$f: Ref
   var anonymous$1: Ref
@@ -32,7 +32,7 @@ method pkg$$class_Foo$constructor$Tkotlin_Int$Tkotlin_Int(local$a: Int, local$b:
 /classes.kt:(147,156): info: Generated Viper text for createBar:
 field pkg$$class_Bar$member_a: dom$Nullable[Ref]
 
-method pkg$$global$createBar() returns (ret: dom$Unit)
+method pkg$$global$createBar$() returns (ret: dom$Unit)
 {
   var local$b: Ref
   var anonymous$1: Ref

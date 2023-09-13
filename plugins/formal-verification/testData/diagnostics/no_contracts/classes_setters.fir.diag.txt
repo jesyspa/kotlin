@@ -3,7 +3,7 @@ field pkg$$class_AlwaysPlusOne$member_b: Int
 
 field pkg$$class_AlwaysPlusOne$member_num: Int
 
-method pkg$$global$testCustomSetter() returns (ret: dom$Unit)
+method pkg$$global$testCustomSetter$() returns (ret: dom$Unit)
 {
   var local$f: Ref
   var anonymous$1: Ref
@@ -31,7 +31,7 @@ method pkg$$class_AlwaysPlusOne$setter_num(this: Ref, local$value: Int)
 /classes_setters.kt:(434,444): info: Generated Viper text for testSetter:
 field pkg$$class_Person$member_age: Int
 
-method pkg$$global$testSetter() returns (ret: dom$Unit)
+method pkg$$global$testSetter$() returns (ret: dom$Unit)
 {
   var local$person: Ref
   var anonymous$1: Ref
@@ -57,7 +57,7 @@ field pkg$$class_Bar$member_a: Int
 
 field pkg$$class_Foo$member_b: Ref
 
-method pkg$$global$testSetterCascade() returns (ret: dom$Unit)
+method pkg$$global$testSetterCascade$() returns (ret: dom$Unit)
 {
   var local$f: Ref
   var anonymous$1: Ref
@@ -88,7 +88,7 @@ method pkg$$class_Bar$constructor$Tkotlin_Int(local$a: Int)
 /classes_setters.kt:(585,609): info: Generated Viper text for testSetterNoBackingField:
 field pkg$$class_Baz$member__a: Int
 
-method pkg$$global$testSetterNoBackingField() returns (ret: dom$Unit)
+method pkg$$global$testSetterNoBackingField$() returns (ret: dom$Unit)
 {
   var local$baz: Ref
   var anonymous$1: Ref
@@ -113,7 +113,7 @@ method pkg$$class_Baz$setter_a(this: Ref, local$value: Int)
 /classes_setters.kt:(694,704): info: Generated Viper text for mockInline:
 field pkg$$class_Bar$member_a: Int
 
-method pkg$$global$mockInline(local$b: Ref) returns (ret: dom$Unit)
+method pkg$$global$mockInline$TBar(local$b: Ref) returns (ret: dom$Unit)
 {
   inhale dom$Type$isSubtype((dom$TypeOf$typeOf(local$b): dom$Type), dom$Type$pkg$$class_Bar())
   inhale acc(local$b.pkg$$class_Bar$member_a, write)
@@ -125,7 +125,7 @@ method pkg$$global$mockInline(local$b: Ref) returns (ret: dom$Unit)
 /classes_setters.kt:(735,751): info: Generated Viper text for testSetterLambda:
 field pkg$$class_Bar$member_a: Int
 
-method pkg$$global$testSetterLambda() returns (ret: dom$Unit)
+method pkg$$global$testSetterLambda$() returns (ret: dom$Unit)
 {
   var anonymous$1: dom$Unit
   if (true) {
@@ -134,7 +134,7 @@ method pkg$$global$testSetterLambda() returns (ret: dom$Unit)
     inhale acc(anonymous$2.pkg$$class_Bar$member_a, write)
     anonymous$2.pkg$$class_Bar$member_a := 42
     exhale acc(anonymous$2.pkg$$class_Bar$member_a, write)
-    label inline$pkg$$global$mockInline$label$ret
+    label inline_label$pkg$$global$mockInline$TBar$ret
   }
   label label$ret
 }
