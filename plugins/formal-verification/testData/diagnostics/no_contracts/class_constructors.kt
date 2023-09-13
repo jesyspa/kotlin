@@ -16,10 +16,7 @@ class Foo {
 }
 
 class Bar(val a: Int) {
-    constructor(b: Boolean) : this(when (b) {
-                                        true -> 1
-                                        false -> 0
-                                    }) {
+    constructor(b: Boolean) : this(if (b) { 1 } else { 0 }) {
         // Do something...
     }
 }
