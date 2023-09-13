@@ -13,6 +13,7 @@ import org.jetbrains.kotlin.fir.declarations.impl.FirDefaultPropertyGetter
 import org.jetbrains.kotlin.fir.declarations.impl.FirDefaultPropertySetter
 import org.jetbrains.kotlin.fir.expressions.*
 import org.jetbrains.kotlin.fir.expressions.impl.FirElseIfTrueCondition
+import org.jetbrains.kotlin.fir.expressions.impl.FirUnitExpression
 import org.jetbrains.kotlin.fir.symbols.SymbolInternals
 import org.jetbrains.kotlin.fir.symbols.impl.*
 import org.jetbrains.kotlin.fir.types.coneType
@@ -33,6 +34,8 @@ import org.jetbrains.kotlin.formver.viper.ast.PermExp
 import org.jetbrains.kotlin.formver.viper.ast.Stmt
 import org.jetbrains.kotlin.formver.embeddings.*
 import org.jetbrains.kotlin.formver.viper.MangledName
+import org.jetbrains.kotlin.name.ClassId
+import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.text
 import org.jetbrains.kotlin.types.ConstantValueKind
 
@@ -72,6 +75,19 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext<Re
             ConstantValueKind.Boolean -> BooleanLit(constExpression.value as Boolean)
             ConstantValueKind.Null -> (data.embedType(constExpression) as NullableTypeEmbedding).nullVal
             else -> handleUnimplementedElement("Constant Expression of type ${constExpression.kind} is not yet implemented.", data)
+        }
+
+    override fun visitExpression(expression: FirExpression, data: StmtConversionContext<ResultTrackingContext>): ExpEmbedding =
+        if (expression is FirUnitExpression) UnitLit else super.visitExpression(expression, data)
+
+    override fun visitResolvedQualifier(
+        resolvedQualifier: FirResolvedQualifier,
+        data: StmtConversionContext<ResultTrackingContext>
+    ): ExpEmbedding =
+        if (resolvedQualifier.classId == ClassId(FqName("kotlin"), FqName("Unit"), false)) {
+            UnitLit
+        } else {
+            super.visitResolvedQualifier(resolvedQualifier, data)
         }
 
     override fun visitWhenSubjectExpression(

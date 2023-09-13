@@ -4,7 +4,23 @@ method pkg$$global$return_unit() returns (ret: dom$Unit)
   label label$ret
 }
 
-/basic.kt:(25,35): info: Generated Viper text for return_int:
+/basic.kt:(25,37): info: Generated Viper text for return_unit2:
+method pkg$$global$return_unit2() returns (ret: dom$Unit)
+{
+  ret := dom$Unit$element()
+  goto label$ret
+  label label$ret
+}
+
+/basic.kt:(51,63): info: Generated Viper text for return_unit3:
+method pkg$$global$return_unit3() returns (ret: dom$Unit)
+{
+  ret := dom$Unit$element()
+  goto label$ret
+  label label$ret
+}
+
+/basic.kt:(81,91): info: Generated Viper text for return_int:
 method pkg$$global$return_int() returns (ret: Int)
 {
   ret := 0
@@ -12,14 +28,14 @@ method pkg$$global$return_int() returns (ret: Int)
   label label$ret
 }
 
-/basic.kt:(60,80): info: Generated Viper text for take_int_return_unit:
+/basic.kt:(116,136): info: Generated Viper text for take_int_return_unit:
 method pkg$$global$take_int_return_unit(local$x: Int)
   returns (ret: dom$Unit)
 {
   label label$ret
 }
 
-/basic.kt:(126,145): info: Generated Viper text for take_int_return_int:
+/basic.kt:(182,201): info: Generated Viper text for take_int_return_int:
 method pkg$$global$take_int_return_int(local$x: Int) returns (ret: Int)
 {
   ret := local$x
@@ -27,7 +43,7 @@ method pkg$$global$take_int_return_int(local$x: Int) returns (ret: Int)
   label label$ret
 }
 
-/basic.kt:(176,200): info: Generated Viper text for take_int_return_int_expr:
+/basic.kt:(232,256): info: Generated Viper text for take_int_return_int_expr:
 method pkg$$global$take_int_return_int_expr(local$x: Int)
   returns (ret: Int)
 {
@@ -36,7 +52,7 @@ method pkg$$global$take_int_return_int_expr(local$x: Int)
   label label$ret
 }
 
-/basic.kt:(222,242): info: Generated Viper text for with_int_declaration:
+/basic.kt:(278,298): info: Generated Viper text for with_int_declaration:
 method pkg$$global$with_int_declaration() returns (ret: Int)
 {
   var local$x: Int
@@ -46,7 +62,7 @@ method pkg$$global$with_int_declaration() returns (ret: Int)
   label label$ret
 }
 
-/basic.kt:(285,299): info: Generated Viper text for int_assignment:
+/basic.kt:(341,355): info: Generated Viper text for int_assignment:
 method pkg$$global$int_assignment() returns (ret: dom$Unit)
 {
   var local$x: Int

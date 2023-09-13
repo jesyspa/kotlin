@@ -1,4 +1,6 @@
 fun <!VIPER_TEXT!>return_unit<!>() {}
+fun <!VIPER_TEXT!>return_unit2<!>() = Unit
+fun <!VIPER_TEXT!>return_unit3<!>() { return }
 fun <!VIPER_TEXT!>return_int<!>(): Int { return 0 }
 fun <!VIPER_TEXT!>take_int_return_unit<!>(@Suppress("UNUSED_PARAMETER") x: Int) {}
 fun <!VIPER_TEXT!>take_int_return_int<!>(x: Int): Int { return x }
