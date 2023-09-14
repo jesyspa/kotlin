@@ -59,7 +59,6 @@ class UserMethodEmbedding(
     override fun convertBody(ctx: ProgramConverter) {
         val methodCtx = object : MethodConversionContext, ProgramConversionContext by ctx {
             override val method: MethodEmbedding = this@UserMethodEmbedding
-            override val fields: MutableMap<MangledName, FieldEmbedding> = ctx.fields
 
             override val nameMangler = NoopNameMangler
             override fun getLambdaOrNull(name: Name): SubstitutionLambda? = null

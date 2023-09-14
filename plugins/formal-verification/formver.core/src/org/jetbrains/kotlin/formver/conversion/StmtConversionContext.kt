@@ -63,13 +63,13 @@ fun <RTC : ResultTrackingContext> StmtConversionContext<RTC>.embedPropertyAccess
 @OptIn(SymbolInternals::class)
 fun <RTC : ResultTrackingContext> StmtConversionContext<RTC>.embedGetter(symbol: FirPropertySymbol): GetterEmbedding? =
     when (val getter = symbol.fir.getter) {
-        null, is FirDefaultPropertyGetter -> fields[symbol.callableId.embedName()]?.let { BackingFieldGetter(it) }
+        null, is FirDefaultPropertyGetter -> getField(symbol)?.let { BackingFieldGetter(it) }
         else -> CustomGetter(embedFunction(getter.symbol))
     }
 
 @OptIn(SymbolInternals::class)
 fun <RTC : ResultTrackingContext> StmtConversionContext<RTC>.embedSetter(symbol: FirPropertySymbol): SetterEmbedding? =
     when (val setter = symbol.fir.setter) {
-        null, is FirDefaultPropertySetter -> fields[symbol.callableId.embedName()]?.let { BackingFieldSetter(it) }
+        null, is FirDefaultPropertySetter -> getField(symbol)?.let { BackingFieldSetter(it) }
         else -> CustomSetter(embedFunction(setter.symbol))
     }

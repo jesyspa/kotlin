@@ -18,7 +18,6 @@ import org.jetbrains.kotlin.formver.UnsupportedFeatureBehaviour
 import org.jetbrains.kotlin.formver.domains.*
 import org.jetbrains.kotlin.formver.embeddings.*
 import org.jetbrains.kotlin.formver.viper.MangledName
-import org.jetbrains.kotlin.formver.viper.ast.Field
 import org.jetbrains.kotlin.formver.viper.ast.Program
 
 /**
@@ -30,7 +29,7 @@ import org.jetbrains.kotlin.formver.viper.ast.Program
 class ProgramConverter(val session: FirSession, override val config: PluginConfiguration) : ProgramConversionContext {
     private val methods: MutableMap<MangledName, MethodEmbedding> = mutableMapOf()
     private val classes: MutableMap<ClassName, ClassTypeEmbedding> = mutableMapOf()
-    override val fields: MutableMap<MangledName, FieldEmbedding> = mutableMapOf()
+    private val fields: MutableMap<MangledName, FieldEmbedding> = mutableMapOf()
 
     val program: Program
         get() = Program(
@@ -98,6 +97,8 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         }
         else -> unimplementedTypeEmbedding(type)
     }
+
+    override fun getField(field: FirPropertySymbol): FieldEmbedding? = fields[field.callableId.embedName()]
 
     private var nextAnonVarNumber = 0
     override fun newAnonName(): AnonymousName = AnonymousName(++nextAnonVarNumber)
