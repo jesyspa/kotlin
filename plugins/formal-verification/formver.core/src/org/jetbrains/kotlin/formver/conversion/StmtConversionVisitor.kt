@@ -87,7 +87,7 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext<Re
     override fun visitWhenExpression(whenExpression: FirWhenExpression, data: StmtConversionContext<ResultTrackingContext>): ExpEmbedding {
         val subj = whenExpression.subject?.let { data.convertAndStore(it) }
         val type = data.embedType(whenExpression)
-        val ctx = if (type != NothingTypeEmbedding) {
+        val ctx = if (type != NothingTypeEmbedding && type != UnitTypeEmbedding) {
             data.withResult(type)
         } else {
             data.withoutResult()
