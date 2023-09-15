@@ -40,9 +40,11 @@ method pkg$$global$when_return(local$a: Bool, local$b: Bool, local$c: Bool)
 method pkg$$global$single_branch_when(local$a: Bool) returns (ret: Int)
 {
   var local$x: Int
+  var anonymous$1: dom$Unit
   local$x := 1
   if (local$a) {
     local$x := 2
+    anonymous$1 := dom$Unit$element()
   }
   ret := local$x
   goto label$ret
@@ -54,13 +56,17 @@ method pkg$$global$no_else_when(local$a: Bool, local$b: Bool, local$c: Bool)
   returns (ret: Int)
 {
   var local$y: Int
+  var anonymous$1: dom$Unit
   local$y := 0
   if (local$a) {
     local$y := 1
+    anonymous$1 := dom$Unit$element()
   } elseif (local$b) {
     local$y := 2
+    anonymous$1 := dom$Unit$element()
   } elseif (local$c) {
     local$y := 3
+    anonymous$1 := dom$Unit$element()
   }
   ret := local$y
   goto label$ret
@@ -115,12 +121,27 @@ method pkg$$global$when_with_subject_var(local$x: Int) returns (ret: Int)
 /when.kt:(962,972): info: Generated Viper text for empty_when:
 method pkg$$global$empty_when() returns (ret: Int)
 {
+  var anonymous$1: dom$Unit
   ret := 1
   goto label$ret
   label label$ret
 }
 
-/when.kt:(1053,1060): info: Generated Viper text for when_is:
+/when.kt:(1015,1028): info: Generated Viper text for unused_result:
+method pkg$$global$unused_result() returns (ret: Int)
+{
+  var local$x: Int
+  var anonymous$1: Int
+  var anonymous$2: Int
+  anonymous$2 := 5
+  anonymous$1 := 0
+  local$x := anonymous$1
+  ret := local$x
+  goto label$ret
+  label label$ret
+}
+
+/when.kt:(1222,1229): info: Generated Viper text for when_is:
 method pkg$$global$when_is(local$x: Ref) returns (ret: Bool)
 {
   var anonymous$1: Bool
