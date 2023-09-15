@@ -14,11 +14,13 @@ interface CallableEmbedding : CallableSignature {
     fun insertCallImpl(args: List<ExpEmbedding>, ctx: StmtConversionContext<ResultTrackingContext>): ExpEmbedding
 
     // Some callables can *only* be called via the FIR.
+    // TODO: Remove this method once everything implements `insertCallImpl` correctly.
     fun insertFirCallImpl(firArgs: List<FirExpression>, ctx: StmtConversionContext<ResultTrackingContext>): ExpEmbedding =
         insertCall(firArgs.map { ctx.convert(it) }, ctx)
 }
 
 fun CallableEmbedding.insertCall(args: List<ExpEmbedding>, ctx: StmtConversionContext<ResultTrackingContext>): ExpEmbedding =
-    callWithTypecasts(args) {
-        insertCallImpl(it, ctx)
-    }
+    args.zip(formalArgTypes)
+        .map { (arg, type) -> arg.withType(type) }
+        .let { insertCallImpl(it, ctx) }
+        .withType(returnType)

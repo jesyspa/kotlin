@@ -58,17 +58,18 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
             is UserFunctionEmbedding -> return existing
             else -> {}
         }
-        val new = processFunction(symbol, signature)
+        val new = UserFunctionEmbedding(processCallable(symbol, signature))
         methods[signature.name] = new
         return new
     }
 
-    override fun embedFunction(symbol: FirFunctionSymbol<*>): FunctionEmbedding = methods.getOrPut(symbol.embedName()) {
-        val signature = embedSignature(symbol)
-        val embedding = processFunction(symbol, signature)
-        embedding.viperMethod = convertMethodWithoutBody(symbol, signature)
-        embedding
-    }
+    override fun embedFunction(symbol: FirFunctionSymbol<*>): FunctionEmbedding =
+        methods.getOrPut(symbol.embedName()) {
+            val signature = embedSignature(symbol)
+            val embedding = UserFunctionEmbedding(processCallable(symbol, signature))
+            embedding.viperMethod = convertMethodWithoutBody(symbol, signature)
+            embedding
+        }
 
     private fun embedClass(symbol: FirRegularClassSymbol): ClassTypeEmbedding {
         val className = symbol.classId.embedName()
@@ -157,9 +158,6 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
             }
     }
 
-    private fun processFunction(symbol: FirFunctionSymbol<*>, signature: FullNamedFunctionSignature): UserFunctionEmbedding =
-        UserFunctionEmbedding(processCallable(symbol, signature))
-
     private fun processCallable(symbol: FirFunctionSymbol<*>, signature: FullNamedFunctionSignature): CallableEmbedding =
         if (symbol.isInline) {
             InlineNamedFunction(signature, symbol)
@@ -168,13 +166,13 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         }
 
     private fun convertMethodWithBody(declaration: FirSimpleFunction, signature: FullNamedFunctionSignature): Method {
-        val methodCtx = object : MethodConversionContext, ProgramConversionContext by this {
-            override val signature: FullNamedFunctionSignature = signature
-            override val nameMangler = NoopNameMangler
-            override fun getLambdaOrNull(name: Name): SubstitutionLambda? = null
-        }
-
         val body = declaration.body?.let {
+            val methodCtx = object : MethodConversionContext, ProgramConversionContext by this {
+                override val signature: FullNamedFunctionSignature = signature
+                override val nameMangler = NoopNameMangler
+                override fun getLambdaOrNull(name: Name): SubstitutionLambda? = null
+            }
+
             val stmtCtx = StmtConverter(methodCtx, SeqnBuilder(), NoopResultTrackerFactory, scopeDepth = 0)
             signature.formalArgs.forEach { arg ->
                 // Ideally we would want to assume these rather than inhale them to prevent inconsistencies with permissions.

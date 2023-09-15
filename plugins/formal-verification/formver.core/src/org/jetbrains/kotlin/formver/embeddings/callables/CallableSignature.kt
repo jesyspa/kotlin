@@ -5,7 +5,6 @@
 
 package org.jetbrains.kotlin.formver.embeddings.callables
 
-import org.jetbrains.kotlin.formver.embeddings.ExpEmbedding
 import org.jetbrains.kotlin.formver.embeddings.TypeEmbedding
 
 /**
@@ -21,9 +20,3 @@ interface CallableSignature {
     val formalArgTypes: List<TypeEmbedding>
         get() = listOfNotNull(receiverType) + paramTypes
 }
-
-fun CallableSignature.callWithTypecasts(args: List<ExpEmbedding>, call: (List<ExpEmbedding>) -> ExpEmbedding): ExpEmbedding =
-    args.zip(formalArgTypes)
-        .map { (arg, type) -> arg.withType(type) }
-        .let { call(it) }
-        .withType(returnType)
