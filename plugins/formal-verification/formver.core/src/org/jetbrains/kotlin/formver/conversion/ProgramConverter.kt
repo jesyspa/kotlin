@@ -54,10 +54,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
     }
 
     fun embedUserFunction(symbol: FirFunctionSymbol<*>, signature: FullNamedFunctionSignature): UserFunctionEmbedding {
-        when (val existing = methods[signature.name]) {
-            is UserFunctionEmbedding -> return existing
-            else -> {}
-        }
+        (methods[signature.name] as? UserFunctionEmbedding)?.also { return it }
         val new = UserFunctionEmbedding(processCallable(symbol, signature))
         methods[signature.name] = new
         return new
