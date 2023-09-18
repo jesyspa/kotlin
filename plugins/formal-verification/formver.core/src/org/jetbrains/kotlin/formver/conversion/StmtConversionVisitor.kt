@@ -207,7 +207,7 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext<Re
         if (!symbol.isLocal) {
             throw Exception("StmtConversionVisitor should not encounter non-local properties.")
         }
-        val localVar = data.embedLocalProperty(symbol)
+        val localVar = data.embedProperty(symbol)
         data.addDeclaration(localVar.toLocalVarDecl())
         property.initializer?.let {
             val initializerExp = data.convert(it)

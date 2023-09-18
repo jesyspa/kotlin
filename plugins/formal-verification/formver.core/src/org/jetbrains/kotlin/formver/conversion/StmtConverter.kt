@@ -95,6 +95,6 @@ data class StmtConverter<out RTC : ResultTrackingContext>(
         scopedNames[name] = scopeDepth
     }
 
-    override fun getScopeDepth(name: Name): Int? =
-        scopedNames[name]
+    override fun getScopeDepth(name: Name): Int =
+        scopedNames[name] ?: throw IllegalArgumentException("$name not found in scope $scopedNames")
 }
