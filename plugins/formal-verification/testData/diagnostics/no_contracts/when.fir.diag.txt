@@ -93,7 +93,7 @@ method pkg$$global$when_with_subject_call$Tkotlin_Int(local$x: Int)
 {
   var anonymous$1: Int
   var anonymous$2: Int
-  anonymous$1 := pkg$$global$when_with_subject_var(local$x)
+  anonymous$1 := pkg$$global$when_with_subject_var$Tkotlin_Int(local$x)
   if (anonymous$1 == 1) {
     anonymous$2 := 2
   } elseif (anonymous$1 == 2) {
@@ -101,7 +101,7 @@ method pkg$$global$when_with_subject_call$Tkotlin_Int(local$x: Int)
   } else {
     var anonymous$3: Int
     var anonymous$4: Int
-    anonymous$3 := pkg$$global$when_with_subject_var(0)
+    anonymous$3 := pkg$$global$when_with_subject_var$Tkotlin_Int(0)
     if (anonymous$3 == 3) {
       anonymous$4 := 4
     } elseif (anonymous$3 == 4) {
@@ -120,7 +120,7 @@ method pkg$$global$when_with_subject_var$Tkotlin_Int(local$x: Int)
 
 
 /when.kt:(962,972): info: Generated Viper text for empty_when:
-method pkg$$global$empty_when() returns (ret: Int)
+method pkg$$global$empty_when$() returns (ret: Int)
 {
   ret := 1
   goto label$ret
@@ -128,7 +128,7 @@ method pkg$$global$empty_when() returns (ret: Int)
 }
 
 /when.kt:(1015,1028): info: Generated Viper text for unused_result:
-method pkg$$global$unused_result() returns (ret: Int)
+method pkg$$global$unused_result$() returns (ret: Int)
 {
   var local$x: Int
   var anonymous$1: Int
@@ -142,7 +142,7 @@ method pkg$$global$unused_result() returns (ret: Int)
 }
 
 /when.kt:(1222,1229): info: Generated Viper text for when_is:
-method pkg$$global$when_is(local$x: Ref) returns (ret: Bool)
+method pkg$$global$when_is$TFoo(local$x: Ref) returns (ret: Bool)
 {
   var anonymous$1: Bool
   inhale dom$Type$isSubtype((dom$TypeOf$typeOf(local$x): dom$Type), dom$Type$pkg$$class_Foo())

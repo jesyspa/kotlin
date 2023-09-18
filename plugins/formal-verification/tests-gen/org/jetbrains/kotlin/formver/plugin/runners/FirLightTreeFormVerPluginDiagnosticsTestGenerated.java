@@ -6,8 +6,8 @@
 package org.jetbrains.kotlin.formver.plugin.runners;
 
 import com.intellij.testFramework.TestDataPath;
-import org.jetbrains.kotlin.test.TestMetadata;
 import org.jetbrains.kotlin.test.util.KtTestUtil;
+import org.jetbrains.kotlin.test.TestMetadata;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -201,6 +201,12 @@ public class FirLightTreeFormVerPluginDiagnosticsTestGenerated extends AbstractF
         @TestMetadata("function_overloading.kt")
         public void testFunction_overloading() throws Exception {
             runTest("plugins/formal-verification/testData/diagnostics/no_contracts/function_overloading.kt");
+        }
+
+        @Test
+        @TestMetadata("generics.kt")
+        public void testGenerics() throws Exception {
+            runTest("plugins/formal-verification/testData/diagnostics/no_contracts/generics.kt");
         }
 
         @Test

@@ -142,7 +142,7 @@ method pkg$$global$loopUntil$Tkotlin_Function0__kotlin_Boolean__(local$lambda: R
 }
 
 /calls_in_place.kt:(1178,1181): info: Generated Viper text for run:
-method pkg$$global$run(local$block: Ref)
+method pkg$$global$run$Tkotlin_Function0__R__(local$block: Ref)
   returns (ret: dom$Nullable[dom$Any])
   requires acc(local$block.special$function_object_call_counter, write)
   ensures acc(local$block.special$function_object_call_counter, write)

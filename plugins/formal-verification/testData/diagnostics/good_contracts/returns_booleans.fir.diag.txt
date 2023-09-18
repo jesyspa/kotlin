@@ -75,7 +75,7 @@ method pkg$$global$binary_logic_expressions$Tkotlin_Boolean$Tkotlin_Boolean(loca
 
 
 /returns_booleans.kt:(1268,1281): info: Generated Viper text for isNullOrEmpty:
-method pkg$$global$isNullOrEmpty(this: dom$Nullable[Ref])
+method pkg$$global$isNullOrEmpty$(this: dom$Nullable[Ref])
   returns (ret: Bool)
   ensures ret == false ==> this != (dom$Nullable$null(): dom$Nullable[Ref])
 {
@@ -92,7 +92,7 @@ method pkg$$global$isNullOrEmpty(this: dom$Nullable[Ref])
     anonymous$1 := true
   } else {
     var anonymous$2: Bool
-    anonymous$2 := pkg$kotlin$collections$class_Collection$member_isEmpty((dom$Casting$cast(this,
+    anonymous$2 := pkg$kotlin$collections$class_Collection$fun_isEmpty$((dom$Casting$cast(this,
       dom$Type$pkg$kotlin$collections$class_Collection()): Ref))
     anonymous$1 := anonymous$2
   }
@@ -101,5 +101,6 @@ method pkg$$global$isNullOrEmpty(this: dom$Nullable[Ref])
   label label$ret
 }
 
-method pkg$kotlin$collections$class_Collection$member_isEmpty(this: Ref)
+method pkg$kotlin$collections$class_Collection$fun_isEmpty$(this: Ref)
   returns (ret: Bool)
+
