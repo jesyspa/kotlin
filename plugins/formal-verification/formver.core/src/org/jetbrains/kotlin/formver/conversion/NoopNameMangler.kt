@@ -10,8 +10,7 @@ import org.jetbrains.kotlin.fir.symbols.impl.FirValueParameterSymbol
 import org.jetbrains.kotlin.formver.embeddings.embedName
 
 object NoopNameMangler : NameMangler {
-    override fun mangleParameterName(parameter: FirValueParameterSymbol, scopeDepth: Int) =
-        parameter.embedName()
+    override fun mangleParameterName(parameter: FirValueParameterSymbol) = parameter.embedName()
 
     override fun mangleLocalPropertyName(property: FirPropertySymbol, scopeDepth: Int) = property.callableId.embedName(scopeDepth)
 
