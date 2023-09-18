@@ -37,10 +37,10 @@ jobs:
         java-version: '11'
         distribution: 'temurin'
 
-    - name: Generate loca.properties
+    - name: Disable required old JDK builds
       run: echo kotlin.build.isObsoleteJdkOverrideEnabled=true > ./local.properties
 
-    - name: Build with Gradle
-      uses: gradle/gradle-build-action@bd5760595778326ba7f1441bcf7e88b49de61a25 # v2.6.0
-      with:
-        arguments: :kotlin-formver-compiler-plugin:build
+    - name: Setup Gradle
+      uses: gradle/gradle-build-action@v2
+    - name: Build and test
+      run: ./gradlew :kotlin-formver-compiler-plugin:build
