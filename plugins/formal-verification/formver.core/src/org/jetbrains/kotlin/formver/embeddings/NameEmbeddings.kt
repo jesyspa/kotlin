@@ -113,7 +113,8 @@ fun FirFunctionSymbol<*>.embedTypeSignature(): String = valueParameterSymbols.jo
     param.resolvedReturnType.mangledName
 }
 
-fun FirValueParameterSymbol.embedName(scope: Int): LocalName = LocalName(name, scope)
+// Parameters always have scope depth equal to zero
+fun FirValueParameterSymbol.embedName(): LocalName = LocalName(name, 0)
 
 fun FirPropertyAccessorSymbol.embedName(): MangledName {
     val className = propertySymbol.callableId.classId!!.embedName()
@@ -125,7 +126,7 @@ fun FirPropertyAccessorSymbol.embedName(): MangledName {
     }
 }
 
-fun FirFunctionSymbol<*>.embedName(scope: Int): MangledName = when (this) {
+fun FirFunctionSymbol<*>.embedName(): MangledName = when (this) {
     is FirPropertyAccessorSymbol -> embedName()
     is FirConstructorSymbol -> ClassConstructorName(callableId.classId!!.embedName(), embedTypeSignature())
     else -> {

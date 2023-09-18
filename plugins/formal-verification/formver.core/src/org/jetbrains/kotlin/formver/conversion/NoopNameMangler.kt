@@ -11,7 +11,7 @@ import org.jetbrains.kotlin.formver.embeddings.embedName
 
 object NoopNameMangler : NameMangler {
     override fun mangleParameterName(parameter: FirValueParameterSymbol, scopeDepth: Int) =
-        parameter.embedName(scopeDepth)
+        parameter.embedName()
 
     override fun mangleLocalPropertyName(property: FirPropertySymbol, scopeDepth: Int) = property.callableId.embedName(scopeDepth)
 

@@ -109,12 +109,12 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
     private fun embedSignature(symbol: FirFunctionSymbol<*>): MethodSignatureEmbedding {
         val retType = symbol.resolvedReturnTypeRef.type
         val params = symbol.valueParameterSymbols.map {
-            VariableEmbedding(it.embedName(0), embedType(it.resolvedReturnType))
+            VariableEmbedding(it.embedName(), embedType(it.resolvedReturnType))
         }
         val receiverType = symbol.receiverType
         val receiver = receiverType?.let { VariableEmbedding(ThisReceiverName, embedType(it)) }
         return object : MethodSignatureEmbedding {
-            override val name = symbol.embedName(0)
+            override val name = symbol.embedName()
             override val receiver = receiver
             override val params = params
             override val returnType = embedType(retType)
