@@ -93,12 +93,11 @@ val ConeKotlinType.mangledName: String
             false -> "T" // Type
         }
         // Check if there are any type argument in type's name
-        val mangled = toString().replace("/", "_").replace(Regex("[? ]"), "").let {
-            when {
-                typeArguments.isNotEmpty() -> it.replace(Regex("[<>]"), "__").replace(",", "$")
-                else -> it
-            }
-        }
+        val mangled = toString()
+            .replace("/", "_")
+            .replace(Regex("[? ]"), "")
+            .replace(Regex("[<>]"), "__")
+            .replace(",", "$")
         return prefix + mangled
     }
 
@@ -109,8 +108,6 @@ val ConeKotlinType.mangledName: String
 fun FirFunctionSymbol<*>.embedTypeSignature(): String = valueParameterSymbols.joinToString("$") { param ->
     param.resolvedReturnType.mangledName
 }
-
-fun FirConstructorSymbol.embedName(): MangledName = ClassConstructorName(callableId.classId!!.embedName(), embedTypeSignature())
 
 fun FirValueParameterSymbol.embedName(): LocalName = LocalName(name)
 
@@ -126,7 +123,7 @@ fun FirPropertyAccessorSymbol.embedName(): MangledName {
 
 fun FirFunctionSymbol<*>.embedName(): MangledName = when (this) {
     is FirPropertyAccessorSymbol -> embedName()
-    is FirConstructorSymbol -> embedName()
+    is FirConstructorSymbol -> ClassConstructorName(callableId.classId!!.embedName(), embedTypeSignature())
     else -> {
         // When mangling the function name we have to take into account function overloading.
         // To distinguish functions with the same name we use function's type signature.
