@@ -98,7 +98,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         else -> unimplementedTypeEmbedding(type)
     }
 
-    override fun getField(field: FirPropertySymbol): FieldEmbedding? = fields[field.callableId.embedName()]
+    override fun getField(field: FirPropertySymbol): FieldEmbedding? = fields[field.callableId.embedClassMemberName()]
 
     private var nextAnonVarNumber = 0
     override fun newAnonName(): AnonymousName = AnonymousName(++nextAnonVarNumber)
@@ -109,12 +109,12 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
     private fun embedSignature(symbol: FirFunctionSymbol<*>): MethodSignatureEmbedding {
         val retType = symbol.resolvedReturnTypeRef.type
         val params = symbol.valueParameterSymbols.map {
-            VariableEmbedding(it.embedName(), embedType(it.resolvedReturnType))
+            VariableEmbedding(it.embedName(0), embedType(it.resolvedReturnType))
         }
         val receiverType = symbol.receiverType
         val receiver = receiverType?.let { VariableEmbedding(ThisReceiverName, embedType(it)) }
         return object : MethodSignatureEmbedding {
-            override val name = symbol.embedName()
+            override val name = symbol.embedName(0)
             override val receiver = receiver
             override val params = params
             override val returnType = embedType(retType)
@@ -132,8 +132,8 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
             .filterIsInstance<FirPropertySymbol>()
             .filter { it.hasBackingField }
             .forEach {
-                val fieldName = it.callableId.embedName()
-                fields[fieldName] = FieldEmbedding(it.callableId.embedName(), embedType(it.resolvedReturnType))
+                val fieldName = it.callableId.embedClassMemberName()
+                fields[fieldName] = FieldEmbedding(it.callableId.embedClassMemberName(), embedType(it.resolvedReturnType))
             }
     }
 

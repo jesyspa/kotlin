@@ -15,15 +15,26 @@ import org.jetbrains.kotlin.name.Name
 interface MethodConversionContext : ProgramConversionContext {
     val method: MethodEmbedding
     val nameMangler: NameMangler
-
+    fun addScopedName(name: Name) = Unit
+    fun getScopeDepth(name: Name): Int? = null
     fun getLambdaOrNull(name: Name): SubstitutionLambda?
 }
 
 fun MethodConversionContext.embedValueParameter(symbol: FirValueParameterSymbol): VariableEmbedding =
-    VariableEmbedding(nameMangler.mangleParameterName(symbol), embedType(symbol.resolvedReturnType))
+    VariableEmbedding(
+        // Parameters always have scope depth equal to zero
+        nameMangler.mangleParameterName(symbol, 0),
+        embedType(symbol.resolvedReturnType)
+    )
 
 fun MethodConversionContext.embedLocalProperty(symbol: FirPropertySymbol): VariableEmbedding =
-    VariableEmbedding(nameMangler.mangleLocalPropertyName(symbol), embedType(symbol.resolvedReturnType))
+    VariableEmbedding(
+        nameMangler.mangleLocalPropertyName(
+            symbol,
+            getScopeDepth(symbol.name)
+                ?: throw IllegalArgumentException("null scope found while embedding local property $symbol")
+        ), embedType(symbol.resolvedReturnType)
+    )
 
 val MethodConversionContext.returnVar: VariableEmbedding
     get() = VariableEmbedding(nameMangler.mangledReturnValueName, method.returnType)

@@ -47,6 +47,7 @@ interface StmtConversionContext<out RTC : ResultTrackingContext> : MethodConvers
     }
 
     fun withWhenSubject(subject: VariableEmbedding?, action: (StmtConversionContext<RTC>) -> Unit)
+    fun inNewScope(action: (StmtConversionContext<RTC>) -> ExpEmbedding): ExpEmbedding
 }
 
 fun <RTC : ResultTrackingContext> StmtConversionContext<RTC>.embedPropertyAccess(symbol: FirPropertyAccessExpression): PropertyAccessEmbedding =
