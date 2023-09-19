@@ -39,6 +39,12 @@ interface StmtConversionContext<out RTC : ResultTrackingContext> : MethodConvers
         substitutionParams: Map<Name, SubstitutionItem>,
     ): StmtConversionContext<RTC>
 
+    fun withLambdaContext(
+        inlineSignature: FullNamedFunctionSignature,
+        returnVarName: MangledName,
+        substitutionParams: Map<Name, SubstitutionItem>,
+    ): StmtConversionContext<RTC>
+
     fun withResult(type: TypeEmbedding, action: StmtConversionContext<VarResultTrackingContext>.() -> Unit): VariableEmbedding {
         val ctx = withResult(type)
         ctx.action()

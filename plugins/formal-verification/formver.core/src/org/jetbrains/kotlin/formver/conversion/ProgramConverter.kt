@@ -113,6 +113,9 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
     private var nextWhileIndex = 0
     override fun newWhileIndex() = ++nextWhileIndex
 
+    private var nextReturnLabelIndex = 0
+    override fun newtReturnLabelIndex() = ++nextReturnLabelIndex
+
     private fun embedSignature(symbol: FirFunctionSymbol<*>): FullNamedFunctionSignature {
         val retType = symbol.resolvedReturnTypeRef.type
         val params = symbol.valueParameterSymbols.map {

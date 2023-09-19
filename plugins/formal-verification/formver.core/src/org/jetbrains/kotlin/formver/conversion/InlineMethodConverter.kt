@@ -9,6 +9,7 @@ import org.jetbrains.kotlin.fir.expressions.FirBlock
 import org.jetbrains.kotlin.fir.symbols.impl.FirPropertySymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirValueParameterSymbol
 import org.jetbrains.kotlin.formver.embeddings.callables.FullNamedFunctionSignature
+import org.jetbrains.kotlin.formver.embeddings.embedName
 import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.name.Name
 
@@ -27,18 +28,19 @@ data class SubstitutionLambda(val body: FirBlock, val args: List<Name>) : Substi
 }
 
 class InlineNameMangler(
-    val discriminator: MangledName,
     override val mangledReturnValueName: MangledName,
-    val substitutionParams: Map<Name, SubstitutionItem>,
+    private val substitutionParams: Map<Name, SubstitutionItem>,
+    returnLabelIndex: Int,
 ) :
     NameMangler {
     override fun mangleParameterName(parameter: FirValueParameterSymbol): MangledName =
-        substitutionParams[parameter.name]?.name ?: throw Exception("Unnamed parameter used in a way that requires a name.")
+        substitutionParams[parameter.name]?.name ?: parameter.embedName()
 
     override fun mangleLocalPropertyName(property: FirPropertySymbol, scopeDepth: Int): MangledName =
-        InlineName(discriminator, NoopNameMangler.mangleLocalPropertyName(property, scopeDepth))
+        NoopNameMangler.mangleLocalPropertyName(property, scopeDepth)
 
-    override val mangledReturnLabelName: MangledName = InlineName(discriminator, NoopNameMangler.mangledReturnLabelName)
+    override val mangledReturnLabelName: MangledName =
+        InlineReturnLabelName(returnLabelIndex)
 }
 
 class InlineMethodConverter(
@@ -46,8 +48,9 @@ class InlineMethodConverter(
     override val signature: FullNamedFunctionSignature,
     returnVarName: MangledName,
     private val substitutionParams: Map<Name, SubstitutionItem>,
+    val isLambda: Boolean = false,
 ) : MethodConversionContext, ProgramConversionContext by programCtx {
-    override val nameMangler = InlineNameMangler(signature.name, returnVarName, substitutionParams)
+    override val nameMangler = InlineNameMangler(returnVarName, substitutionParams, programCtx.newtReturnLabelIndex())
 
     override fun getLambdaOrNull(name: Name): SubstitutionLambda? = substitutionParams[name] as? SubstitutionLambda
 }

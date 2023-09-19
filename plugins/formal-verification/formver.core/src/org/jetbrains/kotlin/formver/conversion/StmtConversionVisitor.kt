@@ -190,7 +190,7 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext<Re
                 lambdaArgs.forEach { data.addScopedName(it) }
                 val callArgs = data.getFunctionCallSubstitutionItems(implicitInvokeCall.argumentList.arguments)
                 val subs = lambdaArgs.zip(callArgs).toMap()
-                val lambdaCtx = this.newBlock().withInlineContext(this.signature, this.resultCtx.resultVar.name, subs)
+                val lambdaCtx = this.newBlock().withLambdaContext(this.signature, this.resultCtx.resultVar.name, subs)
                 lambdaCtx.convert(lambda.lambdaBody())
                 // NOTE: It is necessary to drop the last stmt because is a wrong goto
                 val sqn = lambdaCtx.block.copy(stmts = lambdaCtx.block.stmts.dropLast(1))
