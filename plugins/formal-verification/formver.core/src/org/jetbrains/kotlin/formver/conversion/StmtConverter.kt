@@ -57,14 +57,18 @@ data class StmtConverter<out RTC : ResultTrackingContext>(
         returnVarName: MangledName,
         substitutionParams: Map<Name, SubstitutionItem>,
     ): StmtConversionContext<RTC> =
-        copy(methodCtx = InlineMethodConverter(this, inlineSignature, returnVarName, substitutionParams))
+        copy(methodCtx = InlineMethodConverter(this, inlineSignature, returnVarName, substitutionParams), scopedNames = mutableMapOf())
 
     override fun withLambdaContext(
         inlineSignature: FullNamedFunctionSignature,
         returnVarName: MangledName,
         substitutionParams: Map<Name, SubstitutionItem>,
+        scopedNames: Map<Name, Int>
     ): StmtConversionContext<RTC> =
-        copy(methodCtx = InlineMethodConverter(this, inlineSignature, returnVarName, substitutionParams, true))
+        copy(
+            methodCtx = InlineMethodConverter(this, inlineSignature, returnVarName, substitutionParams),
+            scopedNames = scopedNames.toMutableMap()
+        )
 
     // We can't implement these members using `by` due to Kotlin shenanigans.
     override val resultExp: ExpEmbedding
@@ -99,16 +103,11 @@ data class StmtConverter<out RTC : ResultTrackingContext>(
     }
 
     override fun addScopedName(name: Name) {
-        when {
-            // It is necessary to make this distinction otherwise local names of the inline functions and names of a lambda will clash
-            methodCtx is InlineMethodConverter && !methodCtx.isLambda -> scopedNames[Name.identifier("inline\$$name")] = scopeDepth
-            else -> scopedNames[name] = scopeDepth
-        }
+        scopedNames[name] = scopeDepth
     }
 
-    override fun getScopeDepth(name: Name): Int = when {
-        // It is necessary to make this distinction otherwise local names of the inline functions and names of a lambda will clash
-        methodCtx is InlineMethodConverter && !methodCtx.isLambda -> scopedNames[Name.identifier("inline\$$name")]
-        else -> scopedNames[name]
-    } ?: throw IllegalArgumentException("$name not found in scope $scopedNames")
+    override fun getScopeDepth(name: Name): Int =
+        scopedNames[name] ?: throw IllegalArgumentException("$name not found in scope $scopedNames")
+
+    override fun getScopedNames(): Map<Name, Int> = scopedNames
 }

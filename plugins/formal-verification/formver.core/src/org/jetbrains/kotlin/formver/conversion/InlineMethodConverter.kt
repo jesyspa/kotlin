@@ -21,7 +21,7 @@ sealed interface SubstitutionItem {
 
 data class SubstitutionName(override val name: MangledName) : SubstitutionItem
 
-data class SubstitutionLambda(val body: FirBlock, val args: List<Name>) : SubstitutionItem {
+data class SubstitutionLambda(val body: FirBlock, val args: List<Name>, val scopedNames: Map<Name, Int>) : SubstitutionItem {
     override val name = null
     override fun lambdaBody(): FirBlock = body
     override fun lambdaArgs(): List<Name> = args
@@ -48,7 +48,6 @@ class InlineMethodConverter(
     override val signature: FullNamedFunctionSignature,
     returnVarName: MangledName,
     private val substitutionParams: Map<Name, SubstitutionItem>,
-    val isLambda: Boolean = false,
 ) : MethodConversionContext, ProgramConversionContext by programCtx {
     override val nameMangler = InlineNameMangler(returnVarName, substitutionParams, programCtx.newtReturnLabelIndex())
 
