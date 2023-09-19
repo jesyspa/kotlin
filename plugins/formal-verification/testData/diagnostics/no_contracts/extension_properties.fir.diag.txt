@@ -1,0 +1,85 @@
+/extension_properties.kt:(125,148): info: Generated Viper text for extensionGetterProperty:
+method pkg$$global$extensionGetterProperty$() returns (ret: dom$Unit)
+{
+  var local$1$a: Int
+  var anonymous$1: Int
+  var local$1$b: Int
+  var anonymous$2: Int
+  var anonymous$3: Int
+  anonymous$1 := pkg$$ext_getter_succ(3)
+  local$1$a := anonymous$1
+  anonymous$2 := pkg$$ext_getter_succ(40)
+  anonymous$3 := pkg$$ext_getter_succ(anonymous$2)
+  local$1$b := anonymous$3
+  label label$ret
+}
+
+method pkg$$ext_getter_succ(this: Int) returns (ret: Int)
+
+
+/extension_properties.kt:(204,227): info: Generated Viper text for extensionSetterProperty:
+method pkg$$global$extensionSetterProperty$() returns (ret: dom$Unit)
+{
+  var anonymous$1: dom$Unit
+  anonymous$1 := pkg$$ext_setter_strange(42, 0)
+  label label$ret
+}
+
+method pkg$$ext_getter_strange(this: Int) returns (ret: Int)
+
+
+method pkg$$ext_setter_strange(this: Int, local$v: Int)
+  returns (ret: dom$Unit)
+
+
+/extension_properties.kt:(409,448): info: Generated Viper text for extensionGetterPropertyUserDefinedClass:
+field pkg$$class_Foo$member_x: Int
+
+method pkg$$global$extensionGetterPropertyUserDefinedClass$()
+  returns (ret: dom$Unit)
+{
+  var local$1$f: Ref
+  var anonymous$1: Ref
+  var local$1$x: Int
+  var anonymous$2: Int
+  anonymous$1 := pkg$$class_Foo$constructor$Tkotlin_Int(42)
+  local$1$f := anonymous$1
+  anonymous$2 := pkg$$ext_getter_succ(local$1$f)
+  local$1$x := anonymous$2
+  label label$ret
+}
+
+method pkg$$class_Foo$constructor$Tkotlin_Int(local$x: Int)
+  returns (ret: Ref)
+  ensures dom$Type$isSubtype((dom$TypeOf$typeOf(ret): dom$Type), dom$Type$pkg$$class_Foo())
+
+
+method pkg$$ext_getter_succ(this: Ref) returns (ret: Int)
+
+
+/extension_properties.kt:(499,538): info: Generated Viper text for extensionSetterPropertyUserDefinedClass:
+field pkg$$class_Foo$member_x: Int
+
+method pkg$$global$extensionSetterPropertyUserDefinedClass$()
+  returns (ret: dom$Unit)
+{
+  var local$1$f: Ref
+  var anonymous$1: Ref
+  var anonymous$2: dom$Unit
+  anonymous$1 := pkg$$class_Foo$constructor$Tkotlin_Int(42)
+  local$1$f := anonymous$1
+  anonymous$2 := pkg$$ext_setter_strange(local$1$f, 42)
+  label label$ret
+}
+
+method pkg$$class_Foo$constructor$Tkotlin_Int(local$x: Int)
+  returns (ret: Ref)
+  ensures dom$Type$isSubtype((dom$TypeOf$typeOf(ret): dom$Type), dom$Type$pkg$$class_Foo())
+
+
+method pkg$$ext_getter_strange(this: Ref) returns (ret: Int)
+
+
+method pkg$$ext_setter_strange(this: Ref, local$v: Int)
+  returns (ret: dom$Unit)
+

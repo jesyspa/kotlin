@@ -57,4 +57,3 @@ fun FirFunctionSymbol<*>.embedName(ctx: ProgramConversionContext): ScopedKotlinN
     is FirConstructorSymbol -> embedName(ctx)
     else -> callableId.embedFunctionName(ctx.embedType(this))
 }
-
