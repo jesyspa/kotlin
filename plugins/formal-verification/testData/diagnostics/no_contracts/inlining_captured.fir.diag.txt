@@ -12,10 +12,12 @@ method pkg$$global$capture_arg$Tkotlin_Function1__kotlin_Int$kotlin_Int__(local$
   if (true) {
     var anonymous$2: Int
     var anonymous$3: Int
-    var anonymous$4: Int
     anonymous$3 := 0
-    special$invoke_function_object(local$g)
-    anonymous$2 := anonymous$4
+    if (true) {
+      var anonymous$4: Int
+      special$invoke_function_object(local$g)
+      anonymous$2 := anonymous$4
+    }
     anonymous$1 := anonymous$2
     goto inline_label$1$ret
     label inline_label$1$ret
@@ -35,7 +37,9 @@ method pkg$$global$capture_var$() returns (ret: Int)
     var anonymous$2: Int
     var anonymous$3: Int
     anonymous$3 := 0
-    anonymous$2 := anonymous$3 + local$1$x
+    if (true) {
+      anonymous$2 := anonymous$3 + local$1$x
+    }
     anonymous$1 := anonymous$2
     goto inline_label$1$ret
     label inline_label$1$ret
@@ -53,12 +57,14 @@ method pkg$$global$capture_and_shadow$Tkotlin_Int(local$x: Int)
   if (true) {
     var anonymous$2: Int
     var anonymous$3: Int
-    var local$3$y: Int
-    var local$3$x: Int
     anonymous$3 := 0
-    local$3$y := local$x
-    local$3$x := 1
-    anonymous$2 := anonymous$3 + local$3$x + local$3$y
+    if (true) {
+      var local$3$y: Int
+      var local$3$x: Int
+      local$3$y := local$x
+      local$3$x := 1
+      anonymous$2 := anonymous$3 + local$3$x + local$3$y
+    }
     anonymous$1 := anonymous$2
     goto inline_label$1$ret
     label inline_label$1$ret
@@ -79,7 +85,9 @@ method pkg$$global$capture_var_clash$Tkotlin_Int(local$x: Int)
     var anonymous$3: Int
     local$2$x := 1
     anonymous$3 := 0
-    anonymous$2 := anonymous$3 * local$x
+    if (true) {
+      anonymous$2 := anonymous$3 * local$x
+    }
     anonymous$1 := anonymous$2 + local$2$x
     goto inline_label$1$ret
     label inline_label$1$ret
@@ -98,13 +106,15 @@ method pkg$$global$capture_and_shadow_clash$Tkotlin_Int(local$x: Int)
     var local$2$x: Int
     var anonymous$2: Int
     var anonymous$3: Int
-    var local$3$y: Int
-    var local$3$x: Int
     local$2$x := 1
     anonymous$3 := 0
-    local$3$y := local$x
-    local$3$x := 2
-    anonymous$2 := local$3$x + local$3$y + anonymous$3
+    if (true) {
+      var local$3$y: Int
+      var local$3$x: Int
+      local$3$y := local$x
+      local$3$x := 2
+      anonymous$2 := local$3$x + local$3$y + anonymous$3
+    }
     anonymous$1 := anonymous$2 + local$2$x
     goto inline_label$1$ret
     label inline_label$1$ret
@@ -123,28 +133,63 @@ method pkg$$global$nested_lambda_shadowing$Tkotlin_Int(local$x: Int)
     var local$2$x: Int
     var anonymous$2: Int
     var anonymous$3: Int
-    var anonymous$4: Int
-    var local$3$y: Int
-    var local$3$x: Int
     local$2$x := 1
     anonymous$3 := 0
     if (true) {
-      var local$4$x: Int
-      var anonymous$5: Int
-      var anonymous$6: Int
-      var local$5$x: Int
-      local$4$x := 1
-      anonymous$6 := 0
-      local$5$x := 3
-      anonymous$5 := local$5$x + anonymous$6
-      anonymous$4 := anonymous$5 + local$4$x
-      goto inline_label$3$ret
-      label inline_label$3$ret
+      var anonymous$4: Int
+      var local$3$y: Int
+      var local$3$x: Int
+      if (true) {
+        var local$4$x: Int
+        var anonymous$5: Int
+        var anonymous$6: Int
+        local$4$x := 1
+        anonymous$6 := 0
+        if (true) {
+          var local$5$x: Int
+          local$5$x := 3
+          anonymous$5 := local$5$x + anonymous$6
+        }
+        anonymous$4 := anonymous$5 + local$4$x
+        goto inline_label$3$ret
+        label inline_label$3$ret
+      }
+      local$3$y := local$x
+      local$3$x := 4
+      anonymous$2 := local$3$x + local$3$y + anonymous$3
     }
-    local$3$y := local$x
-    local$3$x := 4
-    anonymous$2 := local$3$x + local$3$y + anonymous$3
     anonymous$1 := anonymous$2 + local$2$x
+    goto inline_label$1$ret
+    label inline_label$1$ret
+  }
+  ret := anonymous$1
+  goto label$ret
+  label label$ret
+}
+
+/inlining_captured.kt:(1006,1024): info: Generated Viper text for call_double_invoke:
+method pkg$$global$call_double_invoke$Tkotlin_Int(local$x: Int)
+  returns (ret: Int)
+{
+  var anonymous$1: Int
+  if (true) {
+    var anonymous$2: Int
+    var anonymous$3: Int
+    var anonymous$4: Int
+    var anonymous$5: Int
+    anonymous$3 := 0
+    if (true) {
+      var local$3$x: Int
+      local$3$x := anonymous$3
+      anonymous$2 := local$3$x
+    }
+    anonymous$5 := 1
+    if (true) {
+      var local$3$x: Int
+      local$3$x := anonymous$5
+      anonymous$4 := local$3$x
+    }
+    anonymous$1 := anonymous$4
     goto inline_label$1$ret
     label inline_label$1$ret
   }

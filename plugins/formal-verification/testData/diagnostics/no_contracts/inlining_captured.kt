@@ -51,3 +51,16 @@ fun <!VIPER_TEXT!>nested_lambda_shadowing<!>(x: Int): Int {
         x + y + it
     }
 }
+
+@NeverConvert
+inline fun double_invoke(f: (Int) -> Int): Int {
+    f(0)
+    return f(1)
+}
+
+fun <!VIPER_TEXT!>call_double_invoke<!>(x: Int): Int {
+    return double_invoke {
+        val x = it
+        x
+    }
+}
