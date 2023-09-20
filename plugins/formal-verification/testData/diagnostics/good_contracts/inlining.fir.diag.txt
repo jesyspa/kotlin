@@ -32,8 +32,8 @@ method pkg$$global$call_invoke$Tkotlin_Function1__kotlin_Int$kotlin_Int__(local$
     local$2$x := anonymous$5
     special$invoke_function_object(local$g)
     anonymous$4 := anonymous$6
-    goto inline_label$2$ret
-    label inline_label$2$ret
+    goto inline_label$1$ret
+    label inline_label$1$ret
   }
   ret := anonymous$4
   goto label$ret
@@ -74,8 +74,8 @@ method pkg$$global$call_invoke_with_int$Tkotlin_Function1__kotlin_Int$kotlin_Int
     local$2$x := anonymous$5 + anonymous$5
     special$invoke_function_object(local$g)
     anonymous$4 := anonymous$6
-    goto inline_label$2$ret
-    label inline_label$2$ret
+    goto inline_label$1$ret
+    label inline_label$1$ret
   }
   ret := anonymous$4
   goto label$ret
@@ -114,8 +114,8 @@ method pkg$$global$name_clashes$Tkotlin_Function1__kotlin_Int$kotlin_Int__(local
     local$2$x := local$1$x + local$1$x
     special$invoke_function_object(local$f)
     anonymous$4 := anonymous$5
-    goto inline_label$2$ret
-    label inline_label$2$ret
+    goto inline_label$1$ret
+    label inline_label$1$ret
   }
   ret := anonymous$4
   goto label$ret
@@ -156,8 +156,8 @@ method pkg$$global$different_return_type$Tkotlin_Function1__kotlin_Int$kotlin_In
     local$2$x := anonymous$5
     special$invoke_function_object(local$f)
     anonymous$4 := anonymous$6
-    goto inline_label$2$ret
-    label inline_label$2$ret
+    goto inline_label$1$ret
+    label inline_label$1$ret
   }
   ret := local$1$x == anonymous$4
   goto label$ret

@@ -48,8 +48,9 @@ class InlineMethodConverter(
     override val signature: FullNamedFunctionSignature,
     returnVarName: MangledName,
     private val substitutionParams: Map<Name, SubstitutionItem>,
+    scopeDepth: Int
 ) : MethodConversionContext, ProgramConversionContext by programCtx {
-    override val nameMangler = InlineNameMangler(returnVarName, substitutionParams, programCtx.newtReturnLabelIndex())
+    override val nameMangler = InlineNameMangler(returnVarName, substitutionParams, scopeDepth)
 
     override fun getLambdaOrNull(name: Name): SubstitutionLambda? = substitutionParams[name] as? SubstitutionLambda
 }

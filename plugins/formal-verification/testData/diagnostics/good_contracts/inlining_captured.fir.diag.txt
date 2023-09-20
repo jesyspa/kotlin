@@ -1,21 +1,4 @@
-/inlining_captured.kt:(132,138): info: Generated Viper text for invoke:
-method pkg$$global$invoke$Tkotlin_Function1__kotlin_Int$kotlin_Int__(local$f: Ref)
-  returns (ret: Int)
-  requires acc(local$f.special$function_object_call_counter, write)
-  requires special$duplicable(local$f)
-  ensures acc(local$f.special$function_object_call_counter, write)
-  ensures old(local$f.special$function_object_call_counter) <=
-    local$f.special$function_object_call_counter
-{
-  var anonymous$1: Int
-  inhale dom$Type$isSubtype((dom$TypeOf$typeOf(local$f): dom$Type), dom$Type$Function())
-  special$invoke_function_object(local$f)
-  ret := anonymous$1
-  goto label$ret
-  label label$ret
-}
-
-/inlining_captured.kt:(284,295): info: Generated Viper text for single_call:
+/inlining_captured.kt:(354,365): info: Generated Viper text for single_call:
 method pkg$$global$single_call$Tkotlin_Function1__kotlin_Int$kotlin_Int__(local$g: Ref)
   returns (ret: Int)
   requires acc(local$g.special$function_object_call_counter, write)
@@ -43,7 +26,7 @@ method pkg$$global$single_call$Tkotlin_Function1__kotlin_Int$kotlin_Int__(local$
   label label$ret
 }
 
-/inlining_captured.kt:(512,523): info: Generated Viper text for double_call:
+/inlining_captured.kt:(582,593): info: Generated Viper text for double_call:
 method pkg$$global$double_call$Tkotlin_Function1__kotlin_Int$kotlin_Int__$Tkotlin_Function1__kotlin_Int$kotlin_Int__(local$f: Ref,
   local$g: Ref)
   returns (ret: Int)
@@ -81,7 +64,7 @@ method pkg$$global$double_call$Tkotlin_Function1__kotlin_Int$kotlin_Int__$Tkotli
   label label$ret
 }
 
-/inlining_captured.kt:(802,813): info: Generated Viper text for nested_call:
+/inlining_captured.kt:(872,883): info: Generated Viper text for nested_call:
 method pkg$$global$nested_call$Tkotlin_Function1__kotlin_Int$kotlin_Int__$Tkotlin_Function1__kotlin_Int$kotlin_Int__(local$f: Ref,
   local$g: Ref)
   returns (ret: Int)

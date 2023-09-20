@@ -14,8 +14,8 @@ method pkg$$global$quadruple$Tkotlin_Int(local$x: Int) returns (ret: Int)
     var local$2$y: Int
     local$2$y := local$x + local$x
     anonymous$2 := local$2$y
-    goto inline_label$2$ret
-    label inline_label$2$ret
+    goto inline_label$1$ret
+    label inline_label$1$ret
   }
   ret := anonymous$1 + anonymous$2
   goto label$ret
@@ -44,12 +44,12 @@ method pkg$$global$use_branching$() returns (ret: Int)
     anonymous$4 := true
     if (anonymous$4) {
       anonymous$3 := 1
-      goto inline_label$2$ret
+      goto inline_label$1$ret
     } else {
       anonymous$3 := 0
-      goto inline_label$2$ret
+      goto inline_label$1$ret
     }
-    label inline_label$2$ret
+    label inline_label$1$ret
   }
   ret := anonymous$1 + anonymous$3
   goto label$ret

@@ -57,7 +57,10 @@ data class StmtConverter<out RTC : ResultTrackingContext>(
         returnVarName: MangledName,
         substitutionParams: Map<Name, SubstitutionItem>,
     ): StmtConversionContext<RTC> =
-        copy(methodCtx = InlineMethodConverter(this, inlineSignature, returnVarName, substitutionParams), scopedNames = mutableMapOf())
+        copy(
+            methodCtx = InlineMethodConverter(this, inlineSignature, returnVarName, substitutionParams, scopeDepth),
+            scopedNames = mutableMapOf()
+        )
 
     override fun withLambdaContext(
         inlineSignature: FullNamedFunctionSignature,
@@ -66,7 +69,7 @@ data class StmtConverter<out RTC : ResultTrackingContext>(
         scopedNames: Map<Name, Int>
     ): StmtConversionContext<RTC> =
         copy(
-            methodCtx = InlineMethodConverter(this, inlineSignature, returnVarName, substitutionParams),
+            methodCtx = InlineMethodConverter(this, inlineSignature, returnVarName, substitutionParams, scopeDepth),
             scopedNames = scopedNames.toMutableMap()
         )
 

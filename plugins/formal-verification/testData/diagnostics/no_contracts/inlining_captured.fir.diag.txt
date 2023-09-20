@@ -1,21 +1,4 @@
-/inlining_captured.kt:(11,17): info: Generated Viper text for invoke:
-method pkg$$global$invoke$Tkotlin_Function1__kotlin_Int$kotlin_Int__(local$f: Ref)
-  returns (ret: Int)
-  requires acc(local$f.special$function_object_call_counter, write)
-  requires special$duplicable(local$f)
-  ensures acc(local$f.special$function_object_call_counter, write)
-  ensures old(local$f.special$function_object_call_counter) <=
-    local$f.special$function_object_call_counter
-{
-  var anonymous$1: Int
-  inhale dom$Type$isSubtype((dom$TypeOf$typeOf(local$f): dom$Type), dom$Type$Function())
-  special$invoke_function_object(local$f)
-  ret := anonymous$1
-  goto label$ret
-  label label$ret
-}
-
-/inlining_captured.kt:(65,76): info: Generated Viper text for capture_arg:
+/inlining_captured.kt:(136,147): info: Generated Viper text for capture_arg:
 method pkg$$global$capture_arg$Tkotlin_Function1__kotlin_Int$kotlin_Int__(local$g: Ref)
   returns (ret: Int)
   requires acc(local$g.special$function_object_call_counter, write)
@@ -42,7 +25,7 @@ method pkg$$global$capture_arg$Tkotlin_Function1__kotlin_Int$kotlin_Int__(local$
   label label$ret
 }
 
-/inlining_captured.kt:(136,147): info: Generated Viper text for capture_var:
+/inlining_captured.kt:(207,218): info: Generated Viper text for capture_var:
 method pkg$$global$capture_var$() returns (ret: Int)
 {
   var local$1$x: Int
@@ -62,7 +45,7 @@ method pkg$$global$capture_var$() returns (ret: Int)
   label label$ret
 }
 
-/inlining_captured.kt:(207,225): info: Generated Viper text for capture_and_shadow:
+/inlining_captured.kt:(278,296): info: Generated Viper text for capture_and_shadow:
 method pkg$$global$capture_and_shadow$Tkotlin_Int(local$x: Int)
   returns (ret: Int)
 {
@@ -85,26 +68,7 @@ method pkg$$global$capture_and_shadow$Tkotlin_Int(local$x: Int)
   label label$ret
 }
 
-/inlining_captured.kt:(336,348): info: Generated Viper text for invoke_clash:
-method pkg$$global$invoke_clash$Tkotlin_Function1__kotlin_Int$kotlin_Int__(local$f: Ref)
-  returns (ret: Int)
-  requires acc(local$f.special$function_object_call_counter, write)
-  requires special$duplicable(local$f)
-  ensures acc(local$f.special$function_object_call_counter, write)
-  ensures old(local$f.special$function_object_call_counter) <=
-    local$f.special$function_object_call_counter
-{
-  var local$1$x: Int
-  var anonymous$1: Int
-  inhale dom$Type$isSubtype((dom$TypeOf$typeOf(local$f): dom$Type), dom$Type$Function())
-  local$1$x := 1
-  special$invoke_function_object(local$f)
-  ret := anonymous$1 + local$1$x
-  goto label$ret
-  label label$ret
-}
-
-/inlining_captured.kt:(414,431): info: Generated Viper text for capture_var_clash:
+/inlining_captured.kt:(499,516): info: Generated Viper text for capture_var_clash:
 method pkg$$global$capture_var_clash$Tkotlin_Int(local$x: Int)
   returns (ret: Int)
 {
@@ -125,7 +89,7 @@ method pkg$$global$capture_var_clash$Tkotlin_Int(local$x: Int)
   label label$ret
 }
 
-/inlining_captured.kt:(489,513): info: Generated Viper text for capture_and_shadow_clash:
+/inlining_captured.kt:(574,598): info: Generated Viper text for capture_and_shadow_clash:
 method pkg$$global$capture_and_shadow_clash$Tkotlin_Int(local$x: Int)
   returns (ret: Int)
 {
@@ -150,7 +114,7 @@ method pkg$$global$capture_and_shadow_clash$Tkotlin_Int(local$x: Int)
   label label$ret
 }
 
-/inlining_captured.kt:(623,646): info: Generated Viper text for nested_lambda_shadowing:
+/inlining_captured.kt:(708,731): info: Generated Viper text for nested_lambda_shadowing:
 method pkg$$global$nested_lambda_shadowing$Tkotlin_Int(local$x: Int)
   returns (ret: Int)
 {

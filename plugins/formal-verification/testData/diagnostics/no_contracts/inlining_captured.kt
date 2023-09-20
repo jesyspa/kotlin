@@ -1,4 +1,7 @@
-inline fun <!VIPER_TEXT!>invoke<!>(f: (Int) -> Int): Int {
+import org.jetbrains.kotlin.formver.plugin.NeverConvert
+
+@NeverConvert
+inline fun invoke(f: (Int) -> Int): Int {
     return f(0)
 }
 
@@ -19,7 +22,8 @@ fun <!VIPER_TEXT!>capture_and_shadow<!>(x: Int): Int {
     }
 }
 
-inline fun <!VIPER_TEXT!>invoke_clash<!>(f: (Int) -> Int): Int {
+@NeverConvert
+inline fun invoke_clash(f: (Int) -> Int): Int {
     val x = 1
     return f(0) + x
 }

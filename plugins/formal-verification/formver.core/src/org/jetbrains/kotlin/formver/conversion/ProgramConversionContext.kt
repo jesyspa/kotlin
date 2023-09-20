@@ -27,7 +27,6 @@ interface ProgramConversionContext {
     fun getField(field: FirPropertySymbol): FieldEmbedding?
     fun newAnonName(): AnonymousName
     fun newWhileIndex(): Int
-    fun newtReturnLabelIndex(): Int
 }
 
 fun ProgramConversionContext.newAnonVar(type: TypeEmbedding): VariableEmbedding = VariableEmbedding(newAnonName(), type)
