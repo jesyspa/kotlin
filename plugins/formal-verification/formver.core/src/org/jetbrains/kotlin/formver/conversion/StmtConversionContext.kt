@@ -7,6 +7,7 @@ package org.jetbrains.kotlin.formver.conversion
 
 import org.jetbrains.kotlin.fir.declarations.impl.FirDefaultPropertyGetter
 import org.jetbrains.kotlin.fir.declarations.impl.FirDefaultPropertySetter
+import org.jetbrains.kotlin.fir.expressions.FirBlock
 import org.jetbrains.kotlin.fir.expressions.FirExpression
 import org.jetbrains.kotlin.fir.expressions.FirPropertyAccessExpression
 import org.jetbrains.kotlin.fir.expressions.FirStatement
@@ -15,6 +16,10 @@ import org.jetbrains.kotlin.fir.symbols.impl.FirPropertySymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirValueParameterSymbol
 import org.jetbrains.kotlin.formver.calleeSymbol
 import org.jetbrains.kotlin.formver.embeddings.*
+import org.jetbrains.kotlin.formver.embeddings.callables.FunctionSignature
+import org.jetbrains.kotlin.formver.viper.ast.Exp
+import org.jetbrains.kotlin.formver.viper.ast.Stmt
+import org.jetbrains.kotlin.name.Name
 
 interface StmtConversionContext<out RTC : ResultTrackingContext> : MethodConversionContext, SeqnBuildContext, ResultTrackingContext,
     WhileStackContext<RTC> {
@@ -79,4 +84,27 @@ fun StmtConversionContext<ResultTrackingContext>.getInlineFunctionCallArgs(
             resultCtx.resultVar.setValue(exp, this)
         }
     }
+}
+
+fun StmtConversionContext<ResultTrackingContext>.insertInlineFunctionCall(
+    calleeSignature: FunctionSignature,
+    paramNames: List<Name>,
+    args: List<ExpEmbedding>,
+    body: FirBlock,
+    parentCtx: MethodConversionContext? = null,
+): ExpEmbedding = withResult(calleeSignature.returnType) {
+    val callArgs = getInlineFunctionCallArgs(args)
+    val subs = paramNames.zip(callArgs).toMap()
+    val returnLabelName = ReturnLabelName(newWhileIndex())
+    val newMethodCtx = MethodConverter(
+        this, calleeSignature,
+        InlineParameterResolver(this.resultCtx.resultVar.name, returnLabelName, subs),
+        parentCtx
+    )
+    val inlineCtx = this.newBlock().withMethodContext(newMethodCtx)
+    inlineCtx.convert(body)
+    inlineCtx.addDeclaration(inlineCtx.returnLabel.toDecl())
+    inlineCtx.addStatement(inlineCtx.returnLabel.toStmt())
+    // NOTE: Putting the block inside the then branch of an if-true statement is a little hack to make Viper respect the scoping
+    addStatement(Stmt.If(Exp.BoolLit(true), inlineCtx.block, Stmt.Seqn(listOf(), listOf())))
 }

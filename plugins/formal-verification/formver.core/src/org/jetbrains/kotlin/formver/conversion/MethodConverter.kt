@@ -13,7 +13,13 @@ import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.name.Name
 
 /**
- * Using the term `MethodConverter` here for consistency with the `XConverter` implementing `XConversionContext`.
+ * The symbol resolution data for a single method.
+ *
+ * Method converters are chained syntactically; the converter of a lambda has the method that the lambda is defined in as a parent.
+ * In general, however, a callee inline function does *not* in general have its caller as a parent: this is because an inlined
+ * function does not have access to the variables of its caller, so it does not make sense to have symbol resolution pass through it.
+ *
+ * We're using the term `MethodConverter` here for consistency with the `XConverter` implementing `XConversionContext`.
  * Really, this class doesn't do any conversion itself, it just provides information for the `StmtConverter`
  * to get its work done.
  */
