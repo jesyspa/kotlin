@@ -7,10 +7,7 @@ package org.jetbrains.kotlin.formver.embeddings.callables
 
 import org.jetbrains.kotlin.fir.symbols.SymbolInternals
 import org.jetbrains.kotlin.fir.symbols.impl.FirFunctionSymbol
-import org.jetbrains.kotlin.formver.conversion.ResultTrackingContext
-import org.jetbrains.kotlin.formver.conversion.StmtConversionContext
-import org.jetbrains.kotlin.formver.conversion.getFunctionCallSubstitutionItems
-import org.jetbrains.kotlin.formver.conversion.returnLabel
+import org.jetbrains.kotlin.formver.conversion.*
 import org.jetbrains.kotlin.formver.embeddings.ExpEmbedding
 import org.jetbrains.kotlin.formver.viper.ast.Exp
 import org.jetbrains.kotlin.formver.viper.ast.Stmt
@@ -23,15 +20,16 @@ class InlineNamedFunction(
     override fun insertCallImpl(args: List<ExpEmbedding>, ctx: StmtConversionContext<ResultTrackingContext>): ExpEmbedding =
         ctx.withResult(returnType) {
             val inlineBody = symbol.fir.body ?: throw Exception("Function symbol $symbol has a null body")
-            val inlineBodyCtx = newBlock()
-            val inlineArgs = symbol.valueParameterSymbols.map { it.name }
-            val callArgs = inlineBodyCtx.getFunctionCallSubstitutionItems(args)
-            val substitutionParams = inlineArgs.zip(callArgs).toMap()
-            val inlineCtx = inlineBodyCtx.withInlineContext(
+            val paramNames = symbol.valueParameterSymbols.map { it.name }
+            val callArgs = getInlineFunctionCallArgs(args)
+            val subs = paramNames.zip(callArgs).toMap()
+            val returnLabelName = ReturnLabelName(ctx.newWhileIndex())
+            val newCtx = MethodConverter(
+                this,
                 this@InlineNamedFunction.signature,
-                inlineBodyCtx.resultCtx.resultVar.name,
-                substitutionParams,
+                InlineParameterResolver(resultCtx.resultVar.name, returnLabelName, subs)
             )
+            val inlineCtx = newBlock().withMethodContext(newCtx)
             inlineCtx.convert(inlineBody)
             // TODO: add these labels automatically.
             inlineCtx.addDeclaration(inlineCtx.returnLabel.toDecl())
