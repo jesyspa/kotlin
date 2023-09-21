@@ -12,6 +12,7 @@ import org.jetbrains.kotlin.formver.embeddings.ExpEmbedding
 class NonInlineNamedFunction(
     val signature: FullNamedFunctionSignature,
 ) : CallableEmbedding, FullNamedFunctionSignature by signature {
+    override val canThrow: Boolean = true
     override fun insertCallImpl(args: List<ExpEmbedding>, ctx: StmtConversionContext<ResultTrackingContext>): ExpEmbedding =
         ctx.withResult(returnType) {
             addStatement(toMethodCall(args, resultCtx.resultVar))

@@ -30,7 +30,7 @@ class MethodConverter(
 ) : MethodConversionContext, ProgramConversionContext by programCtx {
     private var propertyResolver: BasePropertyNameResolver = RootPropertyNameResolver
 
-    override fun <R> withScope(scopeDepth: Int, action: () -> R): R {
+    override fun <R> withScopeImpl(scopeDepth: Int, action: () -> R): R {
         propertyResolver = propertyResolver.innerScope(scopeDepth)
         val result = action()
         propertyResolver = propertyResolver.parent!!

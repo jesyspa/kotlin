@@ -55,7 +55,7 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext<Re
 
     override fun visitBlock(block: FirBlock, data: StmtConversionContext<ResultTrackingContext>): ExpEmbedding =
         // We ignore the accumulator: we just want to get the result of the last expression.
-        data.inNewScope {
+        data.withNewScope {
             block.statements.fold<_, ExpEmbedding>(UnitLit) { _, it -> convert(it) }
         }
 
@@ -311,6 +311,23 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext<Re
         // TODO: check whether there are other cases.
         val function = (lambdaArgumentExpression.expression as FirAnonymousFunctionExpression).anonymousFunction
         return LambdaExp(data.embedFunctionSignature(function.symbol), function, data)
+    }
+
+    override fun visitTryExpression(tryExpression: FirTryExpression, data: StmtConversionContext<ResultTrackingContext>): ExpEmbedding {
+        val catchData = data.withCatches(tryExpression.catches) { exitLabel ->
+            convert(tryExpression.tryBlock)
+            addStatement(exitLabel.toGoto())
+        }
+        for (catch in catchData.blocks) {
+            data.withNewScope {
+                addStatement(catch.entryLabel.toStmt())
+                registerLocalPropertyName(catch.firCatch.parameter.name)
+                data.convert(catch.firCatch.block)
+                addStatement(catchData.exitLabel.toGoto())
+            }
+        }
+        data.addStatement(catchData.exitLabel.toStmt())
+        return UnitLit
     }
 
     private fun handleUnimplementedElement(msg: String, data: StmtConversionContext<ResultTrackingContext>): ExpEmbedding =
