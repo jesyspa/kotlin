@@ -27,7 +27,7 @@ interface StmtConversionContext<out RTC : ResultTrackingContext> : MethodConvers
     val whenSubject: VariableEmbedding?
 
     fun convert(stmt: FirStatement): ExpEmbedding
-    fun convertAndStore(exp: FirExpression): VariableEmbedding
+    fun store(exp: ExpEmbedding): VariableEmbedding
 
     fun convertAndCapture(exp: FirExpression) {
         resultCtx.capture(convert(exp))
@@ -49,7 +49,9 @@ interface StmtConversionContext<out RTC : ResultTrackingContext> : MethodConvers
     fun inNewScope(action: StmtConversionContext<RTC>.() -> ExpEmbedding): ExpEmbedding
 }
 
-fun <RTC : ResultTrackingContext> StmtConversionContext<RTC>.embedPropertyAccess(symbol: FirPropertyAccessExpression): PropertyAccessEmbedding =
+fun StmtConversionContext<ResultTrackingContext>.convertAndStore(exp: FirExpression): VariableEmbedding = store(convert(exp))
+
+fun StmtConversionContext<ResultTrackingContext>.embedPropertyAccess(symbol: FirPropertyAccessExpression): PropertyAccessEmbedding =
     when (val calleeSymbol = symbol.calleeSymbol) {
         is FirValueParameterSymbol -> embedParameter(calleeSymbol) as VariableEmbedding
         is FirPropertySymbol ->

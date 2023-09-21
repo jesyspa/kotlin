@@ -78,3 +78,9 @@ fun <!VIPER_TEXT!>when_is<!>(x: Foo): Boolean = when(x) {
     is Bar -> true
     else -> false
 }
+
+fun <!VIPER_TEXT!>when_subject_val<!>(): Int =
+    when (val x = 0) {
+        1 -> 1
+        else -> x
+    }

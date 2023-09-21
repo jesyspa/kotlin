@@ -94,7 +94,20 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext<Re
     }
 
     override fun visitWhenExpression(whenExpression: FirWhenExpression, data: StmtConversionContext<ResultTrackingContext>): ExpEmbedding {
-        val subj = whenExpression.subject?.let { data.convertAndStore(it) }
+        val subj: VariableEmbedding? = whenExpression.subject?.let {
+            val subjExp = data.convert(it)
+            when (val firSubjVar = whenExpression.subjectVariable) {
+                null -> data.store(subjExp)
+                else -> {
+                    // TODO: handle FirVariables uniformly with FirProperties.
+                    data.registerLocalPropertyName(firSubjVar.name)
+                    val subjVar = VariableEmbedding(data.resolveLocalPropertyName(firSubjVar.name), subjExp.type)
+                    data.addDeclaration(subjVar.toLocalVarDecl())
+                    subjVar.setValue(subjExp, data)
+                    subjVar
+                }
+            }
+        }
         val type = data.embedType(whenExpression)
         val ctx = if (type != NothingTypeEmbedding && type != UnitTypeEmbedding) {
             data.withResult(type)
