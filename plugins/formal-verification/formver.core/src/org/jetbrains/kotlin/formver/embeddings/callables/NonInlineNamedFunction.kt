@@ -7,6 +7,7 @@ package org.jetbrains.kotlin.formver.embeddings.callables
 
 import org.jetbrains.kotlin.formver.conversion.ResultTrackingContext
 import org.jetbrains.kotlin.formver.conversion.StmtConversionContext
+import org.jetbrains.kotlin.formver.conversion.withResult
 import org.jetbrains.kotlin.formver.embeddings.ExpEmbedding
 
 class NonInlineNamedFunction(

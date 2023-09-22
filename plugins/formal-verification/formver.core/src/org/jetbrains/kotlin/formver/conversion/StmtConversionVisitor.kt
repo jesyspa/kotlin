@@ -55,9 +55,7 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext<Re
 
     override fun visitBlock(block: FirBlock, data: StmtConversionContext<ResultTrackingContext>): ExpEmbedding =
         // We ignore the accumulator: we just want to get the result of the last expression.
-        data.withNewScope {
-            block.statements.fold<_, ExpEmbedding>(UnitLit) { _, it -> convert(it) }
-        }
+        block.statements.fold<_, ExpEmbedding>(UnitLit) { _, it -> data.convert(it) }
 
     override fun <T> visitConstExpression(
         constExpression: FirConstExpression<T>,
@@ -85,11 +83,13 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext<Re
             data.convertAndCapture(branch.result)
         } else {
             val cond = data.convert(branch.condition)
-            val thenCtx = data.newBlock()
-            thenCtx.convertAndCapture(branch.result)
-            val elseCtx = data.newBlock()
-            convertWhenBranches(whenBranches, elseCtx)
-            data.addStatement(Stmt.If(cond.toViper(), thenCtx.block, elseCtx.block))
+            val thenBlock = data.withNewScopeToBlock {
+                convertAndCapture(branch.result)
+            }
+            val elseBlock = data.withNewScopeToBlock {
+                convertWhenBranches(whenBranches, this)
+            }
+            data.addStatement(Stmt.If(cond.toViper(), thenBlock, elseBlock))
         }
     }
 
@@ -103,9 +103,9 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext<Re
         }
         val type = data.embedType(whenExpression)
         val ctx = if (type != NothingTypeEmbedding && type != UnitTypeEmbedding) {
-            data.withResult(type)
+            data.addResult(type)
         } else {
-            data.withoutResult()
+            data.removeResult()
         }
         ctx.withWhenSubject(subj) {
             convertWhenBranches(whenExpression.branches.iterator(), this)
@@ -209,17 +209,18 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext<Re
     }
 
     override fun visitWhileLoop(whileLoop: FirWhileLoop, data: StmtConversionContext<ResultTrackingContext>): ExpEmbedding {
-        data.inNewWhileBlock { newWhileContext ->
-            val condCtx = newWhileContext.withResult(BooleanTypeEmbedding)
-            val bodyCtx = condCtx.newBlock()
+        data.withFreshWhile {
+            val condCtx = addResult(BooleanTypeEmbedding)
             condCtx.convertAndCapture(whileLoop.condition)
-            bodyCtx.convert(whileLoop.block)
-            bodyCtx.convertAndCapture(whileLoop.condition)
+            val bodyBlock = condCtx.withNewScopeToBlock {
+                convert(whileLoop.block)
+                convertAndCapture(whileLoop.condition)
+            }
             val postconditions = when (val sig = data.signature) {
                 is FullNamedFunctionSignature -> sig.postconditions
                 else -> listOf()
             }
-            data.addStatement(Stmt.While(condCtx.resultExp.toViper(), invariants = postconditions, bodyCtx.block))
+            data.addStatement(Stmt.While(condCtx.resultExp.toViper(), invariants = postconditions, bodyBlock))
         }
         return UnitLit
     }
@@ -267,18 +268,17 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext<Re
     ): ExpEmbedding {
         val left = data.convert(binaryLogicExpression.leftOperand)
         return data.withResult(BooleanTypeEmbedding) {
-            val rightCtx = newBlock()
-            rightCtx.convertAndCapture(binaryLogicExpression.rightOperand)
+            val rightBlock = withNewScopeToBlock {
+                convertAndCapture(binaryLogicExpression.rightOperand)
+            }
             when (binaryLogicExpression.kind) {
                 LogicOperationKind.AND -> {
-                    val constCtx = newBlock()
-                    constCtx.capture(BooleanLit(false))
-                    data.addStatement(Stmt.If(left.toViper(), rightCtx.block, constCtx.block))
+                    val constBlock = withNewScopeToBlock { capture(BooleanLit(false)) }
+                    data.addStatement(Stmt.If(left.toViper(), rightBlock, constBlock))
                 }
                 LogicOperationKind.OR -> {
-                    val constCtx = newBlock()
-                    constCtx.capture(BooleanLit(true))
-                    data.addStatement(Stmt.If(left.toViper(), constCtx.block, rightCtx.block))
+                    val constBlock = withNewScopeToBlock { capture(BooleanLit(true)) }
+                    data.addStatement(Stmt.If(left.toViper(), constBlock, rightBlock))
                 }
             }
         }
@@ -315,14 +315,16 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext<Re
 
     override fun visitTryExpression(tryExpression: FirTryExpression, data: StmtConversionContext<ResultTrackingContext>): ExpEmbedding {
         val catchData = data.withCatches(tryExpression.catches) { exitLabel ->
-            convert(tryExpression.tryBlock)
-            addStatement(exitLabel.toGoto())
+            withNewScope {
+                convert(tryExpression.tryBlock)
+                addStatement(exitLabel.toGoto())
+            }
         }
         for (catch in catchData.blocks) {
             data.withNewScope {
                 addStatement(catch.entryLabel.toStmt())
                 registerLocalPropertyName(catch.firCatch.parameter.name)
-                data.convert(catch.firCatch.block)
+                convert(catch.firCatch.block)
                 addStatement(catchData.exitLabel.toGoto())
             }
         }

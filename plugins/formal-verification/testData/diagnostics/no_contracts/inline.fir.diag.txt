@@ -5,16 +5,16 @@ method global$fun_quadruple$fun_take$T_Int$return$T_Int(local$x: Int)
   var anonymous$0: Int
   var anonymous$1: Int
   if (true) {
-    var local2$y: Int
-    local2$y := local$x + local$x
-    anonymous$0 := local2$y
+    var local1$y: Int
+    local1$y := local$x + local$x
+    anonymous$0 := local1$y
     goto label$ret$1
     label label$ret$1
   }
   if (true) {
-    var local2$y: Int
-    local2$y := local$x + local$x
-    anonymous$1 := local2$y
+    var local1$y: Int
+    local1$y := local$x + local$x
+    anonymous$1 := local1$y
     goto label$ret$2
     label label$ret$2
   }

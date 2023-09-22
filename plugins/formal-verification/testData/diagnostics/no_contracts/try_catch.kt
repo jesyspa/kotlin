@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.formver.plugin.NeverConvert
+import java.lang.IllegalArgumentException
 
 @NeverConvert
 fun call(x: Int) {
@@ -13,6 +14,19 @@ fun <!VIPER_TEXT!>try_catch<!>() {
     }
 }
 
+fun <!VIPER_TEXT!>nested_try_catch<!>() {
+    try {
+        call(0)
+        try {
+            call(1)
+        }
+        catch (e: IllegalArgumentException) {
+            call(2)
+        }
+    }
+    catch (e: Exception) {}
+}
+
 @NeverConvert
 @Suppress("NOTHING_TO_INLINE")
 inline fun call_twice() {
@@ -25,5 +39,15 @@ fun <!VIPER_TEXT!>try_catch_with_inline<!>() {
         call_twice()
     } catch (e: Exception) {
         call(2)
+    }
+}
+
+fun <!VIPER_TEXT!>try_catch_shadowing<!>() {
+    val x = 0
+    try {
+        val x = 1
+    }
+    catch (e: Exception) {
+        val x = 2
     }
 }

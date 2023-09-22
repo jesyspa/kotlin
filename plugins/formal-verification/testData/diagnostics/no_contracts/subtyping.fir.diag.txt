@@ -34,9 +34,9 @@ method global$fun_return_subtyping$fun_take$$return$NT_Int()
 method global$fun_assignment_subtyping$fun_take$$return$T_Unit()
   returns (ret: dom$Unit)
 {
-  var local1$x: dom$Nullable[Bool]
-  local1$x := (dom$Casting$cast(false, dom$Type$special$Nullable(dom$Type$Boolean())): dom$Nullable[Bool])
-  local1$x := (dom$Casting$cast(true, dom$Type$special$Nullable(dom$Type$Boolean())): dom$Nullable[Bool])
+  var local0$x: dom$Nullable[Bool]
+  local0$x := (dom$Casting$cast(false, dom$Type$special$Nullable(dom$Type$Boolean())): dom$Nullable[Bool])
+  local0$x := (dom$Casting$cast(true, dom$Type$special$Nullable(dom$Type$Boolean())): dom$Nullable[Bool])
   label label$ret$0
 }
 

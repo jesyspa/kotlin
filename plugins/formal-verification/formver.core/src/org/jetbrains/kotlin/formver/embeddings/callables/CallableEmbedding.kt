@@ -7,6 +7,7 @@ package org.jetbrains.kotlin.formver.embeddings.callables
 
 import org.jetbrains.kotlin.formver.conversion.ResultTrackingContext
 import org.jetbrains.kotlin.formver.conversion.StmtConversionContext
+import org.jetbrains.kotlin.formver.conversion.withResult
 import org.jetbrains.kotlin.formver.embeddings.BooleanTypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.ExpEmbedding
 import org.jetbrains.kotlin.formver.viper.ast.Stmt
@@ -36,9 +37,10 @@ fun CallableEmbedding.insertCall(args: List<ExpEmbedding>, ctx: StmtConversionCo
     if (canThrow) {
         for (label in ctx.activeCatchLabels) {
             ctx.withResult(BooleanTypeEmbedding) {
-                val inner = newBlock()
-                inner.addStatement(label.toGoto())
-                addStatement(Stmt.If(resultExp.toViper(), inner.block, Stmt.Seqn()))
+                val block = withNewScopeToBlock {
+                    addStatement(label.toGoto())
+                }
+                addStatement(Stmt.If(resultExp.toViper(), block, Stmt.Seqn()))
             }
         }
     }

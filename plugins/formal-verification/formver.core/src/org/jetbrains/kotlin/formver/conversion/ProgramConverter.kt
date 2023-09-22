@@ -177,7 +177,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
 
     private fun convertMethodWithBody(declaration: FirSimpleFunction, signature: FullNamedFunctionSignature): Method {
         val body = declaration.body?.let {
-            val methodCtx = MethodConverter(this, signature, RootParameterResolver(this, returnLabelNameProducer.getFresh()))
+            val methodCtx = MethodConverter(this, signature, RootParameterResolver(this, returnLabelNameProducer.getFresh()), 0)
             val stmtCtx = StmtConverter(methodCtx, SeqnBuilder(), NoopResultTrackerFactory)
             signature.formalArgs.forEach { arg ->
                 // Ideally we would want to assume these rather than inhale them to prevent inconsistencies with permissions.
