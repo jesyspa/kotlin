@@ -84,3 +84,18 @@ fun <!VIPER_TEXT!>when_subject_val<!>(): Int =
         1 -> 1
         else -> x
     }
+
+fun <!VIPER_TEXT!>when_subject_val_nested<!>() {
+    when (val x = 1) {
+        0 -> 0
+        when (val y = 1) {
+            1 -> 1
+            else -> when (val z = 1) {
+                y -> 2
+                x+1 -> 3
+                else -> 4
+            }
+        } -> 5
+        else -> 6
+    }
+}
