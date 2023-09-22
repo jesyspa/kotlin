@@ -94,23 +94,25 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext<Re
     }
 
     override fun visitWhenExpression(whenExpression: FirWhenExpression, data: StmtConversionContext<ResultTrackingContext>): ExpEmbedding {
-        val subj: VariableEmbedding? = whenExpression.subject?.let {
-            val subjExp = data.convert(it)
-            when (val firSubjVar = whenExpression.subjectVariable) {
-                null -> data.store(subjExp)
-                else -> data.declareLocal(firSubjVar.name, subjExp.type, subjExp)
-            }
-        }
         val type = data.embedType(whenExpression)
         val ctx = if (type != NothingTypeEmbedding && type != UnitTypeEmbedding) {
             data.addResult(type)
         } else {
             data.removeResult()
         }
-        ctx.withWhenSubject(subj) {
-            convertWhenBranches(whenExpression.branches.iterator(), this)
+        return ctx.withNewScope {
+            val subj: VariableEmbedding? = whenExpression.subject?.let {
+                val subjExp = convert(it)
+                when (val firSubjVar = whenExpression.subjectVariable) {
+                    null -> store(subjExp)
+                    else -> declareLocal(firSubjVar.name, subjExp.type, subjExp)
+                }
+            }
+            withWhenSubject(subj) {
+                convertWhenBranches(whenExpression.branches.iterator(), this)
+            }
+            resultExp
         }
-        return ctx.resultExp
     }
 
     override fun visitPropertyAccessExpression(

@@ -89,10 +89,12 @@ method global$fun_conditional_function_assignment$fun_take$T_Boolean$fun_take$$r
   var anonymous$2: Bool
   inhale dom$Type$isSubtype((dom$TypeOf$typeOf(local$f): dom$Type), dom$Type$Function())
   inhale dom$Type$isSubtype((dom$TypeOf$typeOf(local$h): dom$Type), dom$Type$Function())
-  if (local$b) {
-    anonymous$0 := local$f
-  } else {
-    anonymous$0 := local$h}
+  if (true) {
+    if (local$b) {
+      anonymous$0 := local$f
+    } else {
+      anonymous$0 := local$h}
+  }
   local0$g := anonymous$0
   label label$continue$0
   anonymous$2 := global$fun_returns_boolean$fun_take$$return$T_Boolean()
