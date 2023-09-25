@@ -51,3 +51,16 @@ fun <!VIPER_TEXT!>try_catch_shadowing<!>() {
         val x = 2
     }
 }
+
+fun <!VIPER_TEXT!>multiple_catches<!>() {
+    try {
+        call(0)
+        call(1)
+    }
+    catch (e: IllegalArgumentException) {
+        call(2)
+    }
+    catch (e: Exception) {
+        call(3)
+    }
+}
