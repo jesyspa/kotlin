@@ -10,9 +10,7 @@ import org.jetbrains.kotlin.formver.conversion.SpecialFields
 import org.jetbrains.kotlin.formver.conversion.SpecialName
 import org.jetbrains.kotlin.formver.embeddings.LegacyUnspecifiedFunctionTypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.VariableEmbedding
-import org.jetbrains.kotlin.formver.viper.ast.BuiltInMethod
-import org.jetbrains.kotlin.formver.viper.ast.Declaration
-import org.jetbrains.kotlin.formver.viper.ast.Exp
+import org.jetbrains.kotlin.formver.viper.ast.*
 import org.jetbrains.kotlin.formver.viper.ast.Exp.*
 
 object InvokeFunctionObjectMethod : BuiltInMethod(SpecialName("invoke_function_object")) {
@@ -28,6 +26,16 @@ object InvokeFunctionObjectMethod : BuiltInMethod(SpecialName("invoke_function_o
     override val posts: List<Exp> = thisArg.accessInvariants() + listOf(calls)
 }
 
+object LeakFunctionObjectMethod : BuiltInMethod(SpecialName("leak_function_object")) {
+    private val thisArg = VariableEmbedding(AnonymousName(0), LegacyUnspecifiedFunctionTypeEmbedding)
+    private val duplicable = DuplicableFunction.toFuncApp(listOf(thisArg.toViper()))
+
+    override val formalArgs: List<Declaration.LocalVarDecl> = listOf(thisArg.toLocalVarDecl())
+    override val formalReturns: List<Declaration.LocalVarDecl> = listOf()
+    override val pres: List<Exp> = listOf(duplicable)
+    override val posts: List<Exp> = listOf()
+}
+
 object SpecialMethods {
-    val all = listOf(InvokeFunctionObjectMethod)
+    val all = listOf(InvokeFunctionObjectMethod, LeakFunctionObjectMethod)
 }

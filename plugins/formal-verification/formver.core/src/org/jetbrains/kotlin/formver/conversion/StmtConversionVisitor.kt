@@ -190,6 +190,13 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext<Re
             else -> {
                 val retType = implicitInvokeCall.calleeCallableSymbol.resolvedReturnType
                 val args = implicitInvokeCall.functionCallArguments.map(data::convert)
+                // the first argument is the callee and is not considered leaking
+                args.drop(1)
+                    .filter { it.type is UnspecifiedFunctionTypeEmbedding }
+                    .forEach {
+                        val leakFunctionObjectCall = LeakFunctionObjectMethod.toMethodCall(listOf(it.toViper()), listOf())
+                        data.addStatement(leakFunctionObjectCall)
+                    }
                 data.withResult(data.embedType(retType)) {
                     // NOTE: Since it is only relevant to update the number of times that a function object is called,
                     // the function call invocation is intentionally not assigned to the return variable
