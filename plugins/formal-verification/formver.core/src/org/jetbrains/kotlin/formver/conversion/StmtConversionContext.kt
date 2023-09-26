@@ -135,28 +135,14 @@ fun StmtConversionContext<ResultTrackingContext>.insertInlineFunctionCall(
     val returnLabelName = returnLabelNameProducer.getFresh()
     val methodCtxFactory = MethodContextFactory(
         calleeSignature,
-        InlineParameterResolver(this.resultCtx.resultVar.name, returnLabelName, subs),
+        InlineParameterResolver(this.resultCtx.resultVar.name, returnLabelName, subs, getReturnPoints().toMutableMap()),
         parentCtx
     )
+    val sourceName = signature.sourceName
     withMethodCtx(methodCtxFactory) {
+        if (isLambda && sourceName != null) addReturnPoint(sourceName, true)
         convert(body)
         addDeclaration(returnLabel.toDecl())
         addStatement(returnLabel.toStmt())
     }
-
-
-//    val newMethodCtx = MethodConverter(
-//        this,
-//        calleeSignature,
-//        InlineParameterResolver(this.resultCtx.resultVar.name, returnLabelName, subs, getReturnPoints().toMutableMap()),
-//        parentCtx,
-//    )
-//    val inlineCtx = this.newBlock().withMethodContext(newMethodCtx)
-//    val sourceName = signature.sourceName
-//    if (isLambda && sourceName != null) inlineCtx.addReturnPoint(sourceName, true)
-//    inlineCtx.convert(body)
-//    inlineCtx.addDeclaration(inlineCtx.returnLabel.toDecl())
-//    inlineCtx.addStatement(inlineCtx.returnLabel.toStmt())
-//    // NOTE: Putting the block inside the then branch of an if-true statement is a little hack to make Viper respect the scoping
-//    addStatement(Stmt.If(Exp.BoolLit(true), inlineCtx.block, Stmt.Seqn(listOf(), listOf())))
 }

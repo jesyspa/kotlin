@@ -179,24 +179,13 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
 
     private fun convertMethodWithBody(declaration: FirSimpleFunction, signature: FullNamedFunctionSignature): Method {
         val body = declaration.body?.let {
-            val methodCtx = MethodConverter(this, signature, RootParameterResolver(this, returnLabelNameProducer.getFresh()), 0)
+            val sourceName = signature.sourceName
+            val methodCtx =
+                MethodConverter(this, signature, RootParameterResolver(this, returnLabelNameProducer.getFresh(), mutableMapOf()), 0)
             val stmtCtx = StmtConverter(methodCtx, SeqnBuilder(), NoopResultTrackerFactory)
-//            val returnLabelName = returnLabelNameProducer.getFresh()
-//            val sourceName = signature.sourceName
-//            val methodCtx =
-//                MethodConverter(
-//                    this,
-//                    signature,
-//                    RootParameterResolver(
-//                        this,
-//                        returnLabelName,
-//                        mutableMapOf()
-//                    )
-//                )
-//            if (sourceName != null) {
-//                methodCtx.addReturnPoint(sourceName, false)
-//            }
-//            val stmtCtx = StmtConverter(methodCtx, SeqnBuilder(), NoopResultTrackerFactory, scopeDepth = 0)
+            if (sourceName != null) {
+                methodCtx.addReturnPoint(sourceName, false)
+            }
             signature.formalArgs.forEach { arg ->
                 // Ideally we would want to assume these rather than inhale them to prevent inconsistencies with permissions.
                 // Unfortunately Silicon for some reason does not allow Assumes. However, it doesn't matter as long as the
