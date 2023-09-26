@@ -26,16 +26,6 @@ object InvokeFunctionObjectMethod : BuiltInMethod(SpecialName("invoke_function_o
     override val posts: List<Exp> = thisArg.accessInvariants() + listOf(calls)
 }
 
-object LeakFunctionObjectMethod : BuiltInMethod(SpecialName("leak_function_object")) {
-    private val thisArg = VariableEmbedding(AnonymousName(0), LegacyUnspecifiedFunctionTypeEmbedding)
-    private val duplicable = DuplicableFunction.toFuncApp(listOf(thisArg.toViper()))
-
-    override val formalArgs: List<Declaration.LocalVarDecl> = listOf(thisArg.toLocalVarDecl())
-    override val formalReturns: List<Declaration.LocalVarDecl> = listOf()
-    override val pres: List<Exp> = listOf(duplicable)
-    override val posts: List<Exp> = listOf()
-}
-
 object SpecialMethods {
-    val all = listOf(InvokeFunctionObjectMethod, LeakFunctionObjectMethod)
+    val all = listOf(InvokeFunctionObjectMethod)
 }

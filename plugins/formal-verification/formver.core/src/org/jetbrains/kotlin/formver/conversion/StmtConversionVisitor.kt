@@ -194,7 +194,7 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext<Re
                 args.drop(1)
                     .filter { it.type is UnspecifiedFunctionTypeEmbedding }
                     .forEach {
-                        val leakFunctionObjectCall = LeakFunctionObjectMethod.toMethodCall(listOf(it.toViper()), listOf())
+                        val leakFunctionObjectCall = Stmt.Assert(DuplicableFunction.toFuncApp(listOf(it.toViper())))
                         data.addStatement(leakFunctionObjectCall)
                     }
                 data.withResult(data.embedType(retType)) {
