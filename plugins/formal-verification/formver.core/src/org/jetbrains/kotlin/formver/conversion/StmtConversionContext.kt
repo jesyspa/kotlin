@@ -128,19 +128,23 @@ fun StmtConversionContext<ResultTrackingContext>.insertInlineFunctionCall(
     args: List<ExpEmbedding>,
     body: FirBlock,
     parentCtx: MethodConversionContext? = null,
-    isLambda: Boolean = false // since this method is used for inline functions and lambdas, it is necessary to make this distinction
+    isLambdaCallImpl: Boolean = false // since this method is used for inline functions and lambdas, it is necessary to make this distinction
 ): ExpEmbedding = withResult(calleeSignature.returnType) {
     val callArgs = getInlineFunctionCallArgs(args)
     val subs = paramNames.zip(callArgs).toMap()
     val returnLabelName = returnLabelNameProducer.getFresh()
+    val returnPointName = if (isLambdaCallImpl) {
+        signature.sourceName
+    } else {
+        null
+    }
     val methodCtxFactory = MethodContextFactory(
         calleeSignature,
-        InlineParameterResolver(this.resultCtx.resultVar.name, returnLabelName, subs, getReturnPoints().toMutableMap()),
-        parentCtx
+        InlineParameterResolver(this.resultCtx.resultVar.name, returnLabelName, subs),
+        parentCtx,
+        returnPointName
     )
-    val sourceName = signature.sourceName
     withMethodCtx(methodCtxFactory) {
-        if (isLambda && sourceName != null) addReturnPoint(sourceName, true)
         convert(body)
         addDeclaration(returnLabel.toDecl())
         addStatement(returnLabel.toStmt())

@@ -7,7 +7,6 @@ package org.jetbrains.kotlin.formver.conversion
 
 import org.jetbrains.kotlin.contracts.description.LogicOperationKind
 import org.jetbrains.kotlin.fir.FirElement
-import org.jetbrains.kotlin.fir.FirFunctionTarget
 import org.jetbrains.kotlin.fir.declarations.FirProperty
 import org.jetbrains.kotlin.fir.expressions.*
 import org.jetbrains.kotlin.fir.expressions.impl.FirElseIfTrueCondition
@@ -50,11 +49,12 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext<Re
     ): ExpEmbedding {
         val expr = data.convert(returnExpression.result)
         // returnTarget is null when it is the implicit return of a lambda
-        val returnTarget = returnExpression.target.labelName
-        val isLambda = (returnExpression.target as? FirFunctionTarget)?.isLambda
-            ?: throw IllegalArgumentException("$returnExpression target cannot be casted to FirFunctionTarget")
-        val retVar = data.getReturnVar(returnTarget, isLambda)
-        val retLabel = data.getReturnLabel(returnTarget, isLambda)
+        val returnTargetName = returnExpression.target.labelName
+        val (retVar, retLabel) = if (returnTargetName != null) {
+            data.resolveReturnTarget(returnTargetName)
+        } else {
+            ReturnTarget(data.returnVar, data.returnLabel)
+        }
         retVar.setValue(expr, data)
         data.addStatement(retLabel.toGoto())
         return UnitLit

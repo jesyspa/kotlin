@@ -7,10 +7,8 @@ package org.jetbrains.kotlin.formver.conversion
 
 import org.jetbrains.kotlin.fir.symbols.impl.FirValueParameterSymbol
 import org.jetbrains.kotlin.formver.embeddings.ExpEmbedding
-import org.jetbrains.kotlin.formver.embeddings.VariableEmbedding
 import org.jetbrains.kotlin.formver.embeddings.callables.FunctionSignature
 import org.jetbrains.kotlin.formver.viper.MangledName
-import org.jetbrains.kotlin.formver.viper.ast.Label
 import org.jetbrains.kotlin.name.Name
 
 /**
@@ -30,6 +28,7 @@ class MethodConverter(
     private val paramResolver: ParameterResolver,
     scopeDepth: Int,
     private val parent: MethodConversionContext? = null,
+    private val returnPointName: String?, // null while converting the body of an inline function
 ) : MethodConversionContext, ProgramConversionContext by programCtx {
     private var propertyResolver = PropertyNameResolver(scopeDepth)
 
@@ -54,31 +53,11 @@ class MethodConverter(
 
     override val resolvedReturnVarName: MangledName = paramResolver.resolvedReturnVarName
     override val resolvedReturnLabelName: ReturnLabelName = paramResolver.resolvedReturnLabelName
-
-    override fun getReturnVar(sourceName: String?, isLambda: Boolean): VariableEmbedding {
-        val returnPoint = if (sourceName != null) {
-            ReturnPoint(sourceName, isLambda)
+    override fun resolveReturnTarget(sourceName: String): ReturnTarget {
+        return if (returnPointName == null || returnPointName == sourceName) {
+            ReturnTarget(returnVar, returnLabel)
         } else {
-            null
+            parent?.resolveReturnTarget(sourceName) ?: throw IllegalArgumentException("Cannot resolve returnTarget of $sourceName")
         }
-        val name = paramResolver.returnPointResolver[returnPoint]?.resolvedReturnVarName ?: resolvedReturnVarName
-        return VariableEmbedding(name, signature.returnType)
     }
-
-    override fun getReturnLabel(sourceName: String?, isLambda: Boolean): Label {
-        val returnPoint = if (sourceName != null) {
-            ReturnPoint(sourceName, isLambda)
-        } else {
-            null
-        }
-        val name = paramResolver.returnPointResolver[returnPoint]?.resolvedReturnLabelName ?: resolvedReturnLabelName
-        return Label(name, listOf())
-    }
-
-    override fun addReturnPoint(sourceName: String, isLambda: Boolean) {
-        val returnPoint = ReturnPoint(sourceName, isLambda)
-        paramResolver.returnPointResolver[returnPoint] = ReturnTarget(resolvedReturnVarName, resolvedReturnLabelName)
-    }
-
-    override fun getReturnPoints(): Map<ReturnPoint, ReturnTarget> = paramResolver.returnPointResolver
 }

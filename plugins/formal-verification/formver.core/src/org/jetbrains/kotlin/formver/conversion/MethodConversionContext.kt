@@ -15,6 +15,8 @@ import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.formver.viper.ast.Label
 import org.jetbrains.kotlin.name.Name
 
+data class ReturnTarget(val returnVar: VariableEmbedding, val returnLabel: Label)
+
 interface MethodConversionContext : ProgramConversionContext {
     val signature: FunctionSignature
     val resolvedReturnVarName: MangledName
@@ -25,11 +27,7 @@ interface MethodConversionContext : ProgramConversionContext {
     fun registerLocalPropertyName(name: Name)
 
     fun <R> withScopeImpl(scopeDepth: Int, action: () -> R): R
-    fun getReturnVar(sourceName: String?, isLambda: Boolean): VariableEmbedding = returnVar
-    fun getReturnLabel(sourceName: String?, isLambda: Boolean): Label = returnLabel
-
-    fun addReturnPoint(sourceName: String, isLambda: Boolean) // maps the given values with returnVar and returnLabel
-    fun getReturnPoints(): Map<ReturnPoint, ReturnTarget> = mapOf()
+    fun resolveReturnTarget(sourceName: String): ReturnTarget = ReturnTarget(returnVar, returnLabel)
 }
 
 fun MethodConversionContext.embedLocalProperty(symbol: FirPropertySymbol): VariableEmbedding =
