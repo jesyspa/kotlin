@@ -136,6 +136,8 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
     private fun embedFullSignature(symbol: FirFunctionSymbol<*>): FullNamedFunctionSignature {
         val subSignature = object : NamedFunctionSignature, FunctionSignature by embedFunctionSignature(symbol) {
             override val name = symbol.embedName(this@ProgramConverter)
+            override val sourceName: String?
+                get() = super<NamedFunctionSignature>.sourceName
         }
         val contractVisitor = ContractDescriptionConversionVisitor(this@ProgramConverter, subSignature)
 
@@ -179,6 +181,22 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         val body = declaration.body?.let {
             val methodCtx = MethodConverter(this, signature, RootParameterResolver(this, returnLabelNameProducer.getFresh()), 0)
             val stmtCtx = StmtConverter(methodCtx, SeqnBuilder(), NoopResultTrackerFactory)
+//            val returnLabelName = returnLabelNameProducer.getFresh()
+//            val sourceName = signature.sourceName
+//            val methodCtx =
+//                MethodConverter(
+//                    this,
+//                    signature,
+//                    RootParameterResolver(
+//                        this,
+//                        returnLabelName,
+//                        mutableMapOf()
+//                    )
+//                )
+//            if (sourceName != null) {
+//                methodCtx.addReturnPoint(sourceName, false)
+//            }
+//            val stmtCtx = StmtConverter(methodCtx, SeqnBuilder(), NoopResultTrackerFactory, scopeDepth = 0)
             signature.formalArgs.forEach { arg ->
                 // Ideally we would want to assume these rather than inhale them to prevent inconsistencies with permissions.
                 // Unfortunately Silicon for some reason does not allow Assumes. However, it doesn't matter as long as the

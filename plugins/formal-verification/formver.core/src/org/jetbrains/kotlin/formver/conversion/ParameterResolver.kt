@@ -17,16 +17,20 @@ import org.jetbrains.kotlin.name.Name
  *
  * Since parameter names may map to lambda embeddings, we use `embed` for those for consistency.
  */
+data class ReturnPoint(val functionName: String, val isLambda: Boolean)
+data class ReturnTarget(val resolvedReturnVarName: MangledName, val resolvedReturnLabelName: ReturnLabelName)
 interface ParameterResolver {
     fun tryEmbedParameter(symbol: FirValueParameterSymbol): ExpEmbedding?
 
     val resolvedReturnVarName: MangledName
     val resolvedReturnLabelName: ReturnLabelName
+    val returnPointResolver: MutableMap<ReturnPoint, ReturnTarget>
 }
 
 class RootParameterResolver(
     val ctx: ProgramConversionContext,
     override val resolvedReturnLabelName: ReturnLabelName,
+    override val returnPointResolver: MutableMap<ReturnPoint, ReturnTarget>
 ) : ParameterResolver {
     override fun tryEmbedParameter(symbol: FirValueParameterSymbol): ExpEmbedding =
         VariableEmbedding(symbol.embedName(), ctx.embedType(symbol.resolvedReturnType))
@@ -38,6 +42,7 @@ class InlineParameterResolver(
     override val resolvedReturnVarName: MangledName,
     override val resolvedReturnLabelName: ReturnLabelName,
     private val substitutions: Map<Name, ExpEmbedding>,
+    override val returnPointResolver: MutableMap<ReturnPoint, ReturnTarget>
 ) : ParameterResolver {
     override fun tryEmbedParameter(symbol: FirValueParameterSymbol): ExpEmbedding? = substitutions[symbol.name]
 }

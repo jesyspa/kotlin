@@ -128,6 +128,7 @@ fun StmtConversionContext<ResultTrackingContext>.insertInlineFunctionCall(
     args: List<ExpEmbedding>,
     body: FirBlock,
     parentCtx: MethodConversionContext? = null,
+    isLambda: Boolean = false // since this method is used for inline functions and lambdas, it is necessary to make this distinction
 ): ExpEmbedding = withResult(calleeSignature.returnType) {
     val callArgs = getInlineFunctionCallArgs(args)
     val subs = paramNames.zip(callArgs).toMap()
@@ -142,4 +143,20 @@ fun StmtConversionContext<ResultTrackingContext>.insertInlineFunctionCall(
         addDeclaration(returnLabel.toDecl())
         addStatement(returnLabel.toStmt())
     }
+
+
+//    val newMethodCtx = MethodConverter(
+//        this,
+//        calleeSignature,
+//        InlineParameterResolver(this.resultCtx.resultVar.name, returnLabelName, subs, getReturnPoints().toMutableMap()),
+//        parentCtx,
+//    )
+//    val inlineCtx = this.newBlock().withMethodContext(newMethodCtx)
+//    val sourceName = signature.sourceName
+//    if (isLambda && sourceName != null) inlineCtx.addReturnPoint(sourceName, true)
+//    inlineCtx.convert(body)
+//    inlineCtx.addDeclaration(inlineCtx.returnLabel.toDecl())
+//    inlineCtx.addStatement(inlineCtx.returnLabel.toStmt())
+//    // NOTE: Putting the block inside the then branch of an if-true statement is a little hack to make Viper respect the scoping
+//    addStatement(Stmt.If(Exp.BoolLit(true), inlineCtx.block, Stmt.Seqn(listOf(), listOf())))
 }
