@@ -28,11 +28,12 @@ import org.jetbrains.kotlin.name.Name
  */
 interface StmtConversionContext<out RTC : ResultTrackingContext> : MethodConversionContext, SeqnBuildContext, ResultTrackingContext {
     val resultCtx: RTC
-    val continueLabel: Label
-    val breakLabel: Label
     val whenSubject: VariableEmbedding?
     val activeCatchLabels: List<Label>
 
+    fun continueLabel(targetName: String? = null): Label
+    fun breakLabel(targetName: String? = null): Label
+    fun addLoopName(targetName: String)
     fun convert(stmt: FirStatement): ExpEmbedding
     fun store(exp: ExpEmbedding): VariableEmbedding
 
