@@ -53,8 +53,8 @@ class MethodConverter(
 
     override val resolvedReturnVarName: MangledName = paramResolver.resolvedReturnVarName
     override val resolvedReturnLabelName: ReturnLabelName = paramResolver.resolvedReturnLabelName
-    override fun resolveReturnTarget(sourceName: String): ReturnTarget {
-        return if (returnPointName == null || returnPointName == sourceName) {
+    override fun resolveReturnTarget(sourceName: String?): ReturnTarget {
+        return if (returnPointName == null || sourceName == null || returnPointName == sourceName) {
             ReturnTarget(returnVar, returnLabel)
         } else {
             parent?.resolveReturnTarget(sourceName) ?: throw IllegalArgumentException("Cannot resolve returnTarget of $sourceName")

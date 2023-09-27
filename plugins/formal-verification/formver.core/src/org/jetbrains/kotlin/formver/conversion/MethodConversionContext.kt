@@ -27,7 +27,7 @@ interface MethodConversionContext : ProgramConversionContext {
     fun registerLocalPropertyName(name: Name)
 
     fun <R> withScopeImpl(scopeDepth: Int, action: () -> R): R
-    fun resolveReturnTarget(sourceName: String): ReturnTarget = ReturnTarget(returnVar, returnLabel)
+    fun resolveReturnTarget(sourceName: String?): ReturnTarget
 }
 
 fun MethodConversionContext.embedLocalProperty(symbol: FirPropertySymbol): VariableEmbedding =

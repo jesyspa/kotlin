@@ -50,11 +50,7 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext<Re
         val expr = data.convert(returnExpression.result)
         // returnTarget is null when it is the implicit return of a lambda
         val returnTargetName = returnExpression.target.labelName
-        val (retVar, retLabel) = if (returnTargetName != null) {
-            data.resolveReturnTarget(returnTargetName)
-        } else {
-            ReturnTarget(data.returnVar, data.returnLabel)
-        }
+        val (retVar, retLabel) = data.resolveReturnTarget(returnTargetName)
         retVar.setValue(expr, data)
         data.addStatement(retLabel.toGoto())
         return UnitLit
