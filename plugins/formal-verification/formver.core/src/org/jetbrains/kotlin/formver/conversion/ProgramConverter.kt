@@ -9,10 +9,7 @@ import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.declarations.FirSimpleFunction
 import org.jetbrains.kotlin.fir.declarations.utils.hasBackingField
 import org.jetbrains.kotlin.fir.declarations.utils.isInline
-import org.jetbrains.kotlin.fir.symbols.impl.FirFunctionSymbol
-import org.jetbrains.kotlin.fir.symbols.impl.FirPropertyAccessorSymbol
-import org.jetbrains.kotlin.fir.symbols.impl.FirPropertySymbol
-import org.jetbrains.kotlin.fir.symbols.impl.FirRegularClassSymbol
+import org.jetbrains.kotlin.fir.symbols.impl.*
 import org.jetbrains.kotlin.fir.types.*
 import org.jetbrains.kotlin.formver.ErrorCollector
 import org.jetbrains.kotlin.formver.PluginConfiguration
@@ -20,7 +17,6 @@ import org.jetbrains.kotlin.formver.UnsupportedFeatureBehaviour
 import org.jetbrains.kotlin.formver.domains.*
 import org.jetbrains.kotlin.formver.embeddings.*
 import org.jetbrains.kotlin.formver.embeddings.callables.*
-import org.jetbrains.kotlin.formver.isExtensionProperty
 import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.formver.viper.ast.Method
 import org.jetbrains.kotlin.formver.viper.ast.Program
@@ -120,7 +116,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
     // Note: keep in mind that this function is necessary to resolve the name of the function!
     override fun embedType(symbol: FirFunctionSymbol<*>): TypeEmbedding = FunctionTypeEmbedding(embedFunctionSignature(symbol).asData)
 
-    override fun getField(field: FirPropertySymbol): FieldEmbedding? = field.isExtensionProperty.ifFalse {
+    override fun getField(field: FirPropertySymbol): FieldEmbedding? = field.isExtension.ifFalse {
         fields[field.callableId.embedMemberPropertyName()]
     }
 

@@ -1,85 +1,95 @@
 /extension_properties.kt:(125,148): info: Generated Viper text for extensionGetterProperty:
-method pkg$$global$extensionGetterProperty$() returns (ret: dom$Unit)
+method global$fun_extensionGetterProperty$fun_take$$return$T_Unit()
+  returns (ret: dom$Unit)
 {
-  var local$1$a: Int
+  var anonymous$0: Int
+  var local0$a: Int
   var anonymous$1: Int
-  var local$1$b: Int
   var anonymous$2: Int
-  var anonymous$3: Int
-  anonymous$1 := pkg$$ext_getter_succ(3)
-  local$1$a := anonymous$1
-  anonymous$2 := pkg$$ext_getter_succ(40)
-  anonymous$3 := pkg$$ext_getter_succ(anonymous$2)
-  local$1$b := anonymous$3
-  label label$ret
+  var local0$b: Int
+  anonymous$0 := global$ext_getter_succ$fun_take$T_Int$return$T_Int(3)
+  local0$a := anonymous$0
+  anonymous$1 := global$ext_getter_succ$fun_take$T_Int$return$T_Int(40)
+  anonymous$2 := global$ext_getter_succ$fun_take$T_Int$return$T_Int(anonymous$1)
+  local0$b := anonymous$2
+  label label$ret$0
 }
 
-method pkg$$ext_getter_succ(this: Int) returns (ret: Int)
+method global$ext_getter_succ$fun_take$T_Int$return$T_Int(this: Int)
+  returns (ret: Int)
 
 
 /extension_properties.kt:(204,227): info: Generated Viper text for extensionSetterProperty:
-method pkg$$global$extensionSetterProperty$() returns (ret: dom$Unit)
+method global$fun_extensionSetterProperty$fun_take$$return$T_Unit()
+  returns (ret: dom$Unit)
 {
-  var anonymous$1: dom$Unit
-  anonymous$1 := pkg$$ext_setter_strange(42, 0)
-  label label$ret
+  var anonymous$0: dom$Unit
+  anonymous$0 := global$ext_setter_strange$fun_take$T_Int$T_Int$return$T_Unit(42,
+    0)
+  label label$ret$0
 }
 
-method pkg$$ext_getter_strange(this: Int) returns (ret: Int)
+method global$ext_getter_strange$fun_take$T_Int$return$T_Int(this: Int)
+  returns (ret: Int)
 
 
-method pkg$$ext_setter_strange(this: Int, local$v: Int)
+method global$ext_setter_strange$fun_take$T_Int$T_Int$return$T_Unit(this: Int,
+  local$v: Int)
   returns (ret: dom$Unit)
 
 
 /extension_properties.kt:(409,448): info: Generated Viper text for extensionGetterPropertyUserDefinedClass:
-field pkg$$class_Foo$member_x: Int
+field class_scope_global$class_Foo$member_x: Int
 
-method pkg$$global$extensionGetterPropertyUserDefinedClass$()
+method global$fun_extensionGetterPropertyUserDefinedClass$fun_take$$return$T_Unit()
   returns (ret: dom$Unit)
 {
-  var local$1$f: Ref
-  var anonymous$1: Ref
-  var local$1$x: Int
-  var anonymous$2: Int
-  anonymous$1 := pkg$$class_Foo$constructor$Tkotlin_Int(42)
-  local$1$f := anonymous$1
-  anonymous$2 := pkg$$ext_getter_succ(local$1$f)
-  local$1$x := anonymous$2
-  label label$ret
+  var anonymous$0: Ref
+  var local0$f: Ref
+  var anonymous$1: Int
+  var local0$x: Int
+  anonymous$0 := class_scope_global$class_Foo$constructor$fun_take$T_Int$return$T_class_global$class_Foo(42)
+  local0$f := anonymous$0
+  anonymous$1 := global$ext_getter_succ$fun_take$T_class_global$class_Foo$return$T_Int(local0$f)
+  local0$x := anonymous$1
+  label label$ret$0
 }
 
-method pkg$$class_Foo$constructor$Tkotlin_Int(local$x: Int)
+method class_scope_global$class_Foo$constructor$fun_take$T_Int$return$T_class_global$class_Foo(local$x: Int)
   returns (ret: Ref)
-  ensures dom$Type$isSubtype((dom$TypeOf$typeOf(ret): dom$Type), dom$Type$pkg$$class_Foo())
+  ensures dom$Type$isSubtype((dom$TypeOf$typeOf(ret): dom$Type), dom$Type$global$class_Foo())
 
 
-method pkg$$ext_getter_succ(this: Ref) returns (ret: Int)
+method global$ext_getter_succ$fun_take$T_class_global$class_Foo$return$T_Int(this: Ref)
+  returns (ret: Int)
 
 
 /extension_properties.kt:(499,538): info: Generated Viper text for extensionSetterPropertyUserDefinedClass:
-field pkg$$class_Foo$member_x: Int
+field class_scope_global$class_Foo$member_x: Int
 
-method pkg$$global$extensionSetterPropertyUserDefinedClass$()
+method global$fun_extensionSetterPropertyUserDefinedClass$fun_take$$return$T_Unit()
   returns (ret: dom$Unit)
 {
-  var local$1$f: Ref
-  var anonymous$1: Ref
-  var anonymous$2: dom$Unit
-  anonymous$1 := pkg$$class_Foo$constructor$Tkotlin_Int(42)
-  local$1$f := anonymous$1
-  anonymous$2 := pkg$$ext_setter_strange(local$1$f, 42)
-  label label$ret
+  var anonymous$0: Ref
+  var local0$f: Ref
+  var anonymous$1: dom$Unit
+  anonymous$0 := class_scope_global$class_Foo$constructor$fun_take$T_Int$return$T_class_global$class_Foo(42)
+  local0$f := anonymous$0
+  anonymous$1 := global$ext_setter_strange$fun_take$T_class_global$class_Foo$T_Int$return$T_Unit(local0$f,
+    42)
+  label label$ret$0
 }
 
-method pkg$$class_Foo$constructor$Tkotlin_Int(local$x: Int)
+method class_scope_global$class_Foo$constructor$fun_take$T_Int$return$T_class_global$class_Foo(local$x: Int)
   returns (ret: Ref)
-  ensures dom$Type$isSubtype((dom$TypeOf$typeOf(ret): dom$Type), dom$Type$pkg$$class_Foo())
+  ensures dom$Type$isSubtype((dom$TypeOf$typeOf(ret): dom$Type), dom$Type$global$class_Foo())
 
 
-method pkg$$ext_getter_strange(this: Ref) returns (ret: Int)
+method global$ext_getter_strange$fun_take$T_class_global$class_Foo$return$T_Int(this: Ref)
+  returns (ret: Int)
 
 
-method pkg$$ext_setter_strange(this: Ref, local$v: Int)
+method global$ext_setter_strange$fun_take$T_class_global$class_Foo$T_Int$return$T_Unit(this: Ref,
+  local$v: Int)
   returns (ret: dom$Unit)
 
