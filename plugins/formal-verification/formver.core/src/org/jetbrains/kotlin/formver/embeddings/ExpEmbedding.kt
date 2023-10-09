@@ -5,18 +5,22 @@
 
 package org.jetbrains.kotlin.formver.embeddings
 
+import org.jetbrains.kotlin.KtSourceElement
 import org.jetbrains.kotlin.formver.domains.*
 import org.jetbrains.kotlin.formver.viper.ast.AccessPredicate
 import org.jetbrains.kotlin.formver.viper.ast.Exp
 import org.jetbrains.kotlin.formver.viper.ast.PermExp
+import org.jetbrains.kotlin.formver.viper.ast.Position
 
 sealed interface ExpEmbedding {
     val type: TypeEmbedding
+    val pos: KtSourceElement?
+
     fun toViper(): Exp
     fun ignoringCasts(): ExpEmbedding = this
 
     fun withType(newType: TypeEmbedding): ExpEmbedding =
-        if (newType == type) this else Cast(this, newType)
+        if (newType == type) this else Cast(this, newType, pos)
 }
 
 fun List<ExpEmbedding>.toViper(): List<Exp> = map { it.toViper() }
@@ -31,36 +35,41 @@ sealed interface IntArithExpression : ExpEmbedding {
 data class Add(
     override val left: ExpEmbedding,
     override val right: ExpEmbedding,
+    override val pos: KtSourceElement? = null,
 ) : IntArithExpression {
-    override fun toViper() = Exp.Add(left.toViper(), right.toViper())
+    override fun toViper() = Exp.Add(left.toViper(), right.toViper(), Position.KtSourcePosition(pos))
 }
 
 data class Sub(
     override val left: ExpEmbedding,
     override val right: ExpEmbedding,
+    override val pos: KtSourceElement? = null,
 ) : IntArithExpression {
-    override fun toViper() = Exp.Sub(left.toViper(), right.toViper())
+    override fun toViper() = Exp.Sub(left.toViper(), right.toViper(), Position.KtSourcePosition(pos))
 }
 
 data class Mul(
     override val left: ExpEmbedding,
     override val right: ExpEmbedding,
+    override val pos: KtSourceElement? = null,
 ) : IntArithExpression {
-    override fun toViper() = Exp.Mul(left.toViper(), right.toViper())
+    override fun toViper() = Exp.Mul(left.toViper(), right.toViper(), Position.KtSourcePosition(pos))
 }
 
 data class Div(
     override val left: ExpEmbedding,
     override val right: ExpEmbedding,
+    override val pos: KtSourceElement? = null,
 ) : IntArithExpression {
-    override fun toViper() = Exp.Div(left.toViper(), right.toViper())
+    override fun toViper() = Exp.Div(left.toViper(), right.toViper(), Position.KtSourcePosition(pos))
 }
 
 data class Mod(
     override val left: ExpEmbedding,
     override val right: ExpEmbedding,
+    override val pos: KtSourceElement? = null,
 ) : IntArithExpression {
-    override fun toViper() = Exp.Mod(left.toViper(), right.toViper())
+    override fun toViper() = Exp.Mod(left.toViper(), right.toViper(), Position.KtSourcePosition(pos))
 }
 
 
@@ -74,48 +83,54 @@ sealed interface IntComparisonExpression : ExpEmbedding {
 data class LtCmp(
     override val left: ExpEmbedding,
     override val right: ExpEmbedding,
+    override val pos: KtSourceElement? = null,
 ) : IntComparisonExpression {
-    override fun toViper() = Exp.LtCmp(left.toViper(), right.toViper())
+    override fun toViper() = Exp.LtCmp(left.toViper(), right.toViper(), Position.KtSourcePosition(pos))
 }
 
 data class LeCmp(
     override val left: ExpEmbedding,
     override val right: ExpEmbedding,
+    override val pos: KtSourceElement? = null,
 ) : IntComparisonExpression {
-    override fun toViper() = Exp.LeCmp(left.toViper(), right.toViper())
+    override fun toViper() = Exp.LeCmp(left.toViper(), right.toViper(), Position.KtSourcePosition(pos))
 }
 
 data class GtCmp(
     override val left: ExpEmbedding,
     override val right: ExpEmbedding,
+    override val pos: KtSourceElement? = null,
 ) : IntComparisonExpression {
-    override fun toViper() = Exp.GtCmp(left.toViper(), right.toViper())
+    override fun toViper() = Exp.GtCmp(left.toViper(), right.toViper(), Position.KtSourcePosition(pos))
 }
 
 data class GeCmp(
     override val left: ExpEmbedding,
     override val right: ExpEmbedding,
+    override val pos: KtSourceElement? = null,
 ) : IntComparisonExpression {
-    override fun toViper() = Exp.GeCmp(left.toViper(), right.toViper())
+    override fun toViper() = Exp.GeCmp(left.toViper(), right.toViper(), Position.KtSourcePosition(pos))
 }
 
 
 data class EqCmp(
     val left: ExpEmbedding,
     val right: ExpEmbedding,
+    override val pos: KtSourceElement? = null,
 ) : ExpEmbedding {
     override val type = BooleanTypeEmbedding
 
-    override fun toViper() = Exp.EqCmp(left.toViper(), right.toViper())
+    override fun toViper() = Exp.EqCmp(left.toViper(), right.toViper(), Position.KtSourcePosition(pos))
 }
 
 data class NeCmp(
     val left: ExpEmbedding,
     val right: ExpEmbedding,
+    override val pos: KtSourceElement? = null,
 ) : ExpEmbedding {
     override val type = BooleanTypeEmbedding
 
-    override fun toViper() = Exp.NeCmp(left.toViper(), right.toViper())
+    override fun toViper() = Exp.NeCmp(left.toViper(), right.toViper(), Position.KtSourcePosition(pos))
 }
 
 
@@ -129,46 +144,51 @@ sealed interface BinaryBooleanExpression : ExpEmbedding {
 data class And(
     override val left: ExpEmbedding,
     override val right: ExpEmbedding,
+    override val pos: KtSourceElement? = null,
 ) : BinaryBooleanExpression {
-    override fun toViper() = Exp.And(left.toViper(), right.toViper())
+    override fun toViper() = Exp.And(left.toViper(), right.toViper(), Position.KtSourcePosition(pos))
 }
 
 data class Or(
     override val left: ExpEmbedding,
     override val right: ExpEmbedding,
+    override val pos: KtSourceElement? = null,
 ) : BinaryBooleanExpression {
-    override fun toViper() = Exp.Or(left.toViper(), right.toViper())
+    override fun toViper() = Exp.Or(left.toViper(), right.toViper(), Position.KtSourcePosition(pos))
 }
 
 data class Implies(
     override val left: ExpEmbedding,
     override val right: ExpEmbedding,
+    override val pos: KtSourceElement? = null,
 ) : BinaryBooleanExpression {
-    override fun toViper() = Exp.Implies(left.toViper(), right.toViper())
+    override fun toViper() = Exp.Implies(left.toViper(), right.toViper(), Position.KtSourcePosition(pos))
 }
 
 data class Not(
     val exp: ExpEmbedding,
+    override val pos: KtSourceElement? = null,
 ) : ExpEmbedding {
     override val type = BooleanTypeEmbedding
 
-    override fun toViper() = Exp.Not(exp.toViper())
+    override fun toViper() = Exp.Not(exp.toViper(), Position.KtSourcePosition(pos))
 }
 
 
 data object UnitLit : ExpEmbedding {
     override val type = UnitTypeEmbedding
+    override val pos: KtSourceElement? = null
 
     override fun toViper() = UnitDomain.element
 }
 
-data class IntLit(val value: Int) : ExpEmbedding {
+data class IntLit(val value: Int, override val pos: KtSourceElement? = null, ) : ExpEmbedding {
     override val type = IntTypeEmbedding
 
     override fun toViper() = Exp.IntLit(value)
 }
 
-data class BooleanLit(val value: Boolean) : ExpEmbedding {
+data class BooleanLit(val value: Boolean, override val pos: KtSourceElement? = null, ) : ExpEmbedding {
     override val type = BooleanTypeEmbedding
 
     override fun toViper() = Exp.BoolLit(value)
@@ -176,24 +196,25 @@ data class BooleanLit(val value: Boolean) : ExpEmbedding {
 
 data class NullLit(val elemType: TypeEmbedding) : ExpEmbedding {
     override val type = NullableTypeEmbedding(elemType)
+    override val pos: KtSourceElement? = null
 
     override fun toViper() = NullableDomain.nullVal(elemType.viperType)
 }
 
-data class Is(val exp: ExpEmbedding, val comparisonType: TypeEmbedding) : ExpEmbedding {
+data class Is(val exp: ExpEmbedding, val comparisonType: TypeEmbedding, override val pos: KtSourceElement? = null) : ExpEmbedding {
     override val type = BooleanTypeEmbedding
 
     override fun toViper() =
         TypeDomain.isSubtype(TypeOfDomain.typeOf(exp.toViper()), comparisonType.runtimeType)
 }
 
-data class Cast(val exp: ExpEmbedding, override val type: TypeEmbedding) : ExpEmbedding {
+data class Cast(val exp: ExpEmbedding, override val type: TypeEmbedding, override val pos: KtSourceElement? = null) : ExpEmbedding {
     override fun toViper() = CastingDomain.cast(exp.toViper(), type)
     override fun ignoringCasts(): ExpEmbedding = exp
 }
 
-data class FieldAccess(val receiver: ExpEmbedding, val field: FieldEmbedding) : ExpEmbedding {
+data class FieldAccess(val receiver: ExpEmbedding, val field: FieldEmbedding, override val pos: KtSourceElement? = null) : ExpEmbedding {
     override val type: TypeEmbedding = field.type
-    override fun toViper() = Exp.FieldAccess(receiver.toViper(), field.toViper())
+    override fun toViper() = Exp.FieldAccess(receiver.toViper(), field.toViper(), Position.KtSourcePosition(pos))
     fun getAccessPredicate(perm: PermExp = PermExp.FullPerm()) = AccessPredicate.FieldAccessPredicate(toViper(), perm)
 }

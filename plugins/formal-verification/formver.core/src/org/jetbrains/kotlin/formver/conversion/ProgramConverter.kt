@@ -23,6 +23,7 @@ import org.jetbrains.kotlin.formver.embeddings.callables.*
 import org.jetbrains.kotlin.formver.names.*
 import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.formver.viper.ast.Method
+import org.jetbrains.kotlin.formver.viper.ast.Position
 import org.jetbrains.kotlin.formver.viper.ast.Program
 import org.jetbrains.kotlin.formver.viper.ast.Stmt
 import org.jetbrains.kotlin.utils.addToStdlib.ifFalse
@@ -157,9 +158,9 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         val retType = symbol.resolvedReturnTypeRef.type
         val receiverType = symbol.receiverType
         return object : FunctionSignature {
-            override val receiver = receiverType?.let { VariableEmbedding(ThisReceiverName, embedType(it)) }
+            override val receiver = receiverType?.let { VariableEmbedding(ThisReceiverName, embedType(it), null) }
             override val params = symbol.valueParameterSymbols.map {
-                VariableEmbedding(it.embedName(), embedType(it.resolvedReturnType))
+                VariableEmbedding(it.embedName(), embedType(it.resolvedReturnType), it.source)
             }
             override val returnType = embedType(retType)
         }
@@ -276,12 +277,12 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
             stmtCtx.block
         }
 
-        return signature.toViperMethod(body)
+        return signature.toViperMethod(body, Position.KtSourcePosition(declaration.source))
     }
 
     private fun convertMethodWithoutBody(symbol: FirFunctionSymbol<*>, signature: FullNamedFunctionSignature): Method? =
         symbol.isInline.ifFalse {
-            signature.toViperMethod(null)
+            signature.toViperMethod(null, Position.KtSourcePosition(symbol.source))
         }
 
     private fun unimplementedTypeEmbedding(type: ConeKotlinType): TypeEmbedding =

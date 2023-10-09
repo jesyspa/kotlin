@@ -5,21 +5,25 @@
 
 package org.jetbrains.kotlin.formver.viper.ast
 
-import org.jetbrains.kotlin.KtSourceElement
 import org.jetbrains.kotlin.formver.viper.IntoSilver
 import viper.silver.ast.`NoPosition$`
-import java.nio.file.Path
 
-interface KtSourcePosition : viper.silver.ast.Position {
-    val pos: KtSourceElement
+interface PositionWrapper<P> : viper.silver.ast.Position {
+    val ktPosition: P
 }
 
 sealed class Position : IntoSilver<viper.silver.ast.Position> {
+
     data object NoPosition : Position() {
         override fun toSilver(): viper.silver.ast.Position = `NoPosition$`.`MODULE$`
     }
-    data class SourcePosition(val file: Path, val line: Int, val column: Int) : Position() {
-        override fun toSilver(): viper.silver.ast.Position = viper.silver.ast.SourcePosition.apply(file, line, column)
+
+    data class KtSourcePosition<P>(val pos: P) : Position() {
+        override fun toSilver(): viper.silver.ast.Position = object : PositionWrapper<P> {
+            override fun toString(): String = pos.toString()
+            override val ktPosition: P
+                get() = pos
+        }
     }
 }
 

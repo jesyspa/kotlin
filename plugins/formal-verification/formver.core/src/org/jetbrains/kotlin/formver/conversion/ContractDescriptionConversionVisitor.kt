@@ -20,6 +20,7 @@ import org.jetbrains.kotlin.formver.embeddings.callables.DuplicableFunction
 import org.jetbrains.kotlin.formver.embeddings.callables.NamedFunctionSignature
 import org.jetbrains.kotlin.formver.viper.ast.Exp
 import org.jetbrains.kotlin.formver.viper.ast.Exp.*
+import org.jetbrains.kotlin.formver.viper.ast.Position
 
 class ContractDescriptionConversionVisitor(
     private val ctx: ProgramConversionContext,
@@ -36,7 +37,7 @@ class ContractDescriptionConversionVisitor(
         return (parameterIndices - callsInPlaceIndices)
             .map { embeddedVarByIndex(it) }
             .filter { it.type is FunctionTypeEmbedding }
-            .map { DuplicableFunction.toFuncApp(listOf(it.toViper())) }
+            .map { DuplicableFunction.toFuncApp(listOf(it.toViper()), Position.KtSourcePosition(it.pos)) }
     }
 
     fun getPostconditions(symbol: FirFunctionSymbol<*>): List<Exp> =

@@ -5,12 +5,14 @@
 
 package org.jetbrains.kotlin.formver.embeddings
 
+import org.jetbrains.kotlin.KtSourceElement
 import org.jetbrains.kotlin.formver.conversion.ResultTrackingContext
 import org.jetbrains.kotlin.formver.conversion.StmtConversionContext
 import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.formver.viper.ast.*
 
-class VariableEmbedding(val name: MangledName, override val type: TypeEmbedding) : ExpEmbedding, PropertyAccessEmbedding {
+class VariableEmbedding(val name: MangledName, override val type: TypeEmbedding, override val pos: KtSourceElement? = null) : ExpEmbedding,
+    PropertyAccessEmbedding {
 
     fun toLocalVarDecl(
         pos: Position = Position.NoPosition,
@@ -19,7 +21,7 @@ class VariableEmbedding(val name: MangledName, override val type: TypeEmbedding)
     ): Declaration.LocalVarDecl = Declaration.LocalVarDecl(name, type.viperType, pos, info, trafos)
 
 
-    override fun toViper(): Exp.LocalVar = Exp.LocalVar(name, type.viperType)
+    override fun toViper(): Exp.LocalVar = Exp.LocalVar(name, type.viperType, Position.KtSourcePosition(pos))
 
     fun toFieldAccess(
         field: Field,

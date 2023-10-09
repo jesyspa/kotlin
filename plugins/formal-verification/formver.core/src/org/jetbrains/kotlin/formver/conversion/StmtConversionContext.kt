@@ -5,6 +5,9 @@
 
 package org.jetbrains.kotlin.formver.conversion
 
+import org.jetbrains.kotlin.KtSourceElement
+import org.jetbrains.kotlin.fir.declarations.impl.FirDefaultPropertyGetter
+import org.jetbrains.kotlin.fir.declarations.impl.FirDefaultPropertySetter
 import org.jetbrains.kotlin.fir.expressions.*
 import org.jetbrains.kotlin.fir.symbols.impl.FirPropertySymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirValueParameterSymbol
@@ -72,9 +75,10 @@ fun StmtConversionContext<ResultTrackingContext>.declareLocal(
     name: Name,
     type: TypeEmbedding,
     initializer: ExpEmbedding?,
+    pos: KtSourceElement? = null
 ): VariableEmbedding {
     registerLocalPropertyName(name)
-    val varEmb = VariableEmbedding(resolveLocalPropertyName(name), type)
+    val varEmb = VariableEmbedding(resolveLocalPropertyName(name), type, pos)
     addDeclaration(varEmb.toLocalVarDecl())
     initializer?.let { varEmb.setValue(it, this) }
     return varEmb
