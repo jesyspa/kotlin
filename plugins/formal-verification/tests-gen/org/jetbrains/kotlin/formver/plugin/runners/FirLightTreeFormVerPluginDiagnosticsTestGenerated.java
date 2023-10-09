@@ -264,6 +264,12 @@ public class FirLightTreeFormVerPluginDiagnosticsTestGenerated extends AbstractF
         }
 
         @Test
+        @TestMetadata("interface.kt")
+        public void testInterface() throws Exception {
+            runTest("plugins/formal-verification/testData/diagnostics/no_contracts/interface.kt");
+        }
+
+        @Test
         @TestMetadata("is_operator.kt")
         public void testIs_operator() throws Exception {
             runTest("plugins/formal-verification/testData/diagnostics/no_contracts/is_operator.kt");
