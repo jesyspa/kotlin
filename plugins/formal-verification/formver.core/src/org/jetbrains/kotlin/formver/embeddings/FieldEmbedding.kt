@@ -8,6 +8,7 @@ package org.jetbrains.kotlin.formver.embeddings
 import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.formver.viper.ast.Field
 
-class FieldEmbedding(val name: MangledName, val type: TypeEmbedding) {
+// inhalePolicy is true when it is necessary to inhale permission before accessing the field
+class FieldEmbedding(val name: MangledName, val type: TypeEmbedding, val inhalePolicy: Boolean = true) {
     fun toViper(): Field = Field(name, type.viperType)
 }

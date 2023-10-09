@@ -121,6 +121,12 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
     // Note: keep in mind that this function is necessary to resolve the name of the function!
     override fun embedType(symbol: FirFunctionSymbol<*>): TypeEmbedding = FunctionTypeEmbedding(embedFunctionSignature(symbol).asData)
 
+    // TODO-sync:
+//    val callableIdName = field.callableId.toString()
+////        TODO: find a better and uniform way to do this kind of checks (sometimes has to be deduced from the supertypes)
+//    if (callableIdName == "kotlin/collections/List.size" || callableIdName == "kotlin/collections/MutableList.size") {
+//        FieldEmbedding(SpecialFields.ListSizeField.name, IntTypeEmbedding, false)
+//    }
     override fun embedProperty(symbol: FirPropertySymbol): PropertyEmbedding = if (!symbol.isExtension) {
         // Ensure that the class has been processed.
         embedType(symbol.dispatchReceiverType!!)

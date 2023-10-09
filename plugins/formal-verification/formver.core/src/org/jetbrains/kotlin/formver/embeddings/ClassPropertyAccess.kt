@@ -7,6 +7,7 @@ package org.jetbrains.kotlin.formver.embeddings
 
 import org.jetbrains.kotlin.formver.conversion.ResultTrackingContext
 import org.jetbrains.kotlin.formver.conversion.StmtConversionContext
+import org.jetbrains.kotlin.formver.viper.ast.Stmt
 
 // We assume that thanks to the checks done by the Kotlin compiler, a property with a
 // missing getter or setter will never be accessed.
@@ -19,3 +20,11 @@ class ClassPropertyAccess(val receiver: ExpEmbedding, val property: PropertyEmbe
     }
 }
 
+//TODO-sync:
+//if (field.inhalePolicy) {
+//    ctx.addStatement(Stmt.Inhale(accPred))
+//}
+//ctx.action(fieldAccess)
+//if (field.inhalePolicy) {
+//    ctx.addStatement(Stmt.Exhale(accPred))
+//}

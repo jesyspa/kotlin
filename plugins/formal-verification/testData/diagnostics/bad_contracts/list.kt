@@ -32,10 +32,20 @@ fun <!VIPER_TEXT!>list_add<!>(l: MutableList<Int>) {
     val n = l[0]
 }
 
-//@AlwaysVerify
-//fun list_size(l: List<Int>) {
-//    val s = l.size
-//}
+@AlwaysVerify
+fun <!VIPER_TEXT!>safe_last<!>(l: List<Int>) : Int? {
+    val size = l.size
+    if (size != 0) {
+        return l[size - 1]
+    } else {
+        return null
+    }
+}
+
+@AlwaysVerify
+fun <!FUNCTION_WITH_UNVERIFIED_CONTRACT, VIPER_TEXT, VIPER_VERIFICATION_ERROR!>unsafe_last<!>(l: List<Int>) : Int {
+    return l[l.size - 1]
+}
 
 //fun list2() {
 //    val l = listOf(1, 2, 3)
@@ -47,7 +57,6 @@ fun <!VIPER_TEXT!>list_add<!>(l: MutableList<Int>) {
 
 /* TODO:
  * listOf
- * size
  * first
  * toMutable
  * sum
