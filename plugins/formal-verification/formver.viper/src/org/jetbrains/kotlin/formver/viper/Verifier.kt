@@ -20,10 +20,12 @@ sealed interface VerifierError {
 
 data class ConsistencyError(val err: viper.silver.verifier.ConsistencyError) : VerifierError {
     override val msg = err.toString()
+    override fun toString(): String = "ConsistencyError($msg)"
 }
 
 data class VerificationError(val result: viper.silicon.interfaces.VerificationResult) : VerifierError {
     override val msg = result.toString()
+    override fun toString(): String = "VerificationError($msg)"
 }
 
 class Verifier {
@@ -54,7 +56,7 @@ class Verifier {
         return success
     }
 
-    /** Verify the program.  Returns true on successful verification.
+    /** Verify the program. Returns true on successful verification.
      */
     fun verify(program: Program, onFailure: (VerificationError) -> Unit): Boolean {
         val viperProgram = program.toSilver()
