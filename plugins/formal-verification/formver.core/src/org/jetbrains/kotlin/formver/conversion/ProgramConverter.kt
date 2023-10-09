@@ -155,13 +155,15 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         return object : FullNamedFunctionSignature, NamedFunctionSignature by subSignature {
             override val preconditions = subSignature.formalArgs.flatMap { it.invariants() } +
                     subSignature.formalArgs.flatMap { it.accessInvariants() } +
-                    contractVisitor.getPreconditions(symbol)
+                    contractVisitor.getPreconditions(symbol) +
+                    symbol.stdLibPreConditions(subSignature)
 
             override val postconditions = subSignature.formalArgs.flatMap { it.accessInvariants() } +
                     subSignature.params.flatMap { it.dynamicInvariants() } +
                     subSignature.returnVar.invariants() +
                     subSignature.returnVar.provenInvariants() +
-                    contractVisitor.getPostconditions(symbol)
+                    contractVisitor.getPostconditions(symbol) +
+                    symbol.stdLibPostConditions(subSignature)
         }
     }
 
