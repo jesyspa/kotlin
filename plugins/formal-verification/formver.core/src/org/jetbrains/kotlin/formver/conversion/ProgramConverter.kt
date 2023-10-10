@@ -156,7 +156,14 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
 
     override fun embedFunctionSignature(symbol: FirFunctionSymbol<*>): FunctionSignature {
         val retType = symbol.resolvedReturnTypeRef.type
-        val receiverType = symbol.receiverType
+        /**
+         * When the function is an extension function defined within a class, its
+         * receiver type is not dispatchReceiver's type, but it is extensionReceiver's type.
+         */
+        val receiverType = when {
+            symbol.isExtension -> symbol.resolvedReceiverTypeRef!!.type
+            else -> symbol.receiverType
+        }
         return object : FunctionSignature {
             override val receiver =
                 receiverType?.let { VariableEmbedding(ThisReceiverName, embedType(it), symbol.receiverParameter?.source) }

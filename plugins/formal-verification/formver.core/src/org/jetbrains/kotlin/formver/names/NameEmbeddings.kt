@@ -32,12 +32,17 @@ fun CallableId.embedGetterName(): ScopedKotlinName = embedScoped(GetterKotlinNam
 fun CallableId.embedSetterName(): ScopedKotlinName = embedScoped(SetterKotlinName(callableName))
 fun CallableId.embedExtensionGetterName(type: TypeEmbedding): ScopedKotlinName =
     embedScopedWithType(type, ExtensionGetterKotlinName(callableName))
+
 fun CallableId.embedExtensionSetterName(type: TypeEmbedding): ScopedKotlinName =
     embedScopedWithType(type, ExtensionSetterKotlinName(callableName))
+
 fun CallableId.embedMemberPropertyName(): ScopedKotlinName = embedScoped(MemberKotlinName(callableName))
 fun CallableId.embedUnscopedPropertyName(): SimpleKotlinName = SimpleKotlinName(callableName)
 fun CallableId.embedFunctionName(type: TypeEmbedding): ScopedKotlinName =
     embedScopedWithType(type, FunctionKotlinName(callableName))
+
+fun CallableId.embedExtensionFunctionName(type: TypeEmbedding): ScopedKotlinName =
+    embedScopedWithType(type, ExtensionFunctionKotlinName(callableName))
 
 fun CallableId.embedPropertyName(scope: Int): ScopedKotlinName = when {
     isLocal -> ScopedKotlinName(LocalScope(scope), SimpleKotlinName(callableName))
@@ -65,5 +70,11 @@ fun FirConstructorSymbol.embedName(ctx: ProgramConversionContext): ScopedKotlinN
 fun FirFunctionSymbol<*>.embedName(ctx: ProgramConversionContext): ScopedKotlinName = when (this) {
     is FirPropertyAccessorSymbol -> embedName(ctx)
     is FirConstructorSymbol -> embedName(ctx)
-    else -> callableId.embedFunctionName(ctx.embedType(this))
+    else -> {
+        if (this.isExtension) {
+            callableId.embedExtensionFunctionName(ctx.embedType(this))
+        } else {
+            callableId.embedFunctionName(ctx.embedType(this))
+        }
+    }
 }

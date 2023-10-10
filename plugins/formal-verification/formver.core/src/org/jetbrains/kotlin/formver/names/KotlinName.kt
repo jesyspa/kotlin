@@ -26,6 +26,7 @@ abstract class PrefixedKotlinName(prefix: String, name: Name) : KotlinName {
 }
 
 data class FunctionKotlinName(val name: Name) : PrefixedKotlinName("fun", name)
+data class ExtensionFunctionKotlinName(val name: Name) : PrefixedKotlinName("ext_fun", name)
 data class MemberKotlinName(val name: Name) : PrefixedKotlinName("member", name)
 data class GetterKotlinName(val name: Name) : PrefixedKotlinName("getter", name)
 data class SetterKotlinName(val name: Name) : PrefixedKotlinName("setter", name)
