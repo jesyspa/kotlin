@@ -5,8 +5,8 @@ fun <!VIPER_TEXT!>extension_method_call<!>() {
 }
 
 class Foo
-fun Foo.<!VIPER_TEXT!>nothing<!>(): Unit { }
-fun Foo.<!VIPER_TEXT!>nothing2<!>(a: Int): Unit { }
+fun Foo.<!VIPER_TEXT!>return_unit<!>(): Unit { }
+fun Foo.<!VIPER_TEXT!>return_unit<!>(a: Int): Unit { }
 fun Foo.<!VIPER_TEXT!>inside<!>(): Unit {}
 
 class Bar() {
@@ -28,8 +28,8 @@ class Baz() {
 
 fun <!VIPER_TEXT!>extension_foo_function_call<!>() {
     val f = Foo()
-    f.nothing()
-    f.nothing2(42)
+    f.return_unit()
+    f.return_unit(42)
     f.inside()
 }
 
