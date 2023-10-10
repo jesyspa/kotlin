@@ -46,8 +46,9 @@ object KotlinContractFunction : SpecialKotlinFunction {
     private val contractBuilderType =
         ClassTypeEmbedding(ScopedKotlinName(GlobalScope(packageName), ClassKotlinName(listOf("ContractBuilder"))))
     override val receiverType: TypeEmbedding? = null
+    override val extensionReceiverType: TypeEmbedding? = null
     override val paramTypes: List<TypeEmbedding> =
-        listOf(FunctionTypeEmbedding(CallableSignatureData(contractBuilderType, listOf(), UnitTypeEmbedding)))
+        listOf(FunctionTypeEmbedding(CallableSignatureData(contractBuilderType, null, listOf(), UnitTypeEmbedding)))
     override val returnType: TypeEmbedding = UnitTypeEmbedding
 
     override fun insertCallImpl(
@@ -62,6 +63,7 @@ abstract class KotlinIntSpecialFunction : SpecialKotlinFunction {
     override val className: String? = "Int"
 
     override val receiverType: TypeEmbedding = IntTypeEmbedding
+    override val extensionReceiverType: TypeEmbedding? = null
     override val paramTypes: List<TypeEmbedding> = listOf(IntTypeEmbedding)
     override val returnType: TypeEmbedding = IntTypeEmbedding
 }
@@ -113,6 +115,7 @@ abstract class KotlinBooleanSpecialFunction : SpecialKotlinFunction {
     override val className: String? = "Boolean"
 
     override val receiverType: TypeEmbedding = BooleanTypeEmbedding
+    override val extensionReceiverType: TypeEmbedding? = null
     override val paramTypes: List<TypeEmbedding> = emptyList()
     override val returnType: TypeEmbedding = BooleanTypeEmbedding
 }

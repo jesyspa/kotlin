@@ -11,6 +11,7 @@ import org.jetbrains.kotlin.formver.names.ReturnVariableName
 
 interface FunctionSignature : CallableSignature {
     val receiver: VariableEmbedding?
+    val extensionReceiver: VariableEmbedding?
     val params: List<VariableEmbedding>
     val sourceName: String?
         get() = null
@@ -18,10 +19,12 @@ interface FunctionSignature : CallableSignature {
     val returnVar
         get() = VariableEmbedding(ReturnVariableName, returnType)
     val formalArgs: List<VariableEmbedding>
-        get() = listOfNotNull(receiver) + params
+        get() = listOfNotNull(receiver, extensionReceiver) + params
 
     override val receiverType: TypeEmbedding?
         get() = receiver?.type
+    override val extensionReceiverType: TypeEmbedding?
+        get() = extensionReceiver?.type
     override val paramTypes: List<TypeEmbedding>
         get() = params.map { it.type }
 }

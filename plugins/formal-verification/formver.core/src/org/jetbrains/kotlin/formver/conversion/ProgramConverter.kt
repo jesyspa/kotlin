@@ -122,9 +122,12 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         type.isNothing -> NothingTypeEmbedding
         type.isSomeFunctionType(session) -> {
             val receiverType: TypeEmbedding? = type.receiverType(session)?.let { embedType(it) }
+            // TODO: tweak this line to support context receivers in the future
+            val extensionReceiverTypes = type.contextReceiversTypes(session).map { embedType(it) }
+            val extensionReceiverType: TypeEmbedding? = extensionReceiverTypes.firstOrNull()
             val paramTypes: List<TypeEmbedding> = type.valueParameterTypesWithoutReceivers(session).map(::embedType)
             val returnType: TypeEmbedding = embedType(type.returnType(session))
-            val signature = CallableSignatureData(receiverType, paramTypes, returnType)
+            val signature = CallableSignatureData(receiverType, extensionReceiverType, paramTypes, returnType)
             FunctionTypeEmbedding(signature)
         }
         type.isNullable -> NullableTypeEmbedding(embedType(type.withNullability(ConeNullability.NOT_NULL, session.typeContext)))
@@ -156,17 +159,16 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
 
     override fun embedFunctionSignature(symbol: FirFunctionSymbol<*>): FunctionSignature {
         val retType = symbol.resolvedReturnTypeRef.type
-        /**
-         * When the function is an extension function defined within a class, its
-         * receiver type is not dispatchReceiver's type, but it is extensionReceiver's type.
-         */
-        val receiverType = when {
-            symbol.isExtension -> symbol.resolvedReceiverTypeRef!!.type
-            else -> symbol.receiverType
+        val receiverType = symbol.receiverType
+        val extensionReceiver = when (symbol.isExtension && symbol.dispatchReceiverType != null) {
+            true -> symbol.resolvedReceiverTypeRef?.type
+            else -> null
         }
         return object : FunctionSignature {
             override val receiver =
                 receiverType?.let { VariableEmbedding(ThisReceiverName, embedType(it), symbol.receiverParameter?.source) }
+            override val extensionReceiver =
+                extensionReceiver?.let { VariableEmbedding(QualifiedThisName(it.type.classId!!.embedName().mangled), embedType(it)) }
             override val params = symbol.valueParameterSymbols.map {
                 VariableEmbedding(it.embedName(), embedType(it.resolvedReturnType), it.source)
             }

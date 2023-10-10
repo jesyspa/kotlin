@@ -9,16 +9,18 @@ fun Foo.<!VIPER_TEXT!>return_unit<!>(): Unit { }
 fun Foo.<!VIPER_TEXT!>return_unit<!>(a: Int): Unit { }
 fun Foo.<!VIPER_TEXT!>inside<!>(): Unit {}
 
-class Bar() {
-    fun Foo.<!VIPER_TEXT!>inside<!>(): Unit { }
-    fun <!VIPER_TEXT!>driver<!>() {
-        val f = Foo()
-        f.inside()
+class Bar {
+    fun Foo.<!VIPER_TEXT!>inside<!>(): Unit {
+        val refFoo = this@Foo
+        val refBar = this@Bar
+        val implicitRef = this // The extension receiver takes precedences
+        refBar.inside()
     }
-}
 
-class Baz() {
-    fun Foo.<!VIPER_TEXT!>inside<!>(): Unit { }
+    fun <!VIPER_TEXT!>inside<!>(): Unit {
+        // Returns Unit from Bar
+    }
+
     fun <!VIPER_TEXT!>driver<!>() {
         val f = Foo()
         f.inside()
@@ -38,7 +40,3 @@ fun <!VIPER_TEXT!>extension_foo_within_bar_function_call<!>() {
     b.driver()
 }
 
-fun <!VIPER_TEXT!>extension_foo_within_baz_function_call<!>() {
-    val b = Baz()
-    b.driver()
-}

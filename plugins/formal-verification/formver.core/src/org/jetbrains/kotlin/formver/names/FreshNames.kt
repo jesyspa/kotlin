@@ -31,6 +31,11 @@ data object ThisReceiverName : MangledName {
         get() = "this"
 }
 
+data class QualifiedThisName(val className: String) : MangledName {
+    override val mangled: String
+        get() = "this\$$className"
+}
+
 data class SpecialName(val name: String) : MangledName {
     override val mangled: String
         get() = "special\$$name"

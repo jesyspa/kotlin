@@ -23,7 +23,7 @@ val FirElement.calleeSymbol: FirBasedSymbol<*>
 val FirElement.calleeCallableSymbol: FirCallableSymbol<*>
     get() = calleeReference?.toResolvedCallableSymbol()!!
 val FirFunctionCall.functionCallArguments: List<FirExpression>
-    get() = listOfNotNull(dispatchReceiver) + argumentList.arguments
+    get() = listOfNotNull(dispatchReceiver, extensionReceiver) + argumentList.arguments
 val FirFunctionSymbol<*>.effects: List<FirEffectDeclaration>
     get() = this.resolvedContractDescription?.effects ?: emptyList()
 val KtSourceElement?.asPosition: Position

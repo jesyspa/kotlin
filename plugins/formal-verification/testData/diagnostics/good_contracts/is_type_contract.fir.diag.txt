@@ -19,7 +19,7 @@ method pkg$kotlin$class_CharSequence$getter_length(this: Ref)
 /is_type_contract.kt:(322,330): info: Generated Viper text for isString:
 field pkg$kotlin$class_String$member_length: Int
 
-method global$fun_isString$fun_take$T_Any$return$T_Boolean(this: dom$Any)
+method global$ext_fun_isString$fun_take$T_Any$return$T_Boolean(this: dom$Any)
   returns (ret: Bool)
   ensures ret == true ==>
     dom$Type$isSubtype((dom$TypeOf$typeOf(this): dom$Type), dom$Type$pkg$kotlin$global$class_String())
