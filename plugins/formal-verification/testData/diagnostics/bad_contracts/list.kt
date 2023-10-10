@@ -47,6 +47,15 @@ fun <!FUNCTION_WITH_UNVERIFIED_CONTRACT, VIPER_TEXT, VIPER_VERIFICATION_ERROR!>u
     return l[l.size - 1]
 }
 
+@AlwaysVerify
+fun <!VIPER_TEXT!>is_empty<!>(l: List<Int>) : Int {
+    return if (!l.isEmpty()) {
+        l[0]
+    } else {
+        1
+    }
+}
+
 //fun list2() {
 //    val l = listOf(1, 2, 3)
 //}

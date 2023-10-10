@@ -10,7 +10,6 @@ import org.jetbrains.kotlin.formver.embeddings.callables.FunctionSignature
 import org.jetbrains.kotlin.formver.viper.ast.Exp
 import org.jetbrains.kotlin.formver.viper.ast.Exp.*
 import org.jetbrains.kotlin.formver.viper.ast.PermExp
-import org.jetbrains.kotlin.formver.viper.ast.Type
 
 fun LocalVar.list(): List<Exp> =
     listOf(
@@ -56,8 +55,7 @@ fun FirFunctionSymbol<*>.stdLibPostConditions(signature: FunctionSignature): Lis
         .map { it.toViper().list() }
         .flatten()
 
-    // TODO: right return type
-    val retVar = LocalVar(ReturnVariableName, Type.Ref)
+    val retVar = LocalVar(ReturnVariableName, signature.returnType.viperType)
     val receiver = signature.receiver?.toViper()
     val customInvariants =
         if (callableId.packageName.asString() == "kotlin.collections") {
@@ -70,6 +68,13 @@ fun FirFunctionSymbol<*>.stdLibPostConditions(signature: FunctionSignature): Lis
                 }
                 "add" -> {
                     listOf(receiver!!.increasedSize(1))
+                }
+                "isEmpty" -> {
+                    listOf(
+                        receiver!!.sameSize(),
+                        Implies(retVar, EqCmp(receiver.fieldAccess(SpecialFields.ListSizeField), IntLit(0))),
+                        Implies(Not(retVar), GtCmp(receiver.fieldAccess(SpecialFields.ListSizeField), IntLit(0)))
+                    )
                 }
                 else -> listOf()
             }
