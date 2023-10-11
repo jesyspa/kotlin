@@ -16,11 +16,11 @@ import org.jetbrains.kotlin.fir.declarations.FirContractDescriptionOwner
 import org.jetbrains.kotlin.fir.declarations.FirSimpleFunction
 import org.jetbrains.kotlin.fir.declarations.hasAnnotation
 import org.jetbrains.kotlin.formver.conversion.ProgramConverter
-import org.jetbrains.kotlin.formver.viper.ConsistencyError
-import org.jetbrains.kotlin.formver.viper.VerificationError
 import org.jetbrains.kotlin.formver.viper.Verifier
-import org.jetbrains.kotlin.formver.viper.VerifierError
 import org.jetbrains.kotlin.formver.viper.ast.Program
+import org.jetbrains.kotlin.formver.viper.errors.ConsistencyError
+import org.jetbrains.kotlin.formver.viper.errors.VerificationError
+import org.jetbrains.kotlin.formver.viper.errors.VerifierError
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
@@ -29,6 +29,7 @@ private val VerifierError.error: KtDiagnosticFactory1<String>
     get() = when (this) {
         is ConsistencyError -> PluginErrors.VIPER_CONSISTENCY_ERROR
         is VerificationError -> PluginErrors.VIPER_VERIFICATION_ERROR
+        else -> TODO("Unreachable")
     }
 
 private val FirContractDescriptionOwner.hasContract: Boolean

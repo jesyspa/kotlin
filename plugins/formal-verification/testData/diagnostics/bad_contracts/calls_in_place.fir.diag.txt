@@ -27,8 +27,7 @@ method global$fun_unknown$fun_take$fun_take$T_Int$return$T_Int$return$T_Int(loca
   ensures true
 
 
-/calls_in_place.kt:(450,472): warning: Viper verification error: Postcondition of global$fun_incorrect_at_most_once$fun_take$fun_take$T_Int$return$T_Int$return$T_Int might not hold. Assertion local$f.special$function_object_call_counter <= old(local$f.special$function_object_call_counter) + 1 might not hold. (<no position>)
-
+/calls_in_place.kt:(450,472): warning: Viper verification error: [postcondition.violated:assertion.false] Postcondition of global$fun_incorrect_at_most_once$fun_take$fun_take$T_Int$return$T_Int$return$T_Int might not hold. Assertion local$f.special$function_object_call_counter <= old(local$f.special$function_object_call_counter) + 1 might not hold. (<no position>)
 
 /calls_in_place.kt:(450,472): warning: Function incorrect_at_most_once may not satisfy its contract.
 
@@ -52,8 +51,7 @@ method global$fun_incorrect_exactly_once$fun_take$fun_take$T_Int$return$T_Int$re
   label label$ret$0
 }
 
-/calls_in_place.kt:(661,683): warning: Viper verification error: Postcondition of global$fun_incorrect_exactly_once$fun_take$fun_take$T_Int$return$T_Int$return$T_Int might not hold. Assertion local$f.special$function_object_call_counter == old(local$f.special$function_object_call_counter) + 1 might not hold. (<no position>)
-
+/calls_in_place.kt:(661,683): warning: Viper verification error: [postcondition.violated:assertion.false] Postcondition of global$fun_incorrect_exactly_once$fun_take$fun_take$T_Int$return$T_Int$return$T_Int might not hold. Assertion local$f.special$function_object_call_counter == old(local$f.special$function_object_call_counter) + 1 might not hold. (<no position>)
 
 /calls_in_place.kt:(661,683): warning: Function incorrect_exactly_once may not satisfy its contract.
 
@@ -84,8 +82,7 @@ method global$fun_unknown$fun_take$fun_take$T_Int$return$T_Int$return$T_Int(loca
   ensures true
 
 
-/calls_in_place.kt:(866,889): warning: Viper verification error: Postcondition of global$fun_incorrect_at_least_once$fun_take$fun_take$T_Int$return$T_Int$return$T_Int might not hold. Assertion local$f.special$function_object_call_counter > old(local$f.special$function_object_call_counter) might not hold. (<no position>)
-
+/calls_in_place.kt:(866,889): warning: Viper verification error: [postcondition.violated:assertion.false] Postcondition of global$fun_incorrect_at_least_once$fun_take$fun_take$T_Int$return$T_Int$return$T_Int might not hold. Assertion local$f.special$function_object_call_counter > old(local$f.special$function_object_call_counter) might not hold. (<no position>)
 
 /calls_in_place.kt:(866,889): warning: Function incorrect_at_least_once may not satisfy its contract.
 
