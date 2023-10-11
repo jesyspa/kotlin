@@ -111,13 +111,12 @@ object KotlinRunSpecialFunction : SpecialKotlinFunction {
     override val returnType: TypeEmbedding = NullableTypeEmbedding(AnyTypeEmbedding)
 
     override fun insertCallImpl(args: List<ExpEmbedding>, ctx: StmtConversionContext<ResultTrackingContext>): ExpEmbedding {
-        val lambda = when (val arg = args[0]) {
+        val lambda = when (val arg = args[0].ignoringCasts()) {
             is LambdaExp -> arg
-            is Cast -> arg.exp
             else -> throw IllegalStateException("kotlin.run must be called with a lambda argument at the moment")
         }
 
-        return (lambda as LambdaExp).insertCallImpl(listOf(), ctx)
+        return lambda.insertCallImpl(listOf(), ctx)
     }
 }
 
