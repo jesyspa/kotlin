@@ -56,19 +56,9 @@ fun <!VIPER_TEXT!>is_empty<!>(l: List<Int>) : Int {
     }
 }
 
-//fun list2() {
-//    val l = listOf(1, 2, 3)
-//}
-
-//fun list4() {
-//    val l: List<Int> = List(1) { it }
-//}
-
-/* TODO:
- * listOf
- * first
- * toMutable
- * sum
- * isEmpty
- * filter
- */
+@AlwaysVerify
+fun <!VIPER_TEXT!>nullable_list<!>(l: List<Int>?) {
+    if (l != null && !l.isEmpty()) {
+        val x = l[l.size - 1]
+    }
+}

@@ -15,6 +15,7 @@ import org.jetbrains.kotlin.fir.references.toResolvedCallableSymbol
 import org.jetbrains.kotlin.fir.symbols.FirBasedSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirCallableSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirFunctionSymbol
+import org.jetbrains.kotlin.name.CallableId
 
 val FirElement.calleeSymbol: FirBasedSymbol<*>
     get() = calleeReference?.toResolvedBaseSymbol()!!
@@ -24,3 +25,5 @@ val FirFunctionCall.functionCallArguments: List<FirExpression>
     get() = listOfNotNull(dispatchReceiver) + argumentList.arguments
 val FirFunctionSymbol<*>.effects: List<FirEffectDeclaration>
     get() = this.resolvedContractDescription?.effects ?: emptyList()
+val CallableId.isCollection: Boolean
+    get() = this.packageName.asString() == "kotlin.collections"

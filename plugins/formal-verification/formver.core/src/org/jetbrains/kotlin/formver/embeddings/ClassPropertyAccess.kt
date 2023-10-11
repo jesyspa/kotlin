@@ -19,12 +19,3 @@ class ClassPropertyAccess(val receiver: ExpEmbedding, val property: PropertyEmbe
         property.setter!!.setValue(receiver, value, ctx)
     }
 }
-
-//TODO-sync:
-//if (field.inhalePolicy) {
-//    ctx.addStatement(Stmt.Inhale(accPred))
-//}
-//ctx.action(fieldAccess)
-//if (field.inhalePolicy) {
-//    ctx.addStatement(Stmt.Exhale(accPred))
-//}
