@@ -7,7 +7,6 @@ package org.jetbrains.kotlin.formver.embeddings
 
 import org.jetbrains.kotlin.formver.conversion.ResultTrackingContext
 import org.jetbrains.kotlin.formver.conversion.StmtConversionContext
-import org.jetbrains.kotlin.formver.viper.ast.Stmt
 
 // We assume that thanks to the checks done by the Kotlin compiler, a property with a
 // missing getter or setter will never be accessed.
