@@ -70,7 +70,7 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext<Re
         when (constExpression.kind) {
             ConstantValueKind.Int -> IntLit((constExpression.value as Long).toInt(), constExpression.source)
             ConstantValueKind.Boolean -> BooleanLit(constExpression.value as Boolean, constExpression.source)
-            ConstantValueKind.Null -> (data.embedType(constExpression) as NullableTypeEmbedding).nullVal
+            ConstantValueKind.Null -> (data.embedType(constExpression) as NullableTypeEmbedding).nullVal(constExpression.source)
             else -> handleUnimplementedElement("Constant Expression of type ${constExpression.kind} is not yet implemented.", data)
         }
 
@@ -151,7 +151,7 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext<Re
         val rightType = right.type
         return if (leftType is NullableTypeEmbedding && rightType !is NullableTypeEmbedding) {
             And(
-                NeCmp(left, leftType.nullVal),
+                NeCmp(left, leftType.nullVal(pos)),
                 // TODO: Replace the Eq comparison with a member call function to `left.equals`
                 EqCmp(left.withType(leftType.elementType), right.withType(leftType.elementType)),
                 pos
@@ -159,14 +159,14 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext<Re
         } else if (leftType is NullableTypeEmbedding && rightType is NullableTypeEmbedding) {
             Or(
                 And(
-                    EqCmp(left, leftType.nullVal),
-                    EqCmp(right, rightType.nullVal),
+                    EqCmp(left, leftType.nullVal(pos)),
+                    EqCmp(right, rightType.nullVal(pos)),
                 ),
                 // TODO: Replace the Eq comparison with a member call function to `left.equals`
                 And(
                     And(
-                        NeCmp(left, leftType.nullVal),
-                        NeCmp(right, rightType.nullVal),
+                        NeCmp(left, leftType.nullVal(pos)),
+                        NeCmp(right, rightType.nullVal(pos)),
                     ),
                     EqCmp(left.withType(leftType.elementType), right.withType(leftType.elementType))
                 ),
@@ -415,7 +415,7 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext<Re
             }
             addStatement(
                 Stmt.If(
-                    EqCmp(lhs, (lhs.type as NullableTypeEmbedding).nullVal, lhs.pos).toViper(),
+                    EqCmp(lhs, (lhs.type as NullableTypeEmbedding).nullVal(lhs.pos), lhs.pos).toViper(),
                     elseBlock,
                     nonNullBranch
                 )
@@ -442,11 +442,11 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext<Re
                 }
 
                 val whenNull = withNewScopeToBlock {
-                    capture((expType as NullableTypeEmbedding).nullVal)
+                    capture((expType as NullableTypeEmbedding).nullVal(safeCallExpression.source))
                 }
                 addStatement(
                     Stmt.If(
-                        EqCmp(receiver, (receiver.type as NullableTypeEmbedding).nullVal, receiver.pos).toViper(),
+                        EqCmp(receiver, (receiver.type as NullableTypeEmbedding).nullVal(receiver.pos), receiver.pos).toViper(),
                         whenNull,
                         whenNotNullCall
                     )
@@ -460,7 +460,7 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext<Re
             }
             data.addStatement(
                 Stmt.If(
-                    NeCmp(receiver, (receiver.type as NullableTypeEmbedding).nullVal, receiver.pos).toViper(),
+                    NeCmp(receiver, (receiver.type as NullableTypeEmbedding).nullVal(receiver.pos), receiver.pos).toViper(),
                     whenNotNullCall,
                     Stmt.Seqn(),
                 )

@@ -194,10 +194,8 @@ data class BooleanLit(val value: Boolean, override val pos: KtSourceElement? = n
     override fun toViper() = Exp.BoolLit(value)
 }
 
-data class NullLit(val elemType: TypeEmbedding) : ExpEmbedding {
+data class NullLit(val elemType: TypeEmbedding, override val pos: KtSourceElement? = null) : ExpEmbedding {
     override val type = NullableTypeEmbedding(elemType)
-    override val pos: KtSourceElement? = null
-
     override fun toViper() = NullableDomain.nullVal(elemType.viperType)
 }
 

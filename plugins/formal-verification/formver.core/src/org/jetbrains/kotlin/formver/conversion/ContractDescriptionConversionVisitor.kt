@@ -166,9 +166,9 @@ class ContractDescriptionConversionVisitor(
     private fun VariableEmbedding.nullCmp(isNegated: Boolean): Exp =
         if (type is NullableTypeEmbedding) {
             if (isNegated) {
-                NeCmp(toViper(), type.nullVal.toViper())
+                NeCmp(toViper(), type.nullVal(pos).toViper())
             } else {
-                EqCmp(toViper(), type.nullVal.toViper())
+                EqCmp(toViper(), type.nullVal(pos).toViper())
             }
         } else {
             BoolLit(isNegated)

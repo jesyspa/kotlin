@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.formver.embeddings
 
+import org.jetbrains.kotlin.KtSourceElement
 import org.jetbrains.kotlin.formver.conversion.SpecialFields
 import org.jetbrains.kotlin.formver.domains.*
 import org.jetbrains.kotlin.formver.embeddings.callables.CallableSignatureData
@@ -159,8 +160,7 @@ data class NullableTypeEmbedding(val elementType: TypeEmbedding) : TypeEmbedding
         override val mangled: String = "N" + elementType.name.mangled
     }
 
-    val nullVal: ExpEmbedding
-        get() = NullLit(elementType)
+    fun nullVal(pos: KtSourceElement? = null): ExpEmbedding = NullLit(elementType, pos)
 
     override fun provenInvariants(v: Exp) = listOf(subtypeInvariant(v))
 
