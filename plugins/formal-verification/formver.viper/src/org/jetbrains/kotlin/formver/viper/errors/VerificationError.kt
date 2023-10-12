@@ -14,7 +14,7 @@ sealed interface VerificationError : VerifierError {
     override val id: String
         get() = result.id()
     override val msg: String
-        get() = result.toString()
+        get() = result.readableMessage(false, true)
     override val position: Position
         get() = Position.fromSilver(result.pos())
 }
@@ -25,10 +25,8 @@ data class PreconditionInCallFalse(
 
 data class PostconditionViolated(
     override val result: errors.PostconditionViolated,
-) : VerificationError {
-    override val position: Position
-        get() = Position.fromSilver(result.member().pos())
-}
+) : VerificationError
+
 data class AssertFailed(
     override val result: errors.AssertFailed,
 ) : VerificationError

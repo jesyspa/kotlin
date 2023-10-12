@@ -12,7 +12,7 @@ sealed interface ConsistencyError : VerifierError {
     override val id: String
         get() = error.fullId()
     override val msg: String
-        get() = error.toString()
+        get() = error.readableMessage()
     override val position: Position
         get() = Position.fromSilver(error.pos())
 }
