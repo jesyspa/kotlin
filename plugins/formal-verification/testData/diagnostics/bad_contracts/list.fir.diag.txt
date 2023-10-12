@@ -14,14 +14,6 @@ method global$fun_empty_list_get$fun_take$$return$T_Unit()
   label label$ret$0
 }
 
-method pkg$kotlin$collections$global$fun_emptyList$fun_take$$return$T_class_pkg$kotlin$collections$global$class_List()
-  returns (ret: Ref)
-  ensures dom$Type$isSubtype((dom$TypeOf$typeOf(ret): dom$Type), dom$Type$pkg$kotlin$collections$global$class_List())
-  ensures acc(ret.special$size, write)
-  ensures ret.special$size >= 0
-  ensures ret.special$size == 0
-
-
 method pkg$kotlin$collections$class_scope_pkg$kotlin$collections$global$class_List$fun_get$fun_take$T_class_pkg$kotlin$collections$global$class_List$T_Int$return$T_Int(this: Ref,
   local$index: Int)
   returns (ret: Int)
@@ -32,6 +24,14 @@ method pkg$kotlin$collections$class_scope_pkg$kotlin$collections$global$class_Li
   ensures acc(this.special$size, write)
   ensures this.special$size >= 0
   ensures this.special$size == old(this.special$size)
+
+
+method pkg$kotlin$collections$global$fun_emptyList$fun_take$$return$T_class_pkg$kotlin$collections$global$class_List()
+  returns (ret: Ref)
+  ensures dom$Type$isSubtype((dom$TypeOf$typeOf(ret): dom$Type), dom$Type$pkg$kotlin$collections$global$class_List())
+  ensures acc(ret.special$size, write)
+  ensures ret.special$size >= 0
+  ensures ret.special$size == 0
 
 
 /list.kt:(91,105): warning: Viper verification error: The precondition of method pkg$kotlin$collections$class_scope_pkg$kotlin$collections$global$class_List$fun_get$fun_take$T_class_pkg$kotlin$collections$global$class_List$T_Int$return$T_Int might not hold. Assertion local0$myList.special$size > 0 might not hold. (<no position>)

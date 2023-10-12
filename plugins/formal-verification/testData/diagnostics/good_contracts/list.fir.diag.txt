@@ -144,17 +144,6 @@ method global$fun_is_empty$fun_take$T_class_pkg$kotlin$collections$global$class_
   label label$ret$0
 }
 
-method pkg$kotlin$collections$class_scope_pkg$kotlin$collections$global$class_List$fun_isEmpty$fun_take$T_class_pkg$kotlin$collections$global$class_List$return$T_Boolean(this: Ref)
-  returns (ret: Bool)
-  requires acc(this.special$size, write)
-  requires this.special$size >= 0
-  ensures acc(this.special$size, write)
-  ensures this.special$size >= 0
-  ensures this.special$size == old(this.special$size)
-  ensures ret ==> this.special$size == 0
-  ensures !ret ==> this.special$size > 0
-
-
 method pkg$kotlin$collections$class_scope_pkg$kotlin$collections$global$class_List$fun_get$fun_take$T_class_pkg$kotlin$collections$global$class_List$T_Int$return$T_Int(this: Ref,
   local$index: Int)
   returns (ret: Int)
@@ -165,6 +154,17 @@ method pkg$kotlin$collections$class_scope_pkg$kotlin$collections$global$class_Li
   ensures acc(this.special$size, write)
   ensures this.special$size >= 0
   ensures this.special$size == old(this.special$size)
+
+
+method pkg$kotlin$collections$class_scope_pkg$kotlin$collections$global$class_List$fun_isEmpty$fun_take$T_class_pkg$kotlin$collections$global$class_List$return$T_Boolean(this: Ref)
+  returns (ret: Bool)
+  requires acc(this.special$size, write)
+  requires this.special$size >= 0
+  ensures acc(this.special$size, write)
+  ensures this.special$size >= 0
+  ensures this.special$size == old(this.special$size)
+  ensures ret ==> this.special$size == 0
+  ensures !ret ==> this.special$size > 0
 
 
 /list.kt:(670,683): info: Generated Viper text for nullable_list:
@@ -212,17 +212,6 @@ method global$fun_nullable_list$fun_take$NT_class_pkg$kotlin$collections$global$
   label label$ret$0
 }
 
-method pkg$kotlin$collections$class_scope_pkg$kotlin$collections$global$class_List$fun_isEmpty$fun_take$T_class_pkg$kotlin$collections$global$class_List$return$T_Boolean(this: Ref)
-  returns (ret: Bool)
-  requires acc(this.special$size, write)
-  requires this.special$size >= 0
-  ensures acc(this.special$size, write)
-  ensures this.special$size >= 0
-  ensures this.special$size == old(this.special$size)
-  ensures ret ==> this.special$size == 0
-  ensures !ret ==> this.special$size > 0
-
-
 method pkg$kotlin$collections$class_scope_pkg$kotlin$collections$global$class_List$fun_get$fun_take$T_class_pkg$kotlin$collections$global$class_List$T_Int$return$T_Int(this: Ref,
   local$index: Int)
   returns (ret: Int)
@@ -233,4 +222,15 @@ method pkg$kotlin$collections$class_scope_pkg$kotlin$collections$global$class_Li
   ensures acc(this.special$size, write)
   ensures this.special$size >= 0
   ensures this.special$size == old(this.special$size)
+
+
+method pkg$kotlin$collections$class_scope_pkg$kotlin$collections$global$class_List$fun_isEmpty$fun_take$T_class_pkg$kotlin$collections$global$class_List$return$T_Boolean(this: Ref)
+  returns (ret: Bool)
+  requires acc(this.special$size, write)
+  requires this.special$size >= 0
+  ensures acc(this.special$size, write)
+  ensures this.special$size >= 0
+  ensures this.special$size == old(this.special$size)
+  ensures ret ==> this.special$size == 0
+  ensures !ret ==> this.special$size > 0
 

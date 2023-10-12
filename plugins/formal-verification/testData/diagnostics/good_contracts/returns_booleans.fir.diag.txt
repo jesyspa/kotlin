@@ -123,7 +123,3 @@ method pkg$kotlin$collections$class_scope_pkg$kotlin$collections$global$class_Co
   ensures ret ==> this.special$size == 0
   ensures !ret ==> this.special$size > 0
 
-
-method pkg$kotlin$collections$class_scope_pkg$kotlin$collections$global$class_Collection$getter_size(this: Ref)
-  returns (ret: Int)
-
