@@ -263,13 +263,13 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
                     0,
                     returnPointName = signature.sourceName
                 )
-            val stmtCtx = StmtConverter(methodCtx, SeqnBuilder(), NoopResultTrackerFactory)
+            val stmtCtx = StmtConverter(methodCtx, SeqnBuilder(declaration.source), NoopResultTrackerFactory)
             signature.formalArgs.forEach { arg ->
                 // Ideally we would want to assume these rather than inhale them to prevent inconsistencies with permissions.
                 // Unfortunately Silicon for some reason does not allow Assumes. However, it doesn't matter as long as the
                 // provenInvariants don't contain permissions.
                 arg.provenInvariants().forEach { invariant ->
-                    stmtCtx.addStatement(Stmt.Inhale(invariant))
+                    stmtCtx.addStatement(Stmt.Inhale(invariant, arg.source.asSilverPosition))
                 }
             }
             stmtCtx.addDeclaration(methodCtx.returnLabel.toDecl())

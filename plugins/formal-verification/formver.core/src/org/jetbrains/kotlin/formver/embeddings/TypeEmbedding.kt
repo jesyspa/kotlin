@@ -160,7 +160,7 @@ data class NullableTypeEmbedding(val elementType: TypeEmbedding) : TypeEmbedding
         override val mangled: String = "N" + elementType.name.mangled
     }
 
-    fun nullVal(pos: KtSourceElement? = null): ExpEmbedding = NullLit(elementType, pos)
+    fun nullVal(source: KtSourceElement? = null): ExpEmbedding = NullLit(elementType, source)
 
     override fun provenInvariants(v: Exp) = listOf(subtypeInvariant(v))
 

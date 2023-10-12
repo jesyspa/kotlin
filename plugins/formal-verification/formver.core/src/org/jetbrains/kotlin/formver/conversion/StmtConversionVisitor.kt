@@ -15,14 +15,10 @@ import org.jetbrains.kotlin.fir.symbols.impl.*
 import org.jetbrains.kotlin.fir.types.coneType
 import org.jetbrains.kotlin.fir.types.resolvedType
 import org.jetbrains.kotlin.fir.visitors.FirVisitor
-import org.jetbrains.kotlin.formver.UnsupportedFeatureBehaviour
-import org.jetbrains.kotlin.formver.calleeCallableSymbol
-import org.jetbrains.kotlin.formver.calleeSymbol
+import org.jetbrains.kotlin.formver.*
 import org.jetbrains.kotlin.formver.embeddings.*
 import org.jetbrains.kotlin.formver.embeddings.callables.*
-import org.jetbrains.kotlin.formver.functionCallArguments
 import org.jetbrains.kotlin.formver.viper.ast.Exp
-import org.jetbrains.kotlin.formver.viper.ast.Position
 import org.jetbrains.kotlin.formver.viper.ast.Stmt
 import org.jetbrains.kotlin.text
 import org.jetbrains.kotlin.types.ConstantValueKind
@@ -54,8 +50,8 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext<Re
         // returnTarget is null when it is the implicit return of a lambda
         val returnTargetName = returnExpression.target.labelName
         val (retVar, retLabel) = data.resolveReturnTarget(returnTargetName)
-        retVar.setValue(expr, data)
-        data.addStatement(retLabel.toGoto())
+        retVar.setValue(expr, data, returnExpression.source)
+        data.addStatement(retLabel.toGoto(returnExpression.source.asSilverPosition))
         return UnitLit
     }
 
@@ -95,7 +91,7 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext<Re
             val elseBlock = data.withNewScopeToBlock {
                 convertWhenBranches(whenBranches, this)
             }
-            data.addStatement(Stmt.If(cond.toViper(), thenBlock, elseBlock))
+            data.addStatement(Stmt.If(cond.toViper(), thenBlock, elseBlock, cond.source.asSilverPosition))
         }
     }
 
@@ -126,7 +122,7 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext<Re
         data: StmtConversionContext<ResultTrackingContext>,
     ): ExpEmbedding {
         val propertyAccess = data.embedPropertyAccess(propertyAccessExpression)
-        return propertyAccess.getValue(data)
+        return propertyAccess.getValue(data, propertyAccessExpression.source)
     }
 
     override fun visitEqualityOperatorCall(
@@ -146,41 +142,44 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext<Re
         }
     }
 
-    private fun convertEqCmp(left: ExpEmbedding, right: ExpEmbedding, pos: KtSourceElement?): ExpEmbedding {
+    private fun convertEqCmp(left: ExpEmbedding, right: ExpEmbedding, source: KtSourceElement?): ExpEmbedding {
         val leftType = left.type
         val rightType = right.type
         return if (leftType is NullableTypeEmbedding && rightType !is NullableTypeEmbedding) {
             And(
-                NeCmp(left, leftType.nullVal(pos)),
+                NeCmp(left, leftType.nullVal(source), source),
                 // TODO: Replace the Eq comparison with a member call function to `left.equals`
-                EqCmp(left.withType(leftType.elementType), right.withType(leftType.elementType)),
-                pos
+                EqCmp(left.withType(leftType.elementType), right.withType(leftType.elementType), source),
+                source
             )
         } else if (leftType is NullableTypeEmbedding && rightType is NullableTypeEmbedding) {
             Or(
                 And(
-                    EqCmp(left, leftType.nullVal(pos)),
-                    EqCmp(right, rightType.nullVal(pos)),
+                    EqCmp(left, leftType.nullVal(source), source),
+                    EqCmp(right, rightType.nullVal(source), source),
+                    source
                 ),
                 // TODO: Replace the Eq comparison with a member call function to `left.equals`
                 And(
                     And(
-                        NeCmp(left, leftType.nullVal(pos)),
-                        NeCmp(right, rightType.nullVal(pos)),
+                        NeCmp(left, leftType.nullVal(source), source),
+                        NeCmp(right, rightType.nullVal(source), source),
+                        source
                     ),
-                    EqCmp(left.withType(leftType.elementType), right.withType(leftType.elementType))
+                    EqCmp(left.withType(leftType.elementType), right.withType(leftType.elementType), source),
+                    source
                 ),
-                pos
+                source
             )
         } else {
             // TODO: Replace the Eq comparison with a member call function to `left.equals`
-            EqCmp(left, right.withType(leftType), pos)
+            EqCmp(left, right.withType(leftType), source)
         }
     }
 
     override fun visitComparisonExpression(
         comparisonExpression: FirComparisonExpression,
-        data: StmtConversionContext<ResultTrackingContext>
+        data: StmtConversionContext<ResultTrackingContext>,
     ): ExpEmbedding {
         val dispatchReceiver = comparisonExpression.compareToCall.dispatchReceiver
         val arg = comparisonExpression.compareToCall.argumentList.arguments.firstOrNull()
@@ -193,10 +192,10 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext<Re
         val left = data.convert(dispatchReceiver)
         val right = data.convert(arg)
         return when (comparisonExpression.operation) {
-            FirOperation.LT -> LtCmp(left, right)
-            FirOperation.LT_EQ -> LeCmp(left, right)
-            FirOperation.GT -> GtCmp(left, right)
-            FirOperation.GT_EQ -> GeCmp(left, right)
+            FirOperation.LT -> LtCmp(left, right, comparisonExpression.source)
+            FirOperation.LT_EQ -> LeCmp(left, right, comparisonExpression.source)
+            FirOperation.GT -> GtCmp(left, right, comparisonExpression.source)
+            FirOperation.GT_EQ -> GeCmp(left, right, comparisonExpression.source)
             else -> throw IllegalArgumentException("expected comparison operation but found ${comparisonExpression.operation}")
         }
     }
@@ -204,7 +203,7 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext<Re
     override fun visitFunctionCall(functionCall: FirFunctionCall, data: StmtConversionContext<ResultTrackingContext>): ExpEmbedding {
         val symbol = functionCall.calleeCallableSymbol
         val callee = data.embedFunction(symbol as FirFunctionSymbol<*>)
-        return callee.insertCall(functionCall.functionCallArguments.map(data::convert), data)
+        return callee.insertCall(functionCall.functionCallArguments.map(data::convert), data, functionCall.source)
     }
 
     override fun visitImplicitInvokeCall(
@@ -218,7 +217,7 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext<Re
             is LambdaExp -> {
                 // The lambda is already the receiver, so we do not need to convert it.
                 // TODO: do this more uniformly: convert the receiver, see it is a lambda, use insertCall on it.
-                exp.insertCall(args, data)
+                exp.insertCall(args, data, implicitInvokeCall.source)
             }
             else -> {
                 val retType = implicitInvokeCall.calleeCallableSymbol.resolvedReturnType
@@ -227,7 +226,7 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext<Re
                         val leakFunctionObjectCall = Stmt.Assert(
                             DuplicableFunction.toFuncApp(
                                 listOf(it.toViper()),
-                                Position.KtSourcePosition(implicitInvokeCall.source)
+                                implicitInvokeCall.source.asSilverPosition
                             )
                         )
                         data.addStatement(leakFunctionObjectCall)
@@ -240,7 +239,7 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext<Re
                         InvokeFunctionObjectMethod.toMethodCall(
                             receiver.toViper(),
                             listOf(),
-                            Position.KtSourcePosition(implicitInvokeCall.source)
+                            implicitInvokeCall.source.asSilverPosition
                         )
                     )
                 }
@@ -275,7 +274,14 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext<Re
                 is FullNamedFunctionSignature -> sig.postconditions
                 else -> listOf()
             }
-            data.addStatement(Stmt.While(condCtx.resultExp.toViper(), invariants = postconditions, bodyBlock))
+            data.addStatement(
+                Stmt.While(
+                    condCtx.resultExp.toViper(),
+                    invariants = postconditions,
+                    bodyBlock,
+                    whileLoop.source.asSilverPosition
+                )
+            )
         }
         return UnitLit
     }
@@ -286,7 +292,7 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext<Re
     ): ExpEmbedding {
         val targetName = breakExpression.target.labelName
         val breakLabel = data.breakLabel(targetName)
-        data.addStatement(breakLabel.toGoto())
+        data.addStatement(breakLabel.toGoto(breakExpression.source.asSilverPosition))
         return UnitLit
     }
 
@@ -296,7 +302,7 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext<Re
     ): ExpEmbedding {
         val targetName = continueExpression.target.labelName
         val continueLabel = data.continueLabel(targetName)
-        data.addStatement(continueLabel.toGoto())
+        data.addStatement(continueLabel.toGoto(continueExpression.source.asSilverPosition))
         return UnitLit
     }
 
@@ -308,7 +314,7 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext<Re
             ?: throw IllegalArgumentException("Left hand of an assignment must be a property access.")
         val embedding = data.embedPropertyAccess(propertyAccess)
         val convertedRValue = data.convert(variableAssignment.rValue)
-        embedding.setValue(convertedRValue, data)
+        embedding.setValue(convertedRValue, data, variableAssignment.source)
         return UnitLit
     }
 
@@ -333,11 +339,11 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext<Re
             when (binaryLogicExpression.kind) {
                 LogicOperationKind.AND -> {
                     val constBlock = withNewScopeToBlock { capture(BooleanLit(false, null)) }
-                    data.addStatement(Stmt.If(left.toViper(), rightBlock, constBlock))
+                    data.addStatement(Stmt.If(left.toViper(), rightBlock, constBlock, binaryLogicExpression.source.asSilverPosition))
                 }
                 LogicOperationKind.OR -> {
                     val constBlock = withNewScopeToBlock { capture(BooleanLit(true, null)) }
-                    data.addStatement(Stmt.If(left.toViper(), constBlock, rightBlock))
+                    data.addStatement(Stmt.If(left.toViper(), constBlock, rightBlock, binaryLogicExpression.source.asSilverPosition))
                 }
             }
         }
@@ -378,7 +384,7 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext<Re
                 val maybeJumpToSomeCatch = {
                     for (catchBlock in catchData.blocks) {
                         nonDeterministically {
-                            addStatement(catchBlock.entryLabel.toGoto())
+                            addStatement(catchBlock.entryLabel.toGoto(catchBlock.firCatch.source.asSilverPosition))
                         }
                     }
                 }
@@ -390,13 +396,13 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext<Re
         }
         for (catchBlock in catchData.blocks) {
             data.withNewScope {
-                addStatement(catchBlock.entryLabel.toStmt())
+                addStatement(catchBlock.entryLabel.toStmt(catchBlock.firCatch.source.asSilverPosition))
                 registerLocalPropertyName(catchBlock.firCatch.parameter.name)
                 convert(catchBlock.firCatch.block)
-                addStatement(catchData.exitLabel.toGoto())
+                addStatement(catchData.exitLabel.toGoto(catchBlock.firCatch.source.asSilverPosition))
             }
         }
-        data.addStatement(catchData.exitLabel.toStmt())
+        data.addStatement(catchData.exitLabel.toStmt(tryExpression.source.asSilverPosition))
         return UnitLit
     }
 
@@ -415,9 +421,10 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext<Re
             }
             addStatement(
                 Stmt.If(
-                    EqCmp(lhs, (lhs.type as NullableTypeEmbedding).nullVal(lhs.pos), lhs.pos).toViper(),
+                    EqCmp(lhs, (lhs.type as NullableTypeEmbedding).nullVal(lhs.source), elvisExpression.source).toViper(),
                     elseBlock,
-                    nonNullBranch
+                    nonNullBranch,
+                    elvisExpression.source.asSilverPosition
                 )
             )
         }
@@ -446,9 +453,10 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext<Re
                 }
                 addStatement(
                     Stmt.If(
-                        EqCmp(receiver, (receiver.type as NullableTypeEmbedding).nullVal(receiver.pos), receiver.pos).toViper(),
+                        EqCmp(receiver, (receiver.type as NullableTypeEmbedding).nullVal(receiver.source), receiver.source).toViper(),
                         whenNull,
-                        whenNotNullCall
+                        whenNotNullCall,
+                        safeCallExpression.source.asSilverPosition
                     )
                 )
             }
@@ -460,9 +468,10 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext<Re
             }
             data.addStatement(
                 Stmt.If(
-                    NeCmp(receiver, (receiver.type as NullableTypeEmbedding).nullVal(receiver.pos), receiver.pos).toViper(),
+                    NeCmp(receiver, (receiver.type as NullableTypeEmbedding).nullVal(receiver.source), receiver.source).toViper(),
                     whenNotNullCall,
                     Stmt.Seqn(),
+                    safeCallExpression.source.asSilverPosition
                 )
             )
             UnitLit

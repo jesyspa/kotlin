@@ -5,13 +5,15 @@
 
 package org.jetbrains.kotlin.formver.conversion
 
+import org.jetbrains.kotlin.KtSourceElement
+import org.jetbrains.kotlin.formver.asSilverPosition
 import org.jetbrains.kotlin.formver.viper.ast.Declaration
 import org.jetbrains.kotlin.formver.viper.ast.Stmt
 
-class SeqnBuilder : SeqnBuildContext {
+class SeqnBuilder(val source: KtSourceElement? = null) : SeqnBuildContext {
     private val statements: MutableList<Stmt> = mutableListOf()
     private val declarations: MutableList<Declaration> = mutableListOf()
-    override val block = Stmt.Seqn(statements, declarations)
+    override val block = Stmt.Seqn(statements, declarations, source.asSilverPosition)
 
     override fun addStatement(stmt: Stmt) {
         statements.add(stmt)
