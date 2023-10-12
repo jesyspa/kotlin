@@ -17,13 +17,13 @@ import org.jetbrains.kotlin.fir.types.*
 import org.jetbrains.kotlin.formver.ErrorCollector
 import org.jetbrains.kotlin.formver.PluginConfiguration
 import org.jetbrains.kotlin.formver.UnsupportedFeatureBehaviour
+import org.jetbrains.kotlin.formver.asSilverPosition
 import org.jetbrains.kotlin.formver.domains.*
 import org.jetbrains.kotlin.formver.embeddings.*
 import org.jetbrains.kotlin.formver.embeddings.callables.*
 import org.jetbrains.kotlin.formver.names.*
 import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.formver.viper.ast.Method
-import org.jetbrains.kotlin.formver.viper.ast.Position
 import org.jetbrains.kotlin.formver.viper.ast.Program
 import org.jetbrains.kotlin.formver.viper.ast.Stmt
 import org.jetbrains.kotlin.utils.addToStdlib.ifFalse
@@ -158,7 +158,8 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         val retType = symbol.resolvedReturnTypeRef.type
         val receiverType = symbol.receiverType
         return object : FunctionSignature {
-            override val receiver = receiverType?.let { VariableEmbedding(ThisReceiverName, embedType(it), null) }
+            override val receiver =
+                receiverType?.let { VariableEmbedding(ThisReceiverName, embedType(it), symbol.receiverParameter?.source) }
             override val params = symbol.valueParameterSymbols.map {
                 VariableEmbedding(it.embedName(), embedType(it.resolvedReturnType), it.source)
             }
@@ -277,12 +278,12 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
             stmtCtx.block
         }
 
-        return signature.toViperMethod(body, Position.KtSourcePosition(declaration.source))
+        return signature.toViperMethod(body, declaration.source.asSilverPosition)
     }
 
     private fun convertMethodWithoutBody(symbol: FirFunctionSymbol<*>, signature: FullNamedFunctionSignature): Method? =
         symbol.isInline.ifFalse {
-            signature.toViperMethod(null, Position.KtSourcePosition(symbol.source))
+            signature.toViperMethod(null, symbol.source.asSilverPosition)
         }
 
     private fun unimplementedTypeEmbedding(type: ConeKotlinType): TypeEmbedding =
