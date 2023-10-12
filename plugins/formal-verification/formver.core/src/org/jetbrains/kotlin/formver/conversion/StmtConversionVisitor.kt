@@ -51,7 +51,7 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext<Re
         val returnTargetName = returnExpression.target.labelName
         val (retVar, retLabel) = data.resolveReturnTarget(returnTargetName)
         retVar.setValue(expr, data, returnExpression.source)
-        data.addStatement(retLabel.toGoto(returnExpression.source.asSilverPosition))
+        data.addStatement(retLabel.toGoto(returnExpression.source.asPosition))
         return UnitLit
     }
 
@@ -91,7 +91,7 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext<Re
             val elseBlock = data.withNewScopeToBlock {
                 convertWhenBranches(whenBranches, this)
             }
-            data.addStatement(Stmt.If(cond.toViper(), thenBlock, elseBlock, cond.source.asSilverPosition))
+            data.addStatement(Stmt.If(cond.toViper(), thenBlock, elseBlock, cond.source.asPosition))
         }
     }
 
@@ -226,7 +226,7 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext<Re
                         val leakFunctionObjectCall = Stmt.Assert(
                             DuplicableFunction.toFuncApp(
                                 listOf(it.toViper()),
-                                implicitInvokeCall.source.asSilverPosition
+                                implicitInvokeCall.source.asPosition
                             )
                         )
                         data.addStatement(leakFunctionObjectCall)
@@ -239,7 +239,7 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext<Re
                         InvokeFunctionObjectMethod.toMethodCall(
                             receiver.toViper(),
                             listOf(),
-                            implicitInvokeCall.source.asSilverPosition
+                            implicitInvokeCall.source.asPosition
                         )
                     )
                 }
@@ -279,7 +279,7 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext<Re
                     condCtx.resultExp.toViper(),
                     invariants = postconditions,
                     bodyBlock,
-                    whileLoop.source.asSilverPosition
+                    whileLoop.source.asPosition
                 )
             )
         }
@@ -292,7 +292,7 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext<Re
     ): ExpEmbedding {
         val targetName = breakExpression.target.labelName
         val breakLabel = data.breakLabel(targetName)
-        data.addStatement(breakLabel.toGoto(breakExpression.source.asSilverPosition))
+        data.addStatement(breakLabel.toGoto(breakExpression.source.asPosition))
         return UnitLit
     }
 
@@ -302,7 +302,7 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext<Re
     ): ExpEmbedding {
         val targetName = continueExpression.target.labelName
         val continueLabel = data.continueLabel(targetName)
-        data.addStatement(continueLabel.toGoto(continueExpression.source.asSilverPosition))
+        data.addStatement(continueLabel.toGoto(continueExpression.source.asPosition))
         return UnitLit
     }
 
@@ -339,11 +339,11 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext<Re
             when (binaryLogicExpression.kind) {
                 LogicOperationKind.AND -> {
                     val constBlock = withNewScopeToBlock { capture(BooleanLit(false, null)) }
-                    data.addStatement(Stmt.If(left.toViper(), rightBlock, constBlock, binaryLogicExpression.source.asSilverPosition))
+                    data.addStatement(Stmt.If(left.toViper(), rightBlock, constBlock, binaryLogicExpression.source.asPosition))
                 }
                 LogicOperationKind.OR -> {
                     val constBlock = withNewScopeToBlock { capture(BooleanLit(true, null)) }
-                    data.addStatement(Stmt.If(left.toViper(), constBlock, rightBlock, binaryLogicExpression.source.asSilverPosition))
+                    data.addStatement(Stmt.If(left.toViper(), constBlock, rightBlock, binaryLogicExpression.source.asPosition))
                 }
             }
         }
@@ -384,7 +384,7 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext<Re
                 val maybeJumpToSomeCatch = {
                     for (catchBlock in catchData.blocks) {
                         nonDeterministically {
-                            addStatement(catchBlock.entryLabel.toGoto(catchBlock.firCatch.source.asSilverPosition))
+                            addStatement(catchBlock.entryLabel.toGoto(catchBlock.firCatch.source.asPosition))
                         }
                     }
                 }
@@ -396,13 +396,13 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext<Re
         }
         for (catchBlock in catchData.blocks) {
             data.withNewScope {
-                addStatement(catchBlock.entryLabel.toStmt(catchBlock.firCatch.source.asSilverPosition))
+                addStatement(catchBlock.entryLabel.toStmt(catchBlock.firCatch.source.asPosition))
                 registerLocalPropertyName(catchBlock.firCatch.parameter.name)
                 convert(catchBlock.firCatch.block)
-                addStatement(catchData.exitLabel.toGoto(catchBlock.firCatch.source.asSilverPosition))
+                addStatement(catchData.exitLabel.toGoto(catchBlock.firCatch.source.asPosition))
             }
         }
-        data.addStatement(catchData.exitLabel.toStmt(tryExpression.source.asSilverPosition))
+        data.addStatement(catchData.exitLabel.toStmt(tryExpression.source.asPosition))
         return UnitLit
     }
 
@@ -424,7 +424,7 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext<Re
                     EqCmp(lhs, (lhs.type as NullableTypeEmbedding).nullVal(lhs.source), elvisExpression.source).toViper(),
                     elseBlock,
                     nonNullBranch,
-                    elvisExpression.source.asSilverPosition
+                    elvisExpression.source.asPosition
                 )
             )
         }
@@ -456,7 +456,7 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext<Re
                         EqCmp(receiver, (receiver.type as NullableTypeEmbedding).nullVal(receiver.source), receiver.source).toViper(),
                         whenNull,
                         whenNotNullCall,
-                        safeCallExpression.source.asSilverPosition
+                        safeCallExpression.source.asPosition
                     )
                 )
             }
@@ -471,7 +471,7 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext<Re
                     NeCmp(receiver, (receiver.type as NullableTypeEmbedding).nullVal(receiver.source), receiver.source).toViper(),
                     whenNotNullCall,
                     Stmt.Seqn(),
-                    safeCallExpression.source.asSilverPosition
+                    safeCallExpression.source.asPosition
                 )
             )
             UnitLit

@@ -26,7 +26,7 @@ val FirFunctionCall.functionCallArguments: List<FirExpression>
     get() = listOfNotNull(dispatchReceiver) + argumentList.arguments
 val FirFunctionSymbol<*>.effects: List<FirEffectDeclaration>
     get() = this.resolvedContractDescription?.effects ?: emptyList()
-val KtSourceElement?.asSilverPosition: Position
+val KtSourceElement?.asPosition: Position
     get() = when (this) {
         null -> Position.NoPosition
         else -> Position.Wrapped(this)

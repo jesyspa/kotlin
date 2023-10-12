@@ -6,7 +6,7 @@
 package org.jetbrains.kotlin.formver.embeddings.callables
 
 import org.jetbrains.kotlin.KtSourceElement
-import org.jetbrains.kotlin.formver.asSilverPosition
+import org.jetbrains.kotlin.formver.asPosition
 import org.jetbrains.kotlin.formver.conversion.ResultTrackingContext
 import org.jetbrains.kotlin.formver.conversion.StmtConversionContext
 import org.jetbrains.kotlin.formver.conversion.withResult
@@ -21,7 +21,7 @@ class NonInlineNamedFunction(
         source: KtSourceElement?,
     ): ExpEmbedding =
         ctx.withResult(returnType) {
-            addStatement(toMethodCall(args, resultCtx.resultVar, source.asSilverPosition))
+            addStatement(toMethodCall(args, resultCtx.resultVar, source.asPosition))
             resultExp
         }
 }

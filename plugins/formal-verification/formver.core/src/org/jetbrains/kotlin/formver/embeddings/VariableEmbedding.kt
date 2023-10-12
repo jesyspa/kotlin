@@ -6,7 +6,7 @@
 package org.jetbrains.kotlin.formver.embeddings
 
 import org.jetbrains.kotlin.KtSourceElement
-import org.jetbrains.kotlin.formver.asSilverPosition
+import org.jetbrains.kotlin.formver.asPosition
 import org.jetbrains.kotlin.formver.conversion.ResultTrackingContext
 import org.jetbrains.kotlin.formver.conversion.StmtConversionContext
 import org.jetbrains.kotlin.formver.viper.MangledName
@@ -23,7 +23,7 @@ class VariableEmbedding(val name: MangledName, override val type: TypeEmbedding,
     ): Declaration.LocalVarDecl = Declaration.LocalVarDecl(name, type.viperType, pos, info, trafos)
 
 
-    override fun toViper(): Exp.LocalVar = Exp.LocalVar(name, type.viperType, source.asSilverPosition)
+    override fun toViper(): Exp.LocalVar = Exp.LocalVar(name, type.viperType, source.asPosition)
 
     fun toFieldAccess(
         field: Field,
@@ -35,7 +35,7 @@ class VariableEmbedding(val name: MangledName, override val type: TypeEmbedding,
     override fun getValue(ctx: StmtConversionContext<ResultTrackingContext>, source: KtSourceElement?): ExpEmbedding = this
 
     override fun setValue(value: ExpEmbedding, ctx: StmtConversionContext<ResultTrackingContext>, source: KtSourceElement?) {
-        ctx.addStatement(Stmt.LocalVarAssign(toViper(), value.withType(type).toViper(), source.asSilverPosition))
+        ctx.addStatement(Stmt.LocalVarAssign(toViper(), value.withType(type).toViper(), source.asPosition))
     }
 
     fun pureInvariants(): List<Exp> = type.pureInvariants(toViper())

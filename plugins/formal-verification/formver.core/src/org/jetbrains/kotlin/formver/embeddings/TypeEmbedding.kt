@@ -165,8 +165,8 @@ data class NullableTypeEmbedding(val elementType: TypeEmbedding) : TypeEmbedding
     override fun provenInvariants(v: Exp) = listOf(subtypeInvariant(v))
 
     override fun accessInvariants(v: Exp): List<Exp> {
-        return elementType.accessInvariants(CastingDomain.cast(v, elementType))
-            .map { Exp.Implies(Exp.NeCmp(v, nullVal.toViper()), it) }
+        return elementType.accessInvariants(CastingDomain.cast(v, elementType, null))
+            .map { Exp.Implies(Exp.NeCmp(v, nullVal().toViper()), it) }
     }
 }
 

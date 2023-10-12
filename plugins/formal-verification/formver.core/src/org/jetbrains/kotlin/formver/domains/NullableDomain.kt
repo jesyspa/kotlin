@@ -6,7 +6,7 @@
 package org.jetbrains.kotlin.formver.domains
 
 import org.jetbrains.kotlin.KtSourceElement
-import org.jetbrains.kotlin.formver.asSilverPosition
+import org.jetbrains.kotlin.formver.asPosition
 import org.jetbrains.kotlin.formver.viper.ast.*
 
 /**
@@ -54,7 +54,7 @@ object NullableDomain : BuiltinDomain("Nullable") {
     // e.g. in the expression x == null_val(), if x is of type type Nullable[Int], then
     // null_val() also needs to of type Nullable[Int] and can't be of type Nullable[T].
     fun nullVal(elemType: Type, source: KtSourceElement? = null): Exp.DomainFuncApp =
-        funcApp(nullFunc, emptyList(), mapOf(T to elemType), source.asSilverPosition)
+        funcApp(nullFunc, emptyList(), mapOf(T to elemType), source.asPosition)
 
     val someNotNull =
         createNamedDomainAxiom(

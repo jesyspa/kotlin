@@ -10,7 +10,7 @@ inline fun invoke(f: (Int) -> Int): Int {
 
 @OptIn(ExperimentalContracts::class)
 @Suppress("WRONG_INVOCATION_KIND", "LEAKED_IN_PLACE_LAMBDA")
-fun <!FUNCTION_WITH_UNVERIFIED_CONTRACT, VIPER_TEXT, VIPER_VERIFICATION_ERROR!>nested_call<!>(g: (Int) -> Int): Int {
+fun <!FUNCTION_WITH_UNVERIFIED_CONTRACT, VIPER_TEXT!>nested_call<!>(g: (Int) -> Int): Int {
     contract {
         callsInPlace(g, EXACTLY_ONCE)
     }
@@ -19,7 +19,7 @@ fun <!FUNCTION_WITH_UNVERIFIED_CONTRACT, VIPER_TEXT, VIPER_VERIFICATION_ERROR!>n
 
 @OptIn(ExperimentalContracts::class)
 @Suppress("WRONG_INVOCATION_KIND", "LEAKED_IN_PLACE_LAMBDA")
-fun <!FUNCTION_WITH_UNVERIFIED_CONTRACT, VIPER_TEXT, VIPER_VERIFICATION_ERROR!>double_call<!>(g: (Int) -> Int): Int {
+fun <!FUNCTION_WITH_UNVERIFIED_CONTRACT, VIPER_TEXT!>double_call<!>(g: (Int) -> Int): Int {
     contract {
         callsInPlace(g, AT_MOST_ONCE)
     }

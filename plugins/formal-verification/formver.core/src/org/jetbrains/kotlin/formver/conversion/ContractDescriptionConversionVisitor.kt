@@ -11,7 +11,7 @@ import org.jetbrains.kotlin.fir.contracts.description.ConeContractConstantValues
 import org.jetbrains.kotlin.fir.diagnostics.ConeDiagnostic
 import org.jetbrains.kotlin.fir.symbols.impl.FirFunctionSymbol
 import org.jetbrains.kotlin.fir.types.ConeKotlinType
-import org.jetbrains.kotlin.formver.asSilverPosition
+import org.jetbrains.kotlin.formver.asPosition
 import org.jetbrains.kotlin.formver.domains.TypeDomain
 import org.jetbrains.kotlin.formver.domains.TypeOfDomain
 import org.jetbrains.kotlin.formver.effects
@@ -42,7 +42,7 @@ class ContractDescriptionConversionVisitor(
         return (parameterIndices - callsInPlaceIndices)
             .map { embeddedVarByIndex(it) }
             .filter { it.type is FunctionTypeEmbedding }
-            .map { DuplicableFunction.toFuncApp(listOf(it.toViper()), it.source.asSilverPosition) }
+            .map { DuplicableFunction.toFuncApp(listOf(it.toViper()), it.source.asPosition) }
     }
 
     fun getPostconditions(symbol: FirFunctionSymbol<*>): List<Exp> {
@@ -58,8 +58,8 @@ class ContractDescriptionConversionVisitor(
         booleanConstantDescriptor: KtBooleanConstantReference<ConeKotlinType, ConeDiagnostic>,
         data: ContractDescriptionVisitorContext,
     ): Exp = when (booleanConstantDescriptor) {
-        ConeContractConstantValues.TRUE -> BoolLit(true, data.effectSource.asSilverPosition)
-        ConeContractConstantValues.FALSE -> BoolLit(false, data.effectSource.asSilverPosition)
+        ConeContractConstantValues.TRUE -> BoolLit(true, data.effectSource.asPosition)
+        ConeContractConstantValues.FALSE -> BoolLit(false, data.effectSource.asPosition)
         else -> throw IllegalArgumentException("Unexpected boolean constant: $booleanConstantDescriptor")
     }
 
@@ -69,7 +69,7 @@ class ContractDescriptionConversionVisitor(
     ): Exp {
         val retVar = signature.returnVar.toViper()
         return when (returnsEffect.value) {
-            ConeContractConstantValues.WILDCARD -> BoolLit(true, data.effectSource.asSilverPosition)
+            ConeContractConstantValues.WILDCARD -> BoolLit(true, data.effectSource.asPosition)
             /* NOTE: in a function that has a non-nullable return type, the compiler will not complain if there is an effect like
              * returnsNotNull(). So it is necessary to take care of these cases in order to avoid comparison between non-nullable
              * values and null. In a function that has a non-nullable return type, returnsNotNull() is mapped to true and returns(null)
@@ -79,13 +79,13 @@ class ContractDescriptionConversionVisitor(
             ConeContractConstantValues.NOT_NULL -> signature.returnVar.nullCmp(true, data.effectSource)
             ConeContractConstantValues.TRUE -> EqCmp(
                 retVar,
-                BoolLit(true, data.effectSource.asSilverPosition),
-                data.effectSource.asSilverPosition
+                BoolLit(true, data.effectSource.asPosition),
+                data.effectSource.asPosition
             )
             ConeContractConstantValues.FALSE -> EqCmp(
                 retVar,
-                BoolLit(false, data.effectSource.asSilverPosition),
-                data.effectSource.asSilverPosition
+                BoolLit(false, data.effectSource.asPosition),
+                data.effectSource.asPosition
             )
             else -> throw IllegalArgumentException("Unexpected constant: ${returnsEffect.value}")
         }
@@ -115,14 +115,14 @@ class ContractDescriptionConversionVisitor(
         val left = binaryLogicExpression.left.accept(this, data)
         val right = binaryLogicExpression.right.accept(this, data)
         return when (binaryLogicExpression.kind) {
-            LogicOperationKind.AND -> And(left, right, data.effectSource.asSilverPosition)
-            LogicOperationKind.OR -> Or(left, right, data.effectSource.asSilverPosition)
+            LogicOperationKind.AND -> And(left, right, data.effectSource.asPosition)
+            LogicOperationKind.OR -> Or(left, right, data.effectSource.asPosition)
         }
     }
 
     override fun visitLogicalNot(logicalNot: KtLogicalNot<ConeKotlinType, ConeDiagnostic>, data: ContractDescriptionVisitorContext): Exp {
         val arg = logicalNot.arg.accept(this, data)
-        return Not(arg, data.effectSource.asSilverPosition)
+        return Not(arg, data.effectSource.asPosition)
     }
 
     override fun visitConditionalEffectDeclaration(
@@ -131,7 +131,7 @@ class ContractDescriptionConversionVisitor(
     ): Exp {
         val effect = conditionalEffect.effect.accept(this, data)
         val cond = conditionalEffect.condition.accept(this, data)
-        return Implies(effect, cond, data.effectSource.asSilverPosition)
+        return Implies(effect, cond, data.effectSource.asPosition)
     }
 
     override fun visitCallsEffectDeclaration(
@@ -139,36 +139,36 @@ class ContractDescriptionConversionVisitor(
         data: ContractDescriptionVisitorContext,
     ): Exp {
         val param = callsEffect.valueParameterReference.accept(this, data)
-        val callsFieldAccess = FieldAccess(param, SpecialFields.FunctionObjectCallCounterField, data.effectSource.asSilverPosition)
+        val callsFieldAccess = FieldAccess(param, SpecialFields.FunctionObjectCallCounterField, data.effectSource.asPosition)
         return when (callsEffect.kind) {
             // NOTE: case not supported for contracts
             EventOccurrencesRange.ZERO -> EqCmp(
                 callsFieldAccess,
                 Old(callsFieldAccess),
-                data.effectSource.asSilverPosition
+                data.effectSource.asPosition
             )
             EventOccurrencesRange.AT_MOST_ONCE -> LeCmp(
                 callsFieldAccess,
                 Add(Old(callsFieldAccess), IntLit(1)),
-                data.effectSource.asSilverPosition
+                data.effectSource.asPosition
             )
             EventOccurrencesRange.EXACTLY_ONCE -> EqCmp(
                 callsFieldAccess,
                 Add(Old(callsFieldAccess), IntLit(1)),
-                data.effectSource.asSilverPosition
+                data.effectSource.asPosition
             )
             EventOccurrencesRange.AT_LEAST_ONCE -> GtCmp(
                 callsFieldAccess,
                 Old(callsFieldAccess),
-                data.effectSource.asSilverPosition
+                data.effectSource.asPosition
             )
             // NOTE: case not supported for contracts
             EventOccurrencesRange.MORE_THAN_ONCE -> GtCmp(
                 callsFieldAccess,
                 Add(Old(callsFieldAccess), IntLit(1)),
-                data.effectSource.asSilverPosition
+                data.effectSource.asPosition
             )
-            EventOccurrencesRange.UNKNOWN -> BoolLit(true, data.effectSource.asSilverPosition)
+            EventOccurrencesRange.UNKNOWN -> BoolLit(true, data.effectSource.asPosition)
         }
     }
 
@@ -194,7 +194,7 @@ class ContractDescriptionConversionVisitor(
                 EqCmp(toViper(), type.nullVal(source).toViper())
             }
         } else {
-            BoolLit(isNegated, source.asSilverPosition)
+            BoolLit(isNegated, source.asPosition)
         }
 }
 
