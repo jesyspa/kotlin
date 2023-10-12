@@ -5,11 +5,13 @@
 
 package org.jetbrains.kotlin.formver.conversion
 
+import org.jetbrains.kotlin.KtSourceElement
 import org.jetbrains.kotlin.contracts.description.*
 import org.jetbrains.kotlin.fir.contracts.description.ConeContractConstantValues
 import org.jetbrains.kotlin.fir.diagnostics.ConeDiagnostic
 import org.jetbrains.kotlin.fir.symbols.impl.FirFunctionSymbol
 import org.jetbrains.kotlin.fir.types.ConeKotlinType
+import org.jetbrains.kotlin.formver.asSilverPosition
 import org.jetbrains.kotlin.formver.domains.TypeDomain
 import org.jetbrains.kotlin.formver.domains.TypeOfDomain
 import org.jetbrains.kotlin.formver.effects
@@ -20,12 +22,15 @@ import org.jetbrains.kotlin.formver.embeddings.callables.DuplicableFunction
 import org.jetbrains.kotlin.formver.embeddings.callables.NamedFunctionSignature
 import org.jetbrains.kotlin.formver.viper.ast.Exp
 import org.jetbrains.kotlin.formver.viper.ast.Exp.*
-import org.jetbrains.kotlin.formver.viper.ast.Position
+
+interface ContractDescriptionVisitorContext {
+    val effectSource: KtSourceElement?
+}
 
 class ContractDescriptionConversionVisitor(
     private val ctx: ProgramConversionContext,
     private val signature: NamedFunctionSignature,
-) : KtContractDescriptionVisitor<Exp, Unit, ConeKotlinType, ConeDiagnostic>() {
+) : KtContractDescriptionVisitor<Exp, ContractDescriptionVisitorContext, ConeKotlinType, ConeDiagnostic>() {
     private val parameterIndices = signature.params.indices.toSet() + setOfNotNull(signature.receiver?.let { -1 })
 
     fun getPreconditions(symbol: FirFunctionSymbol<*>): List<Exp> {
@@ -37,121 +42,139 @@ class ContractDescriptionConversionVisitor(
         return (parameterIndices - callsInPlaceIndices)
             .map { embeddedVarByIndex(it) }
             .filter { it.type is FunctionTypeEmbedding }
-            .map { DuplicableFunction.toFuncApp(listOf(it.toViper()), Position.KtSourcePosition(it.pos)) }
+            .map { DuplicableFunction.toFuncApp(listOf(it.toViper()), it.source.asSilverPosition) }
     }
 
-    fun getPostconditions(symbol: FirFunctionSymbol<*>): List<Exp> =
-        symbol.effects.map { it.effect.accept(this, Unit) }
+    fun getPostconditions(symbol: FirFunctionSymbol<*>): List<Exp> {
+        return symbol.effects.map {
+            it.effect.accept(this, object : ContractDescriptionVisitorContext {
+                override val effectSource: KtSourceElement? = it.source
+            })
+        }
+    }
 
 
     override fun visitBooleanConstantDescriptor(
         booleanConstantDescriptor: KtBooleanConstantReference<ConeKotlinType, ConeDiagnostic>,
-        data: Unit,
+        data: ContractDescriptionVisitorContext,
     ): Exp = when (booleanConstantDescriptor) {
-        ConeContractConstantValues.TRUE -> BoolLit(true)
-        ConeContractConstantValues.FALSE -> BoolLit(false)
+        ConeContractConstantValues.TRUE -> BoolLit(true, data.effectSource.asSilverPosition)
+        ConeContractConstantValues.FALSE -> BoolLit(false, data.effectSource.asSilverPosition)
         else -> throw IllegalArgumentException("Unexpected boolean constant: $booleanConstantDescriptor")
     }
 
     override fun visitReturnsEffectDeclaration(
         returnsEffect: KtReturnsEffectDeclaration<ConeKotlinType, ConeDiagnostic>,
-        data: Unit,
+        data: ContractDescriptionVisitorContext,
     ): Exp {
         val retVar = signature.returnVar.toViper()
         return when (returnsEffect.value) {
-            ConeContractConstantValues.WILDCARD -> BoolLit(true)
+            ConeContractConstantValues.WILDCARD -> BoolLit(true, data.effectSource.asSilverPosition)
             /* NOTE: in a function that has a non-nullable return type, the compiler will not complain if there is an effect like
              * returnsNotNull(). So it is necessary to take care of these cases in order to avoid comparison between non-nullable
              * values and null. In a function that has a non-nullable return type, returnsNotNull() is mapped to true and returns(null)
              * is mapped to false
              */
-            ConeContractConstantValues.NULL -> signature.returnVar.nullCmp(false)
-            ConeContractConstantValues.NOT_NULL -> signature.returnVar.nullCmp(true)
-            ConeContractConstantValues.TRUE -> EqCmp(retVar, BoolLit(true))
-            ConeContractConstantValues.FALSE -> EqCmp(retVar, BoolLit(false))
+            ConeContractConstantValues.NULL -> signature.returnVar.nullCmp(false, data.effectSource)
+            ConeContractConstantValues.NOT_NULL -> signature.returnVar.nullCmp(true, data.effectSource)
+            ConeContractConstantValues.TRUE -> EqCmp(
+                retVar,
+                BoolLit(true, data.effectSource.asSilverPosition),
+                data.effectSource.asSilverPosition
+            )
+            ConeContractConstantValues.FALSE -> EqCmp(
+                retVar,
+                BoolLit(false, data.effectSource.asSilverPosition),
+                data.effectSource.asSilverPosition
+            )
             else -> throw IllegalArgumentException("Unexpected constant: ${returnsEffect.value}")
         }
     }
 
     override fun visitValueParameterReference(
         valueParameterReference: KtValueParameterReference<ConeKotlinType, ConeDiagnostic>,
-        data: Unit,
+        data: ContractDescriptionVisitorContext,
     ): Exp = valueParameterReference.embeddedVar().toViper()
 
     override fun visitIsNullPredicate(
         isNullPredicate: KtIsNullPredicate<ConeKotlinType, ConeDiagnostic>,
-        data: Unit,
+        data: ContractDescriptionVisitorContext,
     ): Exp {
         /* NOTE: useless comparisons like x != null with x non-nullable will compile with just a warning.
          * So it is necessary to take care of these cases in order to avoid comparison between non-nullable
          * values and null. Let x be a non-nullable variable, then x == null is mapped to false and x != null is mapped to true
          */
         val param = isNullPredicate.arg.embeddedVar()
-        return param.nullCmp(isNullPredicate.isNegated)
+        return param.nullCmp(isNullPredicate.isNegated, data.effectSource)
     }
 
     override fun visitLogicalBinaryOperationContractExpression(
         binaryLogicExpression: KtBinaryLogicExpression<ConeKotlinType, ConeDiagnostic>,
-        data: Unit,
+        data: ContractDescriptionVisitorContext,
     ): Exp {
         val left = binaryLogicExpression.left.accept(this, data)
         val right = binaryLogicExpression.right.accept(this, data)
         return when (binaryLogicExpression.kind) {
-            LogicOperationKind.AND -> And(left, right)
-            LogicOperationKind.OR -> Or(left, right)
+            LogicOperationKind.AND -> And(left, right, data.effectSource.asSilverPosition)
+            LogicOperationKind.OR -> Or(left, right, data.effectSource.asSilverPosition)
         }
     }
 
-    override fun visitLogicalNot(logicalNot: KtLogicalNot<ConeKotlinType, ConeDiagnostic>, data: Unit): Exp {
+    override fun visitLogicalNot(logicalNot: KtLogicalNot<ConeKotlinType, ConeDiagnostic>, data: ContractDescriptionVisitorContext): Exp {
         val arg = logicalNot.arg.accept(this, data)
-        return Not(arg)
+        return Not(arg, data.effectSource.asSilverPosition)
     }
 
     override fun visitConditionalEffectDeclaration(
         conditionalEffect: KtConditionalEffectDeclaration<ConeKotlinType, ConeDiagnostic>,
-        data: Unit,
+        data: ContractDescriptionVisitorContext,
     ): Exp {
         val effect = conditionalEffect.effect.accept(this, data)
         val cond = conditionalEffect.condition.accept(this, data)
-        return Implies(effect, cond)
+        return Implies(effect, cond, data.effectSource.asSilverPosition)
     }
 
     override fun visitCallsEffectDeclaration(
         callsEffect: KtCallsEffectDeclaration<ConeKotlinType, ConeDiagnostic>,
-        data: Unit,
+        data: ContractDescriptionVisitorContext,
     ): Exp {
         val param = callsEffect.valueParameterReference.accept(this, data)
-        val callsFieldAccess = FieldAccess(param, SpecialFields.FunctionObjectCallCounterField)
+        val callsFieldAccess = FieldAccess(param, SpecialFields.FunctionObjectCallCounterField, data.effectSource.asSilverPosition)
         return when (callsEffect.kind) {
             // NOTE: case not supported for contracts
             EventOccurrencesRange.ZERO -> EqCmp(
                 callsFieldAccess,
-                Old(callsFieldAccess)
+                Old(callsFieldAccess),
+                data.effectSource.asSilverPosition
             )
             EventOccurrencesRange.AT_MOST_ONCE -> LeCmp(
                 callsFieldAccess,
-                Add(Old(callsFieldAccess), IntLit(1))
+                Add(Old(callsFieldAccess), IntLit(1)),
+                data.effectSource.asSilverPosition
             )
             EventOccurrencesRange.EXACTLY_ONCE -> EqCmp(
                 callsFieldAccess,
-                Add(Old(callsFieldAccess), IntLit(1))
+                Add(Old(callsFieldAccess), IntLit(1)),
+                data.effectSource.asSilverPosition
             )
             EventOccurrencesRange.AT_LEAST_ONCE -> GtCmp(
                 callsFieldAccess,
-                Old(callsFieldAccess)
+                Old(callsFieldAccess),
+                data.effectSource.asSilverPosition
             )
             // NOTE: case not supported for contracts
             EventOccurrencesRange.MORE_THAN_ONCE -> GtCmp(
                 callsFieldAccess,
-                Add(Old(callsFieldAccess), IntLit(1))
+                Add(Old(callsFieldAccess), IntLit(1)),
+                data.effectSource.asSilverPosition
             )
-            EventOccurrencesRange.UNKNOWN -> BoolLit(true)
+            EventOccurrencesRange.UNKNOWN -> BoolLit(true, data.effectSource.asSilverPosition)
         }
     }
 
     override fun visitIsInstancePredicate(
         isInstancePredicate: KtIsInstancePredicate<ConeKotlinType, ConeDiagnostic>,
-        data: Unit,
+        data: ContractDescriptionVisitorContext,
     ): Exp {
         val argVar = isInstancePredicate.arg.embeddedVar()
         return TypeDomain.isSubtype(TypeOfDomain.typeOf(argVar.toViper()), ctx.embedType(isInstancePredicate.type).runtimeType)
@@ -163,15 +186,15 @@ class ContractDescriptionConversionVisitor(
     private fun embeddedVarByIndex(ix: Int): VariableEmbedding =
         if (ix == -1) signature.receiver!! else signature.params[ix]
 
-    private fun VariableEmbedding.nullCmp(isNegated: Boolean): Exp =
+    private fun VariableEmbedding.nullCmp(isNegated: Boolean, source: KtSourceElement?): Exp =
         if (type is NullableTypeEmbedding) {
             if (isNegated) {
-                NeCmp(toViper(), type.nullVal(pos).toViper())
+                NeCmp(toViper(), type.nullVal(source).toViper())
             } else {
-                EqCmp(toViper(), type.nullVal(pos).toViper())
+                EqCmp(toViper(), type.nullVal(source).toViper())
             }
         } else {
-            BoolLit(isNegated)
+            BoolLit(isNegated, source.asSilverPosition)
         }
 }
 
