@@ -8,16 +8,17 @@ package org.jetbrains.kotlin.formver.viper.ast
 import org.jetbrains.kotlin.formver.viper.IntoSilver
 import viper.silver.ast.`NoPosition$`
 
-data class PositionWrapper<P>(val ktPosition: P) : viper.silver.ast.Position
-
 sealed class Position : IntoSilver<viper.silver.ast.Position> {
 
+    internal class Wrapper<P>(val wrappedValue: P) : viper.silver.ast.Position {
+        override fun toString(): String = "<wrapped value>"
+    }
+
     companion object {
-        fun fromSilver(pos: viper.silver.ast.Position): Position = when {
-            pos == `NoPosition$`.`MODULE$` -> NoPosition
-            else -> {
-                KtSourcePosition((pos as PositionWrapper<*>).ktPosition)
-            }
+        fun fromSilver(pos: viper.silver.ast.Position): Position = when (pos) {
+            `NoPosition$`.`MODULE$` -> NoPosition
+            is Wrapper<*> -> Wrapped(pos.wrappedValue)
+            else -> TODO("Unreachable")
         }
     }
 
@@ -25,14 +26,14 @@ sealed class Position : IntoSilver<viper.silver.ast.Position> {
         override fun toSilver(): viper.silver.ast.Position = `NoPosition$`.`MODULE$`
     }
 
-    data class KtSourcePosition<P>(val wrappedPosition: P) : Position() {
-        override fun toSilver(): viper.silver.ast.Position = PositionWrapper(wrappedPosition)
+    class Wrapped<P>(val source: P) : Position() {
+        override fun toSilver(): viper.silver.ast.Position = Wrapper(source)
     }
 }
 
 //region Define Extension Function Utilities
 inline fun <reified P> Position.unwrap(): P? = when (this) {
-    is Position.KtSourcePosition<*> -> wrappedPosition as? P
+    is Position.Wrapped<*> -> source as? P
     else -> null
 }
 
