@@ -5,7 +5,6 @@
 
 package org.jetbrains.kotlin.formver.conversion
 
-import org.jetbrains.kotlin.fir.symbols.impl.FirFunctionSymbol
 import org.jetbrains.kotlin.formver.embeddings.callables.NamedFunctionSignature
 import org.jetbrains.kotlin.formver.viper.ast.Exp
 import org.jetbrains.kotlin.formver.viper.ast.Exp.*
@@ -14,13 +13,13 @@ fun LocalVar.sameSize(): Exp = EqCmp(fieldAccess(SpecialFields.ListSizeField), O
 fun LocalVar.increasedSize(amount: Int): Exp =
     EqCmp(fieldAccess(SpecialFields.ListSizeField), Add(Old(fieldAccess(SpecialFields.ListSizeField)), IntLit(amount)))
 
-fun FirFunctionSymbol<*>.stdLibPreConditions(signature: NamedFunctionSignature): List<Exp> =
-    if (signature.name.isCollection) {
-        when (callableId.callableName.asString()) {
+fun NamedFunctionSignature.stdLibPreConditions(): List<Exp> =
+    if (isCollection) {
+        when (sourceName) {
             "emptyList" -> listOf()
             "get" -> {
-                val receiver = signature.receiver!!.toViper()
-                val indexArg = signature.formalArgs[1].toViper()
+                val receiver = receiver!!.toViper()
+                val indexArg = formalArgs[1].toViper()
                 listOf(
                     GeCmp(indexArg, IntLit(0)),
                     GtCmp(receiver.fieldAccess(SpecialFields.ListSizeField), indexArg),
@@ -33,32 +32,30 @@ fun FirFunctionSymbol<*>.stdLibPreConditions(signature: NamedFunctionSignature):
     }
 
 
-fun FirFunctionSymbol<*>.stdLibPostConditions(signature: NamedFunctionSignature): List<Exp> {
-    val retVar = LocalVar(ReturnVariableName, signature.returnType.viperType)
-    val receiver = signature.receiver?.toViper()
-    val customInvariants =
-        if (signature.name.isCollection) {
-            when (callableId.callableName.asString()) {
-                "emptyList" -> listOf(
-                    EqCmp(retVar.fieldAccess(SpecialFields.ListSizeField), IntLit(0))
-                )
-                "get" -> {
-                    listOf(receiver!!.sameSize())
-                }
-                "add" -> {
-                    listOf(receiver!!.increasedSize(1))
-                }
-                "isEmpty" -> {
-                    listOf(
-                        receiver!!.sameSize(),
-                        Implies(retVar, EqCmp(receiver.fieldAccess(SpecialFields.ListSizeField), IntLit(0))),
-                        Implies(Not(retVar), GtCmp(receiver.fieldAccess(SpecialFields.ListSizeField), IntLit(0)))
-                    )
-                }
-                else -> listOf()
+fun NamedFunctionSignature.stdLibPostConditions(): List<Exp> {
+    val retVar = LocalVar(ReturnVariableName, returnType.viperType)
+    val receiver = receiver?.toViper()
+    return if (isCollection) {
+        when (sourceName) {
+            "emptyList" -> listOf(
+                EqCmp(retVar.fieldAccess(SpecialFields.ListSizeField), IntLit(0))
+            )
+            "get" -> {
+                listOf(receiver!!.sameSize())
             }
-        } else {
-            listOf()
+            "add" -> {
+                listOf(receiver!!.increasedSize(1))
+            }
+            "isEmpty" -> {
+                listOf(
+                    receiver!!.sameSize(),
+                    Implies(retVar, EqCmp(receiver.fieldAccess(SpecialFields.ListSizeField), IntLit(0))),
+                    Implies(Not(retVar), GtCmp(receiver.fieldAccess(SpecialFields.ListSizeField), IntLit(0)))
+                )
+            }
+            else -> listOf()
         }
-    return customInvariants
+    } else {
+        listOf()
+    }
 }

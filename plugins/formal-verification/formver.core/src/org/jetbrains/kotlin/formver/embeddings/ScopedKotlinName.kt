@@ -15,8 +15,12 @@ data class ScopedKotlinName(val scope: NameScope, val name: KotlinName, val type
     override val mangled: String
         get() = listOfNotNull(scope.mangled, name.mangled, type?.name?.mangled).joinToString("$")
 
-    override val isCollection: Boolean
-        get() = scope.isCollection
+    val isCollection: Boolean
+        get() = if (scope is PackagePrefixScope) {
+            scope.packageName.asString() == "kotlin.collections"
+        } else {
+            false
+        }
 }
 
 fun FqName.asViperString() = asString().replace('.', '$')
