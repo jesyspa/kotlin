@@ -185,9 +185,10 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
 
     private fun processProperty(symbol: FirPropertySymbol) {
         val name = symbol.callableId.embedMemberPropertyName()
-        val backingField = symbol.specialEmbedding() ?: symbol.hasBackingField
-            .ifTrue { FieldEmbedding(symbol.callableId.embedMemberPropertyName(), embedType(symbol.resolvedReturnType)) }
-            .also { it?.let { fields.add(it) } }
+        val backingField = name.specialEmbedding()
+            ?: symbol.hasBackingField
+                .ifTrue { FieldEmbedding(symbol.callableId.embedMemberPropertyName(), embedType(symbol.resolvedReturnType)) }
+                ?.also { fields.add(it) }
         val getter: GetterEmbedding? = symbol.getterSymbol?.let { embedGetter(it, backingField) }
         val setter: SetterEmbedding? = symbol.setterSymbol?.let { embedSetter(it, backingField) }
         properties[name] = PropertyEmbedding(getter, setter)

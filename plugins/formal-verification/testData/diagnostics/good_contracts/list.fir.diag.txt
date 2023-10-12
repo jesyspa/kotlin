@@ -170,11 +170,15 @@ method pkg$kotlin$collections$class_scope_pkg$kotlin$collections$global$class_Li
 /list.kt:(670,683): info: Generated Viper text for nullable_list:
 method global$fun_nullable_list$fun_take$NT_class_pkg$kotlin$collections$global$class_List$return$T_Unit(local$l: dom$Nullable[Ref])
   returns (ret: dom$Unit)
-  requires acc((dom$Casting$cast(local$l, dom$Type$pkg$kotlin$collections$global$class_List()): Ref).special$size, write)
-  requires (dom$Casting$cast(local$l, dom$Type$pkg$kotlin$collections$global$class_List()): Ref).special$size >=
+  requires local$l != (dom$Nullable$null(): dom$Nullable[Ref]) ==>
+    acc((dom$Casting$cast(local$l, dom$Type$pkg$kotlin$collections$global$class_List()): Ref).special$size, write)
+  requires local$l != (dom$Nullable$null(): dom$Nullable[Ref]) ==>
+    (dom$Casting$cast(local$l, dom$Type$pkg$kotlin$collections$global$class_List()): Ref).special$size >=
     0
-  ensures acc((dom$Casting$cast(local$l, dom$Type$pkg$kotlin$collections$global$class_List()): Ref).special$size, write)
-  ensures (dom$Casting$cast(local$l, dom$Type$pkg$kotlin$collections$global$class_List()): Ref).special$size >=
+  ensures local$l != (dom$Nullable$null(): dom$Nullable[Ref]) ==>
+    acc((dom$Casting$cast(local$l, dom$Type$pkg$kotlin$collections$global$class_List()): Ref).special$size, write)
+  ensures local$l != (dom$Nullable$null(): dom$Nullable[Ref]) ==>
+    (dom$Casting$cast(local$l, dom$Type$pkg$kotlin$collections$global$class_List()): Ref).special$size >=
     0
 {
   inhale dom$Type$isSubtype((dom$TypeOf$typeOf(local$l): dom$Type), dom$Type$special$Nullable(dom$Type$pkg$kotlin$collections$global$class_List()))

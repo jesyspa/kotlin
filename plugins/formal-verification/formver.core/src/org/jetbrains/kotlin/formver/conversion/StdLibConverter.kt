@@ -6,8 +6,7 @@
 package org.jetbrains.kotlin.formver.conversion
 
 import org.jetbrains.kotlin.fir.symbols.impl.FirFunctionSymbol
-import org.jetbrains.kotlin.formver.embeddings.callables.FunctionSignature
-import org.jetbrains.kotlin.formver.isCollection
+import org.jetbrains.kotlin.formver.embeddings.callables.NamedFunctionSignature
 import org.jetbrains.kotlin.formver.viper.ast.Exp
 import org.jetbrains.kotlin.formver.viper.ast.Exp.*
 
@@ -15,8 +14,8 @@ fun LocalVar.sameSize(): Exp = EqCmp(fieldAccess(SpecialFields.ListSizeField), O
 fun LocalVar.increasedSize(amount: Int): Exp =
     EqCmp(fieldAccess(SpecialFields.ListSizeField), Add(Old(fieldAccess(SpecialFields.ListSizeField)), IntLit(amount)))
 
-fun FirFunctionSymbol<*>.stdLibPreConditions(signature: FunctionSignature): List<Exp> =
-    if (callableId.packageName.asString() == "kotlin.collections") {
+fun FirFunctionSymbol<*>.stdLibPreConditions(signature: NamedFunctionSignature): List<Exp> =
+    if (signature.name.isCollection) {
         when (callableId.callableName.asString()) {
             "emptyList" -> listOf()
             "get" -> {
@@ -34,11 +33,11 @@ fun FirFunctionSymbol<*>.stdLibPreConditions(signature: FunctionSignature): List
     }
 
 
-fun FirFunctionSymbol<*>.stdLibPostConditions(signature: FunctionSignature): List<Exp> {
+fun FirFunctionSymbol<*>.stdLibPostConditions(signature: NamedFunctionSignature): List<Exp> {
     val retVar = LocalVar(ReturnVariableName, signature.returnType.viperType)
     val receiver = signature.receiver?.toViper()
     val customInvariants =
-        if (callableId.isCollection) {
+        if (signature.name.isCollection) {
             when (callableId.callableName.asString()) {
                 "emptyList" -> listOf(
                     EqCmp(retVar.fieldAccess(SpecialFields.ListSizeField), IntLit(0))

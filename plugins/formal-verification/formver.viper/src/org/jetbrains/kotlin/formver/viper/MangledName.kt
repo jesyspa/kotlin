@@ -13,4 +13,6 @@ package org.jetbrains.kotlin.formver.viper
  */
 interface MangledName {
     val mangled: String
+    val isCollection: Boolean
+        get() = false
 }

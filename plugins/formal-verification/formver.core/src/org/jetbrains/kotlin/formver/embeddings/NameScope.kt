@@ -19,6 +19,8 @@ interface PackagePrefixScope : NameScope {
         } else {
             "pkg\$${packageName.asViperString()}\$$suffix"
         }
+    override val isCollection: Boolean
+        get() = packageName.asString() == "kotlin.collections"
 }
 
 data class GlobalScope(override val packageName: FqName) : PackagePrefixScope {

@@ -129,6 +129,7 @@ data class NullableTypeEmbedding(val elementType: TypeEmbedding) : TypeEmbedding
 
     override fun accessInvariants(v: Exp): List<Exp> {
         return elementType.accessInvariants(CastingDomain.cast(v, elementType))
+            .map { Exp.Implies(Exp.NeCmp(v, nullVal.toViper()), it) }
     }
 }
 
@@ -177,7 +178,7 @@ data class ClassTypeEmbedding(val className: ScopedKotlinName, val superTypes: L
     override fun provenInvariants(v: Exp) = listOf(subtypeInvariant(v))
 
     override fun accessInvariants(v: Exp): List<Exp> {
-        return if (isCollection) {
+        return if (className.isCollection) {
             listOf(
                 v.fieldAccessPredicate(SpecialFields.ListSizeField, PermExp.FullPerm()),
                 Exp.GeCmp(v.fieldAccess(SpecialFields.ListSizeField), Exp.IntLit(0))
@@ -186,7 +187,4 @@ data class ClassTypeEmbedding(val className: ScopedKotlinName, val superTypes: L
             emptyList()
         }
     }
-
-    private val isCollection
-        get() = (className.scope as? GlobalScope)?.packageName?.asString() == "kotlin.collections"
 }

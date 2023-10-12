@@ -79,11 +79,15 @@ method global$fun_call_fun_with_contracts$fun_take$T_Boolean$return$T_Boolean(lo
 /returns_booleans.kt:(1268,1281): info: Generated Viper text for isNullOrEmpty:
 method global$fun_isNullOrEmpty$fun_take$NT_class_pkg$kotlin$collections$global$class_Collection$return$T_Boolean(this: dom$Nullable[Ref])
   returns (ret: Bool)
-  requires acc((dom$Casting$cast(this, dom$Type$pkg$kotlin$collections$global$class_Collection()): Ref).special$size, write)
-  requires (dom$Casting$cast(this, dom$Type$pkg$kotlin$collections$global$class_Collection()): Ref).special$size >=
+  requires this != (dom$Nullable$null(): dom$Nullable[Ref]) ==>
+    acc((dom$Casting$cast(this, dom$Type$pkg$kotlin$collections$global$class_Collection()): Ref).special$size, write)
+  requires this != (dom$Nullable$null(): dom$Nullable[Ref]) ==>
+    (dom$Casting$cast(this, dom$Type$pkg$kotlin$collections$global$class_Collection()): Ref).special$size >=
     0
-  ensures acc((dom$Casting$cast(this, dom$Type$pkg$kotlin$collections$global$class_Collection()): Ref).special$size, write)
-  ensures (dom$Casting$cast(this, dom$Type$pkg$kotlin$collections$global$class_Collection()): Ref).special$size >=
+  ensures this != (dom$Nullable$null(): dom$Nullable[Ref]) ==>
+    acc((dom$Casting$cast(this, dom$Type$pkg$kotlin$collections$global$class_Collection()): Ref).special$size, write)
+  ensures this != (dom$Nullable$null(): dom$Nullable[Ref]) ==>
+    (dom$Casting$cast(this, dom$Type$pkg$kotlin$collections$global$class_Collection()): Ref).special$size >=
     0
   ensures ret == false ==> this != (dom$Nullable$null(): dom$Nullable[Ref])
 {

@@ -14,6 +14,9 @@ import org.jetbrains.kotlin.name.FqName
 data class ScopedKotlinName(val scope: NameScope, val name: KotlinName, val type: TypeEmbedding? = null) : MangledName {
     override val mangled: String
         get() = listOfNotNull(scope.mangled, name.mangled, type?.name?.mangled).joinToString("$")
+
+    override val isCollection: Boolean
+        get() = scope.isCollection
 }
 
 fun FqName.asViperString() = asString().replace('.', '$')
