@@ -13,7 +13,7 @@ class Bar {
     fun Foo.<!VIPER_TEXT!>inside<!>(): Unit {
         val refFoo = this@Foo
         val refBar = this@Bar
-        val implicitRef = this // The extension receiver takes precedences
+        val implicitRef = this // The extension receiver (Foo) takes precedences
         refBar.inside()
     }
 

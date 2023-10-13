@@ -352,9 +352,10 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext<Re
     override fun visitThisReceiverExpression(
         thisReceiverExpression: FirThisReceiverExpression,
         data: StmtConversionContext<ResultTrackingContext>,
-    ): ExpEmbedding =
-        data.signature.extensionReceiver ?: data.signature.receiver
-        ?: throw IllegalArgumentException("Can't resolve the 'this' receiver since the function does not have one.")
+    ): ExpEmbedding = when (data.embedType(thisReceiverExpression.resolvedType)) {
+        data.signature.extensionReceiverType -> data.signature.extensionReceiver
+        else -> data.signature.receiver
+    } ?: throw IllegalArgumentException("Can't resolve the 'this' receiver since the function does not have one.")
 
     override fun visitTypeOperatorCall(
         typeOperatorCall: FirTypeOperatorCall,

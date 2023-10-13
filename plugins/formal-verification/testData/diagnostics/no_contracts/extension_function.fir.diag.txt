@@ -47,7 +47,7 @@ method global$ext_fun_inside$fun_take$T_class_global$class_Foo$return$T_Unit(thi
 
 /extension_function.kt:(207,213): info: Generated Viper text for inside:
 method class_scope_global$class_Bar$ext_fun_inside$fun_take$T_class_global$class_Bar$T_class_global$class_Foo$return$T_Unit(this: Ref,
-  this$global$class_Foo: Ref)
+  this$ext: Ref)
   returns (ret: dom$Unit)
 {
   var local0$refFoo: Ref
@@ -55,11 +55,10 @@ method class_scope_global$class_Bar$ext_fun_inside$fun_take$T_class_global$class
   var local0$implicitRef: Ref
   var anonymous$0: dom$Unit
   inhale dom$Type$isSubtype((dom$TypeOf$typeOf(this): dom$Type), dom$Type$global$class_Bar())
-  inhale dom$Type$isSubtype((dom$TypeOf$typeOf(this$global$class_Foo): dom$Type),
-    dom$Type$global$class_Foo())
-  local0$refFoo := this_global$class_Foo
-  local0$refBar := (dom$Casting$cast(this_global$class_Foo, dom$Type$global$class_Bar()): Ref)
-  local0$implicitRef := this_global$class_Foo
+  inhale dom$Type$isSubtype((dom$TypeOf$typeOf(this$ext): dom$Type), dom$Type$global$class_Foo())
+  local0$refFoo := this$ext
+  local0$refBar := this
+  local0$implicitRef := this$ext
   anonymous$0 := class_scope_global$class_Bar$fun_inside$fun_take$T_class_global$class_Bar$return$T_Unit(local0$refBar)
   label label$ret$0
 }
@@ -68,7 +67,7 @@ method class_scope_global$class_Bar$fun_inside$fun_take$T_class_global$class_Bar
   returns (ret: dom$Unit)
 
 
-/extension_function.kt:(398,404): info: Generated Viper text for inside:
+/extension_function.kt:(404,410): info: Generated Viper text for inside:
 method class_scope_global$class_Bar$fun_inside$fun_take$T_class_global$class_Bar$return$T_Unit(this: Ref)
   returns (ret: dom$Unit)
 {
@@ -76,7 +75,7 @@ method class_scope_global$class_Bar$fun_inside$fun_take$T_class_global$class_Bar
   label label$ret$0
 }
 
-/extension_function.kt:(463,469): info: Generated Viper text for driver:
+/extension_function.kt:(469,475): info: Generated Viper text for driver:
 method class_scope_global$class_Bar$fun_driver$fun_take$T_class_global$class_Bar$return$T_Unit(this: Ref)
   returns (ret: dom$Unit)
 {
@@ -97,11 +96,11 @@ method class_scope_global$class_Foo$constructor$fun_take$$return$T_class_global$
 
 
 method class_scope_global$class_Bar$ext_fun_inside$fun_take$T_class_global$class_Bar$T_class_global$class_Foo$return$T_Unit(this: Ref,
-  this$global$class_Foo: Ref)
+  this$ext: Ref)
   returns (ret: dom$Unit)
 
 
-/extension_function.kt:(529,556): info: Generated Viper text for extension_foo_function_call:
+/extension_function.kt:(535,562): info: Generated Viper text for extension_foo_function_call:
 method global$fun_extension_foo_function_call$fun_take$$return$T_Unit()
   returns (ret: dom$Unit)
 {
@@ -137,7 +136,7 @@ method global$ext_fun_inside$fun_take$T_class_global$class_Foo$return$T_Unit(thi
   returns (ret: dom$Unit)
 
 
-/extension_function.kt:(643,681): info: Generated Viper text for extension_foo_within_bar_function_call:
+/extension_function.kt:(649,687): info: Generated Viper text for extension_foo_within_bar_function_call:
 method global$fun_extension_foo_within_bar_function_call$fun_take$$return$T_Unit()
   returns (ret: dom$Unit)
 {

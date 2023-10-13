@@ -160,15 +160,12 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
     override fun embedFunctionSignature(symbol: FirFunctionSymbol<*>): FunctionSignature {
         val retType = symbol.resolvedReturnTypeRef.type
         val receiverType = symbol.receiverType
-        val extensionReceiver = when (symbol.isExtension && symbol.dispatchReceiverType != null) {
-            true -> symbol.resolvedReceiverTypeRef?.type
-            else -> null
-        }
+        val extensionReceiverType = symbol.extensionReceiverType
         return object : FunctionSignature {
             override val receiver =
                 receiverType?.let { VariableEmbedding(ThisReceiverName, embedType(it), symbol.receiverParameter?.source) }
             override val extensionReceiver =
-                extensionReceiver?.let { VariableEmbedding(QualifiedThisName(it.type.classId!!.embedName().mangled), embedType(it)) }
+                extensionReceiverType?.let { VariableEmbedding(QualifiedThisName("ext"), embedType(it)) }
             override val params = symbol.valueParameterSymbols.map {
                 VariableEmbedding(it.embedName(), embedType(it.resolvedReturnType), it.source)
             }
@@ -207,6 +204,17 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
                 else -> this
             }
             return symbol.dispatchReceiverType ?: symbol.resolvedReceiverTypeRef?.type
+        }
+
+    private val FirFunctionSymbol<*>.extensionReceiverType: ConeKotlinType?
+        get() {
+            // An extension function can be defined within a class's scope (extensions as members). Therefore, the function has
+            // two receivers: the `extensionReceiver` (*an instance of the receiver type of the extension method*), and
+            // a `dispatchReceiver` (*an instance of a class in which the extension is declared*).
+            return when (isExtension && dispatchReceiverType != null) {
+                true -> resolvedReceiverTypeRef?.type
+                false -> null
+            }
         }
 
     /**
