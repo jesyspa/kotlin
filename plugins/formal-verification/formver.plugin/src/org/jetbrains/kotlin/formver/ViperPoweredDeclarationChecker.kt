@@ -18,8 +18,7 @@ import org.jetbrains.kotlin.fir.declarations.hasAnnotation
 import org.jetbrains.kotlin.formver.conversion.ProgramConverter
 import org.jetbrains.kotlin.formver.viper.Verifier
 import org.jetbrains.kotlin.formver.viper.ast.Program
-import org.jetbrains.kotlin.formver.viper.ast.isEmpty
-import org.jetbrains.kotlin.formver.viper.ast.unwrap
+import org.jetbrains.kotlin.formver.viper.ast.unwrapOr
 import org.jetbrains.kotlin.formver.viper.errors.ConsistencyError
 import org.jetbrains.kotlin.formver.viper.errors.VerificationError
 import org.jetbrains.kotlin.formver.viper.errors.VerifierError
@@ -27,7 +26,7 @@ import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 
-private val VerifierError.toPluginError: KtDiagnosticFactory1<String>
+private val VerifierError.asPluginError: KtDiagnosticFactory1<String>
     get() = when (this) {
         is ConsistencyError -> PluginErrors.VIPER_CONSISTENCY_ERROR
         is VerificationError -> PluginErrors.VIPER_VERIFICATION_ERROR
@@ -64,11 +63,10 @@ class ViperPoweredDeclarationChecker(private val session: FirSession, private va
             val verifier = Verifier()
 
             val onFailure = { err: VerifierError ->
-                val source = when (err.position.isEmpty()) {
-                    true -> declaration.source
-                    false -> err.position.unwrap()
+                val source = err.position.unwrapOr {
+                    declaration.source
                 }
-                reporter.reportOn(source, err.toPluginError, err.msg, context)
+                reporter.reportOn(source, err.asPluginError, err.msg, context)
             }
 
             val consistent = verifier.checkConsistency(program, onFailure)

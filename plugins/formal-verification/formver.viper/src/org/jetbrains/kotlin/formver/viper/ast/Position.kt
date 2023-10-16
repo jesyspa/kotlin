@@ -32,9 +32,9 @@ sealed class Position : IntoSilver<viper.silver.ast.Position> {
 }
 
 //region Define Extension Function Utilities
-inline fun <reified P> Position.unwrap(): P? = when (this) {
+inline fun <reified P> Position.unwrapOr(orBlock: () -> P?): P? = when (this) {
     is Position.Wrapped<*> -> source as? P
-    else -> null
+    else -> orBlock()
 }
 
 fun Position.isEmpty(): Boolean = (this is Position.NoPosition)

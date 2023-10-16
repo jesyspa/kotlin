@@ -16,7 +16,7 @@ sealed interface ExpEmbedding {
     val type: TypeEmbedding
 
     /**
-     * When Viper arises an VerifierError, the result contained within it
+     * When Viper raises an VerifierError, the result contained within it
      * will have the source element. Therefore, it is reasonable to embed
      * source information on the top-level Viper's node.
      *
