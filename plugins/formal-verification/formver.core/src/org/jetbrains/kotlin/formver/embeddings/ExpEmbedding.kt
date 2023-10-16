@@ -212,7 +212,7 @@ data class Is(val exp: ExpEmbedding, val comparisonType: TypeEmbedding, override
     override val type = BooleanTypeEmbedding
 
     override fun toViper() =
-        TypeDomain.isSubtype(TypeOfDomain.typeOf(exp.toViper()), comparisonType.runtimeType)
+        TypeDomain.isSubtype(TypeOfDomain.typeOf(exp.toViper()), comparisonType.runtimeType, pos = source.asPosition)
 }
 
 data class Cast(val exp: ExpEmbedding, override val type: TypeEmbedding, override val source: KtSourceElement? = null) : ExpEmbedding {

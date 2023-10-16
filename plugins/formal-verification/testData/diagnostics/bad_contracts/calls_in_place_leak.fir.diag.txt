@@ -24,7 +24,7 @@ method global$fun_invalid_calls_in_place$fun_take$fun_take$$return$T_Unit$return
 
 /calls_in_place_leak.kt:(364,386): warning: Function invalid_calls_in_place may not satisfy its contract.
 
-/calls_in_place_leak.kt:(454,463): warning: Viper verification error: The precondition of method global$fun_escape$fun_take$fun_take$$return$T_Unit$return$T_Unit might not hold. Assertion special$duplicable(local$f) might not hold. (<wrapped value>)
+/calls_in_place_leak.kt:(454,463): warning: Viper verification error: The precondition of method global$fun_escape$fun_take$fun_take$$return$T_Unit$return$T_Unit might not hold. Assertion special$duplicable(local$f) might not hold.
 
 /calls_in_place_leak.kt:(544,564): info: Generated Viper text for function_object_call:
 method global$fun_function_object_call$fun_take$fun_take$fun_take$$return$T_Unit$return$T_Unit$fun_take$$return$T_Unit$return$T_Unit(local$f: Ref,
@@ -53,4 +53,4 @@ method global$fun_function_object_call$fun_take$fun_take$fun_take$$return$T_Unit
 
 /calls_in_place_leak.kt:(544,564): warning: Function function_object_call may not satisfy its contract.
 
-/calls_in_place_leak.kt:(663,667): warning: Viper verification error: Assert might fail. Assertion special$duplicable(local$g) might not hold. (<wrapped value>)
+/calls_in_place_leak.kt:(663,667): warning: Viper verification error: Assert might fail. Assertion special$duplicable(local$g) might not hold.

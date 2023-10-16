@@ -14,7 +14,7 @@ sealed interface VerificationError : VerifierError {
     override val id: String
         get() = result.id()
     override val msg: String
-        get() = result.readableMessage(false, true)
+        get() = result.readableMessage(false, false)
     override val position: Position
         get() = Position.fromSilver(result.pos())
 }

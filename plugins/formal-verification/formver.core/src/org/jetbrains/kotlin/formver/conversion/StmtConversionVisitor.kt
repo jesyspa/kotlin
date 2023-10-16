@@ -363,8 +363,8 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext<Re
         val argument = data.convert(typeOperatorCall.arguments[0])
         val conversionType = data.embedType(typeOperatorCall.conversionTypeRef.coneType)
         return when (typeOperatorCall.operation) {
-            FirOperation.IS -> Is(argument, conversionType, typeOperatorCall.source)
-            FirOperation.NOT_IS -> Not(Is(argument, conversionType, typeOperatorCall.source), typeOperatorCall.source)
+            FirOperation.IS -> Is(argument, conversionType)
+            FirOperation.NOT_IS -> Not(Is(argument, conversionType))
             else -> handleUnimplementedElement("Can't embed type operator ${typeOperatorCall.operation}.", data)
         }
     }
