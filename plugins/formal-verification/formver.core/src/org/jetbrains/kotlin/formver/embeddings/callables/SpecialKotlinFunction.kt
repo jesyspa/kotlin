@@ -73,7 +73,7 @@ object KotlinIntPlusFunctionImplementation : KotlinIntSpecialFunction() {
         ctx: StmtConversionContext<ResultTrackingContext>,
         source: KtSourceElement?,
     ): ExpEmbedding =
-        Add(args[0], args[1], source)
+        Add(args[0], args[1])
 }
 
 object KotlinIntMinusFunctionImplementation : KotlinIntSpecialFunction() {
@@ -83,7 +83,7 @@ object KotlinIntMinusFunctionImplementation : KotlinIntSpecialFunction() {
         ctx: StmtConversionContext<ResultTrackingContext>,
         source: KtSourceElement?,
     ): ExpEmbedding =
-        Sub(args[0], args[1], source)
+        Sub(args[0], args[1])
 }
 
 object KotlinIntTimesFunctionImplementation : KotlinIntSpecialFunction() {
@@ -93,7 +93,7 @@ object KotlinIntTimesFunctionImplementation : KotlinIntSpecialFunction() {
         ctx: StmtConversionContext<ResultTrackingContext>,
         source: KtSourceElement?,
     ): ExpEmbedding =
-        Mul(args[0], args[1], source)
+        Mul(args[0], args[1])
 }
 
 object KotlinIntDivFunctionImplementation : KotlinIntSpecialFunction() {
@@ -104,7 +104,7 @@ object KotlinIntDivFunctionImplementation : KotlinIntSpecialFunction() {
         source: KtSourceElement?,
     ): ExpEmbedding {
         ctx.addStatement(Stmt.Inhale(NeCmp(args[1], IntLit(0)).toViper()))
-        return Div(args[0], args[1], source)
+        return Div(args[0], args[1])
     }
 }
 
@@ -124,7 +124,7 @@ object KotlinBooleanNotFunctionImplementation : KotlinBooleanSpecialFunction() {
         ctx: StmtConversionContext<ResultTrackingContext>,
         source: KtSourceElement?,
     ): ExpEmbedding =
-        Not(args[0], source)
+        Not(args[0])
 }
 
 object KotlinRunSpecialFunction : SpecialKotlinFunction {

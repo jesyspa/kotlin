@@ -27,6 +27,19 @@ interface ContractDescriptionVisitorContext {
     val effectSource: KtSourceElement?
 }
 
+/**
+ * NOTE: this comments explains how we assign source information to the generated Viper's Abstract Syntax Tree nodes to warn users.
+ *
+ * A contract has [several effects](https://kotlinlang.org/spec/kotlin-spec.html#function-contracts)
+ * defined within it. We are interested in assigning a source info to each one of these effects, in a way we are able
+ * to warn the user what effect is not verifying correctly.
+ * The effects we have are the following: `callsInPlace`, `returns(bool) implies (value-type-implication)`.
+ * Specifically, we embed the source position into Viper's node for the following effects:
+ * 1. `returns()`
+ * 2. `returns(...) implies (...)`
+ * 3. `callsInPlace`
+ */
+
 class ContractDescriptionConversionVisitor(
     private val ctx: ProgramConversionContext,
     private val signature: NamedFunctionSignature,
@@ -58,8 +71,8 @@ class ContractDescriptionConversionVisitor(
         booleanConstantDescriptor: KtBooleanConstantReference<ConeKotlinType, ConeDiagnostic>,
         data: ContractDescriptionVisitorContext,
     ): Exp = when (booleanConstantDescriptor) {
-        ConeContractConstantValues.TRUE -> BoolLit(true, data.effectSource.asPosition)
-        ConeContractConstantValues.FALSE -> BoolLit(false, data.effectSource.asPosition)
+        ConeContractConstantValues.TRUE -> BoolLit(true)
+        ConeContractConstantValues.FALSE -> BoolLit(false)
         else -> throw IllegalArgumentException("Unexpected boolean constant: $booleanConstantDescriptor")
     }
 
@@ -69,7 +82,7 @@ class ContractDescriptionConversionVisitor(
     ): Exp {
         val retVar = signature.returnVar.toViper()
         return when (returnsEffect.value) {
-            ConeContractConstantValues.WILDCARD -> BoolLit(true, data.effectSource.asPosition)
+            ConeContractConstantValues.WILDCARD -> BoolLit(true)
             /* NOTE: in a function that has a non-nullable return type, the compiler will not complain if there is an effect like
              * returnsNotNull(). So it is necessary to take care of these cases in order to avoid comparison between non-nullable
              * values and null. In a function that has a non-nullable return type, returnsNotNull() is mapped to true and returns(null)
@@ -77,16 +90,8 @@ class ContractDescriptionConversionVisitor(
              */
             ConeContractConstantValues.NULL -> signature.returnVar.nullCmp(false, data.effectSource)
             ConeContractConstantValues.NOT_NULL -> signature.returnVar.nullCmp(true, data.effectSource)
-            ConeContractConstantValues.TRUE -> EqCmp(
-                retVar,
-                BoolLit(true, data.effectSource.asPosition),
-                data.effectSource.asPosition
-            )
-            ConeContractConstantValues.FALSE -> EqCmp(
-                retVar,
-                BoolLit(false, data.effectSource.asPosition),
-                data.effectSource.asPosition
-            )
+            ConeContractConstantValues.TRUE -> EqCmp(retVar, BoolLit(true), data.effectSource.asPosition)
+            ConeContractConstantValues.FALSE -> EqCmp(retVar, BoolLit(false), data.effectSource.asPosition)
             else -> throw IllegalArgumentException("Unexpected constant: ${returnsEffect.value}")
         }
     }
@@ -105,7 +110,7 @@ class ContractDescriptionConversionVisitor(
          * values and null. Let x be a non-nullable variable, then x == null is mapped to false and x != null is mapped to true
          */
         val param = isNullPredicate.arg.embeddedVar()
-        return param.nullCmp(isNullPredicate.isNegated, data.effectSource)
+        return param.nullCmp(isNullPredicate.isNegated)
     }
 
     override fun visitLogicalBinaryOperationContractExpression(
@@ -115,14 +120,14 @@ class ContractDescriptionConversionVisitor(
         val left = binaryLogicExpression.left.accept(this, data)
         val right = binaryLogicExpression.right.accept(this, data)
         return when (binaryLogicExpression.kind) {
-            LogicOperationKind.AND -> And(left, right, data.effectSource.asPosition)
-            LogicOperationKind.OR -> Or(left, right, data.effectSource.asPosition)
+            LogicOperationKind.AND -> And(left, right)
+            LogicOperationKind.OR -> Or(left, right)
         }
     }
 
     override fun visitLogicalNot(logicalNot: KtLogicalNot<ConeKotlinType, ConeDiagnostic>, data: ContractDescriptionVisitorContext): Exp {
         val arg = logicalNot.arg.accept(this, data)
-        return Not(arg, data.effectSource.asPosition)
+        return Not(arg)
     }
 
     override fun visitConditionalEffectDeclaration(
@@ -139,7 +144,7 @@ class ContractDescriptionConversionVisitor(
         data: ContractDescriptionVisitorContext,
     ): Exp {
         val param = callsEffect.valueParameterReference.accept(this, data)
-        val callsFieldAccess = FieldAccess(param, SpecialFields.FunctionObjectCallCounterField, data.effectSource.asPosition)
+        val callsFieldAccess = FieldAccess(param, SpecialFields.FunctionObjectCallCounterField)
         return when (callsEffect.kind) {
             // NOTE: case not supported for contracts
             EventOccurrencesRange.ZERO -> EqCmp(
@@ -186,12 +191,12 @@ class ContractDescriptionConversionVisitor(
     private fun embeddedVarByIndex(ix: Int): VariableEmbedding =
         if (ix == -1) signature.receiver!! else signature.params[ix]
 
-    private fun VariableEmbedding.nullCmp(isNegated: Boolean, source: KtSourceElement?): Exp =
+    private fun VariableEmbedding.nullCmp(isNegated: Boolean, source: KtSourceElement? = null): Exp =
         if (type is NullableTypeEmbedding) {
             if (isNegated) {
-                NeCmp(toViper(), type.nullVal(source).toViper())
+                NeCmp(toViper(), type.nullVal().toViper(), source.asPosition)
             } else {
-                EqCmp(toViper(), type.nullVal(source).toViper())
+                EqCmp(toViper(), type.nullVal().toViper(), source.asPosition)
             }
         } else {
             BoolLit(isNegated, source.asPosition)

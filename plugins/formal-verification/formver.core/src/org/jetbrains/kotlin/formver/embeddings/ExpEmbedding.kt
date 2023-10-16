@@ -14,6 +14,15 @@ import org.jetbrains.kotlin.formver.viper.ast.PermExp
 
 sealed interface ExpEmbedding {
     val type: TypeEmbedding
+
+    /**
+     * When Viper arises an VerifierError, the result contained within it
+     * will have the source element. Therefore, it is reasonable to embed
+     * source information on the top-level Viper's node.
+     *
+     * Example: when a pre-condition/post-condition/assertion may fail
+     * it is useful to keep the source information.
+     */
     val source: KtSourceElement?
 
     fun toViper(): Exp
