@@ -235,6 +235,14 @@ object LightTreePositioningStrategies {
         }
 
         override fun isValid(node: LighterASTNode, tree: FlyweightCapableTreeStructure<LighterASTNode>): Boolean {
+            // NOTE: the following if statement is a temporary fix for our test suite.
+            // The reason behind these checks lies on how Kotlin contract effects are represented in FIR level.
+            // For instance: `returns(...)` and `callsInPlace(...)` are a CALL_EXPRESSION
+            // But, `returns(...) implies (...)` is a `BINARY_EXPRESSION`.
+            if (node.tokenType == KtNodeTypes.BINARY_EXPRESSION || node.tokenType == KtNodeTypes.CALL_EXPRESSION) {
+                return true
+            }
+
             //in FE 1.0 this is part of DeclarationHeader abstract strategy
             if (node.tokenType != KtNodeTypes.OBJECT_DECLARATION
                 && node.tokenType != KtNodeTypes.FUN
