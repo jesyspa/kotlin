@@ -17,7 +17,7 @@ fun unknown(f : (Int) -> Int) : Int{
 @OptIn(ExperimentalContracts::class)
 fun <!FUNCTION_WITH_UNVERIFIED_CONTRACT, VIPER_TEXT!>incorrect_at_most_once<!>(f : (Int) -> Int) : Int{
     contract {
-        callsInPlace(f, AT_MOST_ONCE)
+        <!VIPER_VERIFICATION_ERROR!>callsInPlace(f, AT_MOST_ONCE)<!>
     }
     return f(unknown(f))
 }
@@ -26,7 +26,7 @@ fun <!FUNCTION_WITH_UNVERIFIED_CONTRACT, VIPER_TEXT!>incorrect_at_most_once<!>(f
 @OptIn(ExperimentalContracts::class)
 fun <!FUNCTION_WITH_UNVERIFIED_CONTRACT, VIPER_TEXT!>incorrect_exactly_once<!>(f : (Int) -> Int) : Int{
     contract {
-        callsInPlace(f, EXACTLY_ONCE)
+        <!VIPER_VERIFICATION_ERROR!>callsInPlace(f, EXACTLY_ONCE)<!>
     }
     return f(f(1))
 }
@@ -35,7 +35,7 @@ fun <!FUNCTION_WITH_UNVERIFIED_CONTRACT, VIPER_TEXT!>incorrect_exactly_once<!>(f
 @OptIn(ExperimentalContracts::class)
 fun <!FUNCTION_WITH_UNVERIFIED_CONTRACT, VIPER_TEXT!>incorrect_at_least_once<!>(f : (Int) -> Int) : Int{
     contract {
-        callsInPlace(f, AT_LEAST_ONCE)
+        <!VIPER_VERIFICATION_ERROR!>callsInPlace(f, AT_LEAST_ONCE)<!>
     }
     return unknown(f)
 }
@@ -45,7 +45,7 @@ fun <!FUNCTION_WITH_UNVERIFIED_CONTRACT, VIPER_TEXT!>incorrect_at_least_once<!>(
 @OptIn(ExperimentalContracts::class)
 fun <!FUNCTION_WITH_UNVERIFIED_CONTRACT, VIPER_TEXT!>incorrect_exactly_once_with_catch<!>(f : () -> Unit) : Unit {
     contract {
-        callsInPlace(f, EXACTLY_ONCE)
+        <!VIPER_VERIFICATION_ERROR!>callsInPlace(f, EXACTLY_ONCE)<!>
     }
     try {
         f()
@@ -58,7 +58,7 @@ fun <!FUNCTION_WITH_UNVERIFIED_CONTRACT, VIPER_TEXT!>incorrect_exactly_once_with
 @OptIn(ExperimentalContracts::class)
 fun <!FUNCTION_WITH_UNVERIFIED_CONTRACT, VIPER_TEXT!>incorrect_exactly_once_with_call_in_catch<!>(f : () -> Unit) : Unit {
     contract {
-        callsInPlace(f, EXACTLY_ONCE)
+        <!VIPER_VERIFICATION_ERROR!>callsInPlace(f, EXACTLY_ONCE)<!>
     }
     try {
         f()

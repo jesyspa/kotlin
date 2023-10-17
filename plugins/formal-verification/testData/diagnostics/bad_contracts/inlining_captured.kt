@@ -12,7 +12,7 @@ inline fun invoke(f: (Int) -> Int): Int {
 @Suppress("WRONG_INVOCATION_KIND", "LEAKED_IN_PLACE_LAMBDA")
 fun <!FUNCTION_WITH_UNVERIFIED_CONTRACT, VIPER_TEXT!>nested_call<!>(g: (Int) -> Int): Int {
     contract {
-        callsInPlace(g, EXACTLY_ONCE)
+        <!VIPER_VERIFICATION_ERROR!>callsInPlace(g, EXACTLY_ONCE)<!>
     }
     return invoke { g(g(it)) }
 }
@@ -21,7 +21,7 @@ fun <!FUNCTION_WITH_UNVERIFIED_CONTRACT, VIPER_TEXT!>nested_call<!>(g: (Int) -> 
 @Suppress("WRONG_INVOCATION_KIND", "LEAKED_IN_PLACE_LAMBDA")
 fun <!FUNCTION_WITH_UNVERIFIED_CONTRACT, VIPER_TEXT!>double_call<!>(g: (Int) -> Int): Int {
     contract {
-        callsInPlace(g, AT_MOST_ONCE)
+        <!VIPER_VERIFICATION_ERROR!>callsInPlace(g, AT_MOST_ONCE)<!>
     }
     return invoke { g(it); g(it) }
 }
