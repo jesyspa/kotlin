@@ -135,14 +135,25 @@ object KotlinRunSpecialFunction : SpecialKotlinFunction {
     override val name: String = "run"
 
     override val receiverType: TypeEmbedding? = null
+    override val extensionReceiverType: TypeEmbedding? = null
+
     override val paramTypes: List<TypeEmbedding> =
-        listOf(FunctionTypeEmbedding(CallableSignatureData(null, emptyList(), NullableTypeEmbedding(AnyTypeEmbedding))))
+        listOf(
+            FunctionTypeEmbedding(
+                CallableSignatureData(
+                    receiverType = null,
+                    extensionReceiverType = null,
+                    emptyList(),
+                    NullableTypeEmbedding(AnyTypeEmbedding)
+                )
+            )
+        )
     override val returnType: TypeEmbedding = NullableTypeEmbedding(AnyTypeEmbedding)
 
     override fun insertCallImpl(
         args: List<ExpEmbedding>,
         ctx: StmtConversionContext<ResultTrackingContext>,
-        source: KtSourceElement?
+        source: KtSourceElement?,
     ): ExpEmbedding {
         val lambda = when (val arg = args[0].ignoringCasts()) {
             is LambdaExp -> arg

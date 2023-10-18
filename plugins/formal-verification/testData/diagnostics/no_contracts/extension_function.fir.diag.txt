@@ -46,7 +46,7 @@ method global$ext_fun_inside$fun_take$T_class_global$class_Foo$return$T_Unit(thi
 }
 
 /extension_function.kt:(207,213): info: Generated Viper text for inside:
-method class_scope_global$class_Bar$ext_fun_inside$fun_take$T_class_global$class_Bar$T_class_global$class_Foo$return$T_Unit(this: Ref,
+method class_Bar$ext_fun_inside$fun_take$T_class_global$class_Bar$T_class_global$class_Foo$return$T_Unit(this: Ref,
   this$ext: Ref)
   returns (ret: dom$Unit)
 {
@@ -59,16 +59,16 @@ method class_scope_global$class_Bar$ext_fun_inside$fun_take$T_class_global$class
   local0$refFoo := this$ext
   local0$refBar := this
   local0$implicitRef := this$ext
-  anonymous$0 := class_scope_global$class_Bar$fun_inside$fun_take$T_class_global$class_Bar$return$T_Unit(local0$refBar)
+  anonymous$0 := class_Bar$fun_inside$fun_take$T_class_global$class_Bar$return$T_Unit(local0$refBar)
   label label$ret$0
 }
 
-method class_scope_global$class_Bar$fun_inside$fun_take$T_class_global$class_Bar$return$T_Unit(this: Ref)
+method class_Bar$fun_inside$fun_take$T_class_global$class_Bar$return$T_Unit(this: Ref)
   returns (ret: dom$Unit)
 
 
 /extension_function.kt:(404,410): info: Generated Viper text for inside:
-method class_scope_global$class_Bar$fun_inside$fun_take$T_class_global$class_Bar$return$T_Unit(this: Ref)
+method class_Bar$fun_inside$fun_take$T_class_global$class_Bar$return$T_Unit(this: Ref)
   returns (ret: dom$Unit)
 {
   inhale dom$Type$isSubtype((dom$TypeOf$typeOf(this): dom$Type), dom$Type$global$class_Bar())
@@ -76,54 +76,37 @@ method class_scope_global$class_Bar$fun_inside$fun_take$T_class_global$class_Bar
 }
 
 /extension_function.kt:(469,475): info: Generated Viper text for driver:
-method class_scope_global$class_Bar$fun_driver$fun_take$T_class_global$class_Bar$return$T_Unit(this: Ref)
+method class_Bar$ext_fun_inside$fun_take$T_class_global$class_Bar$T_class_global$class_Foo$return$T_Unit(this: Ref,
+  this$ext: Ref)
+  returns (ret: dom$Unit)
+
+
+method class_Bar$fun_driver$fun_take$T_class_global$class_Bar$return$T_Unit(this: Ref)
   returns (ret: dom$Unit)
 {
   var anonymous$0: Ref
   var local0$f: Ref
   var anonymous$1: dom$Unit
   inhale dom$Type$isSubtype((dom$TypeOf$typeOf(this): dom$Type), dom$Type$global$class_Bar())
-  anonymous$0 := class_scope_global$class_Foo$constructor$fun_take$$return$T_class_global$class_Foo()
+  anonymous$0 := class_Foo$constructor$fun_take$$return$T_class_global$class_Foo()
   local0$f := anonymous$0
-  anonymous$1 := class_scope_global$class_Bar$ext_fun_inside$fun_take$T_class_global$class_Bar$T_class_global$class_Foo$return$T_Unit(this,
+  anonymous$1 := class_Bar$ext_fun_inside$fun_take$T_class_global$class_Bar$T_class_global$class_Foo$return$T_Unit(this,
     local0$f)
   label label$ret$0
 }
 
-method class_scope_global$class_Foo$constructor$fun_take$$return$T_class_global$class_Foo()
+method class_Foo$constructor$fun_take$$return$T_class_global$class_Foo()
   returns (ret: Ref)
   ensures dom$Type$isSubtype((dom$TypeOf$typeOf(ret): dom$Type), dom$Type$global$class_Foo())
-
-
-method class_scope_global$class_Bar$ext_fun_inside$fun_take$T_class_global$class_Bar$T_class_global$class_Foo$return$T_Unit(this: Ref,
-  this$ext: Ref)
-  returns (ret: dom$Unit)
 
 
 /extension_function.kt:(535,562): info: Generated Viper text for extension_foo_function_call:
-method global$fun_extension_foo_function_call$fun_take$$return$T_Unit()
-  returns (ret: dom$Unit)
-{
-  var anonymous$0: Ref
-  var local0$f: Ref
-  var anonymous$1: dom$Unit
-  var anonymous$2: dom$Unit
-  var anonymous$3: dom$Unit
-  anonymous$0 := class_scope_global$class_Foo$constructor$fun_take$$return$T_class_global$class_Foo()
-  local0$f := anonymous$0
-  anonymous$1 := global$ext_fun_return_unit$fun_take$T_class_global$class_Foo$return$T_Unit(local0$f)
-  anonymous$2 := global$ext_fun_return_unit$fun_take$T_class_global$class_Foo$T_Int$return$T_Unit(local0$f,
-    42)
-  anonymous$3 := global$ext_fun_inside$fun_take$T_class_global$class_Foo$return$T_Unit(local0$f)
-  label label$ret$0
-}
-
-method class_scope_global$class_Foo$constructor$fun_take$$return$T_class_global$class_Foo()
+method class_Foo$constructor$fun_take$$return$T_class_global$class_Foo()
   returns (ret: Ref)
   ensures dom$Type$isSubtype((dom$TypeOf$typeOf(ret): dom$Type), dom$Type$global$class_Foo())
 
 
-method global$ext_fun_return_unit$fun_take$T_class_global$class_Foo$return$T_Unit(this: Ref)
+method global$ext_fun_inside$fun_take$T_class_global$class_Foo$return$T_Unit(this: Ref)
   returns (ret: dom$Unit)
 
 
@@ -132,28 +115,45 @@ method global$ext_fun_return_unit$fun_take$T_class_global$class_Foo$T_Int$return
   returns (ret: dom$Unit)
 
 
-method global$ext_fun_inside$fun_take$T_class_global$class_Foo$return$T_Unit(this: Ref)
+method global$ext_fun_return_unit$fun_take$T_class_global$class_Foo$return$T_Unit(this: Ref)
   returns (ret: dom$Unit)
 
 
+method global$fun_extension_foo_function_call$fun_take$$return$T_Unit()
+  returns (ret: dom$Unit)
+{
+  var anonymous$0: Ref
+  var local0$f: Ref
+  var anonymous$1: dom$Unit
+  var anonymous$2: dom$Unit
+  var anonymous$3: dom$Unit
+  anonymous$0 := class_Foo$constructor$fun_take$$return$T_class_global$class_Foo()
+  local0$f := anonymous$0
+  anonymous$1 := global$ext_fun_return_unit$fun_take$T_class_global$class_Foo$return$T_Unit(local0$f)
+  anonymous$2 := global$ext_fun_return_unit$fun_take$T_class_global$class_Foo$T_Int$return$T_Unit(local0$f,
+    42)
+  anonymous$3 := global$ext_fun_inside$fun_take$T_class_global$class_Foo$return$T_Unit(local0$f)
+  label label$ret$0
+}
+
 /extension_function.kt:(649,687): info: Generated Viper text for extension_foo_within_bar_function_call:
+method class_Bar$constructor$fun_take$$return$T_class_global$class_Bar()
+  returns (ret: Ref)
+  ensures dom$Type$isSubtype((dom$TypeOf$typeOf(ret): dom$Type), dom$Type$global$class_Bar())
+
+
+method class_Bar$fun_driver$fun_take$T_class_global$class_Bar$return$T_Unit(this: Ref)
+  returns (ret: dom$Unit)
+
+
 method global$fun_extension_foo_within_bar_function_call$fun_take$$return$T_Unit()
   returns (ret: dom$Unit)
 {
   var anonymous$0: Ref
   var local0$b: Ref
   var anonymous$1: dom$Unit
-  anonymous$0 := class_scope_global$class_Bar$constructor$fun_take$$return$T_class_global$class_Bar()
+  anonymous$0 := class_Bar$constructor$fun_take$$return$T_class_global$class_Bar()
   local0$b := anonymous$0
-  anonymous$1 := class_scope_global$class_Bar$fun_driver$fun_take$T_class_global$class_Bar$return$T_Unit(local0$b)
+  anonymous$1 := class_Bar$fun_driver$fun_take$T_class_global$class_Bar$return$T_Unit(local0$b)
   label label$ret$0
 }
-
-method class_scope_global$class_Bar$constructor$fun_take$$return$T_class_global$class_Bar()
-  returns (ret: Ref)
-  ensures dom$Type$isSubtype((dom$TypeOf$typeOf(ret): dom$Type), dom$Type$global$class_Bar())
-
-
-method class_scope_global$class_Bar$fun_driver$fun_take$T_class_global$class_Bar$return$T_Unit(this: Ref)
-  returns (ret: dom$Unit)
-
