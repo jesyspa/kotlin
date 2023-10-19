@@ -411,13 +411,11 @@ sealed interface Exp : IntoSilver<viper.silver.ast.Exp> {
 
         /**
          * Take the conjunction of the given expressions.
-         *
-         * We do not permit an empty list here, as it typically means the expression as a whole would be needlessly complicated.
          */
-        fun List<Exp>.toConjunction(): Exp {
-            assert(isNotEmpty()) { "Conjunction of empty list of expressions not permitted." }
-            return reduce { l, r -> Exp.And(l, r) }
-        }
+        fun List<Exp>.toConjunction(): Exp =
+            if (isEmpty()) BoolLit(true)
+            else reduce { l, r -> And(l, r) }
+
     }
 
     /**
