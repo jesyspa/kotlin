@@ -5,16 +5,17 @@
 
 package org.jetbrains.kotlin.formver.embeddings
 
+import org.jetbrains.kotlin.formver.conversion.AccessPolicy
 import org.jetbrains.kotlin.KtSourceElement
 import org.jetbrains.kotlin.formver.conversion.SpecialFields
 import org.jetbrains.kotlin.formver.domains.*
 import org.jetbrains.kotlin.formver.embeddings.callables.CallableSignatureData
-import org.jetbrains.kotlin.formver.names.ScopedKotlinName
-import org.jetbrains.kotlin.formver.names.SimpleKotlinName
-import org.jetbrains.kotlin.formver.names.SpecialName
+import org.jetbrains.kotlin.formver.names.*
+import org.jetbrains.kotlin.formver.names.NameMatcher
 import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.formver.viper.ast.Exp
 import org.jetbrains.kotlin.formver.viper.ast.PermExp
+import org.jetbrains.kotlin.formver.viper.ast.Predicate
 import org.jetbrains.kotlin.formver.viper.ast.Type
 import org.jetbrains.kotlin.utils.addToStdlib.ifTrue
 
@@ -68,6 +69,9 @@ interface TypeEmbedding {
      * Invariants that provide access to a resource and thus behave linearly.
      */
     fun accessInvariants(v: Exp): List<Exp> = emptyList()
+
+    // Note: this function will replace accessInvariants when nested unfold will be implemented
+    fun predicateAccessInvariants(v: Exp): List<Exp> = emptyList()
 
     /**
      * A list of invariants that are already known to be true based on the Kotlin code being well-formed.
@@ -179,6 +183,12 @@ data class NullableTypeEmbedding(val elementType: TypeEmbedding) : TypeEmbedding
             .map { Exp.Implies(Exp.NeCmp(v, nullVal().toViper()), it) }
     }
 
+    // Note: this function will replace accessInvariants when nested unfold will be implemented
+    override fun predicateAccessInvariants(v: Exp): List<Exp> {
+        return elementType.predicateAccessInvariants(CastingDomain.cast(v, elementType))
+            .map { Exp.Implies(Exp.NeCmp(v, nullVal().toViper()), it) }
+    }
+
     override fun getNullable(): TypeEmbedding = this
 
     override val isNullable = true
@@ -256,5 +266,49 @@ data class ClassTypeEmbedding(val className: ScopedKotlinName) : TypeEmbedding {
     override fun accessInvariants(v: Exp): List<Exp> =
         flatMapUniqueFields { _, field -> field.accessInvariantsForParameter(v) }
 
+    // Note: this function will replace accessInvariants when nested unfold will be implemented
+    override fun predicateAccessInvariants(v: Exp): List<Exp> = listOf(Exp.PredicateAccess(name, listOf(v)))
+
     override fun provenInvariants(v: Exp) = listOf(subtypeInvariant(v))
+
+    private val thisEmbedding = VariableEmbedding(ThisReceiverName, this)
+    val classPredicate: Predicate
+        get() {
+            val accessReadableFields = fields.values
+                .filter { it.accessPolicy == AccessPolicy.ALWAYS_READABLE }
+                .map { FieldAccess(thisEmbedding, it).getAccessPredicate(PermExp.WildcardPerm()) }
+
+            val accessSpecialFields = fields.values
+                .filter { it.accessPolicy == AccessPolicy.ALWAYS_WRITEABLE }
+                .map { FieldAccess(thisEmbedding, it).getAccessPredicate(PermExp.FullPerm()) }
+
+            val classFieldPredicates = fields.values
+                .filter { it.accessPolicy == AccessPolicy.ALWAYS_READABLE }
+                .map { it.type.predicateAccessInvariants(Exp.FieldAccess(Exp.LocalVar(ThisReceiverName, Type.Ref), it.toViper())) }
+                .flatten()
+
+            val superTypesPredicates = superTypes
+                .filterIsInstance<ClassTypeEmbedding>()
+                .map { Exp.PredicateAccess(it.name, listOf(thisEmbedding.toViper())) }
+
+            val conditions = accessReadableFields + accessSpecialFields + specialConditions + classFieldPredicates + superTypesPredicates
+            val body = if (conditions.isNotEmpty()) {
+                conditions
+                    .drop(1)
+                    .fold(conditions.first()) { acc, expEmbedding -> Exp.And(acc, expEmbedding) }
+            } else {
+                Exp.BoolLit(true)
+            }
+            return Predicate(name, listOf(thisEmbedding.toLocalVarDecl()), body)
+        }
+
+    private val specialConditions: List<Exp>
+        get() {
+            NameMatcher.match(this.className) {
+                ifIsCollectionInterface {
+                    return listOf(GeCmp(FieldAccess(thisEmbedding, ListSizeFieldEmbedding), IntLit(0)).toViper())
+                }
+                return listOf()
+            }
+        }
 }

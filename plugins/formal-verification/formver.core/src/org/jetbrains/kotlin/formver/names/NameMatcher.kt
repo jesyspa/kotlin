@@ -26,7 +26,8 @@ internal class NameMatcher(val name: MangledName) {
     }
 
     inline fun ifClassName(vararg segments: String, action: NameMatcher.() -> Unit) {
-        if (className == ClassKotlinName(segments.toList()))
+        // TODO: not sure that it is correct to add the second check here
+        if (className == ClassKotlinName(segments.toList()) || scopedName?.name == ClassKotlinName(segments.toList()))
             this.action()
     }
 
