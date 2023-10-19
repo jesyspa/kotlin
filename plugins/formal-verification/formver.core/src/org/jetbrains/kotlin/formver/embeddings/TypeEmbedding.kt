@@ -185,7 +185,7 @@ data class NullableTypeEmbedding(val elementType: TypeEmbedding) : TypeEmbedding
 
     // Note: this function will replace accessInvariants when nested unfold will be implemented
     override fun predicateAccessInvariants(v: Exp): List<Exp> {
-        return elementType.predicateAccessInvariants(CastingDomain.cast(v, elementType))
+        return elementType.predicateAccessInvariants(CastingDomain.cast(v, elementType, null))
             .map { Exp.Implies(Exp.NeCmp(v, nullVal().toViper()), it) }
     }
 
