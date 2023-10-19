@@ -5,7 +5,7 @@ import org.jetbrains.kotlin.formver.plugin.AlwaysVerify
 @AlwaysVerify
 fun <!VIPER_TEXT!>safe_binary_search<!>(arr: List<Int>, target: Int): Boolean {
     val size = arr.size
-    val mid = arr.size / 2 // +1 o -1 throws IndexOutOfBound
+    val mid = arr.size / 2 // +1 or -1 throws IndexOutOfBound
     return when {
         arr.isEmpty() -> false
         arr[mid] == target -> true
