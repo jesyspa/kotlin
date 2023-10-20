@@ -5,7 +5,7 @@ import org.jetbrains.kotlin.formver.plugin.AlwaysVerify
 @AlwaysVerify
 fun <!VIPER_TEXT!>mid_increased_by_one<!>(arr: List<Int>, target: Int): Boolean {
     val size = arr.size
-    val mid = arr.size / 2 + 1 // possible IndexOutOfBound
+    val mid = arr.size / 2 + 1 // if arr.size == 1, mid is out of bounds
     return when {
         arr.isEmpty() -> false
         <!VIPER_VERIFICATION_ERROR!>arr[mid]<!> == target -> true
@@ -17,7 +17,7 @@ fun <!VIPER_TEXT!>mid_increased_by_one<!>(arr: List<Int>, target: Int): Boolean 
 @AlwaysVerify
 fun <!VIPER_TEXT!>mid_decreased_by_one<!>(arr: List<Int>, target: Int): Boolean {
     val size = arr.size
-    val mid = arr.size / 2 - 1 // possible IndexOutOfBound
+    val mid = arr.size / 2 - 1 // if arr.size == 1, mid is out of bounds
     return when {
         arr.isEmpty() -> false
         <!VIPER_VERIFICATION_ERROR!>arr[mid]<!> == target -> true
@@ -34,7 +34,8 @@ fun <!VIPER_TEXT!>mid_decreased_by_one_in_rec_call<!>(arr: List<Int>, target: In
         arr.isEmpty() -> false
         arr[mid] == target -> true
         arr[mid] < target -> mid_decreased_by_one_in_rec_call(arr.subList(mid + 1, size), target)
-        else -> mid_decreased_by_one_in_rec_call(<!VIPER_VERIFICATION_ERROR!>arr.subList(0, mid - 1)<!>, target) // possible IllegalArgumentException
+        // if arr.size == 1, arr.subList(0, -1) is called
+        else -> mid_decreased_by_one_in_rec_call(<!VIPER_VERIFICATION_ERROR!>arr.subList(0, mid - 1)<!>, target)
     }
 }
 
