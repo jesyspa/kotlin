@@ -9,38 +9,40 @@ field class_Rec$member_next: dom$Nullable[Ref]
 
 field special$size: Int
 
-predicate T_class_global$class_Bar(this: Ref) {
-  acc(this.class_Bar$member_foo, wildcard) &&
-  acc(T_class_global$class_Foo(this.class_Bar$member_foo), write) &&
-  acc(T_class_global$class_Baz(this), write)
+predicate T_class_global$class_Bar(class$predicate$subject: Ref) {
+  acc(class$predicate$subject.class_Bar$member_foo, wildcard) &&
+  acc(T_class_global$class_Foo(class$predicate$subject.class_Bar$member_foo), write) &&
+  acc(T_class_global$class_Baz(class$predicate$subject), write)
 }
 
-predicate T_class_global$class_Baz(this: Ref) {
+predicate T_class_global$class_Baz(class$predicate$subject: Ref) {
   true
 }
 
-predicate T_class_global$class_Foo(this: Ref) {
-  acc(this.class_Foo$member_x, wildcard)
+predicate T_class_global$class_Foo(class$predicate$subject: Ref) {
+  acc(class$predicate$subject.class_Foo$member_x, wildcard)
 }
 
-predicate T_class_global$class_Rec(this: Ref) {
-  acc(this.class_Rec$member_next, wildcard) &&
-  (this.class_Rec$member_next != (dom$Nullable$null(): dom$Nullable[Ref]) ==>
-  acc(T_class_global$class_Rec((dom$Casting$cast(this.class_Rec$member_next,
+predicate T_class_global$class_Rec(class$predicate$subject: Ref) {
+  acc(class$predicate$subject.class_Rec$member_next, wildcard) &&
+  (class$predicate$subject.class_Rec$member_next !=
+  (dom$Nullable$null(): dom$Nullable[Ref]) ==>
+  acc(T_class_global$class_Rec((dom$Casting$cast(class$predicate$subject.class_Rec$member_next,
   dom$Type$global$class_Rec()): Ref)), write))
 }
 
-predicate T_class_pkg$kotlin$collections$global$class_Collection(this: Ref) {
-  acc(this.special$size, write) && this.special$size >= 0 &&
-  acc(T_class_pkg$kotlin$collections$global$class_Iterable(this), write)
+predicate T_class_pkg$kotlin$collections$global$class_Collection(class$predicate$subject: Ref) {
+  acc(class$predicate$subject.special$size, write) &&
+  class$predicate$subject.special$size >= 0 &&
+  acc(T_class_pkg$kotlin$collections$global$class_Iterable(class$predicate$subject), write)
 }
 
-predicate T_class_pkg$kotlin$collections$global$class_Iterable(this: Ref) {
+predicate T_class_pkg$kotlin$collections$global$class_Iterable(class$predicate$subject: Ref) {
   true
 }
 
-predicate T_class_pkg$kotlin$collections$global$class_List(this: Ref) {
-  acc(T_class_pkg$kotlin$collections$global$class_Collection(this), write)
+predicate T_class_pkg$kotlin$collections$global$class_List(class$predicate$subject: Ref) {
+  acc(T_class_pkg$kotlin$collections$global$class_Collection(class$predicate$subject), write)
 }
 
 method global$fun_useFoo$fun_take$T_class_global$class_Bar$T_class_global$class_Rec$T_class_pkg$kotlin$collections$global$class_List$return$T_Unit(local$bar: Ref,

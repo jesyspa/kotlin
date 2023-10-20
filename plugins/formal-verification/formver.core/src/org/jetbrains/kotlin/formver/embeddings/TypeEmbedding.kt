@@ -11,9 +11,9 @@ import org.jetbrains.kotlin.formver.conversion.SpecialFields
 import org.jetbrains.kotlin.formver.domains.*
 import org.jetbrains.kotlin.formver.embeddings.callables.CallableSignatureData
 import org.jetbrains.kotlin.formver.names.*
-import org.jetbrains.kotlin.formver.names.NameMatcher
 import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.formver.viper.ast.Exp
+import org.jetbrains.kotlin.formver.viper.ast.Exp.Companion.toConjunction
 import org.jetbrains.kotlin.formver.viper.ast.PermExp
 import org.jetbrains.kotlin.formver.viper.ast.Predicate
 import org.jetbrains.kotlin.formver.viper.ast.Type
@@ -80,6 +80,7 @@ interface TypeEmbedding {
      * An example of this is when other systems (e.g. the type checker) have already proven these.
      *
      * TODO: This should probably always include the `subtypeInvariant`, but primitive types make that harder.
+     * TODO: Can be included in the class predicate when unfolding works
      */
     fun provenInvariants(v: Exp): List<Exp> = emptyList()
 
@@ -238,12 +239,35 @@ data class ClassTypeEmbedding(val className: ScopedKotlinName) : TypeEmbedding {
     }
 
     private var _fields: Map<SimpleKotlinName, FieldEmbedding>? = null
+    private var _predicate: Predicate? = null
     val fields: Map<SimpleKotlinName, FieldEmbedding>
         get() = _fields ?: throw IllegalStateException("Fields of $className have not been initialised yet.")
+    val predicate: Predicate
+        get() = _predicate ?: throw IllegalStateException("Predicate of $className has not been initialised yet.")
 
     fun initFields(newFields: Map<SimpleKotlinName, FieldEmbedding>) {
         if (_fields != null) throw IllegalStateException("Fields of $className are already initialised.")
         _fields = newFields
+        _predicate = initPredicate()
+    }
+
+    private fun initPredicate(): Predicate {
+        val subjectEmbedding = VariableEmbedding(ClassPredicateSubjectName, this)
+        val accessFields = fields.values
+            .flatMap { it.accessInvariantsForParameter(subjectEmbedding.toViper()) }
+
+        // For the moment ALWAYS_WRITEABLE fields with some class type do not exist.
+        // Whether to include them here will need to be considered in the future.
+        val accessFieldPredicates = fields.values
+            .filter { it.accessPolicy == AccessPolicy.ALWAYS_READABLE }
+            .flatMap { it.type.predicateAccessInvariants(Exp.FieldAccess(subjectEmbedding.toViper(), it.toViper())) }
+
+        val accessSuperTypesPredicates = superTypes
+            .filterIsInstance<ClassTypeEmbedding>()
+            .map { Exp.PredicateAccess(it.name, listOf(subjectEmbedding.toViper())) }
+
+        val body = (accessFields + accessFieldPredicates + accessSuperTypesPredicates).toConjunction()
+        return Predicate(name, listOf(subjectEmbedding.toLocalVarDecl()), body)
     }
 
     override val runtimeType = TypeDomain.classType(className)
@@ -270,45 +294,4 @@ data class ClassTypeEmbedding(val className: ScopedKotlinName) : TypeEmbedding {
     override fun predicateAccessInvariants(v: Exp): List<Exp> = listOf(Exp.PredicateAccess(name, listOf(v)))
 
     override fun provenInvariants(v: Exp) = listOf(subtypeInvariant(v))
-
-    private val thisEmbedding = VariableEmbedding(ThisReceiverName, this)
-    val classPredicate: Predicate
-        get() {
-            val accessReadableFields = fields.values
-                .filter { it.accessPolicy == AccessPolicy.ALWAYS_READABLE }
-                .map { FieldAccess(thisEmbedding, it).getAccessPredicate(PermExp.WildcardPerm()) }
-
-            val accessSpecialFields = fields.values
-                .filter { it.accessPolicy == AccessPolicy.ALWAYS_WRITEABLE }
-                .map { FieldAccess(thisEmbedding, it).getAccessPredicate(PermExp.FullPerm()) }
-
-            val classFieldPredicates = fields.values
-                .filter { it.accessPolicy == AccessPolicy.ALWAYS_READABLE }
-                .map { it.type.predicateAccessInvariants(Exp.FieldAccess(Exp.LocalVar(ThisReceiverName, Type.Ref), it.toViper())) }
-                .flatten()
-
-            val superTypesPredicates = superTypes
-                .filterIsInstance<ClassTypeEmbedding>()
-                .map { Exp.PredicateAccess(it.name, listOf(thisEmbedding.toViper())) }
-
-            val conditions = accessReadableFields + accessSpecialFields + specialConditions + classFieldPredicates + superTypesPredicates
-            val body = if (conditions.isNotEmpty()) {
-                conditions
-                    .drop(1)
-                    .fold(conditions.first()) { acc, expEmbedding -> Exp.And(acc, expEmbedding) }
-            } else {
-                Exp.BoolLit(true)
-            }
-            return Predicate(name, listOf(thisEmbedding.toLocalVarDecl()), body)
-        }
-
-    private val specialConditions: List<Exp>
-        get() {
-            NameMatcher.match(this.className) {
-                ifIsCollectionInterface {
-                    return listOf(GeCmp(FieldAccess(thisEmbedding, ListSizeFieldEmbedding), IntLit(0)).toViper())
-                }
-                return listOf()
-            }
-        }
 }

@@ -54,7 +54,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
                 .distinctBy { it.name },
             functions = SpecialFunctions.all,
             methods = SpecialMethods.all + methods.values.mapNotNull { it.viperMethod }.toList(),
-            predicates = classes.values.map { it.classPredicate }
+            predicates = classes.values.map { it.predicate }
         )
 
     fun registerForVerification(declaration: FirSimpleFunction) {
