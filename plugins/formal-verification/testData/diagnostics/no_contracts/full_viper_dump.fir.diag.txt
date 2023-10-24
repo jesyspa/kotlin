@@ -292,6 +292,13 @@ field class_Foo$member_x: Int
 
 field special$function_object_call_counter: Int
 
+function T_class_global$class_Foo$get$class_Foo$member_x(get$function$subject: Ref): Int
+  requires acc(T_class_global$class_Foo(get$function$subject), write)
+{
+  (unfolding acc(T_class_global$class_Foo(get$function$subject), write) in
+    get$function$subject.class_Foo$member_x)
+}
+
 function special$duplicable(anonymous$0: Ref): Bool
 
 

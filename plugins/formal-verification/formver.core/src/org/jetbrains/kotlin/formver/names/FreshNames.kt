@@ -36,6 +36,16 @@ data object ClassPredicateSubjectName : MangledName {
         get() = "class\$predicate\$subject"
 }
 
+data object GetterFunctionSubjectName : MangledName {
+    override val mangled: String
+        get() = "get\$function\$subject"
+}
+
+data class GetterFunctionName(val className: MangledName, val fieldName: MangledName) : MangledName {
+    override val mangled: String
+        get() = "${className.mangled}\$get\$${fieldName.mangled}"
+}
+
 data class SpecialName(val name: String) : MangledName {
     override val mangled: String
         get() = "special\$$name"
