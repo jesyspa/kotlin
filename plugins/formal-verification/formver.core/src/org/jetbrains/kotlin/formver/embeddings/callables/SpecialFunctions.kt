@@ -26,7 +26,7 @@ import org.jetbrains.kotlin.formver.viper.ast.Function
  *      unfolding acc(className(this), write) in unfoldingBody
  *  }
  *  ```
- * @param unfoldingBody should be:
+ * @param unfoldingBody should be one of:
  * - a field access if the field we want to access is declared in the class;
  * - a call to another FieldAccessFunction if the field we want to access is declared in a superclass.
  */
