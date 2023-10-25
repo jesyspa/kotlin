@@ -66,7 +66,9 @@ class ViperPoweredDeclarationChecker(private val session: FirSession, private va
                 val source = err.position.unwrapOr {
                     declaration.source
                 }
-                reporter.reportOn(source, err.asPluginError, err.msg, context)
+                with(VerifierErrorInterpreter) {
+                    reporter.reportOn(source, err.asPluginError, err.toHumanReadableMessage(), context)
+                }
             }
 
             val consistent = verifier.checkConsistency(program, onFailure)

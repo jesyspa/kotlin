@@ -264,7 +264,8 @@ object TypeOfDomain : BuiltinDomain("TypeOf") {
         TypeDomain.Type
     )
 
-    fun typeOf(x: Exp, pos: Position = Position.NoPosition): Exp = funcApp(typeOfFunc, listOf(x), mapOf(T to x.type), pos)
+    fun typeOf(x: Exp, pos: Position = Position.NoPosition, info: Info = Info.NoInfo): Exp =
+        funcApp(typeOfFunc, listOf(x), mapOf(T to x.type), pos, info)
 
     override val functions: List<DomainFunc> = listOf(typeOfFunc)
 

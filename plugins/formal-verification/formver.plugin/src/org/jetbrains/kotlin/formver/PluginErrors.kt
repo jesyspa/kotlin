@@ -19,6 +19,9 @@ object PluginErrors {
     val INTERNAL_ERROR by error1<PsiElement, String>(SourceElementPositioningStrategies.DECLARATION_NAME)
     val MINOR_INTERNAL_ERROR by error1<PsiElement, String>(SourceElementPositioningStrategies.DECLARATION_NAME)
 
+    val MISSING_ADDITIONAL_INFO by warning1<PsiElement, String>()
+    val UNEXPECTED_RETURNED_BOOL_VALUE by warning1<PsiElement, String>()
+
     init {
         RootDiagnosticRendererFactory.registerFactory(FormalVerificationPluginErrorMessages)
     }

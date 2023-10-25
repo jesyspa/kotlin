@@ -22,4 +22,4 @@ method global$fun_non_nullable_returns_null$fun_take$T_Int$return$T_Int(local$x:
   label label$ret$0
 }
 
-/returns_null.kt:(341,354): warning: Viper verification error: Postcondition of global$fun_non_nullable_returns_null$fun_take$T_Int$return$T_Int might not hold. Assertion false might not hold.
+/returns_null.kt:(341,354): warning: Viper verification error: the following nullability condition might not hold.

@@ -37,5 +37,10 @@ object FormalVerificationPluginErrorMessages : BaseDiagnosticRendererFactory() {
             "Formal verification non-fatal internal error: {0}",
             CommonRenderers.STRING,
         )
+        put(
+            PluginErrors.MISSING_ADDITIONAL_INFO,
+            "No further information is available for this warning.",
+            CommonRenderers.STRING
+        )
     }
 }

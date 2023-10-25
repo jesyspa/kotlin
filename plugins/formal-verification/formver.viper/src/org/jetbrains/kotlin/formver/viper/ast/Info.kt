@@ -11,8 +11,7 @@ import scala.collection.immutable.Seq
 import viper.silver.ast.`NoInfo$`
 
 sealed class Info : IntoSilver<viper.silver.ast.Info> {
-
-    internal class Wrapper<I>(val wrappedValue: I) : viper.silver.ast.Info {
+    internal class Wrapper(val wrappedValue: Any) : viper.silver.ast.Info {
         override fun toString(): String = "<wrapped info value>"
         override fun comment(): Seq<String> = JavaConverters.asScala(emptyList<String>()).toSeq()
         override fun isCached(): Boolean = false
@@ -21,7 +20,7 @@ sealed class Info : IntoSilver<viper.silver.ast.Info> {
     companion object {
         fun fromSilver(info: viper.silver.ast.Info): Info = when (info) {
             `NoInfo$`.`MODULE$` -> NoInfo
-            is Wrapper<*> -> Wrapped(info.wrappedValue)
+            is Wrapper -> Wrapped(info.wrappedValue)
             else -> TODO("Unreachable")
         }
     }
@@ -30,14 +29,13 @@ sealed class Info : IntoSilver<viper.silver.ast.Info> {
         override fun toSilver(): viper.silver.ast.Info = `NoInfo$`.`MODULE$`
     }
 
-    class Wrapped<I>(val info: I) : Info() {
+    class Wrapped(val info: Any) : Info() {
         override fun toSilver(): viper.silver.ast.Info = Wrapper(info)
     }
 }
 
-inline fun <reified I> Info.unwrapOr(orBlock: () -> I?): I? = when (this) {
-    is Info.Wrapped<*> -> info as? I
+@Suppress("UNCHECKED_CAST")
+inline fun <I> Info.unwrapOr(orBlock: () -> I): I = when (this) {
+    is Info.Wrapped -> info as I
     else -> orBlock()
 }
-
-fun Info.isEmpty(): Boolean = (this is Info.NoInfo)

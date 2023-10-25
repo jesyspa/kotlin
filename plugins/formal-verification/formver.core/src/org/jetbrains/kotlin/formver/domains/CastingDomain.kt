@@ -54,13 +54,13 @@ object CastingDomain : BuiltinDomain("Casting") {
 
     private val castFunc = createDomainFunc("cast", listOf(a.decl(), newType.decl()), B)
 
-    fun cast(exp: Exp, newType: Exp, newViperType: Type, source: KtSourceElement? = null) =
-        funcApp(castFunc, listOf(exp, newType), mapOf(A to exp.type, B to newViperType), source.asPosition)
+    fun cast(exp: Exp, newType: Exp, newViperType: Type, source: KtSourceElement? = null, info: Info = Info.NoInfo) =
+        funcApp(castFunc, listOf(exp, newType), mapOf(A to exp.type, B to newViperType), source.asPosition, info)
 
     // Prefer this cast method if you have access to a `TypeEmbedding`.
     // An example of where this is not the case is when defining generic domain axioms.
-    fun cast(exp: Exp, newType: TypeEmbedding, source: KtSourceElement?) =
-        cast(exp, newType.runtimeType, newType.viperType, source)
+    fun cast(exp: Exp, newType: TypeEmbedding, source: KtSourceElement?, info: Info = Info.NoInfo) =
+        cast(exp, newType.runtimeType, newType.viperType, source, info)
 
     override val functions: List<DomainFunc> = listOf(castFunc)
 
@@ -87,5 +87,5 @@ object CastingDomain : BuiltinDomain("Casting") {
     }
 }
 
-fun Exp.convertType(currentType: TypeEmbedding, newType: TypeEmbedding, source: KtSourceElement?) =
-    if (newType == currentType) this else CastingDomain.cast(this, newType, source)
+fun Exp.convertType(currentType: TypeEmbedding, newType: TypeEmbedding, source: KtSourceElement?, info: Info = Info.NoInfo) =
+    if (newType == currentType) this else CastingDomain.cast(this, newType, source, info)

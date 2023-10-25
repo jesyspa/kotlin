@@ -82,8 +82,8 @@ object NullableDomain : BuiltinDomain("Nullable") {
     // You need to specify the type if the expression expects a certain nullable type,
     // e.g. in the expression x == null_val(), if x is of type type Nullable[Int], then
     // null_val() also needs to of type Nullable[Int] and can't be of type Nullable[T].
-    fun nullVal(elemType: Type, source: KtSourceElement? = null): Exp.DomainFuncApp =
-        funcApp(nullFunc, emptyList(), mapOf(T to elemType), source.asPosition)
+    fun nullVal(elemType: Type, source: KtSourceElement? = null, info: Info = Info.NoInfo): Exp.DomainFuncApp =
+        funcApp(nullFunc, emptyList(), mapOf(T to elemType), source.asPosition, info)
 
     override val axioms = AxiomListBuilder.build(this) {
         axiom("some_not_null") {
