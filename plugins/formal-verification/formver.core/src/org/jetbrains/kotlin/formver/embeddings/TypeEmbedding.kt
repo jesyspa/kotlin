@@ -19,7 +19,6 @@ import org.jetbrains.kotlin.formver.viper.ast.PermExp
 import org.jetbrains.kotlin.formver.viper.ast.Predicate
 import org.jetbrains.kotlin.formver.viper.ast.Type
 import org.jetbrains.kotlin.utils.addToStdlib.ifTrue
-import org.jetbrains.kotlin.formver.viper.ast.Function
 
 /**
  * Represents our representation of a Kotlin type.
@@ -247,8 +246,6 @@ data class ClassTypeEmbedding(val className: ScopedKotlinName) : TypeEmbedding {
     private var _predicate: Predicate? = null
     val fields: Map<SimpleKotlinName, FieldEmbedding>
         get() = _fields ?: throw IllegalStateException("Fields of $className have not been initialised yet.")
-    val allFields: List<FieldEmbedding>
-        get() = fields.values + classSuperTypes.flatMap { it.allFields }
     val predicate: Predicate
         get() = _predicate ?: throw IllegalStateException("Predicate of $className has not been initialised yet.")
 
@@ -277,21 +274,22 @@ data class ClassTypeEmbedding(val className: ScopedKotlinName) : TypeEmbedding {
         return Predicate(name, listOf(subjectEmbedding.toLocalVarDecl()), body)
     }
 
-    fun getterFunctions(): List<Function> {
+    // Note: This is a preparation for upcoming pull requests, functions for predicates unfolding are just declared and not used.
+    fun getterFunctions(): List<FieldAccessFunction> {
         val receiver = VariableEmbedding(GetterFunctionSubjectName, this)
         val getPropertyFunctions = fields.values
-            .filter { it.accessPolicy != AccessPolicy.ALWAYS_INHALE_EXHALE }
-            .map { FieldAccessFunction(name, it.toViper(), FieldAccess(receiver, it).toViper()) }
+            .filter { field -> field.accessPolicy != AccessPolicy.ALWAYS_INHALE_EXHALE }
+            .map { field -> FieldAccessFunction(name, field, FieldAccess(receiver, field).toViper()) }
         val getSuperPropertyFunctions = classSuperTypes.flatMap {
-            it.allFields
-                .filter { field -> field.accessPolicy != AccessPolicy.ALWAYS_INHALE_EXHALE }
-                .map { field ->
-                    FieldAccessFunction(
-                        name,
-                        field.toViper(),
+            it.flatMapUniqueFields { _, field ->
+                if (field.accessPolicy != AccessPolicy.ALWAYS_INHALE_EXHALE) {
+                    val unfoldingBody =
                         Exp.FuncApp(GetterFunctionName(it.name, field.name), listOf(receiver.toViper()), field.type.viperType)
-                    )
+                    listOf(FieldAccessFunction(name, field, unfoldingBody))
+                } else {
+                    listOf()
                 }
+            }
         }
         return getPropertyFunctions + getSuperPropertyFunctions
     }
