@@ -19,7 +19,7 @@ abstract class BackingFieldAccess(val field: FieldEmbedding) {
         source: KtSourceElement?,
         action: StmtConversionContext<RTC>.(access: FieldAccess) -> Unit,
     ) {
-        val invariant = field.accessInvariantForAccess(receiver.toViper())
+        val invariant = field.accessInvariantForAccess(receiver.toViperExp())
         invariant?.let {
             ctx.addStatement(Stmt.Inhale(it.toViper(), source.asPosition))
         }
@@ -54,7 +54,7 @@ class BackingFieldSetter(field: FieldEmbedding) : BackingFieldAccess(field), Set
         source: KtSourceElement?,
     ) {
         access(receiver, ctx, source) {
-            addStatement(Stmt.assign(it.toViper(), value.withType(field.type).toViper(), source.asPosition))
+            addStatement(Stmt.assign(it.toViperExp(), value.withType(field.type).toViperExp(), source.asPosition))
         }
     }
 }

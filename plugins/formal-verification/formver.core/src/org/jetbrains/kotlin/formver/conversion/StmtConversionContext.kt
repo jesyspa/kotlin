@@ -6,13 +6,13 @@
 package org.jetbrains.kotlin.formver.conversion
 
 import org.jetbrains.kotlin.KtSourceElement
+import org.jetbrains.kotlin.fir.FirLabel
 import org.jetbrains.kotlin.fir.expressions.*
 import org.jetbrains.kotlin.fir.symbols.impl.FirPropertySymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirValueParameterSymbol
 import org.jetbrains.kotlin.formver.calleeSymbol
 import org.jetbrains.kotlin.formver.embeddings.*
 import org.jetbrains.kotlin.formver.embeddings.callables.FunctionSignature
-import org.jetbrains.kotlin.formver.linearization.SeqnBuildContext
 import org.jetbrains.kotlin.formver.viper.ast.Exp
 import org.jetbrains.kotlin.formver.viper.ast.Label
 import org.jetbrains.kotlin.formver.viper.ast.Stmt
@@ -25,7 +25,7 @@ import org.jetbrains.kotlin.name.Name
  * - Functions that return a new `StmtConversionContext` should describe what change they make (`addResult`, `removeResult`...)
  * - Functions that take a lambda to execute should describe what extra state the lambda will have (`withResult`...)
  */
-interface StmtConversionContext<out RTC : ResultTrackingContext> : MethodConversionContext, SeqnBuildContext, ResultTrackingContext {
+interface StmtConversionContext<out RTC : ResultTrackingContext> : MethodConversionContext, ResultTrackingContext {
     val resultCtx: RTC
     val whenSubject: VariableEmbedding?
 
@@ -49,19 +49,13 @@ interface StmtConversionContext<out RTC : ResultTrackingContext> : MethodConvers
     fun withNewScopeToBlock(action: StmtConversionContext<RTC>.() -> Unit): Stmt.Seqn
     fun <R> withMethodCtx(factory: MethodContextFactory, action: StmtConversionContext<RTC>.() -> R): R
 
-    fun <R> withFreshWhile(action: StmtConversionContext<RTC>.() -> R): R
+    fun <R> withFreshWhile(label: FirLabel?, action: StmtConversionContext<RTC>.() -> R): R
     fun <R> withWhenSubject(subject: VariableEmbedding?, action: StmtConversionContext<RTC>.() -> R): R
     fun <R> withCheckedSafeCallSubject(subject: ExpEmbedding?, action: StmtConversionContext<RTC>.() -> R): R
     fun withCatches(
         catches: List<FirCatch>,
         action: StmtConversionContext<RTC>.(catchBlockListData: CatchBlockListData) -> Unit,
     ): CatchBlockListData
-}
-
-fun <RTC : ResultTrackingContext> StmtConversionContext<RTC>.nonDeterministically(action: StmtConversionContext<RTC>.() -> Unit) {
-    val branchVar = freshAnonVar(BooleanTypeEmbedding)
-    addDeclaration(branchVar.toLocalVarDecl())
-    addStatement(Stmt.If(branchVar.toViper(), withNewScopeToBlock(action), Stmt.Seqn()))
 }
 
 fun StmtConversionContext<ResultTrackingContext>.convertAndStore(exp: FirExpression): VariableEmbedding = store(convert(exp))
@@ -79,7 +73,7 @@ fun StmtConversionContext<ResultTrackingContext>.declareLocal(
     registerLocalPropertyName(name)
     val varEmb = VariableEmbedding(resolveLocalPropertyName(name), type, pos)
     addDeclaration(varEmb.toLocalVarDecl())
-    initializer?.let { varEmb.setValue(it, this, pos) }
+    initializer?.let { varEmb.legacySetValue(it, this, pos) }
     return varEmb
 }
 
@@ -127,7 +121,7 @@ fun StmtConversionContext<ResultTrackingContext>.getInlineFunctionCallArgs(
         is VariableEmbedding -> exp
         is LambdaExp -> exp
         else -> withResult(exp.type) {
-            resultCtx.resultVar.setValue(exp, this, null)
+            resultCtx.resultVar.legacySetValue(exp, this, null)
         }
     }
 }

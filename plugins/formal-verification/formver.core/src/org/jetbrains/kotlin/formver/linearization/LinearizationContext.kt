@@ -9,6 +9,7 @@ import org.jetbrains.kotlin.KtSourceElement
 import org.jetbrains.kotlin.formver.embeddings.TypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.VariableEmbedding
 import org.jetbrains.kotlin.formver.viper.ast.Exp
+import org.jetbrains.kotlin.formver.viper.ast.Label
 import org.jetbrains.kotlin.formver.viper.ast.Stmt
 
 /**
@@ -24,8 +25,22 @@ interface LinearizationContext : SeqnBuildContext {
     fun newVar(type: TypeEmbedding): VariableEmbedding
 
     fun inhaleForThisStatement(assumption: Exp)
-    fun withNewScope(action: LinearizationContext.() -> Unit): Stmt.Seqn
-    fun withPosition(newPosition: KtSourceElement, action: LinearizationContext.() -> Unit)
+    fun withNewScopeToBlock(action: LinearizationContext.() -> Unit): Stmt.Seqn
+    fun <R> withNewScope(action: LinearizationContext.() -> R): R
+    fun <R> withPosition(newPosition: KtSourceElement, action: LinearizationContext.() -> R): R
+
+    /**
+     * Hacky extra method to add statements that do not represent part of the computation,
+     * but rather are things like inhale, assert, etc.
+     *
+     * Easy to end up with something other than what you want, please use sparingly.
+     */
+    fun addImmediateStatement(stmt: Stmt)
 }
 
 fun <R> LinearizationContext.withNewVar(type: TypeEmbedding, action: (v: VariableEmbedding) -> R): R = action(newVar(type))
+
+fun LinearizationContext.addLabel(label: Label) {
+    addStatement(label.toStmt())
+    addDeclaration(label.toDecl())
+}

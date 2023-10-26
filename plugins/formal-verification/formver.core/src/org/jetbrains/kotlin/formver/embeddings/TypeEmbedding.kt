@@ -5,7 +5,6 @@
 
 package org.jetbrains.kotlin.formver.embeddings
 
-import org.jetbrains.kotlin.KtSourceElement
 import org.jetbrains.kotlin.formver.conversion.AccessPolicy
 import org.jetbrains.kotlin.formver.conversion.SpecialFields
 import org.jetbrains.kotlin.formver.domains.*
@@ -185,7 +184,7 @@ data class NullableTypeEmbedding(val elementType: TypeEmbedding) : TypeEmbedding
         override val mangled: String = "N" + elementType.name.mangled
     }
 
-    fun nullVal(source: KtSourceElement? = null): ExpEmbedding = NullLit(elementType, source)
+    fun nullVal() = NullLit(elementType)
 
     override fun provenInvariants(v: Exp) = listOf(subtypeInvariant(v))
 
@@ -274,17 +273,17 @@ data class ClassTypeEmbedding(val className: ScopedKotlinName) : TypeEmbedding {
     private fun initPredicate(): Predicate {
         val subjectEmbedding = VariableEmbedding(ClassPredicateSubjectName, this)
         val accessFields = fields.values
-            .flatMap { it.accessInvariantsForParameter(subjectEmbedding.toViper()) }
+            .flatMap { it.accessInvariantsForParameter(subjectEmbedding.toLocalVarUse()) }
 
         // For the moment ALWAYS_WRITEABLE fields with some class type do not exist.
         // Whether to include them here will need to be considered in the future.
         val accessFieldPredicates = fields.values
             .filter { it.accessPolicy == AccessPolicy.ALWAYS_READABLE }
-            .flatMap { it.type.predicateAccessInvariants(Exp.FieldAccess(subjectEmbedding.toViper(), it.toViper())) }
+            .flatMap { it.type.predicateAccessInvariants(Exp.FieldAccess(subjectEmbedding.toLocalVarUse(), it.toViper())) }
 
         val accessSuperTypesPredicates = superTypes
             .filterIsInstance<ClassTypeEmbedding>()
-            .map { ExpWrapper(Exp.PredicateAccess(it.name, listOf(subjectEmbedding.toViper())), BooleanTypeEmbedding) }
+            .map { ExpWrapper(Exp.PredicateAccess(it.name, listOf(subjectEmbedding.toLocalVarUse())), BooleanTypeEmbedding) }
 
         val body = (accessFields + accessFieldPredicates + accessSuperTypesPredicates).toConjunction()
         return Predicate(name, listOf(subjectEmbedding.toLocalVarDecl()), body.toViper())

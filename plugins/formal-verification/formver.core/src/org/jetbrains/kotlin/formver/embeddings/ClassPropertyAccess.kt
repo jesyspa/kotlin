@@ -13,9 +13,9 @@ import org.jetbrains.kotlin.formver.conversion.StmtConversionContext
 // missing getter or setter will never be accessed.
 class ClassPropertyAccess(val receiver: ExpEmbedding, val property: PropertyEmbedding) :
     PropertyAccessEmbedding {
-    override fun getValue(ctx: StmtConversionContext<ResultTrackingContext>, source: KtSourceElement?): ExpEmbedding = property.getter!!.getValue(receiver, ctx, source)
+    override fun legacyGetValue(ctx: StmtConversionContext<ResultTrackingContext>, source: KtSourceElement?): ExpEmbedding = property.getter!!.getValue(receiver, ctx, source)
 
-    override fun setValue(value: ExpEmbedding, ctx: StmtConversionContext<ResultTrackingContext>, source: KtSourceElement?) {
+    override fun legacySetValue(value: ExpEmbedding, ctx: StmtConversionContext<ResultTrackingContext>, source: KtSourceElement?) {
         property.setter!!.setValue(receiver, value, ctx, source)
     }
 }

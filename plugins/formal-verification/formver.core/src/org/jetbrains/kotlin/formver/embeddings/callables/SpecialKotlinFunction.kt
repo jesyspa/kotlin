@@ -103,7 +103,7 @@ object KotlinIntDivFunctionImplementation : KotlinIntSpecialFunction() {
         ctx: StmtConversionContext<ResultTrackingContext>,
         source: KtSourceElement?,
     ): ExpEmbedding {
-        ctx.addStatement(Stmt.Inhale(NeCmp(args[1], IntLit(0)).toViper()))
+        ctx.addStatement(Stmt.Inhale(NeCmp(args[1], IntLit(0)).toViperExp()))
         return Div(args[0], args[1])
     }
 }

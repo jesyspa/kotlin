@@ -21,7 +21,10 @@ import org.jetbrains.kotlin.formver.asPosition
 import org.jetbrains.kotlin.formver.domains.*
 import org.jetbrains.kotlin.formver.embeddings.*
 import org.jetbrains.kotlin.formver.embeddings.callables.*
+import org.jetbrains.kotlin.formver.linearization.Linearizer
 import org.jetbrains.kotlin.formver.linearization.SeqnBuilder
+import org.jetbrains.kotlin.formver.linearization.SharedLinearizationState
+import org.jetbrains.kotlin.formver.linearization.toPureViperExp
 import org.jetbrains.kotlin.formver.names.*
 import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.formver.viper.ast.Method
@@ -268,19 +271,22 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
                     0,
                     returnPointName = signature.sourceName
                 )
-            val stmtCtx = StmtConverter(methodCtx, SeqnBuilder(it.source), NoopResultTrackerFactory)
+            val stmtCtx = StmtConverter(methodCtx, NoopResultTrackerFactory)
+            val expEmbedding = stmtCtx.convert(it)
+            val source = declaration.source!!
+            val linearizer = Linearizer(SharedLinearizationState(), SeqnBuilder(source), source)
             signature.formalArgs.forEach { arg ->
                 // Ideally we would want to assume these rather than inhale them to prevent inconsistencies with permissions.
                 // Unfortunately Silicon for some reason does not allow Assumes. However, it doesn't matter as long as the
                 // provenInvariants don't contain permissions.
                 arg.provenInvariants().forEach { invariant ->
-                    stmtCtx.addStatement(Stmt.Inhale(invariant.toViper(), arg.source.asPosition))
+                    linearizer.addStatement(Stmt.Inhale(invariant.toPureViperExp(source), source.asPosition))
                 }
             }
-            stmtCtx.addDeclaration(methodCtx.returnLabel.toDecl())
-            stmtCtx.convert(it)
-            stmtCtx.addStatement(methodCtx.returnLabel.toStmt())
-            stmtCtx.block
+            linearizer.addDeclaration(methodCtx.returnLabel.toDecl())
+            expEmbedding.toViperExp(linearizer)
+            linearizer.addStatement(methodCtx.returnLabel.toStmt())
+            linearizer.block
         }
 
         return signature.toViperMethod(body, declaration.source.asPosition)

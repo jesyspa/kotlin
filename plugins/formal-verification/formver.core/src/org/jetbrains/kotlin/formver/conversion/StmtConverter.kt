@@ -5,12 +5,12 @@
 
 package org.jetbrains.kotlin.formver.conversion
 
+import org.jetbrains.kotlin.fir.FirLabel
 import org.jetbrains.kotlin.fir.expressions.FirCatch
 import org.jetbrains.kotlin.fir.expressions.FirStatement
 import org.jetbrains.kotlin.formver.embeddings.ExpEmbedding
 import org.jetbrains.kotlin.formver.embeddings.TypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.VariableEmbedding
-import org.jetbrains.kotlin.formver.linearization.SeqnBuildContext
 import org.jetbrains.kotlin.formver.linearization.SeqnBuilder
 import org.jetbrains.kotlin.formver.names.BreakLabelName
 import org.jetbrains.kotlin.formver.names.ContinueLabelName
@@ -28,16 +28,15 @@ import org.jetbrains.kotlin.formver.viper.ast.Stmt
  */
 data class StmtConverter<out RTC : ResultTrackingContext>(
     private val methodCtx: MethodConversionContext,
-    private val seqnCtx: SeqnBuildContext,
     private val resultCtxFactory: ResultTrackerFactory<RTC>,
     private val whileIndex: Int = 0,
     override val whenSubject: VariableEmbedding? = null,
     override val checkedSafeCallSubject: ExpEmbedding? = null,
     private val scopeDepth: Int = 0,
     override val activeCatchLabels: List<Label> = listOf(),
-) : StmtConversionContext<RTC>, SeqnBuildContext by seqnCtx, MethodConversionContext by methodCtx, ResultTrackingContext {
+) : StmtConversionContext<RTC>, MethodConversionContext by methodCtx, ResultTrackingContext {
     private fun <NewRTC : ResultTrackingContext> withResultFactory(newFactory: ResultTrackerFactory<NewRTC>): StmtConverter<NewRTC> =
-        StmtConverter(this, seqnCtx, newFactory, whileIndex, whenSubject, checkedSafeCallSubject, scopeDepth, activeCatchLabels)
+        StmtConverter(this, newFactory, whileIndex, whenSubject, checkedSafeCallSubject, scopeDepth, activeCatchLabels)
 
     override val resultCtx: RTC
         get() = resultCtxFactory.build(this)
@@ -93,15 +92,11 @@ data class StmtConverter<out RTC : ResultTrackingContext>(
         methodCtx.addLoopIdentifier(targetName, whileIndex)
     }
 
-    override fun <R> withFreshWhile(action: StmtConversionContext<RTC>.() -> R): R {
+    override fun <R> withFreshWhile(label: FirLabel?, action: StmtConversionContext<RTC>.() -> R): R {
         val freshIndex = whileIndexProducer.getFresh()
         val ctx = copy(whileIndex = freshIndex)
-        addDeclaration(ctx.continueLabel().toDecl())
-        addStatement(ctx.continueLabel().toStmt())
-        val result = ctx.action()
-        addDeclaration(ctx.breakLabel().toDecl())
-        addStatement(ctx.breakLabel().toStmt())
-        return result
+        label?.name?.let { ctx.addLoopName(it) }
+        return ctx.action()
     }
 
     override fun <R> withWhenSubject(subject: VariableEmbedding?, action: StmtConversionContext<RTC>.() -> R): R =

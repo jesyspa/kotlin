@@ -10,17 +10,17 @@ import org.jetbrains.kotlin.formver.conversion.ResultTrackingContext
 import org.jetbrains.kotlin.formver.conversion.StmtConversionContext
 
 interface PropertyAccessEmbedding {
-    fun getValue(ctx: StmtConversionContext<ResultTrackingContext>, source: KtSourceElement?): ExpEmbedding
-    fun setValue(value: ExpEmbedding, ctx: StmtConversionContext<ResultTrackingContext>, source: KtSourceElement?)
+    fun legacyGetValue(ctx: StmtConversionContext<ResultTrackingContext>, source: KtSourceElement?): ExpEmbedding
+    fun legacySetValue(value: ExpEmbedding, ctx: StmtConversionContext<ResultTrackingContext>, source: KtSourceElement?)
 }
 
 fun ExpEmbedding.asPropertyAccess() = when (this) {
     is PropertyAccessEmbedding -> this
     else -> object : PropertyAccessEmbedding {
-        override fun getValue(ctx: StmtConversionContext<ResultTrackingContext>, source: KtSourceElement?): ExpEmbedding =
+        override fun legacyGetValue(ctx: StmtConversionContext<ResultTrackingContext>, source: KtSourceElement?): ExpEmbedding =
             this@asPropertyAccess
 
-        override fun setValue(value: ExpEmbedding, ctx: StmtConversionContext<ResultTrackingContext>, source: KtSourceElement?) {
+        override fun legacySetValue(value: ExpEmbedding, ctx: StmtConversionContext<ResultTrackingContext>, source: KtSourceElement?) {
             throw IllegalStateException("Property does not have a settable value")
         }
     }

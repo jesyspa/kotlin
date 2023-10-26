@@ -21,11 +21,10 @@ interface CallableEmbedding : CallableSignature {
 
 fun CallableEmbedding.insertCall(
     args: List<ExpEmbedding>,
-    ctx: StmtConversionContext<ResultTrackingContext>,
-    source: KtSourceElement?,
+    ctx: StmtConversionContext<ResultTrackingContext>
 ): ExpEmbedding {
     return args.zip(formalArgTypes)
         .map { (arg, type) -> arg.withType(type) }
-        .let { insertCallImpl(it, ctx, source) }
+        .let { insertCallImpl(it, ctx) }
         .withType(returnType)
 }

@@ -30,14 +30,24 @@ data class Linearizer(
         state.assumptionTracker.addAssumption(assumption)
     }
 
-    override fun withNewScope(action: LinearizationContext.() -> Unit): Stmt.Seqn {
+    override fun withNewScopeToBlock(action: LinearizationContext.() -> Unit): Stmt.Seqn {
         val newBuilder = SeqnBuilder(source)
         copy(seqnBuilder = newBuilder).action()
         return newBuilder.block
     }
 
-    override fun withPosition(newPosition: KtSourceElement, action: LinearizationContext.() -> Unit) {
+    override fun <R> withNewScope(action: LinearizationContext.() -> R): R {
+        val newBuilder = SeqnBuilder(source)
+        val result = copy(seqnBuilder = newBuilder).action()
+        addStatement(newBuilder.block)
+        return result
+    }
+
+    override fun <R> withPosition(newPosition: KtSourceElement, action: LinearizationContext.() -> R): R =
         copy(source = newPosition).action()
+
+    override fun addImmediateStatement(stmt: Stmt) {
+        seqnBuilder.addStatement(stmt)
     }
 
     override fun addStatement(stmt: Stmt) {

@@ -40,7 +40,7 @@ class VarResultTrackerFactory(val resultVar: VariableEmbedding) : ResultTrackerF
     override fun build(ctx: StmtConversionContext<VarResultTrackingContext>): VarResultTrackingContext =
         object : VarResultTrackingContext(resultVar) {
             override fun capture(exp: ExpEmbedding) {
-                ctx.addStatement(Stmt.assign(resultExp.toViper(), exp.withType(resultVar.type).toViper()))
+                ctx.addStatement(Stmt.assign(resultExp.toViperExp(), exp.withType(resultVar.type).toViperExp()))
             }
         }
 }

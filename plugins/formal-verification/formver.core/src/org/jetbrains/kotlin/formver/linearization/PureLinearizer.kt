@@ -6,6 +6,7 @@
 package org.jetbrains.kotlin.formver.linearization
 
 import org.jetbrains.kotlin.KtSourceElement
+import org.jetbrains.kotlin.formver.embeddings.ExpEmbedding
 import org.jetbrains.kotlin.formver.embeddings.TypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.VariableEmbedding
 import org.jetbrains.kotlin.formver.viper.ast.Declaration
@@ -22,9 +23,7 @@ class PureLinearizerError(val offendingFunction: String) : IllegalStateException
  * would be an error.
  */
 class PureLinearizer(override val source: KtSourceElement) : LinearizationContext {
-    override fun withPosition(newPosition: KtSourceElement, action: LinearizationContext.() -> Unit) {
-        PureLinearizer(newPosition).action()
-    }
+    override fun<R> withPosition(newPosition: KtSourceElement, action: LinearizationContext.() -> R): R = PureLinearizer(newPosition).action()
 
     override fun newVar(type: TypeEmbedding): VariableEmbedding {
         throw PureLinearizerError("newVar")
@@ -34,8 +33,16 @@ class PureLinearizer(override val source: KtSourceElement) : LinearizationContex
         throw PureLinearizerError("inhaleForThisStatement")
     }
 
-    override fun withNewScope(action: LinearizationContext.() -> Unit): Stmt.Seqn {
+    override fun withNewScopeToBlock(action: LinearizationContext.() -> Unit): Stmt.Seqn {
+        throw PureLinearizerError("withNewScopeToBlock")
+    }
+
+    override fun <R> withNewScope(action: LinearizationContext.() -> R): R {
         throw PureLinearizerError("withNewScope")
+    }
+
+    override fun addImmediateStatement(stmt: Stmt) {
+        throw PureLinearizerError("addImmediateStatement")
     }
 
     override fun addStatement(stmt: Stmt) {
@@ -49,3 +56,15 @@ class PureLinearizer(override val source: KtSourceElement) : LinearizationContex
     override val block: Stmt.Seqn
         get() = throw PureLinearizerError("block")
 }
+
+fun ExpEmbedding.toPureViperExp(source: KtSourceElement): Exp {
+    try {
+        return toViperExp(PureLinearizer(source))
+    } catch (e: PureLinearizerError) {
+        val msg =
+            "PureLinearizer used to convert non-pure ExpEmbedding $this; operation ${e.offendingFunction} is not supported in a pure context."
+        throw IllegalStateException(msg)
+    }
+}
+
+fun List<ExpEmbedding>.toPureViperExps(source: KtSourceElement): List<Exp> = map { it.toPureViperExp(source) }
