@@ -8,12 +8,10 @@ package org.jetbrains.kotlin.formver.linearization
 import org.jetbrains.kotlin.formver.viper.ast.Exp
 
 class AssumptionTracker {
-    val assumptions = mutableListOf<Exp>()
+    private val assumptions = LinkedHashSet<Exp>()
 
     fun addAssumption(assumption: Exp) {
-        if (assumption !in assumptions) {
-            assumptions.add(assumption)
-        }
+        assumptions.add(assumption)
     }
 
     fun clear() {

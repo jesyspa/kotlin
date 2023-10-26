@@ -6,12 +6,19 @@
 package org.jetbrains.kotlin.formver.linearization
 
 import org.jetbrains.kotlin.KtSourceElement
+import org.jetbrains.kotlin.formver.asPosition
 import org.jetbrains.kotlin.formver.embeddings.TypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.VariableEmbedding
 import org.jetbrains.kotlin.formver.viper.ast.Declaration
 import org.jetbrains.kotlin.formver.viper.ast.Exp
 import org.jetbrains.kotlin.formver.viper.ast.Stmt
 
+/**
+ * Standard context for linearization.
+ *
+ * Note that the implementation for `SeqnBuilderContext` is not provided directly by the `seqnBuilder` constructor parameter;
+ * the class may insert extra statements at various points.
+ */
 data class Linearizer(
     val state: SharedLinearizationState,
     val seqnBuilder: SeqnBuilder,
@@ -34,9 +41,9 @@ data class Linearizer(
     }
 
     override fun addStatement(stmt: Stmt) {
-        state.assumptionTracker.forEachForwards { seqnBuilder.addStatement(Stmt.Inhale(it)) }
+        state.assumptionTracker.forEachForwards { seqnBuilder.addStatement(Stmt.Inhale(it, source.asPosition)) }
         seqnBuilder.addStatement(stmt)
-        state.assumptionTracker.forEachBackwards { seqnBuilder.addStatement(Stmt.Exhale(it)) }
+        state.assumptionTracker.forEachBackwards { seqnBuilder.addStatement(Stmt.Exhale(it, source.asPosition)) }
         state.assumptionTracker.clear()
     }
 

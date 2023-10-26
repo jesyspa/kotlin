@@ -11,6 +11,13 @@ import org.jetbrains.kotlin.formver.embeddings.VariableEmbedding
 import org.jetbrains.kotlin.formver.viper.ast.Exp
 import org.jetbrains.kotlin.formver.viper.ast.Stmt
 
+/**
+ * Context in which an `ExpEmbedding` can be flattened to an `Exp` and a sequence of `Stmt`s.
+ *
+ * We do not distinguish between expressions and statements on the Kotlin side, but we do on the Viper side.
+ * As such, an `ExpEmbedding` can represent a nested structure that has to be flattened into sequences
+ * of statements. We call this process linearization.
+ */
 interface LinearizationContext : SeqnBuildContext {
     val source: KtSourceElement
 

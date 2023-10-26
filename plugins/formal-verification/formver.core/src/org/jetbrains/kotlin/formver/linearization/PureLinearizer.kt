@@ -14,6 +14,13 @@ import org.jetbrains.kotlin.formver.viper.ast.Stmt
 
 class PureLinearizerError(val offendingFunction: String) : IllegalStateException(offendingFunction)
 
+/**
+ * Linearization context that does not permit generation of statements.
+ *
+ * There are cases in Viper where we expect our result to be an expression by itself, for example when
+ * processing preconditions, postconditions, and invariants. In those cases, generating statements
+ * would be an error.
+ */
 class PureLinearizer(override val source: KtSourceElement) : LinearizationContext {
     override fun withPosition(newPosition: KtSourceElement, action: LinearizationContext.() -> Unit) {
         PureLinearizer(newPosition).action()
