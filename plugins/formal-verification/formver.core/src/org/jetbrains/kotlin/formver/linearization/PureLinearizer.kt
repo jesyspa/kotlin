@@ -6,9 +6,8 @@
 package org.jetbrains.kotlin.formver.linearization
 
 import org.jetbrains.kotlin.KtSourceElement
-import org.jetbrains.kotlin.formver.embeddings.ExpEmbedding
 import org.jetbrains.kotlin.formver.embeddings.TypeEmbedding
-import org.jetbrains.kotlin.formver.embeddings.VariableEmbedding
+import org.jetbrains.kotlin.formver.embeddings.expression.ExpEmbedding
 import org.jetbrains.kotlin.formver.viper.ast.Declaration
 import org.jetbrains.kotlin.formver.viper.ast.Exp
 import org.jetbrains.kotlin.formver.viper.ast.Stmt
@@ -26,7 +25,7 @@ class PureLinearizer(override val source: KtSourceElement?) : LinearizationConte
     override fun <R> withPosition(newSource: KtSourceElement, action: LinearizationContext.() -> R): R =
         PureLinearizer(newSource).action()
 
-    override fun newVar(type: TypeEmbedding): VariableEmbedding {
+    override fun freshAnonVar(type: TypeEmbedding): Exp.LocalVar {
         throw PureLinearizerError("newVar")
     }
 
@@ -34,8 +33,8 @@ class PureLinearizer(override val source: KtSourceElement?) : LinearizationConte
         throw PureLinearizerError("inhaleForThisStatement")
     }
 
-    override fun withNewScope(action: LinearizationContext.() -> Unit): Stmt.Seqn {
-        throw PureLinearizerError("withNewScope")
+    override fun asBlock(action: LinearizationContext.() -> Unit): Stmt.Seqn {
+        throw PureLinearizerError("withNewScopeToBlock")
     }
 
     override fun addStatement(stmt: Stmt) {
