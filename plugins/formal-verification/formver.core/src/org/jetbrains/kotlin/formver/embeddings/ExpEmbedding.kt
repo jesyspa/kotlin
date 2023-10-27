@@ -29,18 +29,25 @@ sealed interface ExpEmbedding {
     fun ignoringCastsAndMetaNodes(): ExpEmbedding = this
 }
 
+/**
+ * `ExpEmbedding` that can be converted to an `Exp` without any linearization context.
+ */
 sealed interface PureExpEmbedding : ExpEmbedding {
     fun toViper(source: KtSourceElement? = null): Exp
     override fun toViper(ctx: LinearizationContext): Exp = toViper(ctx.source)
 }
 
+/**
+ * `ExpEmbedding` that wraps another `ExpEmbedding` and delegates all the generation to the inner one.
+ *
+ * The embedding can still modify the context, which is the main use for this type of embedding.
+ */
 sealed interface PassthroughExpEmbedding : ExpEmbedding {
     val inner: ExpEmbedding
     override val type: TypeEmbedding
         get() = inner.type
 
-    override fun toViper(ctx: LinearizationContext): Exp =
-        withPassthroughHook(ctx) { inner.toViper(this) }
+    override fun toViper(ctx: LinearizationContext): Exp = withPassthroughHook(ctx) { inner.toViper(this) }
 
 
     fun <R> withPassthroughHook(ctx: LinearizationContext, action: LinearizationContext.() -> R): R
