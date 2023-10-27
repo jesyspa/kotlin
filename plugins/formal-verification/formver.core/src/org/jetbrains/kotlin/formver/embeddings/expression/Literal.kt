@@ -8,13 +8,16 @@ package org.jetbrains.kotlin.formver.embeddings.expression
 import org.jetbrains.kotlin.KtSourceElement
 import org.jetbrains.kotlin.formver.asPosition
 import org.jetbrains.kotlin.formver.domains.NullableDomain
-import org.jetbrains.kotlin.formver.domains.UnitDomain
-import org.jetbrains.kotlin.formver.embeddings.*
+import org.jetbrains.kotlin.formver.embeddings.BooleanTypeEmbedding
+import org.jetbrains.kotlin.formver.embeddings.IntTypeEmbedding
+import org.jetbrains.kotlin.formver.embeddings.NullableTypeEmbedding
+import org.jetbrains.kotlin.formver.embeddings.TypeEmbedding
+import org.jetbrains.kotlin.formver.linearization.LinearizationContext
 import org.jetbrains.kotlin.formver.viper.ast.Exp
 
-data object UnitLit : PureExpEmbedding {
-    override val type = UnitTypeEmbedding
-    override fun toViper(source: KtSourceElement?) = UnitDomain.element
+data object UnitLit : UnitResultExpEmbedding {
+    // No operation: we just want to return unit.
+    override fun toViperSideEffects(ctx: LinearizationContext) {}
 }
 
 data class IntLit(val value: Int) : PureExpEmbedding {

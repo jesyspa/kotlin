@@ -27,7 +27,7 @@ class LambdaExp(
     FunctionSignature by signature {
     override val type: TypeEmbedding = FunctionTypeEmbedding(signature.asData)
 
-    override fun toViperStoringIn(result: Exp, ctx: LinearizationContext) {
+    override fun toViperStoringIn(result: Exp.LocalVar, ctx: LinearizationContext) {
         TODO("create new function object with counter, duplicable (requires toViper restructuring)")
     }
 
