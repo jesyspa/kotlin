@@ -52,7 +52,7 @@ object ErrorAdapter {
  * Given a verification error, find embedded extra information of type `I` in the
  * error's offending nodes. If such information is not found, return `default` as value.
  */
-inline fun <reified I> VerificationError.getInfoOr(default: I): I =
+inline fun <reified I> VerificationError.getInfoOrNull(): I? =
     Info.fromSilver(result.offendingNode().prettyMetadata._2()).unwrapOr<I> {
-        Info.fromSilver(result.reason().offendingNode().prettyMetadata._2()).unwrapOr<I> { default }
+        Info.fromSilver(result.reason().offendingNode().prettyMetadata._2()).unwrapOr<I> { null }
     }

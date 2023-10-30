@@ -20,15 +20,15 @@ object VerifierErrorInterpreter {
     }
 
     private fun VerificationError.toHumanReadableMessage(debug: Boolean): HumanReadableMessage {
-        val role = getInfoOr<SourceRole>(SourceRole.Unknown)
+        val role = getInfoOrNull<SourceRole>()
         return when {
             this is PostconditionViolated && role is SourceRole.ReturnsTrueEffect ->
                 HumanReadableMessage(PluginErrors.UNEXPECTED_RETURNED_VALUE, "false")
             this is PostconditionViolated && role is SourceRole.ReturnsFalseEffect ->
                 HumanReadableMessage(PluginErrors.UNEXPECTED_RETURNED_VALUE, "true")
-            this is PostconditionViolated && role is SourceRole.CondNullEffect ->
+            this is PostconditionViolated && role is SourceRole.ReturnsNullEffect ->
                 HumanReadableMessage(PluginErrors.UNEXPECTED_RETURNED_VALUE, "non-null")
-            this is PostconditionViolated && role is SourceRole.CondNotNullEffect ->
+            this is PostconditionViolated && role is SourceRole.ReturnsNotNullEffect ->
                 HumanReadableMessage(PluginErrors.UNEXPECTED_RETURNED_VALUE, "null")
             else -> HumanReadableMessage(PluginErrors.VIPER_VERIFICATION_ERROR, debug.ifTrue { msg })
         }

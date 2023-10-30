@@ -11,8 +11,8 @@ sealed interface SourceRole {
     data object ReturnsEffect : SourceRole
     data object ReturnsTrueEffect : SourceRole
     data object ReturnsFalseEffect : SourceRole
-    data object CondNullEffect : SourceRole
-    data object CondNotNullEffect : SourceRole
+    data object ReturnsNullEffect : SourceRole
+    data object ReturnsNotNullEffect : SourceRole
 }
 
 val SourceRole?.asInfo: Info

@@ -35,7 +35,7 @@ sealed class Info : IntoSilver<viper.silver.ast.Info> {
 }
 
 @Suppress("UNCHECKED_CAST")
-inline fun <I> Info.unwrapOr(orBlock: () -> I): I = when (this) {
+inline fun <I> Info.unwrapOr(orBlock: () -> I?): I? = when (this) {
     is Info.Wrapped -> info as I
     else -> orBlock()
 }

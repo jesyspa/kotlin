@@ -69,8 +69,8 @@ class ContractDescriptionConversionVisitor(
              * values and null. In a function that has a non-nullable return type, returnsNotNull() is mapped to true and returns(null)
              * is mapped to false
              */
-            ConeContractConstantValues.NULL -> retVar.nullCmp(false, SourceRole.CondNullEffect)
-            ConeContractConstantValues.NOT_NULL -> retVar.nullCmp(true, SourceRole.CondNotNullEffect)
+            ConeContractConstantValues.NULL -> retVar.nullCmp(false, SourceRole.ReturnsNullEffect)
+            ConeContractConstantValues.NOT_NULL -> retVar.nullCmp(true, SourceRole.ReturnsNotNullEffect)
             ConeContractConstantValues.TRUE -> EqCmp(retVar, BooleanLit(true), SourceRole.ReturnsTrueEffect)
             ConeContractConstantValues.FALSE -> EqCmp(retVar, BooleanLit(false), SourceRole.ReturnsFalseEffect)
             else -> throw IllegalArgumentException("Unexpected constant: ${returnsEffect.value}")
@@ -173,7 +173,7 @@ class ContractDescriptionConversionVisitor(
 
     private fun VariableEmbedding.nullCmp(
         isNegated: Boolean,
-        sourceRole: SourceRole = SourceRole.Unknown,
+        sourceRole: SourceRole? = null,
     ): ExpEmbedding =
         if (type is NullableTypeEmbedding) {
             if (isNegated) {
