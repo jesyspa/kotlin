@@ -9,6 +9,7 @@ enum class ErrorStyle {
     USER_FRIENDLY,
     ORIGINAL_VIPER,
     BOTH;
+
     companion object {
         @JvmStatic
         fun defaultBehaviour(): ErrorStyle = USER_FRIENDLY

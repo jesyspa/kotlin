@@ -26,6 +26,7 @@ class ExtensionRegistrarConfigurator(testServices: TestServices) : EnvironmentCo
             else TargetsSelection.TARGETS_WITH_CONTRACT
         val config = PluginConfiguration(
             logLevel,
+            ErrorStyle.USER_FRIENDLY,
             UnsupportedFeatureBehaviour.THROW_EXCEPTION,
             conversionSelection = TargetsSelection.ALL_TARGETS,
             verificationSelection = verificationSelection

@@ -29,18 +29,13 @@ object FormalVerificationPluginErrorMessages : BaseDiagnosticRendererFactory() {
         )
         put(
             PluginErrors.INTERNAL_ERROR,
-            "Formal verification internal error: {0}",
+            "An internal error has occurred.\nDetails: {0}\nPlease report this at https://github.com/jesyspa/kotlin",
             CommonRenderers.STRING,
         )
         put(
             PluginErrors.MINOR_INTERNAL_ERROR,
             "Formal verification non-fatal internal error: {0}",
             CommonRenderers.STRING,
-        )
-        put(
-            PluginErrors.REPORT_CONSISTENCY_ERROR,
-            "An internal error has occurred while verifying the function. Please report the issue.",
-            CommonRenderers.STRING
         )
         put(
             PluginErrors.UNEXPECTED_RETURNED_VALUE,

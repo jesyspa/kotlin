@@ -18,7 +18,6 @@ object PluginErrors {
     val MINOR_INTERNAL_ERROR by error1<PsiElement, String>(SourceElementPositioningStrategies.DECLARATION_NAME)
     val VIPER_VERIFICATION_ERROR by warning1<PsiElement, String>()
     val VIPER_CONSISTENCY_ERROR by warning1<PsiElement, String>(SourceElementPositioningStrategies.DECLARATION_NAME)
-    val REPORT_CONSISTENCY_ERROR by error1<PsiElement, String>()
     val UNEXPECTED_RETURNED_VALUE by warning1<PsiElement, String>()
 
     init {
