@@ -5,11 +5,18 @@
 
 package org.jetbrains.kotlin.formver.info
 
-sealed class SourceRole {
-    data object Unknown : SourceRole()
-    data object ReturnsEffect : SourceRole()
-    data object ReturnsTrueEffect : SourceRole()
-    data object ReturnsFalseEffect : SourceRole()
-    data object CondNullEffect : SourceRole()
-    data object CondNotNullEffect : SourceRole()
+import org.jetbrains.kotlin.formver.viper.ast.Info
+
+sealed interface SourceRole {
+    data object ReturnsEffect : SourceRole
+    data object ReturnsTrueEffect : SourceRole
+    data object ReturnsFalseEffect : SourceRole
+    data object CondNullEffect : SourceRole
+    data object CondNotNullEffect : SourceRole
 }
+
+val SourceRole?.asInfo: Info
+    get() = when (this) {
+        null -> Info.NoInfo
+        else -> Info.Wrapped(this)
+    }
