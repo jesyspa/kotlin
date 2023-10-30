@@ -12,8 +12,8 @@ import org.jetbrains.kotlin.formver.embeddings.BooleanTypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.IntTypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.NullableTypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.TypeEmbedding
-import org.jetbrains.kotlin.formver.info.SourceRole
-import org.jetbrains.kotlin.formver.info.asInfo
+import org.jetbrains.kotlin.formver.SourceRole
+import org.jetbrains.kotlin.formver.asInfo
 import org.jetbrains.kotlin.formver.linearization.LinearizationContext
 import org.jetbrains.kotlin.formver.viper.ast.Exp
 

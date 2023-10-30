@@ -6,7 +6,6 @@
 package org.jetbrains.kotlin.formver
 
 import org.jetbrains.kotlin.diagnostics.KtDiagnosticFactory1
-import org.jetbrains.kotlin.formver.info.SourceRole
 import org.jetbrains.kotlin.formver.viper.errors.*
 import org.jetbrains.kotlin.utils.addToStdlib.ifTrue
 
