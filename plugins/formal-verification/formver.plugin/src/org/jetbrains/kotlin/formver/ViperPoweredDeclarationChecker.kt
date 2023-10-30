@@ -15,6 +15,11 @@ import org.jetbrains.kotlin.fir.declarations.FirContractDescriptionOwner
 import org.jetbrains.kotlin.fir.declarations.FirSimpleFunction
 import org.jetbrains.kotlin.fir.declarations.hasAnnotation
 import org.jetbrains.kotlin.formver.conversion.ProgramConverter
+import org.jetbrains.kotlin.formver.reporting.VerifierErrorInterpreter
+import org.jetbrains.kotlin.formver.reporting.style.BothStrategy
+import org.jetbrains.kotlin.formver.reporting.style.ErrorStyleStrategy
+import org.jetbrains.kotlin.formver.reporting.style.OriginalViperStrategy
+import org.jetbrains.kotlin.formver.reporting.style.UserFriendlyStrategy
 import org.jetbrains.kotlin.formver.viper.Verifier
 import org.jetbrains.kotlin.formver.viper.ast.Program
 import org.jetbrains.kotlin.formver.viper.ast.unwrapOr
@@ -51,8 +56,7 @@ class ViperPoweredDeclarationChecker(private val session: FirSession, private va
             }
 
             val verifier = Verifier()
-            val errorInterpreter = VerifierErrorInterpreter()
-
+            val errorInterpreter = VerifierErrorInterpreter(config.errorStyle.strategy)
             val onFailure = { err: VerifierError ->
                 val source = err.position.unwrapOr { declaration.source }
                 with(errorInterpreter) {
@@ -100,4 +104,11 @@ class ViperPoweredDeclarationChecker(private val session: FirSession, private va
         declaration.hasAnnotation(alwaysVerifyId, session) -> true
         else -> verificationSelection.applicable(declaration)
     }
+
+    private val ErrorStyle.strategy: ErrorStyleStrategy
+        get() = when (this) {
+            ErrorStyle.ORIGINAL_VIPER -> OriginalViperStrategy
+            ErrorStyle.USER_FRIENDLY -> UserFriendlyStrategy
+            ErrorStyle.BOTH -> BothStrategy
+        }
 }
