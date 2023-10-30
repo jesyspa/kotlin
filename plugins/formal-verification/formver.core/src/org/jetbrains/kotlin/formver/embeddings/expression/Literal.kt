@@ -17,7 +17,7 @@ import org.jetbrains.kotlin.formver.viper.ast.Exp
 
 data object UnitLit : UnitResultExpEmbedding {
     // No operation: we just want to return unit.
-    override fun toViperSideEffects(ctx: LinearizationContext) {}
+    override fun toViperSideEffects(ctx: LinearizationContext) = Unit
 }
 
 data class IntLit(val value: Int) : PureExpEmbedding {

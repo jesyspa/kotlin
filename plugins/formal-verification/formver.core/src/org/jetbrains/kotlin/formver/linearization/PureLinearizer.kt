@@ -12,7 +12,7 @@ import org.jetbrains.kotlin.formver.viper.ast.Declaration
 import org.jetbrains.kotlin.formver.viper.ast.Exp
 import org.jetbrains.kotlin.formver.viper.ast.Stmt
 
-class PureLinearizerError(val offendingFunction: String) : IllegalStateException(offendingFunction)
+class PureLinearizerMisuseException(val offendingFunction: String) : IllegalStateException(offendingFunction)
 
 /**
  * Linearization context that does not permit generation of statements.
@@ -26,33 +26,33 @@ class PureLinearizer(override val source: KtSourceElement?) : LinearizationConte
         PureLinearizer(newSource).action()
 
     override fun freshAnonVar(type: TypeEmbedding): Exp.LocalVar {
-        throw PureLinearizerError("newVar")
+        throw PureLinearizerMisuseException("newVar")
     }
 
     override fun inhaleForThisStatement(assumption: Exp) {
-        throw PureLinearizerError("inhaleForThisStatement")
+        throw PureLinearizerMisuseException("inhaleForThisStatement")
     }
 
     override fun asBlock(action: LinearizationContext.() -> Unit): Stmt.Seqn {
-        throw PureLinearizerError("withNewScopeToBlock")
+        throw PureLinearizerMisuseException("withNewScopeToBlock")
     }
 
     override fun addStatement(stmt: Stmt) {
-        throw PureLinearizerError("addStatement")
+        throw PureLinearizerMisuseException("addStatement")
     }
 
     override fun addDeclaration(decl: Declaration) {
-        throw PureLinearizerError("addDeclaration")
+        throw PureLinearizerMisuseException("addDeclaration")
     }
 
     override val block: Stmt.Seqn
-        get() = throw PureLinearizerError("block")
+        get() = throw PureLinearizerMisuseException("block")
 }
 
 fun ExpEmbedding.pureToViper(source: KtSourceElement? = null): Exp {
     try {
         return toViper(PureLinearizer(source))
-    } catch (e: PureLinearizerError) {
+    } catch (e: PureLinearizerMisuseException) {
         val msg =
             "PureLinearizer used to convert non-pure ExpEmbedding $this; operation ${e.offendingFunction} is not supported in a pure context."
         throw IllegalStateException(msg)
