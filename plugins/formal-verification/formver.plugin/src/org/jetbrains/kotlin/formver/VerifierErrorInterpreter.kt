@@ -5,13 +5,22 @@
 
 package org.jetbrains.kotlin.formver
 
+import org.jetbrains.kotlin.KtSourceElement
+import org.jetbrains.kotlin.diagnostics.DiagnosticReporter
 import org.jetbrains.kotlin.diagnostics.KtDiagnosticFactory1
+import org.jetbrains.kotlin.diagnostics.reportOn
+import org.jetbrains.kotlin.fir.analysis.checkers.context.CheckerContext
 import org.jetbrains.kotlin.formver.viper.errors.*
 import org.jetbrains.kotlin.utils.addToStdlib.ifTrue
 
 data class HumanReadableMessage(val pluginError: KtDiagnosticFactory1<String>, val extraMsg: String? = null)
 
-object VerifierErrorInterpreter {
+class VerifierErrorInterpreter {
+
+    fun DiagnosticReporter.reportVerifierError(source: KtSourceElement?, error: VerifierError, context: CheckerContext) {
+        val (diagnosticFactory, message) = error.toHumanReadableMessage()
+        reportOn(source, diagnosticFactory, message ?: "", context)
+    }
 
     private fun ConsistencyError.toHumanReadableMessage(debug: Boolean): HumanReadableMessage = when (debug) {
         true -> HumanReadableMessage(PluginErrors.VIPER_CONSISTENCY_ERROR, this.msg)
