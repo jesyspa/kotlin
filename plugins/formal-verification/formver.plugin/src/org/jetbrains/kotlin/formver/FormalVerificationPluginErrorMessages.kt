@@ -24,7 +24,7 @@ object FormalVerificationPluginErrorMessages : BaseDiagnosticRendererFactory() {
         )
         put(
             PluginErrors.VIPER_VERIFICATION_ERROR,
-            "Viper verification error: {0}",
+            "No further information is available for this warning. {0}",
             CommonRenderers.STRING,
         )
         put(
@@ -38,8 +38,13 @@ object FormalVerificationPluginErrorMessages : BaseDiagnosticRendererFactory() {
             CommonRenderers.STRING,
         )
         put(
-            PluginErrors.MISSING_ADDITIONAL_INFO,
-            "No further information is available for this warning.",
+            PluginErrors.REPORT_CONSISTENCY_ERROR,
+            "An internal error has occurred while verifying the function. Please report the issue.",
+            CommonRenderers.STRING
+        )
+        put(
+            PluginErrors.UNEXPECTED_RETURNED_VALUE,
+            "Function may return a {0} value.",
             CommonRenderers.STRING
         )
     }

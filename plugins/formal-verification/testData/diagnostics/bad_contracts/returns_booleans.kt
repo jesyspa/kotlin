@@ -4,7 +4,7 @@ import kotlin.contracts.ExperimentalContracts
 @OptIn(ExperimentalContracts::class)
 fun <!VIPER_TEXT!>incorrectly_returns_false<!>(): Boolean {
     contract {
-        <!VIPER_VERIFICATION_ERROR!>returns(true)<!>
+        <!UNEXPECTED_RETURNED_VALUE!>returns(true)<!>
     }
     return false
 }
