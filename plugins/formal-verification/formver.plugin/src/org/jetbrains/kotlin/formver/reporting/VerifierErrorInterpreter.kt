@@ -14,7 +14,8 @@ import org.jetbrains.kotlin.formver.PluginErrors
 import org.jetbrains.kotlin.formver.embeddings.SourceRole
 import org.jetbrains.kotlin.formver.viper.errors.*
 
-object VerifierErrorInterpreter {
+class VerifierErrorInterpreter {
+    private var alreadyReported = false
 
     private fun DiagnosticReporter.reportVerificationErrorUserFriendly(
         source: KtSourceElement?,
@@ -31,7 +32,7 @@ object VerifierErrorInterpreter {
                 reportOn(source, PluginErrors.UNEXPECTED_RETURNED_VALUE, "non-null", context)
             error is PostconditionViolated && role is SourceRole.ReturnsNotNullEffect ->
                 reportOn(source, PluginErrors.UNEXPECTED_RETURNED_VALUE, "null", context)
-            else -> reportOn(source, PluginErrors.VIPER_VERIFICATION_ERROR, error.msg, context)
+            else -> reportVerificationErrorOriginalViper(source, error, context)
         }
     }
 
@@ -40,7 +41,10 @@ object VerifierErrorInterpreter {
         error: VerificationError,
         context: CheckerContext,
     ) {
-        reportOn(source, PluginErrors.VIPER_VERIFICATION_ERROR, error.msg, context)
+        if (!alreadyReported) {
+            reportOn(source, PluginErrors.VIPER_VERIFICATION_ERROR, error.msg, context)
+            alreadyReported = true
+        }
     }
 
     private fun DiagnosticReporter.reportVerificationError(
@@ -61,7 +65,12 @@ object VerifierErrorInterpreter {
         reportOn(source, PluginErrors.INTERNAL_ERROR, error.msg, context)
     }
 
-    fun DiagnosticReporter.reportOn(source: KtSourceElement?, error: VerifierError, errorStyle: ErrorStyle, context: CheckerContext) =
+    fun DiagnosticReporter.reportVerifierError(
+        source: KtSourceElement?,
+        error: VerifierError,
+        errorStyle: ErrorStyle,
+        context: CheckerContext,
+    ) =
         when (error) {
             is ConsistencyError -> reportConsistencyError(source, error, context)
             is VerificationError -> reportVerificationError(source, error, errorStyle, context)
