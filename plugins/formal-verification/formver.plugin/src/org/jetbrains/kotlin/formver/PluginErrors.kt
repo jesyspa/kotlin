@@ -18,6 +18,7 @@ object PluginErrors {
     val VIPER_TEXT by info2<PsiElement, String, String>(SourceElementPositioningStrategies.DECLARATION_NAME)
     val INTERNAL_ERROR by error1<PsiElement, String>(SourceElementPositioningStrategies.DECLARATION_NAME)
     val MINOR_INTERNAL_ERROR by error1<PsiElement, String>(SourceElementPositioningStrategies.DECLARATION_NAME)
+    val UNEXPECTED_RETURNED_VALUE by warning1<PsiElement, String>()
 
     init {
         RootDiagnosticRendererFactory.registerFactory(FormalVerificationPluginErrorMessages)
