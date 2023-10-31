@@ -7,4 +7,4 @@ package org.jetbrains.kotlin.formver.reporting
 
 import org.jetbrains.kotlin.diagnostics.KtDiagnosticFactory1
 
-data class HumanReadableMessage(val pluginError: KtDiagnosticFactory1<String>, val extraMsg: String? = null)
+data class HumanReadableMessage(val pluginError: KtDiagnosticFactory1<String>, val extraMsg: String = "")

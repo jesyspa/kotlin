@@ -8,11 +8,15 @@ package org.jetbrains.kotlin.formver.reporting.style
 import org.jetbrains.kotlin.formver.PluginErrors
 import org.jetbrains.kotlin.formver.SourceRole
 import org.jetbrains.kotlin.formver.reporting.HumanReadableMessage
+import org.jetbrains.kotlin.formver.viper.errors.ConsistencyError
 import org.jetbrains.kotlin.formver.viper.errors.PostconditionViolated
 import org.jetbrains.kotlin.formver.viper.errors.VerificationError
 import org.jetbrains.kotlin.formver.viper.errors.getInfoOrNull
 
 object UserFriendlyStrategy : ErrorStyleStrategy {
+    override fun convert(consistencyError: ConsistencyError): List<HumanReadableMessage> =
+        listOf(HumanReadableMessage(PluginErrors.INTERNAL_ERROR, consistencyError.msg))
+
     override fun convert(verificationError: VerificationError): List<HumanReadableMessage> =
         listOf(verificationError.toHumanReadableMessage())
 

@@ -5,7 +5,6 @@
 
 package org.jetbrains.kotlin.formver.reporting.style
 
-import org.jetbrains.kotlin.formver.PluginErrors
 import org.jetbrains.kotlin.formver.reporting.HumanReadableMessage
 import org.jetbrains.kotlin.formver.viper.errors.ConsistencyError
 import org.jetbrains.kotlin.formver.viper.errors.VerificationError
@@ -17,12 +16,6 @@ interface ErrorStyleStrategy {
         is VerificationError -> convert(verifyError)
     }
 
-    /**
-     * Consistency errors have always the same message. Strategies changing this
-     * behavior can do so overriding the following function.
-     */
-    fun convert(consistencyError: ConsistencyError): List<HumanReadableMessage> =
-        listOf(HumanReadableMessage(PluginErrors.INTERNAL_ERROR))
-
+    fun convert(consistencyError: ConsistencyError): List<HumanReadableMessage>
     fun convert(verificationError: VerificationError): List<HumanReadableMessage>
 }

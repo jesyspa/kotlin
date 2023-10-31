@@ -18,7 +18,7 @@ class VerifierErrorInterpreter(
     fun DiagnosticReporter.reportVerifierError(source: KtSourceElement?, error: VerifierError, context: CheckerContext) {
         errorStyleStrategy.convert(error).forEach {
             val (diagnosticFactory, message) = it
-            reportOn(source, diagnosticFactory, message ?: "", context)
+            reportOn(source, diagnosticFactory, message, context)
         }
     }
 }
