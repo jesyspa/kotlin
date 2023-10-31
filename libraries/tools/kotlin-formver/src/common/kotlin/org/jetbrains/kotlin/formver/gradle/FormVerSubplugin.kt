@@ -41,7 +41,7 @@ class FormVerGradleSubplugin
             }
 
             formVerExtension.myErrorStyle?.let {
-                options += SubpluginOption(FormalVerificationPluginNames.ERRRO_STYLE_NAME, it)
+                options += SubpluginOption(FormalVerificationPluginNames.ERROR_STYLE_NAME, it)
             }
 
             formVerExtension.myUnsupportedFeatureBehaviour?.let {
