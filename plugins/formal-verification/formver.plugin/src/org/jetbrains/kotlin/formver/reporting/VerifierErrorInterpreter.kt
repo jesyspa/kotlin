@@ -31,7 +31,7 @@ object VerifierErrorInterpreter {
                 reportOn(source, PluginErrors.UNEXPECTED_RETURNED_VALUE, "non-null", context)
             error is PostconditionViolated && role is SourceRole.ReturnsNotNullEffect ->
                 reportOn(source, PluginErrors.UNEXPECTED_RETURNED_VALUE, "null", context)
-            else -> reportOn(source, PluginErrors.VIPER_VERIFICATION_ERROR, "verification failed, missing extra info.", context)
+            else -> reportOn(source, PluginErrors.VIPER_VERIFICATION_ERROR, error.msg, context)
         }
     }
 
