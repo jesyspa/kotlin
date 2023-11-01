@@ -149,22 +149,22 @@ fun StmtConversionContext<ResultTrackingContext>.insertInlineFunctionCall(
     paramNames: List<Name>,
     args: List<ExpEmbedding>,
     body: FirBlock,
-    returnPointName: String?,
+    returnTargetName: String?,
     parentCtx: MethodConversionContext? = null,
 ): ExpEmbedding {
-    val returnPoint = returnTargetProducer.getFresh(calleeSignature.returnType)
-    return withResult(returnPoint.variable) {
+    val returnTarget = returnTargetProducer.getFresh(calleeSignature.returnType)
+    return withResult(returnTarget.variable) {
         val callArgs = getInlineFunctionCallArgs(args)
         val subs = paramNames.zip(callArgs).toMap()
         val methodCtxFactory = MethodContextFactory(
             calleeSignature,
-            InlineParameterResolver(subs, returnPointName, returnPoint),
+            InlineParameterResolver(subs, returnTargetName, returnTarget),
             parentCtx,
         )
         withMethodCtx(methodCtxFactory) {
             convert(body)
-            addDeclaration(returnPoint.label.toDecl())
-            addStatement(returnPoint.label.toStmt())
+            addDeclaration(returnTarget.label.toDecl())
+            addStatement(returnTarget.label.toStmt())
         }
     }
 }

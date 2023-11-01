@@ -266,9 +266,9 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext<Re
                 convert(whileLoop.block)
                 convertAndCapture(whileLoop.condition)
             }
-            val returnPoint = defaultResolvedReturnTarget
+            val returnTarget = defaultResolvedReturnTarget
             val postconditions = when (val sig = data.signature) {
-                is FullNamedFunctionSignature -> sig.getPostconditions(returnPoint.variable)
+                is FullNamedFunctionSignature -> sig.getPostconditions(returnTarget.variable)
                 else -> listOf()
             }
             data.addStatement(
