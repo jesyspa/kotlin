@@ -21,9 +21,17 @@ data class AnonymousName(val n: Int) : MangledName {
         get() = "anonymous\$$n"
 }
 
-data object ReturnVariableName : MangledName {
+/**
+ * Name for variables that should *only* be used in signatures, not in
+ */
+data object PlaceholderReturnVariableName : MangledName {
     override val mangled: String
         get() = "ret"
+}
+
+data class ReturnVariableName(val n: Int) : MangledName {
+    override val mangled: String
+        get() = "ret\$$n"
 }
 
 data object ThisReceiverName : MangledName {
