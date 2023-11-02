@@ -72,13 +72,13 @@ class PlaintextLeaf(val text: String) : TreeView {
 }
 
 
-class OperatorNode(val left: TreeView, val operator: String, val right: TreeView) : TreeView {
+class OperatorNode(val left: TreeView, val op: String, val right: TreeView) : TreeView {
     private val fixedExtraWidth = 2
-    override val widthGuess: Int = left.widthGuess + right.widthGuess + operator.length + fixedExtraWidth
+    override val widthGuess: Int = left.widthGuess + right.widthGuess + op.length + fixedExtraWidth
 
     override fun Printer.printImpl() {
         print(left)
-        print(" $operator ")
+        print(" $op ")
         print(right)
     }
 }
