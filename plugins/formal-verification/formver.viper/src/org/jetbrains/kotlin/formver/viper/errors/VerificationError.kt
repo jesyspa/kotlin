@@ -7,6 +7,7 @@ package org.jetbrains.kotlin.formver.viper.errors
 
 import org.jetbrains.kotlin.formver.viper.ast.Info
 import org.jetbrains.kotlin.formver.viper.ast.Position
+import org.jetbrains.kotlin.formver.viper.ast.info
 import org.jetbrains.kotlin.formver.viper.ast.unwrapOr
 import viper.silver.verifier.errors
 
@@ -60,6 +61,7 @@ object ErrorAdapter {
  * But the actual info we are interested in is on the pre-condition, contained in the reason's offending node.
  */
 inline fun <reified I> VerificationError.getInfoOrNull(): I? =
-    Info.fromSilver(result.offendingNode().prettyMetadata._2()).unwrapOr<I> {
-        Info.fromSilver(result.reason().offendingNode().prettyMetadata._2()).unwrapOr<I> { null }
+    Info.fromSilver(result.offendingNode().info).unwrapOr<I> {
+        Info.fromSilver(result.reason().offendingNode().info).unwrapOr<I> { null }
     }
+

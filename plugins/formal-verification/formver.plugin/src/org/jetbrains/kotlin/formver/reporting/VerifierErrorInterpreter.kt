@@ -17,7 +17,7 @@ import org.jetbrains.kotlin.formver.embeddings.SourceRole
 import org.jetbrains.kotlin.formver.viper.errors.*
 
 class VerifierErrorInterpreter {
-    private var isOgViperErrorReported = false
+    private var isOriginalViperErrorReported = false
 
     private fun DiagnosticReporter.reportVerificationErrorUserFriendly(
         source: KtSourceElement?,
@@ -43,9 +43,9 @@ class VerifierErrorInterpreter {
         error: VerificationError,
         context: CheckerContext,
     ) {
-        if (!isOgViperErrorReported) {
+        if (!isOriginalViperErrorReported) {
             reportOn(source, PluginErrors.VIPER_VERIFICATION_ERROR, error.msg, context)
-            isOgViperErrorReported = true
+            isOriginalViperErrorReported = true
         }
     }
 
