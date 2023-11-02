@@ -50,7 +50,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
     override val scopeIndexProducer = indexProducer()
 
     // For some reason, type deduction does not seem to work here.
-    override val returnTargetProducer = FreshEntityProducer<ReturnTarget, TypeEmbedding> { n, type -> ReturnTarget(n, type) }
+    override val returnTargetProducer = FreshEntityProducer { n, type: TypeEmbedding -> ReturnTarget(n, type) }
 
     val program: Program
         get() = Program(
