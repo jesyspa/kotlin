@@ -5,8 +5,10 @@
 
 package org.jetbrains.kotlin.formver.reporting
 
+import org.jetbrains.kotlin.KtNodeTypes
 import org.jetbrains.kotlin.KtSourceElement
 import org.jetbrains.kotlin.diagnostics.DiagnosticReporter
+import org.jetbrains.kotlin.diagnostics.SourceElementPositioningStrategies
 import org.jetbrains.kotlin.diagnostics.reportOn
 import org.jetbrains.kotlin.fir.analysis.checkers.context.CheckerContext
 import org.jetbrains.kotlin.formver.ErrorStyle
@@ -62,7 +64,12 @@ class VerifierErrorInterpreter {
     }
 
     private fun DiagnosticReporter.reportConsistencyError(source: KtSourceElement?, error: ConsistencyError, context: CheckerContext) {
-        reportOn(source, PluginErrors.INTERNAL_ERROR, error.msg, context)
+        val sourceIsFunctionDeclaration = source?.elementType?.let { it == KtNodeTypes.FUN } ?: false
+        val positionStrategy = when (sourceIsFunctionDeclaration) {
+            true -> SourceElementPositioningStrategies.DECLARATION_NAME
+            false -> SourceElementPositioningStrategies.DEFAULT
+        }
+        reportOn(source, PluginErrors.INTERNAL_ERROR, error.msg, context, positioningStrategy = positionStrategy)
     }
 
     fun DiagnosticReporter.reportVerifierError(
