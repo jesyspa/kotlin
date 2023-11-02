@@ -37,5 +37,10 @@ object FormalVerificationPluginErrorMessages : BaseDiagnosticRendererFactory() {
             "Function may return a {0} value.",
             CommonRenderers.STRING
         )
+        put(
+            PluginErrors.INVALID_INVOCATION_TYPE,
+            "Function may not be called {0} time(s).",
+            CommonRenderers.STRING
+        )
     }
 }
