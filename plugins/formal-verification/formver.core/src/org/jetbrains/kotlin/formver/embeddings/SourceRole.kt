@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.formver.embeddings
 
+import org.jetbrains.kotlin.contracts.description.EventOccurrencesRange
 import org.jetbrains.kotlin.formver.viper.ast.Info
 
 sealed interface SourceRole {
@@ -13,6 +14,7 @@ sealed interface SourceRole {
     data object ReturnsFalseEffect : SourceRole
     data object ReturnsNullEffect : SourceRole
     data object ReturnsNotNullEffect : SourceRole
+    data class CallsInPlaceEffect(val kind: EventOccurrencesRange = EventOccurrencesRange.UNKNOWN) : SourceRole
 }
 
 val SourceRole?.asInfo: Info

@@ -130,30 +130,36 @@ class ContractDescriptionConversionVisitor(
     ): ExpEmbedding {
         val param = callsEffect.valueParameterReference.accept(this, data)
         val callsFieldAccess = FieldAccess(param, SpecialFields.FunctionObjectCallCounterField)
+        val sourceRole = SourceRole.CallsInPlaceEffect(callsEffect.kind)
         return when (callsEffect.kind) {
             // NOTE: case not supported for contracts
             EventOccurrencesRange.ZERO -> EqCmp(
                 callsFieldAccess,
                 Old(callsFieldAccess),
+                sourceRole
             )
             EventOccurrencesRange.AT_MOST_ONCE -> LeCmp(
                 callsFieldAccess,
                 Add(Old(callsFieldAccess), IntLit(1)),
+                sourceRole
             )
             EventOccurrencesRange.EXACTLY_ONCE -> EqCmp(
                 callsFieldAccess,
                 Add(Old(callsFieldAccess), IntLit(1)),
+                sourceRole
             )
             EventOccurrencesRange.AT_LEAST_ONCE -> GtCmp(
                 callsFieldAccess,
                 Old(callsFieldAccess),
+                sourceRole
             )
             // NOTE: case not supported for contracts
             EventOccurrencesRange.MORE_THAN_ONCE -> GtCmp(
                 callsFieldAccess,
                 Add(Old(callsFieldAccess), IntLit(1)),
+                sourceRole
             )
-            EventOccurrencesRange.UNKNOWN -> BooleanLit(true)
+            EventOccurrencesRange.UNKNOWN -> BooleanLit(true, sourceRole)
         }
     }
 
