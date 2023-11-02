@@ -222,7 +222,8 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext<Re
                         val leakFunctionObjectCall = Stmt.Assert(
                             DuplicableFunction.toFuncApp(
                                 listOf(it.pureToViper()),
-                                implicitInvokeCall.source.asPosition
+                                implicitInvokeCall.source.asPosition,
+                                SourceRole.ParamFunctionLeakageCheck.asInfo
                             )
                         )
                         data.addStatement(leakFunctionObjectCall)

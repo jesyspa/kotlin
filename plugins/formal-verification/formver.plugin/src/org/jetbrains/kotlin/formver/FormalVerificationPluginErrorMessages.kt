@@ -37,5 +37,9 @@ object FormalVerificationPluginErrorMessages : BaseDiagnosticRendererFactory() {
             "Function may return a {0} value.",
             CommonRenderers.STRING
         )
+        put(
+            PluginErrors.LAMBDA_MAY_LEAK,
+            "Function may leak from its contract.",
+        )
     }
 }

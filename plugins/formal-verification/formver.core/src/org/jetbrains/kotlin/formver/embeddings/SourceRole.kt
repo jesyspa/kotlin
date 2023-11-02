@@ -13,6 +13,7 @@ sealed interface SourceRole {
     data object ReturnsFalseEffect : SourceRole
     data object ReturnsNullEffect : SourceRole
     data object ReturnsNotNullEffect : SourceRole
+    data object ParamFunctionLeakageCheck : SourceRole
 }
 
 val SourceRole?.asInfo: Info

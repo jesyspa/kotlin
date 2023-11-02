@@ -34,6 +34,8 @@ class VerifierErrorInterpreter {
                 reportOn(source, PluginErrors.UNEXPECTED_RETURNED_VALUE, "non-null", context)
             error is PostconditionViolated && role is SourceRole.ReturnsNotNullEffect ->
                 reportOn(source, PluginErrors.UNEXPECTED_RETURNED_VALUE, "null", context)
+            (error is PreconditionInCallFalse || error is AssertFailed) && role is SourceRole.ParamFunctionLeakageCheck ->
+                reportOn(source, PluginErrors.LAMBDA_MAY_LEAK, context)
             else -> reportVerificationErrorOriginalViper(source, error, context)
         }
     }
