@@ -21,7 +21,7 @@ data class Old(override val inner: ExpEmbedding) : UnaryDirectResultExpEmbedding
 
 data class DuplicableCall(
     override val inner: ExpEmbedding,
-    override val sourceRole: SourceRole = SourceRole.ParamFunctionLeakageCheck,
+    override val sourceRole: SourceRole,
 ) : UnaryDirectResultExpEmbedding {
     override val type: TypeEmbedding = BooleanTypeEmbedding
     override fun toViper(ctx: LinearizationContext): Exp =

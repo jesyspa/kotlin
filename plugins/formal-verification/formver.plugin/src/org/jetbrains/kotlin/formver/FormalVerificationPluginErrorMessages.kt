@@ -8,6 +8,7 @@ package org.jetbrains.kotlin.formver
 import org.jetbrains.kotlin.diagnostics.KtDiagnosticFactoryToRendererMap
 import org.jetbrains.kotlin.diagnostics.rendering.BaseDiagnosticRendererFactory
 import org.jetbrains.kotlin.diagnostics.rendering.CommonRenderers
+import org.jetbrains.kotlin.fir.analysis.diagnostics.FirDiagnosticRenderers
 
 object FormalVerificationPluginErrorMessages : BaseDiagnosticRendererFactory() {
     override val MAP = KtDiagnosticFactoryToRendererMap("FormalVerification").apply {
@@ -39,7 +40,8 @@ object FormalVerificationPluginErrorMessages : BaseDiagnosticRendererFactory() {
         )
         put(
             PluginErrors.LAMBDA_MAY_LEAK,
-            "Function may leak from its contract.",
+            "Function `{0}` may leak from its contract.",
+            FirDiagnosticRenderers.SYMBOL,
         )
     }
 }

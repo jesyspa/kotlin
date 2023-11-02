@@ -217,13 +217,15 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext<Re
             }
             else -> {
                 val retType = implicitInvokeCall.calleeCallableSymbol.resolvedReturnType
-                args.filter { it.type is UnspecifiedFunctionTypeEmbedding }
-                    .forEach {
+                args
+                    .zip(implicitInvokeCall.argumentList.arguments)
+                    .filter { (embedding, _) -> embedding.type is UnspecifiedFunctionTypeEmbedding }
+                    .forEach { (embedding, firArgument) ->
                         val leakFunctionObjectCall = Stmt.Assert(
                             DuplicableFunction.toFuncApp(
-                                listOf(it.pureToViper()),
+                                listOf(embedding.pureToViper()),
                                 implicitInvokeCall.source.asPosition,
-                                SourceRole.ParamFunctionLeakageCheck.asInfo
+                                SourceRole.ParamFunctionLeakageCheck(firArgument.calleeSymbol).asInfo
                             )
                         )
                         data.addStatement(leakFunctionObjectCall)

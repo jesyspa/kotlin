@@ -38,9 +38,14 @@ class ContractDescriptionConversionVisitor(
 
         // All parameters of function type that are not callsInPlace should be marked duplicable.
         return (parameterIndices - callsInPlaceIndices)
-            .map { embeddedVarByIndex(it) }
-            .filter { it.type is FunctionTypeEmbedding }
-            .map { DuplicableCall(it) }
+            .map { Pair(it, embeddedVarByIndex(it)) }
+            .filter { (_, varEmbedding) -> varEmbedding.type is FunctionTypeEmbedding }
+            .map { (idx, varEmbedding) ->
+                DuplicableCall(
+                    varEmbedding,
+                    SourceRole.ParamFunctionLeakageCheck(symbol.valueParameterSymbols[idx])
+                )
+            }
     }
 
     fun getPostconditions(symbol: FirFunctionSymbol<*>, context: ContractVisitorContext): List<ExpEmbedding> {

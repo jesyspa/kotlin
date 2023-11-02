@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.formver.embeddings
 
+import org.jetbrains.kotlin.fir.symbols.FirBasedSymbol
 import org.jetbrains.kotlin.formver.viper.ast.Info
 
 sealed interface SourceRole {
@@ -13,7 +14,7 @@ sealed interface SourceRole {
     data object ReturnsFalseEffect : SourceRole
     data object ReturnsNullEffect : SourceRole
     data object ReturnsNotNullEffect : SourceRole
-    data object ParamFunctionLeakageCheck : SourceRole
+    data class ParamFunctionLeakageCheck(val paramSymbol: FirBasedSymbol<*>) : SourceRole
 }
 
 val SourceRole?.asInfo: Info
