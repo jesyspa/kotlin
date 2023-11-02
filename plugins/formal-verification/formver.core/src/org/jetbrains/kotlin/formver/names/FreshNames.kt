@@ -22,7 +22,7 @@ data class AnonymousName(val n: Int) : MangledName {
 }
 
 /**
- * Name for variables that should *only* be used in signatures, not in
+ * Name for return variable that should *only* be used in signatures of methods without a body.
  */
 data object PlaceholderReturnVariableName : MangledName {
     override val mangled: String
