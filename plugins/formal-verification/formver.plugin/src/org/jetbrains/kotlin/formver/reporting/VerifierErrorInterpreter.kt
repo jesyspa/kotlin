@@ -36,7 +36,7 @@ class VerifierErrorInterpreter {
             error is PostconditionViolated && role is SourceRole.ReturnsNotNullEffect ->
                 reportOn(source, PluginErrors.UNEXPECTED_RETURNED_VALUE, "null", context)
             error is PostconditionViolated && role is SourceRole.CallsInPlaceEffect ->
-                reportOn(source, PluginErrors.INVALID_INVOCATION_TYPE, role.kind.asUserFriendlyMessage, context)
+                reportOn(source, PluginErrors.INVALID_INVOCATION_TYPE, role.paramSymbol, role.kind.asUserFriendlyMessage, context)
             else -> reportVerificationErrorOriginalViper(source, error, context)
         }
     }

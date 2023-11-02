@@ -8,6 +8,7 @@ package org.jetbrains.kotlin.formver
 import org.jetbrains.kotlin.diagnostics.KtDiagnosticFactoryToRendererMap
 import org.jetbrains.kotlin.diagnostics.rendering.BaseDiagnosticRendererFactory
 import org.jetbrains.kotlin.diagnostics.rendering.CommonRenderers
+import org.jetbrains.kotlin.fir.analysis.diagnostics.FirDiagnosticRenderers
 
 object FormalVerificationPluginErrorMessages : BaseDiagnosticRendererFactory() {
     override val MAP = KtDiagnosticFactoryToRendererMap("FormalVerification").apply {
@@ -39,7 +40,8 @@ object FormalVerificationPluginErrorMessages : BaseDiagnosticRendererFactory() {
         )
         put(
             PluginErrors.INVALID_INVOCATION_TYPE,
-            "Function may not be called {0} time(s).",
+            "Could not verify that function `{0}` is called {1}.",
+            FirDiagnosticRenderers.SYMBOL,
             CommonRenderers.STRING
         )
     }

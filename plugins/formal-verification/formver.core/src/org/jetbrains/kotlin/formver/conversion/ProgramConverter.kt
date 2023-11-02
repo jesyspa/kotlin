@@ -180,6 +180,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
             override val sourceName: String?
                 get() = super<NamedFunctionSignature>.sourceName
         }
+        symbol.valueParameterSymbols
         val contractVisitor = ContractDescriptionConversionVisitor(this@ProgramConverter, subSignature)
 
         return object : FullNamedFunctionSignature, NamedFunctionSignature by subSignature {
