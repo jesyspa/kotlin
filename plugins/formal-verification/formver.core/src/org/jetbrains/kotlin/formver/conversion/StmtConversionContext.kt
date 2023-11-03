@@ -95,8 +95,7 @@ fun StmtConversionContext.getInlineFunctionCallArgs(
     val declarations = mutableListOf<Declare>()
     val storedArgs = args.map { arg ->
         when (arg.ignoringMetaNodes()) {
-            is VariableEmbedding -> arg
-            is LambdaExp -> arg
+            is VariableEmbedding, is LambdaExp -> arg
             else -> {
                 val paramVarDecl = declareAnonLocal(arg.type, arg)
                 declarations.add(paramVarDecl)
