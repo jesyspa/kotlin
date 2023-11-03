@@ -180,7 +180,6 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
             override val sourceName: String?
                 get() = super<NamedFunctionSignature>.sourceName
         }
-        symbol.valueParameterSymbols
         val contractVisitor = ContractDescriptionConversionVisitor(this@ProgramConverter, subSignature)
 
         return object : FullNamedFunctionSignature, NamedFunctionSignature by subSignature {
@@ -194,7 +193,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
                     returnVariable.pureInvariants() +
                     returnVariable.provenInvariants() +
                     returnVariable.accessInvariants() +
-                    contractVisitor.getPostconditions(symbol, ContractVisitorContext(returnVariable)) +
+                    contractVisitor.getPostconditions(ContractVisitorContext(returnVariable, symbol)) +
                     subSignature.stdLibPostConditions(returnVariable)
         }
     }

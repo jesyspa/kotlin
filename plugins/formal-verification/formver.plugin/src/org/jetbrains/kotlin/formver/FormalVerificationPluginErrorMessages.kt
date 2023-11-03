@@ -40,7 +40,7 @@ object FormalVerificationPluginErrorMessages : BaseDiagnosticRendererFactory() {
         )
         put(
             PluginErrors.INVALID_INVOCATION_TYPE,
-            "Could not verify that function `{0}` is called {1}.",
+            "Could not verify that function ''{0}'' is called {1}.",
             FirDiagnosticRenderers.SYMBOL,
             CommonRenderers.STRING
         )

@@ -9,7 +9,6 @@ import org.jetbrains.kotlin.contracts.description.*
 import org.jetbrains.kotlin.fir.contracts.description.ConeContractConstantValues
 import org.jetbrains.kotlin.fir.diagnostics.ConeDiagnostic
 import org.jetbrains.kotlin.fir.symbols.impl.FirFunctionSymbol
-import org.jetbrains.kotlin.fir.symbols.impl.FirValueParameterSymbol
 import org.jetbrains.kotlin.fir.types.ConeKotlinType
 import org.jetbrains.kotlin.formver.effects
 import org.jetbrains.kotlin.formver.embeddings.FunctionTypeEmbedding
@@ -20,7 +19,8 @@ import org.jetbrains.kotlin.formver.embeddings.expression.*
 
 data class ContractVisitorContext(
     val returnVariable: VariableEmbedding,
-    val targetParameterFunction: FirValueParameterSymbol? = null
+    // Kotlin function where the visited contract is attached to.
+    val functionContractOwner: FirFunctionSymbol<*>
 )
 
 /**
@@ -47,23 +47,11 @@ class ContractDescriptionConversionVisitor(
             .map { DuplicableCall(it) }
     }
 
-    fun getPostconditions(symbol: FirFunctionSymbol<*>, context: ContractVisitorContext): List<ExpEmbedding> {
-        return symbol.effects.map {
-            // We update the context if we are visiting a `callsInPlace` effect.
-            // With the new context, we keep track of effect's target parameter, so that
-            // during error reporting we can provide detailed user-friendly information to the user.
-            val ctx = when (it.effect) {
-                is KtCallsEffectDeclaration<*, *> -> {
-                    val effect = (it.effect as KtCallsEffectDeclaration<*, *>) // Smart casting doesn't work here.
-                    val paramSymbol = symbol.valueParameterSymbols[effect.valueParameterReference.parameterIndex]
-                    context.copy(targetParameterFunction = paramSymbol)
-                }
-                else -> context
-            }
-            it.effect.accept(this, ctx).withPosition(it.source)
+    fun getPostconditions(context: ContractVisitorContext): List<ExpEmbedding> {
+        return context.functionContractOwner.effects.map {
+            it.effect.accept(this, context).withPosition(it.source)
         }
     }
-
 
     override fun visitBooleanConstantDescriptor(
         booleanConstantDescriptor: KtBooleanConstantReference<ConeKotlinType, ConeDiagnostic>,
@@ -145,7 +133,8 @@ class ContractDescriptionConversionVisitor(
     ): ExpEmbedding {
         val param = callsEffect.valueParameterReference.accept(this, data)
         val callsFieldAccess = FieldAccess(param, SpecialFields.FunctionObjectCallCounterField)
-        val sourceRole = SourceRole.CallsInPlaceEffect(data.targetParameterFunction!!, callsEffect.kind)
+        val targetLambdaByCallsEffect = data.functionContractOwner.valueParameterSymbols[callsEffect.valueParameterReference.parameterIndex]
+        val sourceRole = SourceRole.CallsInPlaceEffect(targetLambdaByCallsEffect, callsEffect.kind)
         return when (callsEffect.kind) {
             // NOTE: case not supported for contracts
             EventOccurrencesRange.ZERO -> EqCmp(

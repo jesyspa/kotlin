@@ -87,11 +87,10 @@ class VerifierErrorInterpreter {
 
     private val EventOccurrencesRange.asUserFriendlyMessage: String
         get() = when (this) {
-            EventOccurrencesRange.ZERO -> "zero"
             EventOccurrencesRange.AT_MOST_ONCE -> "at most once"
             EventOccurrencesRange.EXACTLY_ONCE -> "exactly once"
             EventOccurrencesRange.AT_LEAST_ONCE -> "at least once"
             EventOccurrencesRange.MORE_THAN_ONCE -> "more than once"
-            EventOccurrencesRange.UNKNOWN -> "unknown"
+            else -> TODO("Unreachable")
         }
 }
