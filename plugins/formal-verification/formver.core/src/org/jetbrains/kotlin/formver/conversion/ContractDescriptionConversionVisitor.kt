@@ -8,8 +8,10 @@ package org.jetbrains.kotlin.formver.conversion
 import org.jetbrains.kotlin.contracts.description.*
 import org.jetbrains.kotlin.fir.contracts.description.ConeContractConstantValues
 import org.jetbrains.kotlin.fir.diagnostics.ConeDiagnostic
+import org.jetbrains.kotlin.fir.symbols.FirBasedSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirFunctionSymbol
 import org.jetbrains.kotlin.fir.types.ConeKotlinType
+import org.jetbrains.kotlin.formver.calleeSymbol
 import org.jetbrains.kotlin.formver.effects
 import org.jetbrains.kotlin.formver.embeddings.FunctionTypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.NullableTypeEmbedding
@@ -20,7 +22,7 @@ import org.jetbrains.kotlin.formver.embeddings.expression.*
 data class ContractVisitorContext(
     val returnVariable: VariableEmbedding,
     // Kotlin function where the visited contract is attached to.
-    val functionContractOwner: FirFunctionSymbol<*>
+    val functionContractOwner: FirFunctionSymbol<*>,
 )
 
 /**
@@ -35,8 +37,8 @@ class ContractDescriptionConversionVisitor(
 ) : KtContractDescriptionVisitor<ExpEmbedding, ContractVisitorContext, ConeKotlinType, ConeDiagnostic>() {
     private val parameterIndices = signature.params.indices.toSet() + setOfNotNull(signature.receiver?.let { -1 })
 
-    fun getPreconditions(symbol: FirFunctionSymbol<*>): List<ExpEmbedding> {
-        val callsInPlaceIndices = symbol.effects
+    fun getPreconditions(context: ContractVisitorContext): List<ExpEmbedding> {
+        val callsInPlaceIndices = context.functionContractOwner.effects
             .mapNotNull { (it.effect as? KtCallsEffectDeclaration<*, *>)?.valueParameterReference?.parameterIndex }
             .toSet()
 
@@ -133,7 +135,7 @@ class ContractDescriptionConversionVisitor(
     ): ExpEmbedding {
         val param = callsEffect.valueParameterReference.accept(this, data)
         val callsFieldAccess = FieldAccess(param, SpecialFields.FunctionObjectCallCounterField)
-        val targetLambdaByCallsEffect = data.functionContractOwner.valueParameterSymbols[callsEffect.valueParameterReference.parameterIndex]
+        val targetLambdaByCallsEffect = callsEffect.valueParameterReference.getTargetParameter(data)
         val sourceRole = SourceRole.CallsInPlaceEffect(targetLambdaByCallsEffect, callsEffect.kind)
         return when (callsEffect.kind) {
             // NOTE: case not supported for contracts
@@ -176,11 +178,30 @@ class ContractDescriptionConversionVisitor(
         return if (isInstancePredicate.isNegated) Not(subtypeRel) else subtypeRel
     }
 
+    /**
+     * According to the input index, invoke `default` if the index is equal to -1, otherwise
+     * invoke `mapper` with the given index as input.
+     */
+    private inline fun <T> resolveByIndex(index: Int, default: () -> T, mapper: (Int) -> T): T {
+        // Implementation notes: the `default` value is lazily evaluated, since
+        // we could get a possible NPE if the index is different from -1.
+        // Thanks to inlining, we do not create any extra objects when invoking the function.
+        return when (index) {
+            -1 -> default()
+            else -> mapper(index)
+        }
+    }
+
     private fun KtValueParameterReference<ConeKotlinType, ConeDiagnostic>.embeddedVar(): VariableEmbedding =
         embeddedVarByIndex(parameterIndex)
 
-    private fun embeddedVarByIndex(ix: Int): VariableEmbedding =
-        if (ix == -1) signature.receiver!! else signature.params[ix]
+    private fun KtValueParameterReference<ConeKotlinType, ConeDiagnostic>.getTargetParameter(data: ContractVisitorContext): FirBasedSymbol<*> {
+        return resolveByIndex(
+            parameterIndex,
+            { data.functionContractOwner.receiverParameter!!.calleeSymbol }) { data.functionContractOwner.valueParameterSymbols[it] }
+    }
+
+    private fun embeddedVarByIndex(ix: Int): VariableEmbedding = resolveByIndex(ix, { signature.receiver!! }) { signature.params[it] }
 
     private fun VariableEmbedding.nullCmp(isNegated: Boolean, sourceRole: SourceRole?): ExpEmbedding =
         if (type is NullableTypeEmbedding) {
