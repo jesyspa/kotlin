@@ -45,3 +45,30 @@ inline fun <reified I> VerificationError.getInfoOrNull(): I? =
         Info.fromSilver(result.reason().offendingNode().info).unwrapOr<I> { null }
     }
 
+/**
+ * Extracts information from a specific argument of a function involved in a `VerificationError`.
+ * This function is specifically designed to work with errors related to preconditions
+ * in function calls (`PreconditionInCallFalse`) or failed assertions (`AssertFailed`).
+ */
+fun VerificationError.extractInfoFromFunctionArgument(index: Int): Info {
+    check(this is PreconditionInCallFalse || this is AssertFailed) {
+        "The given error is not a precondition nor assertion satisfied."
+    }
+    check(this.result.reason().offendingNode() is FuncApp) {
+        "The reason's offending node must be a function application to extract info from one of its argument."
+    }
+    return when (this) {
+        is PreconditionInCallFalse, is AssertFailed -> result.reason().extractInfoFromFunctionArgument(index)
+        else -> error("Unreachable code.")
+    }
+}
+
+/**
+ * If the reason's offending node is a function application, then fetch the info metadata
+ * from the index-th argument.
+ * Otherwise, return no info.
+ */
+private fun ErrorReason.extractInfoFromFunctionArgument(index: Int): Info = when (val node = offendingNode()) {
+    is FuncApp -> Info.fromSilver(node.args.apply(index).info)
+    else -> Info.NoInfo
+}

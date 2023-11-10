@@ -7,6 +7,7 @@ package org.jetbrains.kotlin.formver.embeddings.expression
 
 import org.jetbrains.kotlin.KtSourceElement
 import org.jetbrains.kotlin.fir.symbols.FirBasedSymbol
+import org.jetbrains.kotlin.formver.asInfo
 import org.jetbrains.kotlin.formver.asPosition
 import org.jetbrains.kotlin.formver.conversion.StmtConversionContext
 import org.jetbrains.kotlin.formver.embeddings.PropertyAccessEmbedding
@@ -66,7 +67,9 @@ class AnonymousVariableEmbedding(n: Int, override val type: TypeEmbedding) : Var
  * Embedding of a variable that comes from some FIR element.
  */
 class FirVariableEmbedding(override val name: MangledName, override val type: TypeEmbedding, val symbol: FirBasedSymbol<*>) :
-    VariableEmbedding
+    VariableEmbedding {
+    override fun toViper(source: KtSourceElement?): Exp.LocalVar = Exp.LocalVar(name, type.viperType, source.asPosition, symbol.asInfo)
+}
 
 /**
  * Variable embedding generated at linearization phase.

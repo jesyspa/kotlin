@@ -39,6 +39,12 @@ class VerifierErrorInterpreter {
                 reportOn(source, PluginErrors.UNEXPECTED_RETURNED_VALUE, "null", context)
             is SourceRole.CallsInPlaceEffect ->
                 reportOn(source, PluginErrors.INVALID_INVOCATION_TYPE, role.paramSymbol, role.kind.asUserFriendlyMessage, context)
+            is SourceRole.ParamFunctionLeakageCheck -> {
+                val paramSymbol = error.extractInfoFromFunctionArgument(role.INDEX).unwrapOr<FirBasedSymbol<*>> {
+                    error("The function symbol is missing.")
+                }
+                reportOn(source, PluginErrors.LAMBDA_MAY_LEAK, paramSymbol!!, context)
+            }
             else -> reportVerificationErrorOriginalViper(source, error, context)
         }
     }

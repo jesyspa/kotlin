@@ -16,6 +16,12 @@ sealed interface SourceRole {
     data object ReturnsNullEffect : SourceRole
     data object ReturnsNotNullEffect : SourceRole
     data class CallsInPlaceEffect(val paramSymbol: FirBasedSymbol<*>, val kind: EventOccurrencesRange) : SourceRole
+    data object ParamFunctionLeakageCheck : SourceRole {
+        /**
+         * The index field is used to fetch the missing function parameter symbol during error reporting.
+         */
+        const val INDEX: Int = 0
+    }
 }
 
 val SourceRole?.asInfo: Info
