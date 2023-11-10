@@ -17,8 +17,16 @@ import org.jetbrains.kotlin.formver.viper.ast.unwrapOr
  */
 data class ErrorReason(val reason: viper.silver.verifier.ErrorReason)
 
-interface VerificationError : VerifierError {
+class VerificationError private constructor(
     val result: viper.silver.verifier.VerificationError
+) : VerifierError {
+    companion object {
+        fun fromSilver(result: viper.silicon.interfaces.VerificationResult): VerificationError {
+            check(result.isFatal) { "The verification result must contain an error to be converted." }
+            return VerificationError((result as viper.silicon.interfaces.Failure).message())
+        }
+    }
+
     val reason: ErrorReason
         get() = ErrorReason(result.reason())
     override val id: String
@@ -27,16 +35,6 @@ interface VerificationError : VerifierError {
         get() = result.readableMessage(false, false)
     override val position: Position
         get() = Position.fromSilver(result.pos())
-}
-
-object ErrorAdapter {
-    fun translate(result: viper.silicon.interfaces.VerificationResult): VerificationError {
-        check(result.isFatal) { "The verification result must contain an error to be converted." }
-        return object : VerificationError {
-            override val result: viper.silver.verifier.VerificationError =
-                (result as viper.silicon.interfaces.Failure).message()
-        }
-    }
 }
 
 /**
@@ -55,11 +53,9 @@ fun <I> VerificationError.getInfoOrNull(): I? =
     }
 
 /**
- * If the reason's offending node is a function application, then fetch the info metadata
- * from the index-th argument.
- * Otherwise, return no info.
+ * If the reason's offending node is a function application, then fetch the info metadata from the index-th argument.
  */
 fun ErrorReason.extractInfoFromFunctionArgument(argIndex: Int): Info = when (val node = reason.offendingNode()) {
     is viper.silver.ast.FuncApp -> Info.fromSilver(node.args.apply(argIndex).info)
-    else -> Info.NoInfo
+    else -> error("The reason's offending node is not a function application.")
 }
