@@ -7,15 +7,13 @@ package org.jetbrains.kotlin.formver.embeddings.expression
 
 import org.jetbrains.kotlin.KtSourceElement
 import org.jetbrains.kotlin.fir.symbols.FirBasedSymbol
-import org.jetbrains.kotlin.formver.asInfo
 import org.jetbrains.kotlin.formver.asPosition
+import org.jetbrains.kotlin.formver.asSourceRole
 import org.jetbrains.kotlin.formver.conversion.StmtConversionContext
-import org.jetbrains.kotlin.formver.embeddings.PropertyAccessEmbedding
-import org.jetbrains.kotlin.formver.embeddings.TypeEmbedding
+import org.jetbrains.kotlin.formver.embeddings.*
 import org.jetbrains.kotlin.formver.embeddings.expression.debug.NamedBranchingNode
 import org.jetbrains.kotlin.formver.embeddings.expression.debug.PlaintextLeaf
 import org.jetbrains.kotlin.formver.embeddings.expression.debug.TreeView
-import org.jetbrains.kotlin.formver.embeddings.fillHoles
 import org.jetbrains.kotlin.formver.names.AnonymousName
 import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.formver.viper.ast.*
@@ -36,7 +34,7 @@ sealed interface VariableEmbedding : PureExpEmbedding, PropertyAccessEmbedding {
         trafos: Trafos = Trafos.NoTrafos,
     ): Exp.LocalVar = Exp.LocalVar(name, type.viperType, pos, info, trafos)
 
-    override fun toViper(source: KtSourceElement?): Exp.LocalVar = Exp.LocalVar(name, type.viperType, source.asPosition)
+    override fun toViper(source: KtSourceElement?): Exp.LocalVar = Exp.LocalVar(name, type.viperType, source.asPosition, sourceRole.asInfo)
 
     override fun getValue(ctx: StmtConversionContext): ExpEmbedding = this
     override fun setValue(value: ExpEmbedding, ctx: StmtConversionContext): ExpEmbedding = Assign(this, value)
@@ -68,7 +66,8 @@ class AnonymousVariableEmbedding(n: Int, override val type: TypeEmbedding) : Var
  */
 class FirVariableEmbedding(override val name: MangledName, override val type: TypeEmbedding, val symbol: FirBasedSymbol<*>) :
     VariableEmbedding {
-    override fun toViper(source: KtSourceElement?): Exp.LocalVar = Exp.LocalVar(name, type.viperType, source.asPosition, symbol.asInfo)
+    override val sourceRole: SourceRole
+        get() = symbol.asSourceRole
 }
 
 /**

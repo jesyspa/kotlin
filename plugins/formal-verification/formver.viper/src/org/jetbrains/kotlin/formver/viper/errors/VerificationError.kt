@@ -10,8 +10,17 @@ import org.jetbrains.kotlin.formver.viper.ast.Position
 import org.jetbrains.kotlin.formver.viper.ast.info
 import org.jetbrains.kotlin.formver.viper.ast.unwrapOr
 
+/**
+ * This class acts as wrapper for Viper's [viper.silver.verifier.ErrorReason].
+ * This is necessary since extension functions on [viper.silver.verifier.ErrorReason] cannot be
+ * used outside the class' package.
+ */
+data class ErrorReason(val reason: viper.silver.verifier.ErrorReason)
+
 interface VerificationError : VerifierError {
     val result: viper.silver.verifier.VerificationError
+    val reason: ErrorReason
+        get() = ErrorReason(result.reason())
     override val id: String
         get() = result.id()
     override val msg: String
@@ -40,35 +49,17 @@ object ErrorAdapter {
  * as offending node result the call-site of the called method.
  * But the actual info we are interested in is on the pre-condition, contained in the reason's offending node.
  */
-inline fun <reified I> VerificationError.getInfoOrNull(): I? =
+fun <I> VerificationError.getInfoOrNull(): I? =
     Info.fromSilver(result.offendingNode().info).unwrapOr<I> {
         Info.fromSilver(result.reason().offendingNode().info).unwrapOr<I> { null }
     }
-
-/**
- * Extracts information from a specific argument of a function involved in a `VerificationError`.
- * This function is specifically designed to work with errors related to preconditions
- * in function calls (`PreconditionInCallFalse`) or failed assertions (`AssertFailed`).
- */
-fun VerificationError.extractInfoFromFunctionArgument(index: Int): Info {
-    check(this is PreconditionInCallFalse || this is AssertFailed) {
-        "The given error is not a precondition nor assertion satisfied."
-    }
-    check(this.result.reason().offendingNode() is FuncApp) {
-        "The reason's offending node must be a function application to extract info from one of its argument."
-    }
-    return when (this) {
-        is PreconditionInCallFalse, is AssertFailed -> result.reason().extractInfoFromFunctionArgument(index)
-        else -> error("Unreachable code.")
-    }
-}
 
 /**
  * If the reason's offending node is a function application, then fetch the info metadata
  * from the index-th argument.
  * Otherwise, return no info.
  */
-private fun ErrorReason.extractInfoFromFunctionArgument(index: Int): Info = when (val node = offendingNode()) {
-    is FuncApp -> Info.fromSilver(node.args.apply(index).info)
+fun ErrorReason.extractInfoFromFunctionArgument(argIndex: Int): Info = when (val node = reason.offendingNode()) {
+    is viper.silver.ast.FuncApp -> Info.fromSilver(node.args.apply(argIndex).info)
     else -> Info.NoInfo
 }

@@ -16,7 +16,7 @@ import org.jetbrains.kotlin.fir.references.toResolvedCallableSymbol
 import org.jetbrains.kotlin.fir.symbols.FirBasedSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirCallableSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirFunctionSymbol
-import org.jetbrains.kotlin.formver.viper.ast.Info
+import org.jetbrains.kotlin.formver.embeddings.SourceRole
 import org.jetbrains.kotlin.formver.viper.ast.Position
 
 val FirElement.calleeSymbol: FirBasedSymbol<*>
@@ -32,8 +32,5 @@ val KtSourceElement?.asPosition: Position
         null -> Position.NoPosition
         else -> Position.Wrapped(this)
     }
-val FirBasedSymbol<*>?.asInfo: Info
-    get() = when (this) {
-        null -> Info.NoInfo
-        else -> Info.Wrapped(this)
-    }
+val FirBasedSymbol<*>.asSourceRole: SourceRole
+    get() = SourceRole.FirSymbolHolder(this)
