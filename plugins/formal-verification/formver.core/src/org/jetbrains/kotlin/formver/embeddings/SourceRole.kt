@@ -7,6 +7,7 @@ package org.jetbrains.kotlin.formver.embeddings
 
 import org.jetbrains.kotlin.contracts.description.EventOccurrencesRange
 import org.jetbrains.kotlin.fir.symbols.FirBasedSymbol
+import org.jetbrains.kotlin.fir.types.ConeKotlinType
 import org.jetbrains.kotlin.formver.viper.ast.Info
 import org.jetbrains.kotlin.formver.viper.ast.unwrap
 import org.jetbrains.kotlin.formver.viper.errors.ErrorReason
@@ -28,6 +29,16 @@ sealed interface SourceRole {
         fun ErrorReason.fetchLeakingFunction(): FirBasedSymbol<*> =
             extractInfoFromFunctionArgument(0).unwrap<FirSymbolHolder>().firSymbol
     }
+
+    data class ConditionalEffect(val lhs: SourceRole?, val rhs: SourceRole?) : SourceRole
+    data class IsTypeCondition(val targetVariable: FirBasedSymbol<*>, val expectedType: ConeKotlinType, val negated: Boolean = false) :
+        SourceRole
+
+    data class IsNullCondition(val targetVariable: FirBasedSymbol<*>, val negated: Boolean = false) : SourceRole
+    data class ConstantCondition(val literal: Boolean) : SourceRole
+    data class ConjunctiveCondition(val lhs: SourceRole?, val rhs: SourceRole?) : SourceRole
+    data class DisjunctiveCondition(val lhs: SourceRole?, val rhs: SourceRole?) : SourceRole
+    data class NegationCondition(val arg: SourceRole?) : SourceRole
 }
 
 val SourceRole?.asInfo: Info

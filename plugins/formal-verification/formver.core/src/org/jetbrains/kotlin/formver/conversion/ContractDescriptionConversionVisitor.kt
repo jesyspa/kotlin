@@ -6,12 +6,15 @@
 package org.jetbrains.kotlin.formver.conversion
 
 import org.jetbrains.kotlin.contracts.description.*
+import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.contracts.description.ConeContractConstantValues
+import org.jetbrains.kotlin.fir.declarations.FirReceiverParameter
 import org.jetbrains.kotlin.fir.diagnostics.ConeDiagnostic
+import org.jetbrains.kotlin.fir.resolve.providers.getSymbolByTypeRef
+import org.jetbrains.kotlin.fir.resolve.providers.symbolProvider
 import org.jetbrains.kotlin.fir.symbols.FirBasedSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirFunctionSymbol
 import org.jetbrains.kotlin.fir.types.ConeKotlinType
-import org.jetbrains.kotlin.formver.calleeSymbol
 import org.jetbrains.kotlin.formver.effects
 import org.jetbrains.kotlin.formver.embeddings.FunctionTypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.NullableTypeEmbedding
@@ -34,6 +37,7 @@ data class ContractVisitorContext(
 class ContractDescriptionConversionVisitor(
     private val ctx: ProgramConversionContext,
     private val signature: NamedFunctionSignature,
+    private val session: FirSession,
 ) : KtContractDescriptionVisitor<ExpEmbedding, ContractVisitorContext, ConeKotlinType, ConeDiagnostic>() {
     private val parameterIndices = signature.params.indices.toSet() + setOfNotNull(signature.receiver?.let { -1 })
 
@@ -59,8 +63,8 @@ class ContractDescriptionConversionVisitor(
         booleanConstantDescriptor: KtBooleanConstantReference<ConeKotlinType, ConeDiagnostic>,
         data: ContractVisitorContext,
     ): ExpEmbedding = when (booleanConstantDescriptor) {
-        ConeContractConstantValues.TRUE -> BooleanLit(true)
-        ConeContractConstantValues.FALSE -> BooleanLit(false)
+        ConeContractConstantValues.TRUE -> BooleanLit(true, SourceRole.ConstantCondition(true))
+        ConeContractConstantValues.FALSE -> BooleanLit(false, SourceRole.ConstantCondition(false))
         else -> throw IllegalArgumentException("Unexpected boolean constant: $booleanConstantDescriptor")
     }
 
@@ -97,7 +101,8 @@ class ContractDescriptionConversionVisitor(
          * values and null. Let x be a non-nullable variable, then x == null is mapped to false and x != null is mapped to true
          */
         val param = isNullPredicate.arg.embeddedVar()
-        return param.nullCmp(isNullPredicate.isNegated, null)
+        val role = SourceRole.IsNullCondition(isNullPredicate.arg.getTargetParameter(data), isNullPredicate.isNegated)
+        return param.nullCmp(isNullPredicate.isNegated, role)
     }
 
     override fun visitLogicalBinaryOperationContractExpression(
@@ -107,8 +112,8 @@ class ContractDescriptionConversionVisitor(
         val left = binaryLogicExpression.left.accept(this, data)
         val right = binaryLogicExpression.right.accept(this, data)
         return when (binaryLogicExpression.kind) {
-            LogicOperationKind.AND -> And(left, right)
-            LogicOperationKind.OR -> Or(left, right)
+            LogicOperationKind.AND -> And(left, right, SourceRole.ConjunctiveCondition(left.sourceRole, right.sourceRole))
+            LogicOperationKind.OR -> Or(left, right, SourceRole.DisjunctiveCondition(left.sourceRole, right.sourceRole))
         }
     }
 
@@ -117,7 +122,7 @@ class ContractDescriptionConversionVisitor(
         data: ContractVisitorContext,
     ): ExpEmbedding {
         val arg = logicalNot.arg.accept(this, data)
-        return Not(arg)
+        return Not(arg, SourceRole.NegationCondition(arg.sourceRole))
     }
 
     override fun visitConditionalEffectDeclaration(
@@ -126,7 +131,8 @@ class ContractDescriptionConversionVisitor(
     ): ExpEmbedding {
         val effect = conditionalEffect.effect.accept(this, data)
         val cond = conditionalEffect.condition.accept(this, data)
-        return Implies(effect, cond)
+        val role = SourceRole.ConditionalEffect(effect.sourceRole, cond.sourceRole)
+        return Implies(effect, cond, role)
     }
 
     override fun visitCallsEffectDeclaration(
@@ -174,8 +180,10 @@ class ContractDescriptionConversionVisitor(
         data: ContractVisitorContext,
     ): ExpEmbedding {
         val argVar = isInstancePredicate.arg.embeddedVar()
-        val subtypeRel = Is(argVar, ctx.embedType(isInstancePredicate.type))
-        return if (isInstancePredicate.isNegated) Not(subtypeRel) else subtypeRel
+        val argSymbol = isInstancePredicate.arg.getTargetParameter(data)
+        val role = SourceRole.IsTypeCondition(argSymbol, isInstancePredicate.type, isInstancePredicate.isNegated)
+        val subtypeRel = Is(argVar, ctx.embedType(isInstancePredicate.type), role)
+        return if (isInstancePredicate.isNegated) Not(subtypeRel, role) else subtypeRel
     }
 
     /**
@@ -196,12 +204,15 @@ class ContractDescriptionConversionVisitor(
         embeddedVarByIndex(parameterIndex)
 
     private fun KtValueParameterReference<ConeKotlinType, ConeDiagnostic>.getTargetParameter(data: ContractVisitorContext): FirBasedSymbol<*> {
-        return resolveByIndex(
+        return resolveByIndex<FirBasedSymbol<*>>(
             parameterIndex,
-            { data.functionContractOwner.receiverParameter!!.calleeSymbol }) { data.functionContractOwner.valueParameterSymbols[it] }
+            { data.functionContractOwner.receiverParameter!!.receiverSymbol }) { data.functionContractOwner.valueParameterSymbols[it] }
     }
 
     private fun embeddedVarByIndex(ix: Int): VariableEmbedding = resolveByIndex(ix, { signature.receiver!! }) { signature.params[it] }
+
+    private val FirReceiverParameter.receiverSymbol: FirBasedSymbol<*>
+        get() = session.symbolProvider.getSymbolByTypeRef<FirBasedSymbol<*>>(typeRef)!!
 
     private fun VariableEmbedding.nullCmp(isNegated: Boolean, sourceRole: SourceRole?): ExpEmbedding =
         when (val type = this.type) {

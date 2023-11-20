@@ -187,7 +187,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
             override val sourceName: String?
                 get() = super<NamedFunctionSignature>.sourceName
         }
-        val contractVisitor = ContractDescriptionConversionVisitor(this@ProgramConverter, subSignature)
+        val contractVisitor = ContractDescriptionConversionVisitor(this@ProgramConverter, subSignature, session)
 
         return object : FullNamedFunctionSignature, NamedFunctionSignature by subSignature {
             override fun getPreconditions(returnVariable: VariableEmbedding) = subSignature.formalArgs.flatMap { it.pureInvariants() } +
