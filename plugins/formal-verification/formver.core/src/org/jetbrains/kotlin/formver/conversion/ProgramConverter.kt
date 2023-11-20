@@ -63,10 +63,11 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
 
     fun registerForVerification(declaration: FirSimpleFunction) {
         val signature = embedFullSignature(declaration.symbol)
-        // Note: it is important that `viperMethod` is only set later, as we need to
+        // Note: it is important that `body` is only set after `embedUserFunction` is complete, as we need to
         // place the embedding in the map before processing the body.
-        val embedding = embedUserFunction(declaration.symbol, signature)
-        embedding.body = convertMethodWithBody(declaration, signature)
+        embedUserFunction(declaration.symbol, signature).apply {
+            body = convertMethodWithBody(declaration, signature)
+        }
     }
 
     fun embedUserFunction(symbol: FirFunctionSymbol<*>, signature: FullNamedFunctionSignature): UserFunctionEmbedding {
@@ -280,7 +281,6 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         val bodyExp = FunctionExp(signature, stmtCtx.convert(firBody), returnTarget.label)
         val linearizer = Linearizer(SharedLinearizationState(anonVarProducer), SeqnBuilder(declaration.source), declaration.source)
         bodyExp.toViperUnusedResult(linearizer)
-        linearizer.block
         return FunctionBodyEmbedding(linearizer.block, returnTarget, bodyExp)
     }
 
