@@ -13,10 +13,7 @@ import org.jetbrains.kotlin.fir.symbols.impl.FirFunctionSymbol
 import org.jetbrains.kotlin.fir.types.ConeKotlinType
 import org.jetbrains.kotlin.formver.calleeSymbol
 import org.jetbrains.kotlin.formver.effects
-import org.jetbrains.kotlin.formver.embeddings.Condition
-import org.jetbrains.kotlin.formver.embeddings.FunctionTypeEmbedding
-import org.jetbrains.kotlin.formver.embeddings.NullableTypeEmbedding
-import org.jetbrains.kotlin.formver.embeddings.SourceRole
+import org.jetbrains.kotlin.formver.embeddings.*
 import org.jetbrains.kotlin.formver.embeddings.callables.NamedFunctionSignature
 import org.jetbrains.kotlin.formver.embeddings.expression.*
 
@@ -70,16 +67,16 @@ class ContractDescriptionConversionVisitor(
         data: ContractVisitorContext,
     ): ExpEmbedding {
         return when (returnsEffect.value) {
-            ConeContractConstantValues.WILDCARD -> BooleanLit(true, SourceRole.ReturnsEffect)
+            ConeContractConstantValues.WILDCARD -> BooleanLit(true, ReturnsEffect.Wildcard)
             /* NOTE: in a function that has a non-nullable return type, the compiler will not complain if there is an effect like
              * returnsNotNull(). So it is necessary to take care of these cases in order to avoid comparison between non-nullable
              * values and null. In a function that has a non-nullable return type, returnsNotNull() is mapped to true and returns(null)
              * is mapped to false
              */
-            ConeContractConstantValues.NULL -> data.returnVariable.nullCmp(false, SourceRole.ReturnsNullEffect)
-            ConeContractConstantValues.NOT_NULL -> data.returnVariable.nullCmp(true, SourceRole.ReturnsNotNullEffect)
-            ConeContractConstantValues.TRUE -> EqCmp(data.returnVariable, BooleanLit(true), SourceRole.ReturnsTrueEffect)
-            ConeContractConstantValues.FALSE -> EqCmp(data.returnVariable, BooleanLit(false), SourceRole.ReturnsFalseEffect)
+            ConeContractConstantValues.NULL -> data.returnVariable.nullCmp(false, ReturnsEffect.Null(negated = false))
+            ConeContractConstantValues.NOT_NULL -> data.returnVariable.nullCmp(true, ReturnsEffect.Null(negated = true))
+            ConeContractConstantValues.TRUE -> EqCmp(data.returnVariable, BooleanLit(true), ReturnsEffect.Bool(true))
+            ConeContractConstantValues.FALSE -> EqCmp(data.returnVariable, BooleanLit(false), ReturnsEffect.Bool(false))
             else -> throw IllegalArgumentException("Unexpected constant: ${returnsEffect.value}")
         }
     }
@@ -131,7 +128,7 @@ class ContractDescriptionConversionVisitor(
         val effect = conditionalEffect.effect.accept(this, data)
         val cond = conditionalEffect.condition.accept(this, data)
         // The effect's source role it is guaranteed to be not null. The same goes for the condition's source role.
-        val role = SourceRole.ConditionalEffect(effect.sourceRole!!, cond.sourceRole as Condition)
+        val role = SourceRole.ConditionalEffect(effect.sourceRole as ReturnsEffect, cond.sourceRole as Condition)
         return Implies(effect, cond, role)
     }
 

@@ -14,11 +14,6 @@ import org.jetbrains.kotlin.formver.viper.errors.ErrorReason
 import org.jetbrains.kotlin.formver.viper.errors.extractInfoFromFunctionArgument
 
 sealed interface SourceRole {
-    data object ReturnsEffect : SourceRole
-    data object ReturnsTrueEffect : SourceRole
-    data object ReturnsFalseEffect : SourceRole
-    data object ReturnsNullEffect : SourceRole
-    data object ReturnsNotNullEffect : SourceRole
     data object ParamFunctionLeakageCheck : SourceRole {
         /**
          * Retrieves the leaking function parameter symbol from an error reason.
@@ -29,8 +24,14 @@ sealed interface SourceRole {
     }
 
     data class CallsInPlaceEffect(val paramSymbol: FirBasedSymbol<*>, val kind: EventOccurrencesRange) : SourceRole
-    data class ConditionalEffect(val effect: SourceRole, val condition: Condition) : SourceRole
+    data class ConditionalEffect(val effect: ReturnsEffect, val condition: Condition) : SourceRole
     data class FirSymbolHolder(val firSymbol: FirBasedSymbol<*>) : SourceRole, Condition
+}
+
+sealed interface ReturnsEffect : SourceRole {
+    data object Wildcard : ReturnsEffect
+    data class Bool(val bool: Boolean) : ReturnsEffect
+    data class Null(val negated: Boolean) : ReturnsEffect
 }
 
 sealed interface Condition : SourceRole {
