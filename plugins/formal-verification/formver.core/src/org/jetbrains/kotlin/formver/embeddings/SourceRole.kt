@@ -26,22 +26,24 @@ sealed interface SourceRole {
     data class CallsInPlaceEffect(val paramSymbol: FirBasedSymbol<*>, val kind: EventOccurrencesRange) : SourceRole
     data class ConditionalEffect(val effect: ReturnsEffect, val condition: Condition) : SourceRole
     data class FirSymbolHolder(val firSymbol: FirBasedSymbol<*>) : SourceRole, Condition
+
+    sealed interface ReturnsEffect : SourceRole {
+        data object Wildcard : ReturnsEffect
+        data class Bool(val bool: Boolean) : ReturnsEffect
+        data class Null(val negated: Boolean) : ReturnsEffect
+    }
+
+    sealed interface Condition : SourceRole {
+        data class IsType(val targetVariable: FirBasedSymbol<*>, val expectedType: ConeKotlinType, val negated: Boolean = false) : Condition
+        data class IsNull(val targetVariable: FirBasedSymbol<*>, val negated: Boolean = false) : Condition
+        data class Constant(val literal: Boolean) : Condition
+        data class Conjunction(val lhs: Condition, val rhs: Condition) : Condition
+        data class Disjunction(val lhs: Condition, val rhs: Condition) : Condition
+        data class Negation(val arg: Condition) : Condition
+    }
 }
 
-sealed interface ReturnsEffect : SourceRole {
-    data object Wildcard : ReturnsEffect
-    data class Bool(val bool: Boolean) : ReturnsEffect
-    data class Null(val negated: Boolean) : ReturnsEffect
-}
 
-sealed interface Condition : SourceRole {
-    data class IsType(val targetVariable: FirBasedSymbol<*>, val expectedType: ConeKotlinType, val negated: Boolean = false) : Condition
-    data class IsNull(val targetVariable: FirBasedSymbol<*>, val negated: Boolean = false) : Condition
-    data class Constant(val literal: Boolean) : Condition
-    data class Conjunctive(val lhs: Condition, val rhs: Condition) : Condition
-    data class Disjunctive(val lhs: Condition, val rhs: Condition) : Condition
-    data class Negation(val arg: Condition) : Condition
-}
 
 val SourceRole?.asInfo: Info
     get() = when (this) {

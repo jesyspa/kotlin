@@ -14,7 +14,6 @@ import org.jetbrains.kotlin.diagnostics.reportOn
 import org.jetbrains.kotlin.fir.analysis.checkers.context.CheckerContext
 import org.jetbrains.kotlin.formver.ErrorStyle
 import org.jetbrains.kotlin.formver.PluginErrors
-import org.jetbrains.kotlin.formver.embeddings.ReturnsEffect
 import org.jetbrains.kotlin.formver.embeddings.SourceRole
 import org.jetbrains.kotlin.formver.viper.errors.ConsistencyError
 import org.jetbrains.kotlin.formver.viper.errors.VerificationError
@@ -30,7 +29,7 @@ class VerifierErrorInterpreter {
         context: CheckerContext,
     ) {
         when (val role = error.getInfoOrNull<SourceRole>()) {
-            is ReturnsEffect ->
+            is SourceRole.ReturnsEffect ->
                 reportOn(source, PluginErrors.UNEXPECTED_RETURNED_VALUE, role.asUserFriendlyMessage, context)
             is SourceRole.CallsInPlaceEffect ->
                 reportOn(source, PluginErrors.INVALID_INVOCATION_TYPE, role.paramSymbol, role.kind.asUserFriendlyMessage, context)
@@ -94,10 +93,10 @@ class VerifierErrorInterpreter {
             else -> TODO("Unreachable")
         }
 
-    private val ReturnsEffect.asUserFriendlyMessage: String
+    private val SourceRole.ReturnsEffect.asUserFriendlyMessage: String
         get() = when (this) {
-            is ReturnsEffect.Bool -> if (bool) "false" else "true"
-            is ReturnsEffect.Null -> if (negated) "null" else "non-null"
+            is SourceRole.ReturnsEffect.Bool -> if (bool) "false" else "true"
+            is SourceRole.ReturnsEffect.Null -> if (negated) "null" else "non-null"
             else -> TODO("Unreachable")
         }
 }
