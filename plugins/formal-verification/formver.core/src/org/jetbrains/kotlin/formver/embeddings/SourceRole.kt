@@ -19,8 +19,6 @@ sealed interface SourceRole {
     data object ReturnsFalseEffect : SourceRole
     data object ReturnsNullEffect : SourceRole
     data object ReturnsNotNullEffect : SourceRole
-    data class CallsInPlaceEffect(val paramSymbol: FirBasedSymbol<*>, val kind: EventOccurrencesRange) : SourceRole
-    data class FirSymbolHolder(val firSymbol: FirBasedSymbol<*>) : SourceRole
     data object ParamFunctionLeakageCheck : SourceRole {
         /**
          * Retrieves the leaking function parameter symbol from an error reason.
@@ -30,15 +28,18 @@ sealed interface SourceRole {
             extractInfoFromFunctionArgument(0).unwrap<FirSymbolHolder>().firSymbol
     }
 
-    data class ConditionalEffect(val lhs: SourceRole?, val rhs: SourceRole?) : SourceRole
-    data class IsTypeCondition(val targetVariable: FirBasedSymbol<*>, val expectedType: ConeKotlinType, val negated: Boolean = false) :
-        SourceRole
+    data class CallsInPlaceEffect(val paramSymbol: FirBasedSymbol<*>, val kind: EventOccurrencesRange) : SourceRole
+    data class ConditionalEffect(val effect: SourceRole, val condition: Condition) : SourceRole
+    data class FirSymbolHolder(val firSymbol: FirBasedSymbol<*>) : SourceRole, Condition
+}
 
-    data class IsNullCondition(val targetVariable: FirBasedSymbol<*>, val negated: Boolean = false) : SourceRole
-    data class ConstantCondition(val literal: Boolean) : SourceRole
-    data class ConjunctiveCondition(val lhs: SourceRole?, val rhs: SourceRole?) : SourceRole
-    data class DisjunctiveCondition(val lhs: SourceRole?, val rhs: SourceRole?) : SourceRole
-    data class NegationCondition(val arg: SourceRole?) : SourceRole
+sealed interface Condition : SourceRole {
+    data class IsType(val targetVariable: FirBasedSymbol<*>, val expectedType: ConeKotlinType, val negated: Boolean = false) : Condition
+    data class IsNull(val targetVariable: FirBasedSymbol<*>, val negated: Boolean = false) : Condition
+    data class Constant(val literal: Boolean) : Condition
+    data class Conjunctive(val lhs: Condition, val rhs: Condition) : Condition
+    data class Disjunctive(val lhs: Condition, val rhs: Condition) : Condition
+    data class Negation(val arg: Condition) : Condition
 }
 
 val SourceRole?.asInfo: Info
