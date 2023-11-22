@@ -51,11 +51,8 @@ fun ExpEmbedding.withPosition(source: KtSourceElement?): ExpEmbedding =
 data class SharingContext(override val inner: ExpEmbedding) : PassthroughExpEmbedding {
     var sharedExp: Exp? = null
 
-    override fun <R> withPassthroughHook(ctx: LinearizationContext, action: LinearizationContext.() -> R): R {
-        val r = ctx.action()
-        sharedExp = null
-        return r
-    }
+    override fun <R> withPassthroughHook(ctx: LinearizationContext, action: LinearizationContext.() -> R): R =
+        ctx.action().also { sharedExp = null }
 
     fun tryInitShared(f: () -> Exp): Exp = when (val r = sharedExp) {
         null -> {
