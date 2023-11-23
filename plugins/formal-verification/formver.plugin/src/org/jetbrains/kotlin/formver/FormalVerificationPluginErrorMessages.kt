@@ -57,7 +57,7 @@ object FormalVerificationPluginErrorMessages : BaseDiagnosticRendererFactory() {
         )
         put(
             PluginErrors.CONDITIONAL_EFFECT_ERROR,
-            "Cannot verify that if {0} then ''{1}''.",
+            "Cannot verify that if {0} then {1}.",
             CommonRenderers.STRING,
             CommonRenderers.STRING
         )

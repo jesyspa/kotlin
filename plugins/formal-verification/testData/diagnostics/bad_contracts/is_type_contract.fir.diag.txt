@@ -16,7 +16,7 @@ method pkg$kotlin$class_CharSequence$getter_length(this: Ref)
   returns (ret: Int)
 
 
-/is_type_contract.kt:(186,215): warning: Cannot verify that if the function returns then 'x is kotlin.Unit'.
+/is_type_contract.kt:(186,215): warning: Cannot verify that if the function returns then x is Unit.
 
 /is_type_contract.kt:(289,311): info: Generated Viper text for nullableNotNonNullable:
 method global$fun_nullableNotNonNullable$fun_take$NT_Int$return$T_Unit(local$x: dom$Nullable[Int])
@@ -28,4 +28,4 @@ method global$fun_nullableNotNonNullable$fun_take$NT_Int$return$T_Unit(local$x: 
   label label$ret$0
 }
 
-/is_type_contract.kt:(346,374): warning: Cannot verify that if the function returns then 'x is kotlin.Int'.
+/is_type_contract.kt:(346,374): warning: Cannot verify that if the function returns then x is Int.

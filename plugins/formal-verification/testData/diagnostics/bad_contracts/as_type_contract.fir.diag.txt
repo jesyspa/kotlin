@@ -25,4 +25,4 @@ method global$fun_getX$fun_take$T_Any$return$NT_Int(local$a: dom$Any)
   label label$ret$0
 }
 
-/as_type_contract.kt:(194,236): warning: Cannot verify that if a non-null value is returned then 'a !is IntHolder'.
+/as_type_contract.kt:(194,236): warning: Cannot verify that if a non-null value is returned then a !is IntHolder.

@@ -15,6 +15,7 @@ import org.jetbrains.kotlin.fir.analysis.checkers.context.CheckerContext
 import org.jetbrains.kotlin.fir.analysis.diagnostics.FirDiagnosticRenderers
 import org.jetbrains.kotlin.fir.symbols.FirBasedSymbol
 import org.jetbrains.kotlin.fir.types.ConeKotlinType
+import org.jetbrains.kotlin.fir.types.renderReadable
 import org.jetbrains.kotlin.formver.ErrorStyle
 import org.jetbrains.kotlin.formver.PluginErrors
 import org.jetbrains.kotlin.formver.embeddings.SourceRole
@@ -108,8 +109,7 @@ class VerifierErrorInterpreter {
         }
 
     private fun SourceRole.ReturnsEffect.describe(): String = when (this) {
-        is SourceRole.ReturnsEffect.Bool -> "a $bool value is returned"
-        is SourceRole.ReturnsEffect.Null -> "a ${if (negated) "non-null" else "null"} value is returned"
+        is SourceRole.ReturnsEffect.Bool, is SourceRole.ReturnsEffect.Null -> "a $this value is returned"
         SourceRole.ReturnsEffect.Wildcard -> "the function returns"
     }
 
@@ -138,7 +138,7 @@ class VerifierErrorInterpreter {
     }
 
     private val ConeKotlinType.rendered: String
-        get() = FirDiagnosticRenderers.RENDER_TYPE.render(this)
+        get() = renderReadable()
 
     private val FirBasedSymbol<*>.rendered: String
         get() = FirDiagnosticRenderers.DECLARATION_NAME.render(this)
