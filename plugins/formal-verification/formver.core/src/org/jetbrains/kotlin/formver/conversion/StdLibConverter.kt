@@ -6,6 +6,7 @@
 package org.jetbrains.kotlin.formver.conversion
 
 import org.jetbrains.kotlin.formver.embeddings.ListSizeFieldEmbedding
+import org.jetbrains.kotlin.formver.embeddings.SourceRole
 import org.jetbrains.kotlin.formver.embeddings.callables.NamedFunctionSignature
 import org.jetbrains.kotlin.formver.embeddings.expression.*
 import org.jetbrains.kotlin.formver.names.NameMatcher
@@ -23,8 +24,8 @@ fun NamedFunctionSignature.stdLibPreConditions(): List<ExpEmbedding> =
                 val receiver = receiver!!
                 val indexArg = formalArgs[1]
                 return listOf(
-                    GeCmp(indexArg, IntLit(0)),
-                    GtCmp(FieldAccess(receiver, ListSizeFieldEmbedding), indexArg),
+                    GeCmp(indexArg, IntLit(0), SourceRole.ListElementAccessCheck),
+                    GtCmp(FieldAccess(receiver, ListSizeFieldEmbedding), indexArg, SourceRole.ListElementAccessCheck),
                 )
             }
             ifFunctionName("subList") {

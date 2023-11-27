@@ -11,6 +11,7 @@ import org.jetbrains.kotlin.fir.types.ConeKotlinType
 import org.jetbrains.kotlin.formver.viper.ast.Info
 
 sealed interface SourceRole {
+    data object ListElementAccessCheck : SourceRole
     data object ParamFunctionLeakageCheck : SourceRole
     data class CallsInPlaceEffect(val paramSymbol: FirBasedSymbol<*>, val kind: EventOccurrencesRange) : SourceRole
     data class ConditionalEffect(val effect: ReturnsEffect, val condition: Condition) : SourceRole
