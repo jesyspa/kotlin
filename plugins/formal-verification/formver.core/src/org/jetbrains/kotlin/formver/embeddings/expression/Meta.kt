@@ -54,13 +54,9 @@ data class SharingContext(override val inner: ExpEmbedding) : PassthroughExpEmbe
     override fun <R> withPassthroughHook(ctx: LinearizationContext, action: LinearizationContext.() -> R): R =
         ctx.action().also { sharedExp = null }
 
+    // We need a temporary variable here since Kotlin believes sharedExp may be modified at any point.
     fun tryInitShared(f: () -> Exp): Exp = when (val r = sharedExp) {
-        null -> {
-            // Can't use sharedExp as Kotlin thinks it may be modified between the assignment and the return.
-            val newSharedExp = f()
-            sharedExp = newSharedExp
-            newSharedExp
-        }
+        null -> f().also { sharedExp = it }
         else -> r
     }
 
@@ -86,7 +82,7 @@ data class SharingContext(override val inner: ExpEmbedding) : PassthroughExpEmbe
  * TODO: fix this.
  */
 data class Shared(val inner: ExpEmbedding) : StoredResultExpEmbedding {
-    var _context: SharingContext? = null
+    private var _context: SharingContext? = null
     val context: SharingContext
         get() = checkNotNull(_context) { "Context of shared used before initialisation is complete." }
     override val type: TypeEmbedding
@@ -105,6 +101,11 @@ data class Shared(val inner: ExpEmbedding) : StoredResultExpEmbedding {
     override fun ignoringMetaNodes() = inner
     override fun ignoringCastsAndMetaNodes() = inner
 
+    fun initContext(ctx: SharingContext) {
+        check(_context == null) { "Context of shared initialized twice." }
+        _context = ctx
+    }
+
     override val debugTreeView: TreeView
         get() = NamedBranchingNode(
             "Shared",
@@ -116,6 +117,6 @@ data class Shared(val inner: ExpEmbedding) : StoredResultExpEmbedding {
 fun share(toShare: ExpEmbedding, makeSharingScope: (ExpEmbedding) -> ExpEmbedding): ExpEmbedding {
     val shared = Shared(toShare)
     val context = SharingContext(makeSharingScope(shared))
-    shared._context = context
+    shared.initContext(context)
     return context
 }
