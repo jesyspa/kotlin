@@ -19,7 +19,7 @@ import org.jetbrains.kotlin.formver.viper.errors.VerificationError
 import org.jetbrains.kotlin.formver.viper.errors.VerifierError
 import org.jetbrains.kotlin.formver.viper.errors.getInfoOrNull
 
-class VerifierErrorInterpreter {
+object VerifierErrorInterpreter {
 
     private fun fetchVerificationErrorReporter(error: VerificationError): ErrorReporter<*>? =
         when (val role = error.getInfoOrNull<SourceRole>()) {
