@@ -20,42 +20,22 @@ import org.jetbrains.kotlin.formver.viper.errors.VerifierError
 import org.jetbrains.kotlin.formver.viper.errors.getInfoOrNull
 
 class VerifierErrorInterpreter {
-    private var isOriginalViperErrorReported = false
 
-    private fun DiagnosticReporter.reportVerificationErrorUserFriendly(
-        source: KtSourceElement?,
-        error: VerificationError,
-        context: CheckerContext,
-    ) {
+    private fun fetchVerificationErrorReporter(error: VerificationError): ErrorReporter<*>? =
         when (val role = error.getInfoOrNull<SourceRole>()) {
-            is SourceRole.ReturnsEffect -> with(ReturnsEffectPrinter) {
-                reportOn(source, PluginErrors.UNEXPECTED_RETURNED_VALUE, role.prettyPrint(), context)
-            }
-            is SourceRole.CallsInPlaceEffect -> with(CallsInPlacePrinter) {
-                reportOn(source, PluginErrors.INVALID_INVOCATION_TYPE, role.paramSymbol, role.prettyPrint(), context)
-            }
-            is SourceRole.ParamFunctionLeakageCheck -> with(role) {
-                reportOn(source, PluginErrors.LAMBDA_MAY_LEAK, error.fetchLeakingFunction(), context)
-            }
-            is SourceRole.ConditionalEffect -> {
-                val (returnEffect, condition) = role
-                val returnEffectPrettyPrinted = with(ConditionalEffectPrinter.ReturnsEffect) { returnEffect.prettyPrint() }
-                val conditionPrettyPrinted = with(ConditionalEffectPrinter.Condition) { condition.prettyPrint() }
-                reportOn(source, PluginErrors.CONDITIONAL_EFFECT_ERROR, returnEffectPrettyPrinted, conditionPrettyPrinted, context)
-            }
-            else -> reportVerificationErrorOriginalViper(source, error, context)
+            is SourceRole.ReturnsEffect -> ReturnsEffectReporter(error, role)
+            is SourceRole.CallsInPlaceEffect -> CallsInPlaceReporter(error, role)
+            is SourceRole.ParamFunctionLeakageCheck -> LeakingLambdaReporter(error, role)
+            is SourceRole.ConditionalEffect -> ConditionalEffectReporter(error, role)
+            else -> null
         }
-    }
 
-    private fun DiagnosticReporter.reportVerificationErrorOriginalViper(
+    private fun DiagnosticReporter.reportOriginalVerificationError(
         source: KtSourceElement?,
         error: VerificationError,
         context: CheckerContext,
     ) {
-        if (!isOriginalViperErrorReported) {
-            reportOn(source, PluginErrors.VIPER_VERIFICATION_ERROR, error.msg, context)
-            isOriginalViperErrorReported = true
-        }
+        reportOn(source, PluginErrors.VIPER_VERIFICATION_ERROR, error.msg, context)
     }
 
     private fun DiagnosticReporter.reportVerificationError(
@@ -63,12 +43,21 @@ class VerifierErrorInterpreter {
         error: VerificationError,
         errorStyle: ErrorStyle,
         context: CheckerContext,
-    ) = when (errorStyle) {
-        ErrorStyle.USER_FRIENDLY -> reportVerificationErrorUserFriendly(source, error, context)
-        ErrorStyle.ORIGINAL_VIPER -> reportVerificationErrorOriginalViper(source, error, context)
-        ErrorStyle.BOTH -> {
-            reportVerificationErrorUserFriendly(source, error, context)
-            reportVerificationErrorOriginalViper(source, error, context)
+    ) {
+        when (errorStyle) {
+            ErrorStyle.USER_FRIENDLY -> {
+                val reporter = fetchVerificationErrorReporter(error)
+                // If we do not have a human-friendly error report, fallback to the original error message from Viper.
+                reporter?.report(this, source, context) ?: reportOriginalVerificationError(source, error, context)
+            }
+            ErrorStyle.ORIGINAL_VIPER -> {
+                reportOriginalVerificationError(source, error, context)
+            }
+            ErrorStyle.BOTH -> {
+                val reporter = fetchVerificationErrorReporter(error)
+                reporter?.report(this, source, context)
+                reportOriginalVerificationError(source, error, context)
+            }
         }
     }
 
