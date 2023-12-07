@@ -19,64 +19,55 @@ import org.jetbrains.kotlin.formver.viper.errors.VerificationError
 import org.jetbrains.kotlin.formver.viper.errors.VerifierError
 import org.jetbrains.kotlin.formver.viper.errors.getInfoOrNull
 
-object VerifierErrorInterpreter {
-
-    private fun fetchVerificationErrorReporter(error: VerificationError): ErrorReporter<*>? =
-        when (val role = error.getInfoOrNull<SourceRole>()) {
-            is SourceRole.ReturnsEffect -> ReturnsEffectReporter(error, role)
-            is SourceRole.CallsInPlaceEffect -> CallsInPlaceReporter(error, role)
-            is SourceRole.ParamFunctionLeakageCheck -> LeakingLambdaReporter(error, role)
-            is SourceRole.ConditionalEffect -> ConditionalEffectReporter(error, role)
-            else -> null
-        }
-
-    private fun DiagnosticReporter.reportOriginalVerificationError(
-        source: KtSourceElement?,
-        error: VerificationError,
-        context: CheckerContext,
-    ) {
-        reportOn(source, PluginErrors.VIPER_VERIFICATION_ERROR, error.msg, context)
+private fun fetchVerificationErrorReporter(error: VerificationError): ErrorReporter =
+    when (val sourceRole = error.getInfoOrNull<SourceRole>()) {
+        is SourceRole.ReturnsEffect -> ReturnsEffectReporter(sourceRole)
+        is SourceRole.CallsInPlaceEffect -> CallsInPlaceReporter(sourceRole)
+        is SourceRole.ParamFunctionLeakageCheck -> LeakingLambdaReporter(error)
+        is SourceRole.ConditionalEffect -> ConditionalEffectReporter(sourceRole)
+        else -> DefaultErrorReporter(error)
     }
 
-    private fun DiagnosticReporter.reportVerificationError(
-        source: KtSourceElement?,
-        error: VerificationError,
-        errorStyle: ErrorStyle,
-        context: CheckerContext,
-    ) {
-        when (errorStyle) {
-            ErrorStyle.USER_FRIENDLY -> {
-                val reporter = fetchVerificationErrorReporter(error)
-                // If we do not have a human-friendly error report, fallback to the original error message from Viper.
-                reporter?.report(this, source, context) ?: reportOriginalVerificationError(source, error, context)
-            }
-            ErrorStyle.ORIGINAL_VIPER -> {
-                reportOriginalVerificationError(source, error, context)
-            }
-            ErrorStyle.BOTH -> {
-                val reporter = fetchVerificationErrorReporter(error)
-                reporter?.report(this, source, context)
-                reportOriginalVerificationError(source, error, context)
+private fun DiagnosticReporter.reportVerificationError(
+    source: KtSourceElement?,
+    error: VerificationError,
+    errorStyle: ErrorStyle,
+    context: CheckerContext,
+) {
+    when (errorStyle) {
+        ErrorStyle.USER_FRIENDLY -> {
+            val reporter = fetchVerificationErrorReporter(error)
+            reporter.report(this, source, context)
+        }
+        ErrorStyle.ORIGINAL_VIPER -> {
+            DefaultErrorReporter(error).report(this, source, context)
+        }
+        ErrorStyle.BOTH -> {
+            val reporter = fetchVerificationErrorReporter(error)
+            reporter.report(this, source, context)
+            // Avoid duplicate warnings if we do not have a specific reporter for the error.
+            if (reporter !is DefaultErrorReporter) {
+                DefaultErrorReporter(error).report(this, source, context)
             }
         }
     }
+}
 
-    private fun DiagnosticReporter.reportConsistencyError(source: KtSourceElement?, error: ConsistencyError, context: CheckerContext) {
-        val sourceIsFunctionDeclaration = source?.elementType?.let { it == KtNodeTypes.FUN } ?: false
-        val positionStrategy = when (sourceIsFunctionDeclaration) {
-            true -> SourceElementPositioningStrategies.DECLARATION_NAME
-            false -> SourceElementPositioningStrategies.DEFAULT
-        }
-        reportOn(source, PluginErrors.INTERNAL_ERROR, error.msg, context, positioningStrategy = positionStrategy)
+private fun DiagnosticReporter.reportConsistencyError(source: KtSourceElement?, error: ConsistencyError, context: CheckerContext) {
+    val sourceIsFunctionDeclaration = source?.elementType?.let { it == KtNodeTypes.FUN } ?: false
+    val positionStrategy = when (sourceIsFunctionDeclaration) {
+        true -> SourceElementPositioningStrategies.DECLARATION_NAME
+        false -> SourceElementPositioningStrategies.DEFAULT
     }
+    reportOn(source, PluginErrors.INTERNAL_ERROR, error.msg, context, positioningStrategy = positionStrategy)
+}
 
-    fun DiagnosticReporter.reportVerifierError(
-        source: KtSourceElement?,
-        error: VerifierError,
-        errorStyle: ErrorStyle,
-        context: CheckerContext,
-    ) = when (error) {
-        is ConsistencyError -> reportConsistencyError(source, error, context)
-        is VerificationError -> reportVerificationError(source, error, errorStyle, context)
-    }
+fun DiagnosticReporter.reportVerifierError(
+    source: KtSourceElement?,
+    error: VerifierError,
+    errorStyle: ErrorStyle,
+    context: CheckerContext,
+) = when (error) {
+    is ConsistencyError -> reportConsistencyError(source, error, context)
+    is VerificationError -> reportVerificationError(source, error, errorStyle, context)
 }
