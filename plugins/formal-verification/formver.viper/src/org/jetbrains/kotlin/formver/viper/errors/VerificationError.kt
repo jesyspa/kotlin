@@ -5,21 +5,20 @@
 
 package org.jetbrains.kotlin.formver.viper.errors
 
-import org.jetbrains.kotlin.formver.viper.ast.Info
-import org.jetbrains.kotlin.formver.viper.ast.Position
-import org.jetbrains.kotlin.formver.viper.ast.info
-import org.jetbrains.kotlin.formver.viper.ast.unwrapOr
+import org.jetbrains.kotlin.formver.viper.ast.*
+import viper.silver.verifier.DummyReason.offendingNode
 
 /**
  * This class acts as wrapper for Viper's [viper.silver.verifier.ErrorReason].
  * This is necessary since extension functions on [viper.silver.verifier.ErrorReason] cannot be
  * used outside the class' package.
  */
-data class ErrorReason(val reason: viper.silver.verifier.ErrorReason)
+data class ErrorReason(private val reason: viper.silver.verifier.ErrorReason) :
+    IntoSilverCallable by delegateToSilverCallable(reason.offendingNode())
 
 class VerificationError private constructor(
-    val result: viper.silver.verifier.VerificationError
-) : VerifierError {
+    val result: viper.silver.verifier.VerificationError,
+) : VerifierError, IntoSilverCallable by delegateToSilverCallable(offendingNode()) {
     companion object {
         fun fromSilver(result: viper.silicon.interfaces.VerificationResult): VerificationError {
             check(result.isFatal) { "The verification result must contain an error to be converted." }
@@ -51,11 +50,3 @@ fun <I> VerificationError.getInfoOrNull(): I? =
     Info.fromSilver(result.offendingNode().info).unwrapOr<I> {
         Info.fromSilver(result.reason().offendingNode().info).unwrapOr<I> { null }
     }
-
-/**
- * If the reason's offending node is a function application, then fetch the info metadata from the index-th argument.
- */
-fun ErrorReason.extractInfoFromFunctionArgument(argIndex: Int): Info = when (val node = reason.offendingNode()) {
-    is viper.silver.ast.FuncApp -> Info.fromSilver(node.args.apply(argIndex).info)
-    else -> error("The reason's offending node is not a function application.")
-}

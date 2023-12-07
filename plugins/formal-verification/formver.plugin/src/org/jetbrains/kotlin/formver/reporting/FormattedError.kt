@@ -12,7 +12,7 @@ import org.jetbrains.kotlin.diagnostics.reportOn
 import org.jetbrains.kotlin.fir.analysis.checkers.context.CheckerContext
 import org.jetbrains.kotlin.formver.PluginErrors
 import org.jetbrains.kotlin.formver.embeddings.SourceRole
-import org.jetbrains.kotlin.formver.embeddings.SourceRole.ParamFunctionLeakageCheck.fetchLeakingFunction
+import org.jetbrains.kotlin.formver.viper.ast.unwrap
 import org.jetbrains.kotlin.formver.viper.errors.VerificationError
 import org.jetbrains.kotlin.formver.viper.errors.getInfoOrNull
 
@@ -50,7 +50,10 @@ class CallsInPlaceError(private val sourceRole: SourceRole.CallsInPlaceEffect) :
 
 class LeakingLambdaError(private val error: VerificationError) : FormattedError {
     override fun report(reporter: DiagnosticReporter, source: KtSourceElement?, context: CheckerContext) {
-        reporter.reportOn(source, PluginErrors.LAMBDA_MAY_LEAK, error.reason.fetchLeakingFunction(), context)
+        // The leaking function symbol is always contained in the first argument of the error's reason.
+        val reasonArg = error.reason.asCallable().argInfo(0)
+        val leakingFunctionSymbol = reasonArg.unwrap<SourceRole.FirSymbolHolder>().firSymbol
+        reporter.reportOn(source, PluginErrors.LAMBDA_MAY_LEAK, leakingFunctionSymbol, context)
     }
 }
 
