@@ -9,8 +9,6 @@ import org.jetbrains.kotlin.formver.viper.ast.Info
 import org.jetbrains.kotlin.formver.viper.ast.Position
 import org.jetbrains.kotlin.formver.viper.ast.info
 import org.jetbrains.kotlin.formver.viper.ast.unwrapOr
-import scala.collection.Seq
-import viper.silver.ast.Exp
 
 /**
  * This class acts as wrapper for Viper's [viper.silver.verifier.ErrorReason].
@@ -55,32 +53,9 @@ fun <I> VerificationError.getInfoOrNull(): I? =
     }
 
 /**
- * Extract the[Info] metadata from a [viper.silver.ast.MethodCall] argument.
+ * If the reason's offending node is a function application, then fetch the info metadata from the index-th argument.
  */
-fun VerificationError.extractInfoFromFunctionArgument(argIndex: Int, isFromReason: Boolean = false): Info =
-    extraInfoFromCallableArgument<viper.silver.ast.FuncApp>(argIndex, isFromReason) { args() }
-
-/**
- * Extract the [Info] metadata from the `argIndex`-th argument of a callable.
- * @param argIndex The n-th callable argument from where extract the metadata.
- * @param isFromReason If the info metadata is contained in the error's reason offending node.
- * @param body Lambda function defining how to access the callable's argument list.
- */
-private inline fun <reified T> VerificationError.extraInfoFromCallableArgument(
-    argIndex: Int,
-    isFromReason: Boolean,
-    body: T.() -> Seq<Exp>,
-): Info {
-    val offendingNode = if (isFromReason) {
-        reason.reason.offendingNode()
-    } else {
-        result.offendingNode()
-    }
-    return when (offendingNode) {
-        is T -> {
-            val arg = body(offendingNode).apply(argIndex)
-            Info.fromSilver(arg.info)
-        }
-        else -> error("The node is not of type ${T::class}.")
-    }
+fun ErrorReason.extractInfoFromFunctionArgument(argIndex: Int): Info = when (val node = reason.offendingNode()) {
+    is viper.silver.ast.FuncApp -> Info.fromSilver(node.args.apply(argIndex).info)
+    else -> error("The reason's offending node is not a function application.")
 }

@@ -11,7 +11,6 @@ import org.jetbrains.kotlin.fir.types.renderReadable
 import org.jetbrains.kotlin.formver.embeddings.SourceRole
 
 object SourceRoleConditionPrettyPrinter {
-
     private fun FirBasedSymbol<*>.showFirSymbol(): String =
         FirDiagnosticRenderers.DECLARATION_NAME.render(this)
 

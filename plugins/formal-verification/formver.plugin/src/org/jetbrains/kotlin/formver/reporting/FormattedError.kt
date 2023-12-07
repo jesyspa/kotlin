@@ -14,12 +14,13 @@ import org.jetbrains.kotlin.formver.PluginErrors
 import org.jetbrains.kotlin.formver.embeddings.SourceRole
 import org.jetbrains.kotlin.formver.embeddings.SourceRole.ParamFunctionLeakageCheck.fetchLeakingFunction
 import org.jetbrains.kotlin.formver.viper.errors.VerificationError
+import org.jetbrains.kotlin.formver.viper.errors.getInfoOrNull
 
-sealed interface ErrorReporter {
+sealed interface FormattedError {
     fun report(reporter: DiagnosticReporter, source: KtSourceElement?, context: CheckerContext)
 }
 
-class ReturnsEffectReporter(private val sourceRole: SourceRole.ReturnsEffect) : ErrorReporter {
+class ReturnsEffectError(private val sourceRole: SourceRole.ReturnsEffect) : FormattedError {
     private val SourceRole.ReturnsEffect.asUserFriendlyMessage: String
         get() = when (this) {
             is SourceRole.ReturnsEffect.Bool -> if (bool) "false" else "true"
@@ -32,7 +33,7 @@ class ReturnsEffectReporter(private val sourceRole: SourceRole.ReturnsEffect) : 
     }
 }
 
-class CallsInPlaceReporter(private val sourceRole: SourceRole.CallsInPlaceEffect) : ErrorReporter {
+class CallsInPlaceError(private val sourceRole: SourceRole.CallsInPlaceEffect) : FormattedError {
     private val SourceRole.CallsInPlaceEffect.asUserFriendlyMessage: String
         get() = when (kind) {
             EventOccurrencesRange.AT_MOST_ONCE -> "at most once"
@@ -47,14 +48,13 @@ class CallsInPlaceReporter(private val sourceRole: SourceRole.CallsInPlaceEffect
     }
 }
 
-class LeakingLambdaReporter(private val error: VerificationError) : ErrorReporter {
+class LeakingLambdaError(private val error: VerificationError) : FormattedError {
     override fun report(reporter: DiagnosticReporter, source: KtSourceElement?, context: CheckerContext) {
-        reporter.reportOn(source, PluginErrors.LAMBDA_MAY_LEAK, error.fetchLeakingFunction(), context)
+        reporter.reportOn(source, PluginErrors.LAMBDA_MAY_LEAK, error.reason.fetchLeakingFunction(), context)
     }
 }
 
-class ConditionalEffectReporter(private val sourceRole: SourceRole.ConditionalEffect) : ErrorReporter {
-
+class ConditionalEffectError(private val sourceRole: SourceRole.ConditionalEffect) : FormattedError {
     private val SourceRole.ReturnsEffect.asUserFriendlyMessage: String
         get() = when (this) {
             is SourceRole.ReturnsEffect.Bool, is SourceRole.ReturnsEffect.Null -> "a $this value is returned"
@@ -71,8 +71,17 @@ class ConditionalEffectReporter(private val sourceRole: SourceRole.ConditionalEf
     }
 }
 
-class DefaultErrorReporter(private val error: VerificationError) : ErrorReporter {
+class DefaultError(private val error: VerificationError) : FormattedError {
     override fun report(reporter: DiagnosticReporter, source: KtSourceElement?, context: CheckerContext) {
         reporter.reportOn(source, PluginErrors.VIPER_VERIFICATION_ERROR, error.msg, context)
     }
 }
+
+fun VerificationError.formatUserFriendly(): FormattedError? =
+    when (val sourceRole = getInfoOrNull<SourceRole>()) {
+        is SourceRole.ReturnsEffect -> ReturnsEffectError(sourceRole)
+        is SourceRole.CallsInPlaceEffect -> CallsInPlaceError(sourceRole)
+        is SourceRole.ParamFunctionLeakageCheck -> LeakingLambdaError(this)
+        is SourceRole.ConditionalEffect -> ConditionalEffectError(sourceRole)
+        else -> null
+    }
