@@ -6,19 +6,10 @@
 package org.jetbrains.kotlin.formver.viper.errors
 
 import org.jetbrains.kotlin.formver.viper.ast.*
-import viper.silver.verifier.DummyReason.offendingNode
-
-/**
- * This class acts as wrapper for Viper's [viper.silver.verifier.ErrorReason].
- * This is necessary since extension functions on [viper.silver.verifier.ErrorReason] cannot be
- * used outside the class' package.
- */
-data class ErrorReason(private val reason: viper.silver.verifier.ErrorReason) :
-    IntoSilverCallable by delegateToSilverCallable(reason.offendingNode())
 
 class VerificationError private constructor(
     val result: viper.silver.verifier.VerificationError,
-) : VerifierError, IntoSilverCallable by delegateToSilverCallable(offendingNode()) {
+) : VerifierError {
     companion object {
         fun fromSilver(result: viper.silicon.interfaces.VerificationResult): VerificationError {
             check(result.isFatal) { "The verification result must contain an error to be converted." }
@@ -26,8 +17,10 @@ class VerificationError private constructor(
         }
     }
 
-    val reason: ErrorReason
-        get() = ErrorReason(result.reason())
+    val offendingNode: Node
+        get() = Node(result.offendingNode())
+    val reasonOffendingNode: Node
+        get() = Node(result.reason().offendingNode())
     override val id: String
         get() = result.id()
     override val msg: String

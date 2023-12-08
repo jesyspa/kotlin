@@ -51,7 +51,7 @@ class CallsInPlaceError(private val sourceRole: SourceRole.CallsInPlaceEffect) :
 class LeakingLambdaError(private val error: VerificationError) : FormattedError {
     override fun report(reporter: DiagnosticReporter, source: KtSourceElement?, context: CheckerContext) {
         // The leaking function symbol is always contained in the first argument of the error's reason.
-        val reasonArg = error.reason.asCallable().argInfo(0)
+        val reasonArg = error.reasonOffendingNode.asCallable().argInfo(0)
         val leakingFunctionSymbol = reasonArg.unwrap<SourceRole.FirSymbolHolder>().firSymbol
         reporter.reportOn(source, PluginErrors.LAMBDA_MAY_LEAK, leakingFunctionSymbol, context)
     }
