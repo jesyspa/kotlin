@@ -5,7 +5,10 @@
 
 package org.jetbrains.kotlin.formver.viper.errors
 
-import org.jetbrains.kotlin.formver.viper.ast.*
+import org.jetbrains.kotlin.formver.viper.ast.Node
+import org.jetbrains.kotlin.formver.viper.ast.Position
+import org.jetbrains.kotlin.formver.viper.ast.info
+import org.jetbrains.kotlin.formver.viper.ast.unwrapOr
 
 class VerificationError private constructor(
     val result: viper.silver.verifier.VerificationError,
@@ -17,8 +20,22 @@ class VerificationError private constructor(
         }
     }
 
+    /**
+     * The [offendingNode] represents the node in Viper's AST where the error occurred.
+     * This is useful with error reporting, when we want to fetch missing information from the error,
+     * and we need to reconstruct the original Kotlin's code context.
+     */
     val offendingNode: Node
         get() = Node(result.offendingNode())
+
+    /**
+     * The [reasonOffendingNode] represents the reason error node in Viper's AST.
+     * To understand better the role of this field, let us consider a simple example:
+     * - we call a Viper's method with defined pre-conditions.
+     * - Viper throws a [VerificationError] due to a pre-condition that is not holding.
+     * - the [offendingNode] is located at the method call site, while
+     * - the [reasonOffendingNode] is located on the failing pre-condition.
+     */
     val reasonOffendingNode: Node
         get() = Node(result.reason().offendingNode())
     override val id: String
@@ -40,6 +57,6 @@ class VerificationError private constructor(
  * But the actual info we are interested in is on the pre-condition, contained in the reason's offending node.
  */
 fun <I> VerificationError.getInfoOrNull(): I? =
-    Info.fromSilver(result.offendingNode().info).unwrapOr<I> {
-        Info.fromSilver(result.reason().offendingNode().info).unwrapOr<I> { null }
+    offendingNode.info.unwrapOr<I> {
+        reasonOffendingNode.info.unwrapOr<I> { null }
     }

@@ -8,4 +8,4 @@ package org.jetbrains.kotlin.formver.viper.ast
 /**
  * Class wrapper for Viper's AST nodes.
  */
-data class Node(val node: viper.silver.ast.Node) : IntoSilverCallable by delegateToSilverCallable(node)
+data class Node(val node: viper.silver.ast.Node) : IntoCallable by delegateToCallable(node)
