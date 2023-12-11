@@ -27,9 +27,9 @@ class VerificationError private constructor(
         get() = AstWrapper.Node(result.offendingNode())
 
     /**
-     * The [faultProposition] represents the proposition that could not be verified in the Viper's AST.
+     * The [unverifiableProposition] represents the proposition that could not be verified in the Viper's AST.
      */
-    val faultProposition: AstWrapper.Exp
+    val unverifiableProposition: AstWrapper.Exp
         get() = AstWrapper.Exp(result.reason().offendingNode())
     override val id: String
         get() = result.id()

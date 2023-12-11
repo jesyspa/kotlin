@@ -51,7 +51,7 @@ class CallsInPlaceError(private val sourceRole: SourceRole.CallsInPlaceEffect) :
 class LeakingLambdaError(private val error: VerificationError) : FormattedError {
     override fun report(reporter: DiagnosticReporter, source: KtSourceElement?, context: CheckerContext) {
         // The leaking function symbol is always contained in the first argument of the error's reason.
-        val faultPropositionInfo = error.faultProposition.asCallable().arg(0).info
+        val faultPropositionInfo = error.unverifiableProposition.asCallable().arg(0).info
         val leakingFunctionSymbol = faultPropositionInfo.unwrap<SourceRole.FirSymbolHolder>().firSymbol
         reporter.reportOn(source, PluginErrors.LAMBDA_MAY_LEAK, leakingFunctionSymbol, context)
     }
@@ -102,7 +102,7 @@ private fun VerificationError.lookupSourceRole(): SourceRole? {
      * But the actual info we are interested in is on the pre-condition, contained in the reason's offending node.
      */
     return when (val locationNodeRole = locationNode.getInfoOrNull<SourceRole>()) {
-        null -> faultProposition.getInfoOrNull<SourceRole>()
+        null -> unverifiableProposition.getInfoOrNull<SourceRole>()
         else -> locationNodeRole
     }
 }

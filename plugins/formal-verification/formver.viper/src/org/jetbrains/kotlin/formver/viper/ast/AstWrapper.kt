@@ -9,11 +9,11 @@ package org.jetbrains.kotlin.formver.viper.ast
  * Interface acting as a wrapper between Kotlin and Silver's defined data-structure for the Abstract Syntax Tree.
  */
 sealed interface AstWrapper {
-    open class Node(val node: viper.silver.ast.Node) : AstWrapper, IntoCallable by delegateToCallable(node) {
+    open class Node(open val node: viper.silver.ast.Node) : AstWrapper, IntoCallable by delegateToCallable(node) {
         fun <I> getInfoOrNull(): I? = info.unwrapOr<I> { null }
     }
 
-    data class Exp(val exp: viper.silver.ast.Exp) : Node(exp) {
+    data class Exp(override val node: viper.silver.ast.Exp) : Node(node) {
         constructor(node: viper.silver.ast.Node) : this(node as viper.silver.ast.Exp)
     }
 }
