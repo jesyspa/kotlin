@@ -51,5 +51,5 @@ inline fun <reified I> Info.unwrap(): I = when (this) {
 private val viper.silver.ast.Node.info: viper.silver.ast.Info
     get() = prettyMetadata._2()
 
-val Node.info: Info
+val AstWrapper.Node.info: Info
     get() = Info.fromSilver(node.info)

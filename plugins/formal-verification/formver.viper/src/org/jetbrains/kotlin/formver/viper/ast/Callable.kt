@@ -18,33 +18,25 @@ interface IntoCallable {
  * Represents a Viper-callable object with arguments.
  */
 interface Callable {
-    val args: List<Node>
+    val args: List<AstWrapper.Exp>
 
-    fun arg(index: Int): Node {
-        val arguments = args
-        require(index in arguments.indices) {
+    fun arg(index: Int): AstWrapper.Exp {
+        require(index in args.indices) {
             "The callable does not have a ${index + 1}-th argument."
         }
-        return arguments[index]
+        return args[index]
     }
-
-    /**
-     * Extract Info metadata from the i-th argument list.
-     */
-    fun argInfo(index: Int): Info = arg(index).info
 }
 
 class CallableImpl(private val callableNode: viper.silver.ast.Node) : Callable {
-    override val args: List<Node>
-        get() {
-            val arguments = when (callableNode) {
-                is viper.silver.ast.FuncApp -> callableNode.args()
-                is viper.silver.ast.MethodCall -> callableNode.args()
-                else -> throw IllegalStateException("Unknown type for callable node.")
-            }
-            val wrappedArguments = JavaConverters.asJava(arguments).map { Node(it) }
-            return wrappedArguments
+    override val args: List<AstWrapper.Exp> by lazy {
+        val arguments = when (callableNode) {
+            is viper.silver.ast.FuncApp -> callableNode.args()
+            is viper.silver.ast.MethodCall -> callableNode.args()
+            else -> throw IllegalStateException("Unknown type for callable node.")
         }
+        JavaConverters.asJava(arguments).map { AstWrapper.Exp(it) }
+    }
 }
 
 /**
