@@ -63,8 +63,9 @@ object FormalVerificationPluginErrorMessages : BaseDiagnosticRendererFactory() {
         )
         put(
             PluginErrors.POSSIBLE_INDEX_OUT_OF_BOUND,
-            "Index potentially out of bound for list ''{0}''.",
-            FirDiagnosticRenderers.DECLARATION_NAME
+            "Invalid index for {0}, the index may be {1}.",
+            CommonRenderers.STRING,
+            CommonRenderers.STRING
         )
     }
 }

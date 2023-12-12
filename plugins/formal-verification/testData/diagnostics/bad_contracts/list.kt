@@ -3,6 +3,11 @@
 import org.jetbrains.kotlin.formver.plugin.AlwaysVerify
 
 @AlwaysVerify
+fun <!VIPER_TEXT!>empty_list_expr_get<!>() {
+    val s = <!POSSIBLE_INDEX_OUT_OF_BOUND!>emptyList<Int>()[0]<!>
+}
+
+@AlwaysVerify
 fun <!VIPER_TEXT!>empty_list_get<!>() {
     val myList: List<Int> = emptyList()
     val s = <!POSSIBLE_INDEX_OUT_OF_BOUND!>myList[0]<!>

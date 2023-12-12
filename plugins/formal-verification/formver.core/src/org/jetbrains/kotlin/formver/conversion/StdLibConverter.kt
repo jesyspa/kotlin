@@ -24,8 +24,16 @@ fun NamedFunctionSignature.stdLibPreConditions(): List<ExpEmbedding> =
                 val receiver = receiver!!
                 val indexArg = formalArgs[1]
                 return listOf(
-                    GeCmp(indexArg, IntLit(0), SourceRole.ListElementAccessCheck),
-                    GtCmp(FieldAccess(receiver, ListSizeFieldEmbedding), indexArg, SourceRole.ListElementAccessCheck),
+                    GeCmp(
+                        indexArg,
+                        IntLit(0),
+                        SourceRole.ListElementAccessCheck(SourceRole.ListElementAccessCheck.AccessCheckType.LESS_THAN_ZERO)
+                    ),
+                    GtCmp(
+                        FieldAccess(receiver, ListSizeFieldEmbedding),
+                        indexArg,
+                        SourceRole.ListElementAccessCheck(SourceRole.ListElementAccessCheck.AccessCheckType.GREATER_THAN_LIST_SIZE)
+                    ),
                 )
             }
             ifFunctionName("subList") {
