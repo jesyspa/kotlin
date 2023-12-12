@@ -82,7 +82,8 @@ class DefaultError(private val error: VerificationError) : FormattedError {
 
 class IndexOutOfBoundError(private val error: VerificationError) : FormattedError {
     override fun report(reporter: DiagnosticReporter, source: KtSourceElement?, context: CheckerContext) {
-        val targetList: FirBasedSymbol<*> = error.fetchOutOfBoundsIndexList()
+        val targetListInfo = error.locationNode.asCallable().arg(0).info
+        val targetList = targetListInfo.unwrap<SourceRole.FirSymbolHolder>().firSymbol
         reporter.reportOn(source, PluginErrors.POSSIBLE_INDEX_OUT_OF_BOUND, targetList, context)
     }
 }
@@ -91,8 +92,9 @@ fun VerificationError.formatUserFriendly(): FormattedError? =
     when (val sourceRole = lookupSourceRole()) {
         is SourceRole.ReturnsEffect -> ReturnsEffectError(sourceRole)
         is SourceRole.CallsInPlaceEffect -> CallsInPlaceError(sourceRole)
-        is SourceRole.ParamFunctionLeakageCheck -> LeakingLambdaError(this)
         is SourceRole.ConditionalEffect -> ConditionalEffectError(sourceRole)
+        is SourceRole.ParamFunctionLeakageCheck -> LeakingLambdaError(this)
+        is SourceRole.ListElementAccessCheck -> IndexOutOfBoundError(this)
         else -> null
     }
 
