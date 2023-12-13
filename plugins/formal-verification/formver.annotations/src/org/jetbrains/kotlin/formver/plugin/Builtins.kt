@@ -6,6 +6,8 @@
 package org.jetbrains.kotlin.formver.plugin
 
 /**
- * Built-in function used to verify a given boolean predicate with Viper.
+ * Built-in function used to mark a boolean predicate to be verified in Viper.
+ * This function hooks-in in the `formver` plugin, its invocation in a Kotlin
+ * program does not do anything.
  */
-fun verify(predicate: Boolean): Unit = Unit
+fun verify(@Suppress("UNUSED_PARAMETER") predicate: Boolean) = Unit

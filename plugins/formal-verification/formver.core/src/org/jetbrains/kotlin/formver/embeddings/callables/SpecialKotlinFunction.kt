@@ -147,7 +147,6 @@ object SpecialVerifyFunction : SpecialKotlinFunction {
     override val name: String = "verify"
 
     override fun insertCallImpl(args: List<ExpEmbedding>, ctx: StmtConversionContext): ExpEmbedding {
-        // Function calls to the `verify` function will be replaced with an assert statement.
         return Assert(args[0])
     }
 
