@@ -12,6 +12,7 @@ import org.jetbrains.kotlin.formver.viper.ast.Info
 
 sealed interface SourceRole {
     data object ParamFunctionLeakageCheck : SourceRole
+    data class SubListCreation(val mayBeNegative: Boolean = false) : SourceRole
 
     data class ListElementAccessCheck(val accessType: AccessCheckType) : SourceRole {
         enum class AccessCheckType {
