@@ -12,7 +12,6 @@ import org.jetbrains.kotlin.formver.viper.ast.Info
 
 sealed interface SourceRole {
     data object ParamFunctionLeakageCheck : SourceRole
-    data class SubListCreation(val mayBeNegative: Boolean = false) : SourceRole
 
     data class ListElementAccessCheck(val accessType: AccessCheckType) : SourceRole {
         enum class AccessCheckType {
@@ -24,6 +23,11 @@ sealed interface SourceRole {
     data class CallsInPlaceEffect(val paramSymbol: FirBasedSymbol<*>, val kind: EventOccurrencesRange) : SourceRole
     data class ConditionalEffect(val effect: ReturnsEffect, val condition: Condition) : SourceRole
     data class FirSymbolHolder(val firSymbol: FirBasedSymbol<*>) : SourceRole, Condition
+
+    sealed interface SubListCreation : SourceRole {
+        data object CheckInSize : SubListCreation
+        data object CheckNegativeIndices : SubListCreation
+    }
 
     sealed interface ReturnsEffect : SourceRole {
         data object Wildcard : ReturnsEffect

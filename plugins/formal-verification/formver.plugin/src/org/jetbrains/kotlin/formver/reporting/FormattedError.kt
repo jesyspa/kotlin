@@ -110,9 +110,9 @@ class IndexOutOfBoundError(private val error: VerificationError, private val sou
 
 class InvalidSubListRangeError(private val error: VerificationError, private val sourceRole: SourceRole.SubListCreation) : FormattedError {
     private val SourceRole.SubListCreation.asUserFriendlyMessage: String
-        get() = when (mayBeNegative) {
-            true -> "including negative indices"
-            false -> "greater than the list's size"
+        get() = when (this) {
+            is SourceRole.SubListCreation.CheckNegativeIndices -> "including negative indices"
+            is SourceRole.SubListCreation.CheckInSize -> "greater than the list's size"
         }
 
     override fun report(reporter: DiagnosticReporter, source: KtSourceElement?, context: CheckerContext) {
