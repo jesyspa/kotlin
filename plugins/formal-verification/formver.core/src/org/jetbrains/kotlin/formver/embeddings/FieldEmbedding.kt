@@ -44,15 +44,29 @@ interface FieldEmbedding {
             AccessPolicy.ALWAYS_INHALE_EXHALE -> FieldAccessTypeInvariantEmbedding(this, PermExp.FullPerm())
             AccessPolicy.ALWAYS_READABLE, AccessPolicy.ALWAYS_WRITEABLE -> null
         }
+
+    val typesContainingInPrimaryConstructor: Set<TypeEmbedding>
+        get() = setOf()
+
+    fun addTypeContainingInPrimaryConstructor(type: TypeEmbedding) = Unit
 }
 
 class UserFieldEmbedding(
     override val name: ScopedKotlinName,
     override val type: TypeEmbedding,
     override val symbol: FirPropertySymbol
-) : FieldEmbedding {
+): FieldEmbedding {
     override val accessPolicy: AccessPolicy = if (symbol.isVal) AccessPolicy.ALWAYS_READABLE else AccessPolicy.ALWAYS_INHALE_EXHALE
     override val includeInShortDump: Boolean = true
+
+    private val _typesContainingInPrimaryConstructor = mutableSetOf<TypeEmbedding>()
+
+    override val typesContainingInPrimaryConstructor: Set<TypeEmbedding>
+        get() = _typesContainingInPrimaryConstructor
+
+    override fun addTypeContainingInPrimaryConstructor(type: TypeEmbedding) {
+        _typesContainingInPrimaryConstructor.add(type)
+    }
 }
 
 

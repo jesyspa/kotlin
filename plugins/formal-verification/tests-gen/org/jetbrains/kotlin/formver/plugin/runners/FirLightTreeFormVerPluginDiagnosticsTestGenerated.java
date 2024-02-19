@@ -274,6 +274,12 @@ public class FirLightTreeFormVerPluginDiagnosticsTestGenerated extends AbstractF
         }
 
         @Test
+        @TestMetadata("custom_collection.kt")
+        public void testCustom_collection() throws Exception {
+            runTest("plugins/formal-verification/testData/diagnostics/no_contracts/custom_collection.kt");
+        }
+
+        @Test
         @TestMetadata("exp_side_effects.kt")
         public void testExp_side_effects() throws Exception {
             runTest("plugins/formal-verification/testData/diagnostics/no_contracts/exp_side_effects.kt");
@@ -331,6 +337,12 @@ public class FirLightTreeFormVerPluginDiagnosticsTestGenerated extends AbstractF
         @TestMetadata("inheritance.kt")
         public void testInheritance() throws Exception {
             runTest("plugins/formal-verification/testData/diagnostics/no_contracts/inheritance.kt");
+        }
+
+        @Test
+        @TestMetadata("inheritance_fields.kt")
+        public void testInheritance_fields() throws Exception {
+            runTest("plugins/formal-verification/testData/diagnostics/no_contracts/inheritance_fields.kt");
         }
 
         @Test
