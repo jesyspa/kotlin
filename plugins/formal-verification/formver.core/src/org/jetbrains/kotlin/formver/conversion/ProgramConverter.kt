@@ -10,6 +10,7 @@ import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.declarations.FirSimpleFunction
 import org.jetbrains.kotlin.fir.declarations.impl.FirDefaultPropertyGetter
 import org.jetbrains.kotlin.fir.declarations.impl.FirDefaultPropertySetter
+import org.jetbrains.kotlin.fir.declarations.utils.fromPrimaryConstructor
 import org.jetbrains.kotlin.fir.declarations.utils.hasBackingField
 import org.jetbrains.kotlin.fir.declarations.utils.isInline
 import org.jetbrains.kotlin.fir.symbols.SymbolInternals
@@ -228,7 +229,8 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
             UserFieldEmbedding(
                 name,
                 embedType(symbol.resolvedReturnType),
-                symbol.isVal
+                symbol.isVal,
+                symbol.fromPrimaryConstructor
             )
         }
         return backingField?.let { unscopedName to it }

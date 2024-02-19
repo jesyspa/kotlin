@@ -24,6 +24,8 @@ interface FieldEmbedding {
     val name: MangledName
     val type: TypeEmbedding
     val accessPolicy: AccessPolicy
+    val fromPrimaryConstructor: Boolean
+        get() = false
     val includeInShortDump: Boolean
 
     fun toViper(): Field = Field(name, type.viperType, includeInShortDump)
@@ -46,7 +48,12 @@ interface FieldEmbedding {
         }
 }
 
-class UserFieldEmbedding(override val name: ScopedKotlinName, override val type: TypeEmbedding, readOnly: Boolean) : FieldEmbedding {
+class UserFieldEmbedding(
+    override val name: ScopedKotlinName,
+    override val type: TypeEmbedding,
+    readOnly: Boolean,
+    override val fromPrimaryConstructor: Boolean = false
+) : FieldEmbedding {
     override val accessPolicy: AccessPolicy = if (readOnly) AccessPolicy.ALWAYS_READABLE else AccessPolicy.ALWAYS_INHALE_EXHALE
     override val includeInShortDump: Boolean = true
 }
@@ -54,6 +61,7 @@ class UserFieldEmbedding(override val name: ScopedKotlinName, override val type:
 object ListSizeFieldEmbedding : FieldEmbedding {
     override val name = SpecialName("size")
     override val type = IntTypeEmbedding
+    override val fromPrimaryConstructor = false
     override val accessPolicy = AccessPolicy.ALWAYS_WRITEABLE
     override val includeInShortDump: Boolean = true
     override fun extraAccessInvariantsForParameter(): List<TypeInvariantEmbedding> = listOf(NonNegativeSizeTypeInvariantEmbedding)
