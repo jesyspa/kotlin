@@ -6,13 +6,9 @@
 package org.jetbrains.kotlin.formver.embeddings
 
 import org.jetbrains.kotlin.formver.conversion.AccessPolicy
-import org.jetbrains.kotlin.formver.embeddings.expression.ExpEmbedding
-import org.jetbrains.kotlin.formver.embeddings.expression.FieldAccess
-import org.jetbrains.kotlin.formver.embeddings.expression.GeCmp
-import org.jetbrains.kotlin.formver.embeddings.expression.IntLit
+import org.jetbrains.kotlin.formver.embeddings.expression.*
+import org.jetbrains.kotlin.formver.names.*
 import org.jetbrains.kotlin.formver.names.NameMatcher
-import org.jetbrains.kotlin.formver.names.ScopedKotlinName
-import org.jetbrains.kotlin.formver.names.SpecialName
 import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.formver.viper.ast.Field
 import org.jetbrains.kotlin.formver.viper.ast.PermExp
@@ -24,8 +20,6 @@ interface FieldEmbedding {
     val name: MangledName
     val type: TypeEmbedding
     val accessPolicy: AccessPolicy
-    val fromPrimaryConstructor: Boolean
-        get() = false
     val includeInShortDump: Boolean
 
     fun toViper(): Field = Field(name, type.viperType, includeInShortDump)
@@ -48,20 +42,29 @@ interface FieldEmbedding {
         }
 }
 
-class UserFieldEmbedding(
+open class UserFieldEmbedding(
     override val name: ScopedKotlinName,
     override val type: TypeEmbedding,
-    readOnly: Boolean,
-    override val fromPrimaryConstructor: Boolean = false
+    readOnly: Boolean
 ) : FieldEmbedding {
     override val accessPolicy: AccessPolicy = if (readOnly) AccessPolicy.ALWAYS_READABLE else AccessPolicy.ALWAYS_INHALE_EXHALE
     override val includeInShortDump: Boolean = true
 }
 
+class PrimaryConstructorFieldEmbedding(
+    name: ScopedKotlinName,
+    type: TypeEmbedding,
+    readOnly: Boolean,
+    val fieldName: KotlinName
+) : UserFieldEmbedding(name, type, readOnly) {
+    val asMangledLocalName: ScopedKotlinName
+        get() = ScopedKotlinName(ParameterScope, fieldName)
+}
+
+
 object ListSizeFieldEmbedding : FieldEmbedding {
     override val name = SpecialName("size")
     override val type = IntTypeEmbedding
-    override val fromPrimaryConstructor = false
     override val accessPolicy = AccessPolicy.ALWAYS_WRITEABLE
     override val includeInShortDump: Boolean = true
     override fun extraAccessInvariantsForParameter(): List<TypeInvariantEmbedding> = listOf(NonNegativeSizeTypeInvariantEmbedding)

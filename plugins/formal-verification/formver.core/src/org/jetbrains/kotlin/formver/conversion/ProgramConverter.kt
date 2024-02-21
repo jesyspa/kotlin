@@ -196,11 +196,25 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
                     contractVisitor.getPreconditions(ContractVisitorContext(returnVariable, symbol)) +
                     subSignature.stdLibPreConditions()
 
+            fun primaryConstructorInvariants(returnVariable: VariableEmbedding): List<ExpEmbedding> {
+                if (symbol !is FirConstructorSymbol || !symbol.isPrimary || returnType !is ClassTypeEmbedding)
+                    return emptyList()
+                return returnType.fields.values.filterIsInstance<PrimaryConstructorFieldEmbedding>().map { field ->
+                    val correspondingLocalVariable = subSignature.formalArgs.find { param ->
+                        param.name == field.asMangledLocalName
+                    }
+                    //as we know that field is PrimaryConstructorFieldEmbedding we will definitely find local var
+                    checkNotNull(correspondingLocalVariable)
+                    EqCmp(FieldAccess(returnVariable, field), Old(correspondingLocalVariable))
+                }
+            }
+
             override fun getPostconditions(returnVariable: VariableEmbedding) = subSignature.formalArgs.flatMap { it.accessInvariants() } +
                     subSignature.params.flatMap { it.dynamicInvariants() } +
                     returnVariable.pureInvariants() +
                     returnVariable.provenInvariants() +
                     returnVariable.accessInvariants() +
+                    primaryConstructorInvariants(returnVariable) +
                     contractVisitor.getPostconditions(ContractVisitorContext(returnVariable, symbol)) +
                     subSignature.stdLibPostConditions(returnVariable)
 
@@ -226,12 +240,19 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         if (embedding.findAncestorField(unscopedName) != null) return null
         val name = symbol.callableId.embedMemberPropertyName()
         val backingField = name.specialEmbedding() ?: symbol.hasBackingField.ifTrue {
-            UserFieldEmbedding(
-                name,
-                embedType(symbol.resolvedReturnType),
-                symbol.isVal,
-                symbol.fromPrimaryConstructor
-            )
+            if (symbol.fromPrimaryConstructor)
+                PrimaryConstructorFieldEmbedding(
+                    name,
+                    embedType(symbol.resolvedReturnType),
+                    symbol.isVal,
+                    SimpleKotlinName(symbol.name)
+                )
+            else
+                UserFieldEmbedding(
+                    name,
+                    embedType(symbol.resolvedReturnType),
+                    symbol.isVal
+                )
         }
         return backingField?.let { unscopedName to it }
     }
