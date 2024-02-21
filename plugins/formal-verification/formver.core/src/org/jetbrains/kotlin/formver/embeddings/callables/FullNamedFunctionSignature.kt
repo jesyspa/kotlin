@@ -12,6 +12,9 @@ import org.jetbrains.kotlin.formver.embeddings.ClassTypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.PrimaryConstructorFieldEmbedding
 import org.jetbrains.kotlin.formver.embeddings.expression.*
 import org.jetbrains.kotlin.formver.linearization.pureToViper
+import org.jetbrains.kotlin.formver.names.ParameterScope
+import org.jetbrains.kotlin.formver.names.ScopedKotlinName
+import org.jetbrains.kotlin.formver.names.SimpleKotlinName
 import org.jetbrains.kotlin.formver.viper.ast.Stmt
 import org.jetbrains.kotlin.formver.viper.ast.UserMethod
 
@@ -22,21 +25,19 @@ interface FullNamedFunctionSignature : NamedFunctionSignature {
 }
 
 interface PrimaryConstructorFunctionSignature : FullNamedFunctionSignature {
-    fun primaryConstructorFieldsToParams(): Map<PrimaryConstructorFieldEmbedding, VariableEmbedding> {
-        val fields = (returnType as? ClassTypeEmbedding)?.fields?.values ?: return emptyMap()
-        return fields.filterIsInstance<PrimaryConstructorFieldEmbedding>().associateWith { constructorField ->
-            val correspondingParam = params.find { constructorField.asMangledLocalName == it.name }
-            //should be not null at this point
-            checkNotNull(correspondingParam)
-            correspondingParam
-        }
+    private fun primaryConstructorFieldsWithParams(): List<Pair<PrimaryConstructorFieldEmbedding, VariableEmbedding>> {
+        val fields = (returnType as? ClassTypeEmbedding)?.fields?.toList() ?: return emptyList()
+        return fields.filterIsInstance<Pair<SimpleKotlinName, PrimaryConstructorFieldEmbedding>>().map { (name, field) ->
+            val correspondingParam = params.find { ScopedKotlinName(ParameterScope, name) == it.name }
+            field to correspondingParam
+        }.filterIsInstance<Pair<PrimaryConstructorFieldEmbedding, VariableEmbedding>>()
     }
 
-    fun readonlyPrimaryConstructorFieldsToParams(): Map<PrimaryConstructorFieldEmbedding, VariableEmbedding> =
-        primaryConstructorFieldsToParams().filterKeys { it.accessPolicy == AccessPolicy.ALWAYS_READABLE }
+    private fun readonlyPrimaryConstructorFieldsWithParams(): List<Pair<PrimaryConstructorFieldEmbedding, VariableEmbedding>> =
+        primaryConstructorFieldsWithParams().filter { (field, _) -> field.accessPolicy == AccessPolicy.ALWAYS_READABLE }
 
     fun primaryConstructorInvariants(returnVariable: VariableEmbedding) =
-        readonlyPrimaryConstructorFieldsToParams().map { (field, variable) ->
+        readonlyPrimaryConstructorFieldsWithParams().map { (field, variable) ->
             EqCmp(FieldAccess(returnVariable, field), Old(variable))
         }
 }

@@ -242,8 +242,8 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
                 symbol.isVal
             )
             val correspondingParameterName = symbol.correspondingValueParameterFromPrimaryConstructor?.name?.embedParameterName()
-            if (symbol.fromPrimaryConstructor && correspondingParameterName != null)
-                PrimaryConstructorFieldEmbedding(userField, correspondingParameterName)
+            if (symbol.fromPrimaryConstructor)
+                PrimaryConstructorFieldEmbedding(userField)
             else userField
         }
         return backingField?.let { unscopedName to it }

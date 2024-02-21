@@ -52,8 +52,7 @@ class UserFieldEmbedding(
 }
 
 class PrimaryConstructorFieldEmbedding(
-    private val userField: UserFieldEmbedding,
-    val asMangledLocalName: ScopedKotlinName
+    private val userField: UserFieldEmbedding
 ) : FieldEmbedding by userField
 
 
