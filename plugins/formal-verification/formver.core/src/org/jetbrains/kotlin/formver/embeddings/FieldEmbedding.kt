@@ -42,7 +42,7 @@ interface FieldEmbedding {
         }
 }
 
-open class UserFieldEmbedding(
+class UserFieldEmbedding(
     override val name: ScopedKotlinName,
     override val type: TypeEmbedding,
     readOnly: Boolean
@@ -52,14 +52,9 @@ open class UserFieldEmbedding(
 }
 
 class PrimaryConstructorFieldEmbedding(
-    name: ScopedKotlinName,
-    type: TypeEmbedding,
-    readOnly: Boolean,
-    val fieldName: KotlinName
-) : UserFieldEmbedding(name, type, readOnly) {
+    private val userField: UserFieldEmbedding,
     val asMangledLocalName: ScopedKotlinName
-        get() = ScopedKotlinName(ParameterScope, fieldName)
-}
+) : FieldEmbedding by userField
 
 
 object ListSizeFieldEmbedding : FieldEmbedding {

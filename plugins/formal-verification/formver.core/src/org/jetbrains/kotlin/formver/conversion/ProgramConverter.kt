@@ -10,9 +10,7 @@ import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.declarations.FirSimpleFunction
 import org.jetbrains.kotlin.fir.declarations.impl.FirDefaultPropertyGetter
 import org.jetbrains.kotlin.fir.declarations.impl.FirDefaultPropertySetter
-import org.jetbrains.kotlin.fir.declarations.utils.fromPrimaryConstructor
-import org.jetbrains.kotlin.fir.declarations.utils.hasBackingField
-import org.jetbrains.kotlin.fir.declarations.utils.isInline
+import org.jetbrains.kotlin.fir.declarations.utils.*
 import org.jetbrains.kotlin.fir.symbols.SymbolInternals
 import org.jetbrains.kotlin.fir.symbols.impl.*
 import org.jetbrains.kotlin.fir.types.*
@@ -197,8 +195,8 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
                     subSignature.stdLibPreConditions()
 
             fun primaryConstructorInvariants(returnVariable: VariableEmbedding): List<ExpEmbedding> {
-                if (symbol !is FirConstructorSymbol || !symbol.isPrimary || returnType !is ClassTypeEmbedding)
-                    return emptyList()
+                if (symbol !is FirConstructorSymbol || returnType !is ClassTypeEmbedding) return emptyList()
+                if (!symbol.isPrimary) return emptyList()
                 return returnType.fields.values.filterIsInstance<PrimaryConstructorFieldEmbedding>().map { field ->
                     val correspondingLocalVariable = subSignature.formalArgs.find { param ->
                         param.name == field.asMangledLocalName
@@ -239,20 +237,17 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         // This field is already registered in the supertype: we don't need to know about it.
         if (embedding.findAncestorField(unscopedName) != null) return null
         val name = symbol.callableId.embedMemberPropertyName()
+
         val backingField = name.specialEmbedding() ?: symbol.hasBackingField.ifTrue {
-            if (symbol.fromPrimaryConstructor)
-                PrimaryConstructorFieldEmbedding(
-                    name,
-                    embedType(symbol.resolvedReturnType),
-                    symbol.isVal,
-                    SimpleKotlinName(symbol.name)
-                )
-            else
-                UserFieldEmbedding(
-                    name,
-                    embedType(symbol.resolvedReturnType),
-                    symbol.isVal
-                )
+            val userField = UserFieldEmbedding(
+                name,
+                embedType(symbol.resolvedReturnType),
+                symbol.isVal
+            )
+            val correspondingParameterName = symbol.correspondingValueParameterFromPrimaryConstructor?.name?.embedParameterName()
+            if (symbol.fromPrimaryConstructor && correspondingParameterName != null)
+                PrimaryConstructorFieldEmbedding(userField, correspondingParameterName)
+            else userField
         }
         return backingField?.let { unscopedName to it }
     }
