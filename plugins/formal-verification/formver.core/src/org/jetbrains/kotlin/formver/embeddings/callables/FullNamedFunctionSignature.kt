@@ -7,8 +7,10 @@ package org.jetbrains.kotlin.formver.embeddings.callables
 
 import org.jetbrains.kotlin.KtSourceElement
 import org.jetbrains.kotlin.formver.asPosition
-import org.jetbrains.kotlin.formver.embeddings.expression.ExpEmbedding
-import org.jetbrains.kotlin.formver.embeddings.expression.VariableEmbedding
+import org.jetbrains.kotlin.formver.conversion.AccessPolicy
+import org.jetbrains.kotlin.formver.embeddings.ClassTypeEmbedding
+import org.jetbrains.kotlin.formver.embeddings.PrimaryConstructorFieldEmbedding
+import org.jetbrains.kotlin.formver.embeddings.expression.*
 import org.jetbrains.kotlin.formver.linearization.pureToViper
 import org.jetbrains.kotlin.formver.viper.ast.Stmt
 import org.jetbrains.kotlin.formver.viper.ast.UserMethod
@@ -17,6 +19,26 @@ interface FullNamedFunctionSignature : NamedFunctionSignature {
     fun getPreconditions(returnVariable: VariableEmbedding): List<ExpEmbedding>
     fun getPostconditions(returnVariable: VariableEmbedding): List<ExpEmbedding>
     val declarationSource: KtSourceElement?
+}
+
+interface PrimaryConstructorFunctionSignature : FullNamedFunctionSignature {
+    fun primaryConstructorFieldsToParams(): Map<PrimaryConstructorFieldEmbedding, VariableEmbedding> {
+        val fields = (returnType as? ClassTypeEmbedding)?.fields?.values ?: return emptyMap()
+        return fields.filterIsInstance<PrimaryConstructorFieldEmbedding>().associateWith { constructorField ->
+            val correspondingParam = params.find { constructorField.asMangledLocalName == it.name }
+            //should be not null at this point
+            checkNotNull(correspondingParam)
+            correspondingParam
+        }
+    }
+
+    fun readonlyPrimaryConstructorFieldsToParams(): Map<PrimaryConstructorFieldEmbedding, VariableEmbedding> =
+        primaryConstructorFieldsToParams().filterKeys { it.accessPolicy == AccessPolicy.ALWAYS_READABLE }
+
+    fun primaryConstructorInvariants(returnVariable: VariableEmbedding) =
+        readonlyPrimaryConstructorFieldsToParams().map { (field, variable) ->
+            EqCmp(FieldAccess(returnVariable, field), Old(variable))
+        }
 }
 
 fun FullNamedFunctionSignature.toViperMethod(

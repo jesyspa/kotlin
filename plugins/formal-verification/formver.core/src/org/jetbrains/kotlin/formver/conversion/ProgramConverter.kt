@@ -188,37 +188,32 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         }
         val contractVisitor = ContractDescriptionConversionVisitor(this@ProgramConverter, subSignature)
 
-        return object : FullNamedFunctionSignature, NamedFunctionSignature by subSignature {
+        val nonConstructorSignature = object : FullNamedFunctionSignature, NamedFunctionSignature by subSignature {
             override fun getPreconditions(returnVariable: VariableEmbedding) = subSignature.formalArgs.flatMap { it.pureInvariants() } +
                     subSignature.formalArgs.flatMap { it.accessInvariants() } +
                     contractVisitor.getPreconditions(ContractVisitorContext(returnVariable, symbol)) +
                     subSignature.stdLibPreConditions()
-
-            fun primaryConstructorInvariants(returnVariable: VariableEmbedding): List<ExpEmbedding> {
-                if (symbol !is FirConstructorSymbol || returnType !is ClassTypeEmbedding) return emptyList()
-                if (!symbol.isPrimary) return emptyList()
-                return returnType.fields.values.filterIsInstance<PrimaryConstructorFieldEmbedding>().filter {
-                    it.accessPolicy == AccessPolicy.ALWAYS_READABLE
-                }.map { field ->
-                    val correspondingLocalVariable = subSignature.formalArgs.find { param ->
-                        param.name == field.asMangledLocalName
-                    }
-                    //as we know that field is PrimaryConstructorFieldEmbedding we will definitely find local var
-                    checkNotNull(correspondingLocalVariable)
-                    EqCmp(FieldAccess(returnVariable, field), Old(correspondingLocalVariable))
-                }
-            }
 
             override fun getPostconditions(returnVariable: VariableEmbedding) = subSignature.formalArgs.flatMap { it.accessInvariants() } +
                     subSignature.params.flatMap { it.dynamicInvariants() } +
                     returnVariable.pureInvariants() +
                     returnVariable.provenInvariants() +
                     returnVariable.accessInvariants() +
-                    primaryConstructorInvariants(returnVariable) +
                     contractVisitor.getPostconditions(ContractVisitorContext(returnVariable, symbol)) +
                     subSignature.stdLibPostConditions(returnVariable)
 
             override val declarationSource: KtSourceElement? = symbol.source
+        }
+
+        return if (symbol is FirConstructorSymbol && symbol.isPrimary) {
+            object : PrimaryConstructorFunctionSignature, FullNamedFunctionSignature by nonConstructorSignature {
+                override fun getPostconditions(returnVariable: VariableEmbedding): List<ExpEmbedding> {
+                    return nonConstructorSignature.getPostconditions(returnVariable) +
+                            primaryConstructorInvariants(returnVariable)
+                }
+            }
+        } else {
+            nonConstructorSignature
         }
     }
 
