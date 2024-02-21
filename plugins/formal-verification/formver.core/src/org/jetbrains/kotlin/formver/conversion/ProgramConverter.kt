@@ -197,7 +197,9 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
             fun primaryConstructorInvariants(returnVariable: VariableEmbedding): List<ExpEmbedding> {
                 if (symbol !is FirConstructorSymbol || returnType !is ClassTypeEmbedding) return emptyList()
                 if (!symbol.isPrimary) return emptyList()
-                return returnType.fields.values.filterIsInstance<PrimaryConstructorFieldEmbedding>().map { field ->
+                return returnType.fields.values.filterIsInstance<PrimaryConstructorFieldEmbedding>().filter {
+                    it.accessPolicy == AccessPolicy.ALWAYS_READABLE
+                }.map { field ->
                     val correspondingLocalVariable = subSignature.formalArgs.find { param ->
                         param.name == field.asMangledLocalName
                     }
