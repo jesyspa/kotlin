@@ -241,7 +241,6 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
                 embedType(symbol.resolvedReturnType),
                 symbol.isVal
             )
-            val correspondingParameterName = symbol.correspondingValueParameterFromPrimaryConstructor?.name?.embedParameterName()
             if (symbol.fromPrimaryConstructor)
                 PrimaryConstructorFieldEmbedding(userField)
             else userField
