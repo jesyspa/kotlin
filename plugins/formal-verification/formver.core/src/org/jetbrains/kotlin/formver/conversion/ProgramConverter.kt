@@ -236,7 +236,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         val name = symbol.callableId.embedMemberPropertyName()
 
         val backingField = name.specialEmbedding() ?: symbol.hasBackingField.ifTrue {
-            val userField = UserFieldEmbedding(
+            val userField = SimpleUserFieldEmbedding(
                 name,
                 embedType(symbol.resolvedReturnType),
                 symbol.isVal

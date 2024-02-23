@@ -25,11 +25,15 @@ interface FullNamedFunctionSignature : NamedFunctionSignature {
 }
 
 interface PrimaryConstructorFunctionSignature : FullNamedFunctionSignature {
+
     private fun primaryConstructorFieldsWithParams(): List<Pair<PrimaryConstructorFieldEmbedding, VariableEmbedding>> {
         val fields = (returnType as? ClassTypeEmbedding)?.fields?.toList() ?: return emptyList()
+        //second filter is basically cast and doesn't check anything
         return fields.map { (name, field) ->
             val correspondingParam = params.find { ScopedKotlinName(ParameterScope, name) == it.name }
             field to correspondingParam
+        }.filter { (field, variable) ->
+            field is PrimaryConstructorFieldEmbedding && variable != null
         }.filterIsInstance<Pair<PrimaryConstructorFieldEmbedding, VariableEmbedding>>()
     }
 
