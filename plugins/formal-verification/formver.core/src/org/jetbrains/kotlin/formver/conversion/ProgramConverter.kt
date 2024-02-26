@@ -188,7 +188,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         }
         val contractVisitor = ContractDescriptionConversionVisitor(this@ProgramConverter, subSignature)
 
-        val nonConstructorSignature = object : FullNamedFunctionSignature, NamedFunctionSignature by subSignature {
+        val signature = object : FullNamedFunctionSignature, NamedFunctionSignature by subSignature {
             override fun getPreconditions(returnVariable: VariableEmbedding) = subSignature.formalArgs.flatMap { it.pureInvariants() } +
                     subSignature.formalArgs.flatMap { it.accessInvariants() } +
                     contractVisitor.getPreconditions(ContractVisitorContext(returnVariable, symbol)) +
@@ -200,21 +200,14 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
                     returnVariable.provenInvariants() +
                     returnVariable.accessInvariants() +
                     contractVisitor.getPostconditions(ContractVisitorContext(returnVariable, symbol)) +
-                    subSignature.stdLibPostConditions(returnVariable)
+                    subSignature.stdLibPostConditions(returnVariable) +
+                    primaryConstructorInvariants(returnVariable)
 
             override val declarationSource: KtSourceElement? = symbol.source
+            override val isPrimaryConstructor = symbol is FirConstructorSymbol && symbol.isPrimary
         }
 
-        return if (symbol is FirConstructorSymbol && symbol.isPrimary) {
-            object : PrimaryConstructorFunctionSignature, FullNamedFunctionSignature by nonConstructorSignature {
-                override fun getPostconditions(returnVariable: VariableEmbedding): List<ExpEmbedding> {
-                    return nonConstructorSignature.getPostconditions(returnVariable) +
-                            primaryConstructorInvariants(returnVariable)
-                }
-            }
-        } else {
-            nonConstructorSignature
-        }
+        return signature
     }
 
     private val FirFunctionSymbol<*>.receiverType: ConeKotlinType?

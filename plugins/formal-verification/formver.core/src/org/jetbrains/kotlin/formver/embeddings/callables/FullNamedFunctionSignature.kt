@@ -16,23 +16,22 @@ import org.jetbrains.kotlin.formver.names.ParameterScope
 import org.jetbrains.kotlin.formver.names.ScopedKotlinName
 import org.jetbrains.kotlin.formver.viper.ast.Stmt
 import org.jetbrains.kotlin.formver.viper.ast.UserMethod
+import org.jetbrains.kotlin.utils.addToStdlib.ifTrue
 
 interface FullNamedFunctionSignature : NamedFunctionSignature {
     fun getPreconditions(returnVariable: VariableEmbedding): List<ExpEmbedding>
     fun getPostconditions(returnVariable: VariableEmbedding): List<ExpEmbedding>
     val declarationSource: KtSourceElement?
-}
-
-interface PrimaryConstructorFunctionSignature : FullNamedFunctionSignature {
+    val isPrimaryConstructor: Boolean
 
     private fun primaryConstructorFieldsWithParams(): List<Pair<FieldEmbedding, VariableEmbedding>> {
+        if (!isPrimaryConstructor) return emptyList()
         val fields = (returnType as? ClassTypeEmbedding)?.fields?.toList() ?: return emptyList()
-        // second filter is basically cast and doesn't check anything
-        return fields.map { (name, field) ->
+        return fields.mapNotNull { (name, field) ->
             val correspondingParam = params.find { ScopedKotlinName(ParameterScope, name) == it.name }
-            field to correspondingParam
-        }.filter { (field, variable) -> field.fromPrimaryConstructor && variable != null }
-            .filterIsInstance<Pair<FieldEmbedding, VariableEmbedding>>()
+            if (!field.fromPrimaryConstructor || correspondingParam == null) null
+            else field to correspondingParam
+        }
     }
 
     private fun readonlyPrimaryConstructorFieldsWithParams(): List<Pair<FieldEmbedding, VariableEmbedding>> =
