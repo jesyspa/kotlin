@@ -44,14 +44,12 @@ interface FieldEmbedding {
         }
 }
 
-interface UserFieldEmbedding : FieldEmbedding
-
-class SimpleUserFieldEmbedding(
+class UserFieldEmbedding(
     override val name: ScopedKotlinName,
     override val type: TypeEmbedding,
     readOnly: Boolean,
     override val fromPrimaryConstructor: Boolean
-) : UserFieldEmbedding {
+) : FieldEmbedding {
     override val accessPolicy: AccessPolicy = if (readOnly) AccessPolicy.ALWAYS_READABLE else AccessPolicy.ALWAYS_INHALE_EXHALE
     override val includeInShortDump: Boolean = true
 }
