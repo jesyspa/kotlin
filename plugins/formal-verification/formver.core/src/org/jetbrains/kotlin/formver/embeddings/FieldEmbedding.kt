@@ -21,6 +21,8 @@ interface FieldEmbedding {
     val type: TypeEmbedding
     val accessPolicy: AccessPolicy
     val includeInShortDump: Boolean
+    val fromPrimaryConstructor: Boolean
+        get() = false
 
     fun toViper(): Field = Field(name, type.viperType, includeInShortDump)
 
@@ -47,15 +49,12 @@ interface UserFieldEmbedding : FieldEmbedding
 class SimpleUserFieldEmbedding(
     override val name: ScopedKotlinName,
     override val type: TypeEmbedding,
-    readOnly: Boolean
+    readOnly: Boolean,
+    override val fromPrimaryConstructor: Boolean
 ) : UserFieldEmbedding {
     override val accessPolicy: AccessPolicy = if (readOnly) AccessPolicy.ALWAYS_READABLE else AccessPolicy.ALWAYS_INHALE_EXHALE
     override val includeInShortDump: Boolean = true
 }
-
-class PrimaryConstructorFieldEmbedding(
-    private val userField: SimpleUserFieldEmbedding
-) : UserFieldEmbedding by userField
 
 
 object ListSizeFieldEmbedding : FieldEmbedding {
