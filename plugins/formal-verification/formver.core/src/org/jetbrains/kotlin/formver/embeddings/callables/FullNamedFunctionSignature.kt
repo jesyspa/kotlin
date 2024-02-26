@@ -6,17 +6,15 @@
 package org.jetbrains.kotlin.formver.embeddings.callables
 
 import org.jetbrains.kotlin.KtSourceElement
+import org.jetbrains.kotlin.fir.declarations.utils.correspondingValueParameterFromPrimaryConstructor
 import org.jetbrains.kotlin.formver.asPosition
 import org.jetbrains.kotlin.formver.conversion.AccessPolicy
 import org.jetbrains.kotlin.formver.embeddings.ClassTypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.FieldEmbedding
 import org.jetbrains.kotlin.formver.embeddings.expression.*
 import org.jetbrains.kotlin.formver.linearization.pureToViper
-import org.jetbrains.kotlin.formver.names.ParameterScope
-import org.jetbrains.kotlin.formver.names.ScopedKotlinName
 import org.jetbrains.kotlin.formver.viper.ast.Stmt
 import org.jetbrains.kotlin.formver.viper.ast.UserMethod
-import org.jetbrains.kotlin.utils.addToStdlib.ifTrue
 
 interface FullNamedFunctionSignature : NamedFunctionSignature {
     fun getPreconditions(returnVariable: VariableEmbedding): List<ExpEmbedding>
@@ -26,12 +24,12 @@ interface FullNamedFunctionSignature : NamedFunctionSignature {
 
     private fun primaryConstructorFieldsWithParams(): List<Pair<FieldEmbedding, VariableEmbedding>> {
         if (!isPrimaryConstructor) return emptyList()
-        val fields = (returnType as? ClassTypeEmbedding)?.fields?.toList() ?: return emptyList()
-        return fields.mapNotNull { (name, field) ->
-            val correspondingParam = params.find { ScopedKotlinName(ParameterScope, name) == it.name }
-            if (!field.fromPrimaryConstructor || correspondingParam == null) null
-            else field to correspondingParam
-        }
+        return (returnType as? ClassTypeEmbedding)?.fields?.values?.mapNotNull { field ->
+            val correspondingParameterSymbol = field.symbol?.correspondingValueParameterFromPrimaryConstructor
+            val correspondingParameter = symbolsToParams[correspondingParameterSymbol]
+            if (correspondingParameter == null) null
+            else field to correspondingParameter
+        } ?: emptyList()
     }
 
     private fun readonlyPrimaryConstructorFieldsWithParams(): List<Pair<FieldEmbedding, VariableEmbedding>> =

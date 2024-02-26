@@ -5,6 +5,8 @@
 
 package org.jetbrains.kotlin.formver.embeddings
 
+import org.jetbrains.kotlin.fir.symbols.FirBasedSymbol
+import org.jetbrains.kotlin.fir.symbols.impl.FirPropertySymbol
 import org.jetbrains.kotlin.formver.conversion.AccessPolicy
 import org.jetbrains.kotlin.formver.embeddings.expression.*
 import org.jetbrains.kotlin.formver.names.*
@@ -21,8 +23,8 @@ interface FieldEmbedding {
     val type: TypeEmbedding
     val accessPolicy: AccessPolicy
     val includeInShortDump: Boolean
-    val fromPrimaryConstructor: Boolean
-        get() = false
+    val symbol: FirPropertySymbol?
+        get() = null
 
     fun toViper(): Field = Field(name, type.viperType, includeInShortDump)
 
@@ -47,10 +49,9 @@ interface FieldEmbedding {
 class UserFieldEmbedding(
     override val name: ScopedKotlinName,
     override val type: TypeEmbedding,
-    readOnly: Boolean,
-    override val fromPrimaryConstructor: Boolean
+    override val symbol: FirPropertySymbol
 ) : FieldEmbedding {
-    override val accessPolicy: AccessPolicy = if (readOnly) AccessPolicy.ALWAYS_READABLE else AccessPolicy.ALWAYS_INHALE_EXHALE
+    override val accessPolicy: AccessPolicy = if (symbol.isVal) AccessPolicy.ALWAYS_READABLE else AccessPolicy.ALWAYS_INHALE_EXHALE
     override val includeInShortDump: Boolean = true
 }
 
