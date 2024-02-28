@@ -5,7 +5,6 @@
 
 package org.jetbrains.kotlin.formver.embeddings
 
-import org.jetbrains.kotlin.fir.symbols.FirBasedSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirPropertySymbol
 import org.jetbrains.kotlin.formver.conversion.AccessPolicy
 import org.jetbrains.kotlin.formver.embeddings.expression.*
@@ -45,27 +44,27 @@ interface FieldEmbedding {
             AccessPolicy.ALWAYS_READABLE, AccessPolicy.ALWAYS_WRITEABLE -> null
         }
 
-    val typesContainingInPrimaryConstructor: Set<TypeEmbedding>
-        get() = setOf()
+    val typesContainingInPrimaryConstructor: Map<TypeEmbedding, FirPropertySymbol>
+        get() = emptyMap()
 
-    fun addTypeContainingInPrimaryConstructor(type: TypeEmbedding) = Unit
+    fun addTypeContainingInPrimaryConstructor(type: TypeEmbedding, symbol: FirPropertySymbol) = Unit
 }
 
 class UserFieldEmbedding(
     override val name: ScopedKotlinName,
     override val type: TypeEmbedding,
     override val symbol: FirPropertySymbol
-): FieldEmbedding {
+) : FieldEmbedding {
     override val accessPolicy: AccessPolicy = if (symbol.isVal) AccessPolicy.ALWAYS_READABLE else AccessPolicy.ALWAYS_INHALE_EXHALE
     override val includeInShortDump: Boolean = true
 
-    private val _typesContainingInPrimaryConstructor = mutableSetOf<TypeEmbedding>()
+    private val _typesContainingInPrimaryConstructor = mutableMapOf<TypeEmbedding, FirPropertySymbol>()
 
-    override val typesContainingInPrimaryConstructor: Set<TypeEmbedding>
+    override val typesContainingInPrimaryConstructor: Map<TypeEmbedding, FirPropertySymbol>
         get() = _typesContainingInPrimaryConstructor
 
-    override fun addTypeContainingInPrimaryConstructor(type: TypeEmbedding) {
-        _typesContainingInPrimaryConstructor.add(type)
+    override fun addTypeContainingInPrimaryConstructor(type: TypeEmbedding, symbol: FirPropertySymbol) {
+        _typesContainingInPrimaryConstructor[type] = symbol
     }
 }
 
