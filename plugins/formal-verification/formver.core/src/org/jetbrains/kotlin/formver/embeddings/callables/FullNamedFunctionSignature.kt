@@ -24,11 +24,11 @@ interface FullNamedFunctionSignature : NamedFunctionSignature {
 
     private fun primaryConstructorFieldsWithParams(): List<Pair<FieldEmbedding, VariableEmbedding>> {
         if (!isPrimaryConstructor) return emptyList()
+        val symbolsToParams = parametersByFirSymbols()
         return (returnType as? ClassTypeEmbedding)?.fields?.values?.mapNotNull { field ->
-            val correspondingParameterSymbol = field.symbol?.correspondingValueParameterFromPrimaryConstructor
-            val correspondingParameter = symbolsToParams[correspondingParameterSymbol]
-            if (correspondingParameter == null) null
-            else field to correspondingParameter
+            field.symbol?.correspondingValueParameterFromPrimaryConstructor?.let { symbol ->
+                symbolsToParams[symbol]?.let { field to it }
+            }
         } ?: emptyList()
     }
 

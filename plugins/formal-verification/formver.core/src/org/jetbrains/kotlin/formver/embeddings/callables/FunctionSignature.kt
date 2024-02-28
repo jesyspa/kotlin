@@ -13,8 +13,6 @@ import org.jetbrains.kotlin.formver.embeddings.expression.VariableEmbedding
 interface FunctionSignature : CallableSignature {
     val receiver: VariableEmbedding?
     val params: List<FirVariableEmbedding>
-    val symbolsToParams: Map<FirBasedSymbol<*>?, FirVariableEmbedding>
-        get() = params.associateBy { it.symbol }
 
     val sourceName: String?
         get() = null
@@ -27,3 +25,5 @@ interface FunctionSignature : CallableSignature {
     override val paramTypes: List<TypeEmbedding>
         get() = params.map { it.type }
 }
+
+fun FunctionSignature.parametersByFirSymbols(): Map<FirBasedSymbol<*>, FirVariableEmbedding> = params.associateBy { it.symbol }
