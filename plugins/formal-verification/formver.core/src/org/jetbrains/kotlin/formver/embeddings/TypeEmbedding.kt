@@ -69,8 +69,6 @@ interface TypeEmbedding {
      */
     fun <R> flatMapFields(action: (SimpleKotlinName, FieldEmbedding) -> List<R>): List<R> = listOf()
 
-    fun <R> mapNotNullFields(action: (SimpleKotlinName, FieldEmbedding) -> R?): List<R> = listOf()
-
     /**
      * Invariants that provide access to a resource and thus behave linearly.
      */
@@ -130,14 +128,10 @@ fun <R> TypeEmbedding.flatMapUniqueFields(action: (SimpleKotlinName, FieldEmbedd
     }
 }
 
-fun <R> TypeEmbedding.mapNotNullUniqueFields(action: (SimpleKotlinName, FieldEmbedding) -> R?): List<R> {
-    val seenFields = mutableSetOf<SimpleKotlinName>()
-    return mapNotNullFields { name, field ->
-        seenFields.add(name).ifTrue {
-            action(name, field)
-        }
+fun <R> TypeEmbedding.mapNotNullUniqueFields(action: (SimpleKotlinName, FieldEmbedding) -> R?): List<R> =
+    flatMapUniqueFields { name, field ->
+        action(name, field)?.let { listOf(it) } ?: emptyList()
     }
-}
 
 data object UnitTypeEmbedding : TypeEmbedding {
     override val runtimeType = TypeDomain.unitType()
@@ -323,9 +317,6 @@ data class ClassTypeEmbedding(val className: ScopedKotlinName) : TypeEmbedding {
 
     override fun <R> flatMapFields(action: (SimpleKotlinName, FieldEmbedding) -> List<R>): List<R> =
         superTypes.flatMap { it.flatMapFields(action) } + fields.flatMap { (name, field) -> action(name, field) }
-
-    override fun <R> mapNotNullFields(action: (SimpleKotlinName, FieldEmbedding) -> R?): List<R> =
-        superTypes.flatMap { it.mapNotNullFields(action) } + fields.mapNotNull { (name, field) -> action(name, field) }
 
     // We can't easily implement this by recursion on the supertype structure since some supertypes may be seen multiple times.
     // TODO: figure out a nicer way to handle this.

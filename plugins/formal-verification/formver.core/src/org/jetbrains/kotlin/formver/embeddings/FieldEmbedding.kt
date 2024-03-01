@@ -44,10 +44,16 @@ interface FieldEmbedding {
             AccessPolicy.ALWAYS_READABLE, AccessPolicy.ALWAYS_WRITEABLE -> null
         }
 
-    val typesContainingInPrimaryConstructor: Map<TypeEmbedding, FirPropertySymbol>
-        get() = emptyMap()
-
-    fun addTypeContainingInPrimaryConstructor(type: TypeEmbedding, symbol: FirPropertySymbol) = Unit
+    /**
+     * Returns all types in which this field is an argument of the primary constructor.
+     *
+     * This is necessary to provide additional invariants for constructor methods.
+     *
+     * Note that field can be an argument of the primary constructor not only
+     * in the class it was first declared but also in some of its descendants
+     * (via `override`). Thus, we store a map and not a single value.
+     */
+    fun getTypesContainingAsPrimaryConstructorArg(): Map<TypeEmbedding, FirPropertySymbol> = emptyMap()
 }
 
 class UserFieldEmbedding(
@@ -58,13 +64,13 @@ class UserFieldEmbedding(
     override val accessPolicy: AccessPolicy = if (symbol.isVal) AccessPolicy.ALWAYS_READABLE else AccessPolicy.ALWAYS_INHALE_EXHALE
     override val includeInShortDump: Boolean = true
 
-    private val _typesContainingInPrimaryConstructor = mutableMapOf<TypeEmbedding, FirPropertySymbol>()
+    private val _typesContainingAsPrimaryConstructorArg = mutableMapOf<TypeEmbedding, FirPropertySymbol>()
 
-    override val typesContainingInPrimaryConstructor: Map<TypeEmbedding, FirPropertySymbol>
-        get() = _typesContainingInPrimaryConstructor
+    override fun getTypesContainingAsPrimaryConstructorArg(): Map<TypeEmbedding, FirPropertySymbol> =
+        _typesContainingAsPrimaryConstructorArg
 
-    override fun addTypeContainingInPrimaryConstructor(type: TypeEmbedding, symbol: FirPropertySymbol) {
-        _typesContainingInPrimaryConstructor[type] = symbol
+    fun registerTypeContainingAsPrimaryConstructorArg(type: TypeEmbedding, symbol: FirPropertySymbol) {
+        _typesContainingAsPrimaryConstructorArg[type] = symbol
     }
 }
 

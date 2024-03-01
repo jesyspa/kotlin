@@ -222,25 +222,24 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
      */
     private fun processBackingFields(symbol: FirPropertySymbol, embedding: ClassTypeEmbedding): Pair<SimpleKotlinName, FieldEmbedding>? {
         val unscopedName = symbol.callableId.embedUnscopedPropertyName()
-        // This field is already registered in the supertype: we don't need to know about it.
-        val ancestorField = embedding.findAncestorField(unscopedName)
-        if (ancestorField != null) {
-            if (symbol.fromPrimaryConstructor)
-                ancestorField.addTypeContainingInPrimaryConstructor(embedding, symbol)
-            return null
-        }
         val name = symbol.callableId.embedMemberPropertyName()
-
-        val backingField = name.specialEmbedding() ?: symbol.hasBackingField.ifTrue {
+        val ancestorField = embedding.findAncestorField(unscopedName)
+        val backingField = ancestorField ?: name.specialEmbedding() ?: symbol.hasBackingField.ifTrue {
             UserFieldEmbedding(
                 name,
                 embedType(symbol.resolvedReturnType),
                 symbol
-            ).also {
-                if (symbol.fromPrimaryConstructor) it.addTypeContainingInPrimaryConstructor(embedding, symbol)
-            }
+            )
         }
-        return backingField?.let { unscopedName to it }
+        // whether it is an old field or a new one we should register
+        // that it comes from primary constructor if possible
+        if (backingField is UserFieldEmbedding && symbol.fromPrimaryConstructor) {
+            backingField.registerTypeContainingAsPrimaryConstructorArg(embedding, symbol)
+        }
+        // returning only newly created fields
+        return backingField?.let {
+            (ancestorField == null).ifTrue { unscopedName to backingField }
+        }
     }
 
     /**

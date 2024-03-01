@@ -26,7 +26,7 @@ interface FullNamedFunctionSignature : NamedFunctionSignature {
         if (!isPrimaryConstructor) return emptyList()
         val symbolsToParams = parametersByFirSymbols()
         return returnType.mapNotNullUniqueFields { _, field ->
-            field.typesContainingInPrimaryConstructor[returnType]?.correspondingValueParameterFromPrimaryConstructor?.let { symbol ->
+            field.getTypesContainingAsPrimaryConstructorArg()[returnType]?.correspondingValueParameterFromPrimaryConstructor?.let { symbol ->
                 symbolsToParams[symbol]?.let { field to it }
             }
         }
