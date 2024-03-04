@@ -114,7 +114,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
                 newEmbedding.initSuperTypes(symbol.resolvedSuperTypes.map(::embedType))
 
                 // Phase 3
-                val properties = symbol.declarationSymbols.filterIsInstance<FirPropertySymbol>()
+                val properties = symbol.propertySymbols
                 newEmbedding.initFields(properties.mapNotNull { processBackingFields(it, newEmbedding) }.toMap())
 
                 // Phase 4
@@ -167,7 +167,14 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
     }
 
     override fun embedFunctionSignature(symbol: FirFunctionSymbol<*>): FunctionSignature {
-        val retType = symbol.resolvedReturnTypeRef.type
+        val retType = embedType(symbol.resolvedReturnTypeRef.type)
+        val constructorParamSymbolsToFields = if (retType is ClassTypeEmbedding && symbol is FirConstructorSymbol && symbol.isPrimary) {
+            symbol.resolvedReturnType.toRegularClassSymbol(session)?.propertySymbols?.mapNotNull { propertySymbol ->
+                propertySymbol.correspondingValueParameterFromPrimaryConstructor?.let { paramSymbol ->
+                    paramSymbol to retType.findField(propertySymbol.callableId.embedUnscopedPropertyName())
+                }
+            }?.toMap() ?: emptyMap()
+        } else emptyMap()
         val receiverType = symbol.receiverType
         return object : FunctionSignature {
             // TODO: figure out whether we want a symbol here and how to get it.
@@ -176,9 +183,21 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
             override val params = symbol.valueParameterSymbols.map {
                 FirVariableEmbedding(it.embedName(), embedType(it.resolvedReturnType), it)
             }
-            override val returnType = embedType(retType)
+            override val returnType = retType
+
+            override fun primaryConstructorInvariants(returnVariable: VariableEmbedding) =
+                parametersByFirSymbols().mapNotNull { (paramSymbol, param) ->
+                    constructorParamSymbolsToFields[paramSymbol]?.let { field ->
+                        (field.accessPolicy == AccessPolicy.ALWAYS_READABLE).ifTrue {
+                            EqCmp(FieldAccess(returnVariable, field), Old(param))
+                        }
+                    }
+                }
         }
     }
+
+    private val FirRegularClassSymbol.propertySymbols : List<FirPropertySymbol>
+        get() = this.declarationSymbols.filterIsInstance<FirPropertySymbol>()
 
     private fun embedFullSignature(symbol: FirFunctionSymbol<*>): FullNamedFunctionSignature {
         val subSignature = object : NamedFunctionSignature, FunctionSignature by embedFunctionSignature(symbol) {
@@ -204,7 +223,6 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
                     primaryConstructorInvariants(returnVariable)
 
             override val declarationSource: KtSourceElement? = symbol.source
-            override val isPrimaryConstructor = symbol is FirConstructorSymbol && symbol.isPrimary
         }
     }
 
@@ -223,23 +241,15 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
     private fun processBackingFields(symbol: FirPropertySymbol, embedding: ClassTypeEmbedding): Pair<SimpleKotlinName, FieldEmbedding>? {
         val unscopedName = symbol.callableId.embedUnscopedPropertyName()
         val name = symbol.callableId.embedMemberPropertyName()
-        val ancestorField = embedding.findAncestorField(unscopedName)
-        val backingField = ancestorField ?: name.specialEmbedding() ?: symbol.hasBackingField.ifTrue {
+        embedding.findAncestorField(unscopedName)?.let { return null }
+        val backingField = name.specialEmbedding() ?: symbol.hasBackingField.ifTrue {
             UserFieldEmbedding(
                 name,
                 embedType(symbol.resolvedReturnType),
                 symbol
             )
         }
-        // whether it is an old field or a new one we should register
-        // that it comes from primary constructor if possible
-        if (backingField is UserFieldEmbedding && symbol.fromPrimaryConstructor) {
-            backingField.registerTypeContainingAsPrimaryConstructorArg(embedding, symbol)
-        }
-        // returning only newly created fields
-        return backingField?.let {
-            (ancestorField == null).ifTrue { unscopedName to backingField }
-        }
+        return backingField?.let { unscopedName to backingField }
     }
 
     /**

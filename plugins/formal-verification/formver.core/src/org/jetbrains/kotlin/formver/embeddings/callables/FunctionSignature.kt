@@ -7,6 +7,7 @@ package org.jetbrains.kotlin.formver.embeddings.callables
 
 import org.jetbrains.kotlin.fir.symbols.FirBasedSymbol
 import org.jetbrains.kotlin.formver.embeddings.TypeEmbedding
+import org.jetbrains.kotlin.formver.embeddings.expression.ExpEmbedding
 import org.jetbrains.kotlin.formver.embeddings.expression.FirVariableEmbedding
 import org.jetbrains.kotlin.formver.embeddings.expression.VariableEmbedding
 
@@ -24,6 +25,8 @@ interface FunctionSignature : CallableSignature {
         get() = receiver?.type
     override val paramTypes: List<TypeEmbedding>
         get() = params.map { it.type }
+
+    fun primaryConstructorInvariants(returnVariable: VariableEmbedding): List<ExpEmbedding>
 }
 
 fun FunctionSignature.parametersByFirSymbols(): Map<FirBasedSymbol<*>, FirVariableEmbedding> = params.associateBy { it.symbol }

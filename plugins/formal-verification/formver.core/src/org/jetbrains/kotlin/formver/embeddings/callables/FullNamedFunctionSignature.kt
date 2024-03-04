@@ -20,26 +20,6 @@ interface FullNamedFunctionSignature : NamedFunctionSignature {
     fun getPreconditions(returnVariable: VariableEmbedding): List<ExpEmbedding>
     fun getPostconditions(returnVariable: VariableEmbedding): List<ExpEmbedding>
     val declarationSource: KtSourceElement?
-    val isPrimaryConstructor: Boolean
-
-    private fun primaryConstructorFieldsWithParams(): List<Pair<FieldEmbedding, VariableEmbedding>> {
-        if (!isPrimaryConstructor) return emptyList()
-        val symbolsToParams = parametersByFirSymbols()
-        return returnType.mapNotNullUniqueFields { _, field ->
-            field.getTypesContainingAsPrimaryConstructorArg()[returnType]?.correspondingValueParameterFromPrimaryConstructor?.let { symbol ->
-                symbolsToParams[symbol]?.let { field to it }
-            }
-        }
-    }
-
-    private fun readonlyPrimaryConstructorFieldsWithParams(): List<Pair<FieldEmbedding, VariableEmbedding>> =
-        primaryConstructorFieldsWithParams().filter { (field, _) -> field.accessPolicy == AccessPolicy.ALWAYS_READABLE }
-
-    // FieldAccess is guaranteed to be primitive as we filtered only ALWAYS_READABLE fields
-    fun primaryConstructorInvariants(returnVariable: VariableEmbedding) =
-        readonlyPrimaryConstructorFieldsWithParams().map { (field, variable) ->
-            EqCmp(FieldAccess(returnVariable, field), Old(variable))
-        }
 }
 
 fun FullNamedFunctionSignature.toViperMethod(
@@ -52,5 +32,5 @@ fun FullNamedFunctionSignature.toViperMethod(
     getPreconditions(returnVariable).pureToViper(),
     getPostconditions(returnVariable).pureToViper(),
     body,
-    declarationSource.asPosition,
+    declarationSource.asPosition
 )
