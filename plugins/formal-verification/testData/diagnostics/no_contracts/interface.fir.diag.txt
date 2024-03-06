@@ -34,7 +34,7 @@ method class_Impl$constructor$fun_take$T_Int$return$T_class_global$class_Impl(lo
   returns (ret: Ref)
   ensures dom$Type$isSubtype((dom$TypeOf$typeOf(ret): dom$Type), dom$Type$global$class_Impl())
   ensures acc(ret.class_Impl$member_number, wildcard)
-  ensures ret.class_Impl$member_number == old(local$number)
+  ensures ret.class_Impl$member_number == local$number
 
 
 method class_Second$getter_number(this: Ref) returns (ret: Int)

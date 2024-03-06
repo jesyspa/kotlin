@@ -189,7 +189,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
                 parametersByFirSymbols().mapNotNull { (paramSymbol, param) ->
                     constructorParamSymbolsToFields[paramSymbol]?.let { field ->
                         (field.accessPolicy == AccessPolicy.ALWAYS_READABLE).ifTrue {
-                            EqCmp(FieldAccess(returnVariable, field), Old(param))
+                            EqCmp(FieldAccess(returnVariable, field), param)
                         }
                     }
                 }
@@ -249,7 +249,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
                 symbol
             )
         }
-        return backingField?.let { unscopedName to backingField }
+        return backingField?.let { unscopedName to it }
     }
 
     /**

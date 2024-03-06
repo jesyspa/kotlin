@@ -22,7 +22,7 @@ method class_OneValueMap$constructor$fun_take$T_Int$T_Int$return$T_class_global$
   ensures acc(ret.pkg$kotlin$collections$class_AbstractMap$member_values, wildcard)
   ensures acc(ret.class_OneValueMap$member_entries, wildcard)
   ensures ret.pkg$kotlin$collections$class_AbstractMap$member_size ==
-    old(local$size)
+    local$size
 
 
 method global$fun_createOneValueMap$fun_take$$return$T_Unit()
