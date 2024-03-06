@@ -166,15 +166,29 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         properties[symbol.callableId.embedMemberPropertyName()] ?: error("Unknown property ${symbol.callableId}")
     }
 
+    private fun <R> FirPropertySymbol.withConstructorParam(action: FirPropertySymbol.(FirValueParameterSymbol) -> R): R? =
+        this.run {
+            correspondingValueParameterFromPrimaryConstructor?.let { param ->
+                action(param)
+            }
+        }
+
+    private fun extractConstructorParamsAsFields(symbol: FirFunctionSymbol<*>): Map<FirValueParameterSymbol, FieldEmbedding> {
+        if (symbol !is FirConstructorSymbol || !symbol.isPrimary)
+            return emptyMap()
+        val constructedClassSymbol = symbol.resolvedReturnType.toRegularClassSymbol(session) ?: return emptyMap()
+        val constructedClass = embedClass(constructedClassSymbol)
+
+        return constructedClassSymbol.propertySymbols.mapNotNull { propertySymbol ->
+            propertySymbol.withConstructorParam { paramSymbol ->
+                constructedClass.findField(callableId.embedUnscopedPropertyName())?.let { paramSymbol to it }
+            }
+        }.toMap()
+    }
+
     override fun embedFunctionSignature(symbol: FirFunctionSymbol<*>): FunctionSignature {
         val retType = embedType(symbol.resolvedReturnTypeRef.type)
-        val constructorParamSymbolsToFields = if (retType is ClassTypeEmbedding && symbol is FirConstructorSymbol && symbol.isPrimary) {
-            symbol.resolvedReturnType.toRegularClassSymbol(session)?.propertySymbols?.mapNotNull { propertySymbol ->
-                propertySymbol.correspondingValueParameterFromPrimaryConstructor?.let { paramSymbol ->
-                    paramSymbol to retType.findField(propertySymbol.callableId.embedUnscopedPropertyName())
-                }
-            }?.toMap() ?: emptyMap()
-        } else emptyMap()
+        val constructorParamSymbolsToFields = extractConstructorParamsAsFields(symbol)
         val receiverType = symbol.receiverType
         return object : FunctionSignature {
             // TODO: figure out whether we want a symbol here and how to get it.
