@@ -15,26 +15,28 @@ fun <!VIPER_TEXT!>createB<!>() {
     val fieldNotOverride = b.fieldNotOverride
 }
 
-open class FirstBFClass {
+open class FirstBackingFieldClass {
     open val x: Int = 1
 }
 
-open class NoBFClass: FirstBFClass() {
+open class NoBackingFieldClass: FirstBackingFieldClass() {
     override val x: Int
         get() = 1
 }
 
-class SecondBFClass(override val x: Int) : NoBFClass()
+class SecondBackingFieldClass(override val x: Int) : NoBackingFieldClass()
 
+// BF stands for backing field
 fun <!VIPER_TEXT!>createBFsAndNoBF<!>() {
-    val fbf = FirstBFClass()
+    val fbf = FirstBackingFieldClass()
     val fbfx = fbf.x
-    val nbf = NoBFClass()
+    val nbf = NoBackingFieldClass()
     val nbfx = nbf.x
-    val sbf = SecondBFClass(10)
+    val sbf = SecondBackingFieldClass(10)
     val sbfx = sbf.x
 }
 
+// checks that we don't consider value parameter `a` of `Y`'s constructor a field
 open class X(val a: Int)
 class Y(a: Int) : X(0)
 

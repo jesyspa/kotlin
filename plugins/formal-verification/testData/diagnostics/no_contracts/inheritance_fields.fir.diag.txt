@@ -35,31 +35,31 @@ method global$fun_createB$fun_take$$return$T_Unit()
   label label$ret$0
 }
 
-/inheritance_fields.kt:(599,615): info: Generated Viper text for createBFsAndNoBF:
-field class_FirstBFClass$member_x: Int
+/inheritance_fields.kt:(680,696): info: Generated Viper text for createBFsAndNoBF:
+field class_FirstBackingFieldClass$member_x: Int
 
-method class_FirstBFClass$constructor$fun_take$$return$T_class_global$class_FirstBFClass()
+method class_FirstBackingFieldClass$constructor$fun_take$$return$T_class_global$class_FirstBackingFieldClass()
   returns (ret: Ref)
-  ensures dom$Type$isSubtype((dom$TypeOf$typeOf(ret): dom$Type), dom$Type$global$class_FirstBFClass())
-  ensures acc(ret.class_FirstBFClass$member_x, wildcard)
+  ensures dom$Type$isSubtype((dom$TypeOf$typeOf(ret): dom$Type), dom$Type$global$class_FirstBackingFieldClass())
+  ensures acc(ret.class_FirstBackingFieldClass$member_x, wildcard)
 
 
-method class_NoBFClass$constructor$fun_take$$return$T_class_global$class_NoBFClass()
+method class_NoBackingFieldClass$constructor$fun_take$$return$T_class_global$class_NoBackingFieldClass()
   returns (ret: Ref)
-  ensures dom$Type$isSubtype((dom$TypeOf$typeOf(ret): dom$Type), dom$Type$global$class_NoBFClass())
-  ensures acc(ret.class_FirstBFClass$member_x, wildcard)
+  ensures dom$Type$isSubtype((dom$TypeOf$typeOf(ret): dom$Type), dom$Type$global$class_NoBackingFieldClass())
+  ensures acc(ret.class_FirstBackingFieldClass$member_x, wildcard)
 
 
-method class_NoBFClass$getter_x(this: Ref) returns (ret: Int)
-  requires acc(this.class_FirstBFClass$member_x, wildcard)
-  ensures acc(this.class_FirstBFClass$member_x, wildcard)
+method class_NoBackingFieldClass$getter_x(this: Ref) returns (ret: Int)
+  requires acc(this.class_FirstBackingFieldClass$member_x, wildcard)
+  ensures acc(this.class_FirstBackingFieldClass$member_x, wildcard)
 
 
-method class_SecondBFClass$constructor$fun_take$T_Int$return$T_class_global$class_SecondBFClass(local$x: Int)
+method class_SecondBackingFieldClass$constructor$fun_take$T_Int$return$T_class_global$class_SecondBackingFieldClass(local$x: Int)
   returns (ret: Ref)
-  ensures dom$Type$isSubtype((dom$TypeOf$typeOf(ret): dom$Type), dom$Type$global$class_SecondBFClass())
-  ensures acc(ret.class_FirstBFClass$member_x, wildcard)
-  ensures ret.class_FirstBFClass$member_x == old(local$x)
+  ensures dom$Type$isSubtype((dom$TypeOf$typeOf(ret): dom$Type), dom$Type$global$class_SecondBackingFieldClass())
+  ensures acc(ret.class_FirstBackingFieldClass$member_x, wildcard)
+  ensures ret.class_FirstBackingFieldClass$member_x == old(local$x)
 
 
 method global$fun_createBFsAndNoBF$fun_take$$return$T_Unit()
@@ -71,16 +71,16 @@ method global$fun_createBFsAndNoBF$fun_take$$return$T_Unit()
   var local0$nbfx: Int
   var local0$sbf: Ref
   var local0$sbfx: Int
-  local0$fbf := class_FirstBFClass$constructor$fun_take$$return$T_class_global$class_FirstBFClass()
-  local0$fbfx := local0$fbf.class_FirstBFClass$member_x
-  local0$nbf := class_NoBFClass$constructor$fun_take$$return$T_class_global$class_NoBFClass()
-  local0$nbfx := class_NoBFClass$getter_x(local0$nbf)
-  local0$sbf := class_SecondBFClass$constructor$fun_take$T_Int$return$T_class_global$class_SecondBFClass(10)
-  local0$sbfx := local0$sbf.class_FirstBFClass$member_x
+  local0$fbf := class_FirstBackingFieldClass$constructor$fun_take$$return$T_class_global$class_FirstBackingFieldClass()
+  local0$fbfx := local0$fbf.class_FirstBackingFieldClass$member_x
+  local0$nbf := class_NoBackingFieldClass$constructor$fun_take$$return$T_class_global$class_NoBackingFieldClass()
+  local0$nbfx := class_NoBackingFieldClass$getter_x(local0$nbf)
+  local0$sbf := class_SecondBackingFieldClass$constructor$fun_take$T_Int$return$T_class_global$class_SecondBackingFieldClass(10)
+  local0$sbfx := local0$sbf.class_FirstBackingFieldClass$member_x
   label label$ret$0
 }
 
-/inheritance_fields.kt:(826,833): info: Generated Viper text for createY:
+/inheritance_fields.kt:(1019,1026): info: Generated Viper text for createY:
 field class_X$member_a: Int
 
 method class_Y$constructor$fun_take$T_Int$return$T_class_global$class_Y(local$a: Int)

@@ -1,4 +1,4 @@
-/custom_collection.kt:(373,390): info: Generated Viper text for createOneValueMap:
+/custom_collection.kt:(358,375): info: Generated Viper text for createOneValueMap:
 field class_OneValueMap$member_entries: Ref
 
 field pkg$kotlin$collections$class_AbstractMap$member__keys: dom$Nullable[Ref]
@@ -93,3 +93,4 @@ method pkg$kotlin$collections$class_Map$getter_values(this: Ref)
   ensures dom$Type$isSubtype((dom$TypeOf$typeOf(ret): dom$Type), dom$Type$pkg$kotlin$collections$global$class_Collection())
   ensures acc(ret.special$size, write)
   ensures ret.special$size >= 0
+
