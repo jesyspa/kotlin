@@ -536,3 +536,6 @@ sealed interface Exp : IntoSilver<viper.silver.ast.Exp> {
         }
     }
 }
+
+operator fun Exp.not() = Exp.Not(this)
+infix fun Exp.or(other: Exp) = Exp.Or(this, other)
