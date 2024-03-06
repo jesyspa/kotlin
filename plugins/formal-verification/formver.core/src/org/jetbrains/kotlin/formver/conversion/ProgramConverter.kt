@@ -200,8 +200,8 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
             override val returnType = retType
 
             override fun primaryConstructorInvariants(returnVariable: VariableEmbedding) =
-                parametersByFirSymbols().mapNotNull { (paramSymbol, param) ->
-                    constructorParamSymbolsToFields[paramSymbol]?.let { field ->
+                params.mapNotNull { param ->
+                    constructorParamSymbolsToFields[param.symbol]?.let { field ->
                         (field.accessPolicy == AccessPolicy.ALWAYS_READABLE).ifTrue {
                             EqCmp(FieldAccess(returnVariable, field), param)
                         }

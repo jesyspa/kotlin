@@ -28,5 +28,3 @@ interface FunctionSignature : CallableSignature {
 
     fun primaryConstructorInvariants(returnVariable: VariableEmbedding): List<ExpEmbedding>
 }
-
-fun FunctionSignature.parametersByFirSymbols(): Map<FirBasedSymbol<*>, FirVariableEmbedding> = params.associateBy { it.symbol }
