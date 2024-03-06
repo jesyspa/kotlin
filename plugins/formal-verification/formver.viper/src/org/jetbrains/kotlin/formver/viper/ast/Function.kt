@@ -32,6 +32,13 @@ abstract class Function(
         info: Info = Info.NoInfo,
         trafos: Trafos = Trafos.NoTrafos,
     ): Exp.FuncApp = Exp.FuncApp(name, args, retType, pos, info, trafos)
+
+    operator fun invoke(
+        vararg args: Exp,
+        pos: Position = Position.NoPosition,
+        info: Info = Info.NoInfo,
+        trafos: Trafos = Trafos.NoTrafos
+    ): Exp.FuncApp = Exp.FuncApp(name, args.toList(), retType, pos, info, trafos)
 }
 
 abstract class BuiltinFunction(

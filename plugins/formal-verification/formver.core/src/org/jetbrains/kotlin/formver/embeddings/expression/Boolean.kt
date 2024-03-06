@@ -6,11 +6,11 @@
 package org.jetbrains.kotlin.formver.embeddings.expression
 
 import org.jetbrains.kotlin.formver.asPosition
+import org.jetbrains.kotlin.formver.domains.RuntimeTypeDomain
 import org.jetbrains.kotlin.formver.embeddings.BooleanTypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.SourceRole
 import org.jetbrains.kotlin.formver.embeddings.asInfo
 import org.jetbrains.kotlin.formver.linearization.LinearizationContext
-import org.jetbrains.kotlin.formver.viper.ast.Exp
 
 sealed interface BinaryBooleanExpression : BinaryDirectResultExpEmbedding {
     override val type: BooleanTypeEmbedding
@@ -23,7 +23,7 @@ data class And(
     override val sourceRole: SourceRole? = null,
 ) : BinaryBooleanExpression {
     override fun toViper(ctx: LinearizationContext) =
-        Exp.And(left.toViper(ctx), right.toViper(ctx), ctx.source.asPosition, sourceRole.asInfo)
+        RuntimeTypeDomain.andBools(left.toViper(ctx), right.toViper(ctx), pos = ctx.source.asPosition, info = sourceRole.asInfo)
 }
 
 data class Or(
@@ -32,7 +32,7 @@ data class Or(
     override val sourceRole: SourceRole? = null,
 ) : BinaryBooleanExpression {
     override fun toViper(ctx: LinearizationContext) =
-        Exp.Or(left.toViper(ctx), right.toViper(ctx), ctx.source.asPosition, sourceRole.asInfo)
+        RuntimeTypeDomain.orBools(left.toViper(ctx), right.toViper(ctx), pos = ctx.source.asPosition, info = sourceRole.asInfo)
 }
 
 data class Implies(
@@ -41,7 +41,7 @@ data class Implies(
     override val sourceRole: SourceRole? = null,
 ) : BinaryBooleanExpression {
     override fun toViper(ctx: LinearizationContext) =
-        Exp.Implies(left.toViper(ctx), right.toViper(ctx), ctx.source.asPosition, sourceRole.asInfo)
+        RuntimeTypeDomain.impliesBools(left.toViper(ctx), right.toViper(ctx), pos = ctx.source.asPosition, info = sourceRole.asInfo)
 }
 
 data class Not(
@@ -49,7 +49,8 @@ data class Not(
     override val sourceRole: SourceRole? = null
 ) : UnaryDirectResultExpEmbedding {
     override val type = BooleanTypeEmbedding
-    override fun toViper(ctx: LinearizationContext) = Exp.Not(inner.toViper(ctx), ctx.source.asPosition, sourceRole.asInfo)
+    override fun toViper(ctx: LinearizationContext) =
+        RuntimeTypeDomain.notBool(inner.toViper(ctx), pos = ctx.source.asPosition, info = sourceRole.asInfo)
 }
 
 fun List<ExpEmbedding>.toConjunction(): ExpEmbedding =

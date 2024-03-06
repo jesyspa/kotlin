@@ -6,9 +6,7 @@
 package org.jetbrains.kotlin.formver.embeddings.expression
 
 import org.jetbrains.kotlin.formver.asPosition
-import org.jetbrains.kotlin.formver.domains.CastingDomain
-import org.jetbrains.kotlin.formver.domains.TypeDomain
-import org.jetbrains.kotlin.formver.domains.TypeOfDomain
+import org.jetbrains.kotlin.formver.domains.RuntimeTypeDomain
 import org.jetbrains.kotlin.formver.embeddings.*
 import org.jetbrains.kotlin.formver.embeddings.expression.debug.TreeView
 import org.jetbrains.kotlin.formver.embeddings.expression.debug.debugTreeView
@@ -22,11 +20,13 @@ data class Is(override val inner: ExpEmbedding, val comparisonType: TypeEmbeddin
     override val type = BooleanTypeEmbedding
 
     override fun toViper(ctx: LinearizationContext) =
-        TypeDomain.isSubtype(
-            TypeOfDomain.typeOf(inner.toViper(ctx)),
-            comparisonType.runtimeType,
-            pos = ctx.source.asPosition,
-            info = sourceRole.asInfo
+        RuntimeTypeDomain.boolInjection.toRef(
+            RuntimeTypeDomain.isSubtype(
+                RuntimeTypeDomain.typeOf(inner.toViper(ctx)),
+                comparisonType.runtimeType,
+                pos = ctx.source.asPosition,
+                info = sourceRole.asInfo
+            )
         )
 
     override val debugExtraSubtrees: List<TreeView>
@@ -35,7 +35,8 @@ data class Is(override val inner: ExpEmbedding, val comparisonType: TypeEmbeddin
 
 // TODO: probably casts need to be more flexible when it comes to containing result-less nodes.
 data class Cast(override val inner: ExpEmbedding, override val type: TypeEmbedding) : UnaryDirectResultExpEmbedding {
-    override fun toViper(ctx: LinearizationContext) = CastingDomain.cast(inner.toViper(ctx), type, ctx.source)
+    // TODO: we want to assert `inner isOf type` here before making a cast itself
+    override fun toViper(ctx: LinearizationContext) = inner.toViper(ctx)
     override fun ignoringCasts(): ExpEmbedding = inner.ignoringCasts()
     override fun ignoringCastsAndMetaNodes(): ExpEmbedding = inner.ignoringCastsAndMetaNodes()
 
@@ -43,8 +44,7 @@ data class Cast(override val inner: ExpEmbedding, override val type: TypeEmbeddi
         get() = listOf(type.debugTreeView.withDesignation("target"))
 }
 
-fun ExpEmbedding.withType(newType: TypeEmbedding): ExpEmbedding =
-    if (newType == type) this else Cast(this, newType)
+fun ExpEmbedding.withType(newType: TypeEmbedding): ExpEmbedding = this
 
 
 /**
@@ -60,7 +60,7 @@ data class SafeCast(val exp: ExpEmbedding, val targetType: TypeEmbedding) : Stor
     override fun toViperStoringIn(result: VariableEmbedding, ctx: LinearizationContext) {
         val expViper = exp.toViper(ctx)
         val expWrapped = ExpWrapper(expViper, exp.type)
-        val conditional = If(expWrapped.notNullCmp(), expWrapped, type.nullVal, type)
+        val conditional = If(expWrapped.notNullCmp(), expWrapped, NullLit, type)
         conditional.toViperStoringIn(result, ctx)
     }
 

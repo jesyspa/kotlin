@@ -6,19 +6,36 @@
 package org.jetbrains.kotlin.formver.embeddings.callables
 
 import org.jetbrains.kotlin.KtSourceElement
-import org.jetbrains.kotlin.fir.declarations.utils.correspondingValueParameterFromPrimaryConstructor
 import org.jetbrains.kotlin.formver.asPosition
-import org.jetbrains.kotlin.formver.conversion.AccessPolicy
-import org.jetbrains.kotlin.formver.embeddings.FieldEmbedding
 import org.jetbrains.kotlin.formver.embeddings.expression.*
-import org.jetbrains.kotlin.formver.embeddings.mapNotNullUniqueFields
-import org.jetbrains.kotlin.formver.linearization.pureToViper
+import org.jetbrains.kotlin.formver.linearization.pureToViperCondition
 import org.jetbrains.kotlin.formver.viper.ast.Stmt
+import org.jetbrains.kotlin.formver.viper.ast.Exp
 import org.jetbrains.kotlin.formver.viper.ast.UserMethod
 
 interface FullNamedFunctionSignature : NamedFunctionSignature {
-    fun getPreconditions(returnVariable: VariableEmbedding): List<ExpEmbedding>
-    fun getPostconditions(returnVariable: VariableEmbedding): List<ExpEmbedding>
+    /**
+     * Preconditions of function in form of `ExpEmbedding`s with type `boolType()`.
+     */
+    fun getEmbeddingPreconditions(returnVariable: VariableEmbedding): List<ExpEmbedding>
+
+    /**
+     * Postconditions of function in form of `ExpEmbedding`s with type `boolType()`.
+     */
+    fun getEmbeddingPostconditions(returnVariable: VariableEmbedding): List<ExpEmbedding>
+
+    /**
+     * Preconditions of function in form of Viper `Exp`s of type `Bool`.
+     */
+    fun getViperPreconditions(returnVariable: VariableEmbedding): List<Exp> =
+        getEmbeddingPreconditions(returnVariable).pureToViperCondition()
+
+    /**
+     * Postconditions of function in form of Viper `Exp`s of type `Bool`.
+     */
+    fun getViperPostconditions(returnVariable: VariableEmbedding): List<Exp> =
+        getEmbeddingPostconditions(returnVariable).pureToViperCondition()
+
     val declarationSource: KtSourceElement?
 }
 
@@ -29,8 +46,8 @@ fun FullNamedFunctionSignature.toViperMethod(
     name,
     formalArgs.map { it.toLocalVarDecl() },
     returnVariable.toLocalVarDecl(),
-    getPreconditions(returnVariable).pureToViper(),
-    getPostconditions(returnVariable).pureToViper(),
+    getViperPreconditions(returnVariable),
+    getViperPostconditions(returnVariable),
     body,
     declarationSource.asPosition
 )

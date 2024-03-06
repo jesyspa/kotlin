@@ -11,8 +11,7 @@ import org.jetbrains.kotlin.formver.embeddings.expression.*
 import org.jetbrains.kotlin.formver.names.*
 import org.jetbrains.kotlin.formver.names.NameMatcher
 import org.jetbrains.kotlin.formver.viper.MangledName
-import org.jetbrains.kotlin.formver.viper.ast.Field
-import org.jetbrains.kotlin.formver.viper.ast.PermExp
+import org.jetbrains.kotlin.formver.viper.ast.*
 
 /**
  * Embedding of a backing field of a property.
@@ -25,7 +24,7 @@ interface FieldEmbedding {
     val symbol: FirPropertySymbol?
         get() = null
 
-    fun toViper(): Field = Field(name, type.viperType, includeInShortDump)
+    fun toViper(): Field = Field(name, Type.Ref, includeInShortDump)
 
     fun extraAccessInvariantsForParameter(): List<TypeInvariantEmbedding> = listOf()
 

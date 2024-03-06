@@ -68,7 +68,7 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext>()
         when (constExpression.kind) {
             ConstantValueKind.Int -> IntLit((constExpression.value as Long).toInt())
             ConstantValueKind.Boolean -> BooleanLit(constExpression.value as Boolean)
-            ConstantValueKind.Null -> data.embedType(constExpression).getNullable().nullVal
+            ConstantValueKind.Null -> NullLit
             else -> handleUnimplementedElement("Constant Expression of type ${constExpression.kind} is not yet implemented.", data)
         }
 
@@ -147,7 +147,7 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext>()
             leftType is NullableTypeEmbedding && rightType !is NullableTypeEmbedding ->
                 share(left) { sharedLeft ->
                     And(
-                        NeCmp(sharedLeft, leftType.nullVal),
+                        NeCmp(sharedLeft, NullLit),
                         EqCmp(sharedLeft.withType(leftType.elementType), right.withType(leftType.elementType)),
                     )
                 }
@@ -156,13 +156,13 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext>()
                     share(right) { sharedRight ->
                         Or(
                             And(
-                                EqCmp(sharedLeft, leftType.nullVal),
-                                EqCmp(sharedRight, rightType.nullVal),
+                                EqCmp(sharedLeft, NullLit),
+                                EqCmp(sharedRight, NullLit),
                             ),
                             And(
                                 And(
-                                    NeCmp(sharedLeft, leftType.nullVal),
-                                    NeCmp(sharedRight, rightType.nullVal),
+                                    NeCmp(sharedLeft, NullLit),
+                                    NeCmp(sharedRight, NullLit),
                                 ),
                                 EqCmp(sharedLeft.withType(leftType.elementType), sharedRight.withType(leftType.elementType)),
                             ),
@@ -237,7 +237,7 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext>()
         val condition = data.convert(whileLoop.condition)
         val returnTarget = data.defaultResolvedReturnTarget
         val invariants = when (val sig = data.signature) {
-            is FullNamedFunctionSignature -> sig.getPostconditions(returnTarget.variable)
+            is FullNamedFunctionSignature -> sig.getEmbeddingPostconditions(returnTarget.variable)
             else -> listOf()
         }
         return data.withFreshWhile(whileLoop.label) {
@@ -376,7 +376,7 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext>()
             If(
                 sharedReceiver.notNullCmp(),
                 data.withCheckedSafeCallSubject(sharedReceiver.withType(checkedSafeCallSubjectType)) { convert(selector) },
-                expType.getNullable().nullVal,
+                NullLit,
                 expType
             )
         }

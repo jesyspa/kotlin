@@ -6,6 +6,7 @@
 package org.jetbrains.kotlin.formver.embeddings.expression
 
 import org.jetbrains.kotlin.formver.asPosition
+import org.jetbrains.kotlin.formver.domains.RuntimeTypeDomain
 import org.jetbrains.kotlin.formver.embeddings.BooleanTypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.SourceRole
 import org.jetbrains.kotlin.formver.embeddings.asInfo
@@ -20,8 +21,10 @@ sealed interface ComparisonExpression : BinaryDirectResultExpEmbedding {
 data class LtCmp(
     override val left: ExpEmbedding,
     override val right: ExpEmbedding,
+    override val sourceRole: SourceRole? = null,
 ) : ComparisonExpression {
-    override fun toViper(ctx: LinearizationContext) = Exp.LtCmp(left.toViper(ctx), right.toViper(ctx), ctx.source.asPosition)
+    override fun toViper(ctx: LinearizationContext) =
+        RuntimeTypeDomain.ltInts(left.toViper(ctx), right.toViper(ctx), pos = ctx.source.asPosition, info = sourceRole.asInfo)
 }
 
 data class LeCmp(
@@ -30,7 +33,7 @@ data class LeCmp(
     override val sourceRole: SourceRole? = null,
 ) : ComparisonExpression {
     override fun toViper(ctx: LinearizationContext) =
-        Exp.LeCmp(left.toViper(ctx), right.toViper(ctx), ctx.source.asPosition, sourceRole.asInfo)
+        RuntimeTypeDomain.leInts(left.toViper(ctx), right.toViper(ctx), pos = ctx.source.asPosition, info = sourceRole.asInfo)
 }
 
 data class GtCmp(
@@ -39,7 +42,7 @@ data class GtCmp(
     override val sourceRole: SourceRole? = null,
 ) : ComparisonExpression {
     override fun toViper(ctx: LinearizationContext) =
-        Exp.GtCmp(left.toViper(ctx), right.toViper(ctx), ctx.source.asPosition, sourceRole.asInfo)
+        RuntimeTypeDomain.gtInts(left.toViper(ctx), right.toViper(ctx), pos = ctx.source.asPosition, info = sourceRole.asInfo)
 }
 
 data class GeCmp(
@@ -48,7 +51,7 @@ data class GeCmp(
     override val sourceRole: SourceRole? = null,
 ) : ComparisonExpression {
     override fun toViper(ctx: LinearizationContext) =
-        Exp.GeCmp(left.toViper(ctx), right.toViper(ctx), ctx.source.asPosition, sourceRole.asInfo)
+        RuntimeTypeDomain.geInts(left.toViper(ctx), right.toViper(ctx), pos = ctx.source.asPosition, info = sourceRole.asInfo)
 }
 
 data class EqCmp(
@@ -57,7 +60,14 @@ data class EqCmp(
     override val sourceRole: SourceRole? = null,
 ) : ComparisonExpression {
     override fun toViper(ctx: LinearizationContext) =
-        Exp.EqCmp(left.toViper(ctx), right.toViper(ctx), ctx.source.asPosition, sourceRole.asInfo)
+        RuntimeTypeDomain.boolInjection.toRef(
+            Exp.EqCmp(
+                left.toViper(ctx),
+                right.toViper(ctx),
+                pos = ctx.source.asPosition,
+                info = sourceRole.asInfo
+            )
+        )
 }
 
 data class NeCmp(
@@ -66,8 +76,15 @@ data class NeCmp(
     override val sourceRole: SourceRole? = null,
 ) : ComparisonExpression {
     override fun toViper(ctx: LinearizationContext) =
-        Exp.NeCmp(left.toViper(ctx), right.toViper(ctx), ctx.source.asPosition, sourceRole.asInfo)
+        RuntimeTypeDomain.boolInjection.toRef(
+            Exp.NeCmp(
+                left.toViper(ctx),
+                right.toViper(ctx),
+                pos = ctx.source.asPosition,
+                info = sourceRole.asInfo
+            )
+        )
 }
 
-fun ExpEmbedding.notNullCmp(): ExpEmbedding = NeCmp(withType(type.getNullable()), type.getNullable().nullVal)
+fun ExpEmbedding.notNullCmp(): ExpEmbedding = NeCmp(this, NullLit)
 

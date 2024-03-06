@@ -214,8 +214,8 @@ class ContractDescriptionConversionVisitor(
     private fun VariableEmbedding.nullCmp(isNegated: Boolean, sourceRole: SourceRole?): ExpEmbedding =
         when (val type = this.type) {
             is NullableTypeEmbedding ->
-                if (isNegated) NeCmp(this, type.nullVal, sourceRole)
-                else EqCmp(this, type.nullVal, sourceRole)
+                if (isNegated) NeCmp(this, NullLit, sourceRole)
+                else EqCmp(this, NullLit, sourceRole)
             else -> BooleanLit(isNegated, sourceRole)
         }
 }

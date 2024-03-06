@@ -6,6 +6,7 @@
 package org.jetbrains.kotlin.formver.linearization
 
 import org.jetbrains.kotlin.KtSourceElement
+import org.jetbrains.kotlin.formver.domains.toViperCondition
 import org.jetbrains.kotlin.formver.embeddings.TypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.expression.AnonymousVariableEmbedding
 import org.jetbrains.kotlin.formver.embeddings.expression.ExpEmbedding
@@ -57,4 +58,8 @@ fun ExpEmbedding.pureToViper(source: KtSourceElement? = null): Exp {
     }
 }
 
+fun ExpEmbedding.pureToViperCondition(source: KtSourceElement? = null) = pureToViper(source).toViperCondition()
+
 fun List<ExpEmbedding>.pureToViper(source: KtSourceElement? = null): List<Exp> = map { it.pureToViper(source) }
+
+fun List<ExpEmbedding>.pureToViperCondition(source: KtSourceElement? = null): List<Exp> = map { it.pureToViperCondition(source) }

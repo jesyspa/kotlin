@@ -60,15 +60,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
 
     val program: Program
         get() = Program(
-            domains = listOf(
-                UnitDomain,
-                NullableDomain,
-                CastingDomain,
-                TypeOfDomain,
-                TypeDomain(classes.values.toList()),
-                AnyDomain,
-//                RuntimeTypeDomain(classes.values.toList())
-            ),
+            domains = listOf(RuntimeTypeDomain(classes.values.toList())),
             fields = SpecialFields.all.map { it.toViper() } +
                     classes.values.flatMap { it.flatMapUniqueFields { _, field -> listOf(field.toViper()) } }.distinctBy { it.name },
             functions = SpecialFunctions.all + classes.values.flatMap { it.getterFunctions() }.distinctBy { it.name },
@@ -219,12 +211,12 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         val contractVisitor = ContractDescriptionConversionVisitor(this@ProgramConverter, subSignature)
 
         return object : FullNamedFunctionSignature, NamedFunctionSignature by subSignature {
-            override fun getPreconditions(returnVariable: VariableEmbedding) = subSignature.formalArgs.flatMap { it.pureInvariants() } +
+            override fun getEmbeddingPreconditions(returnVariable: VariableEmbedding) = subSignature.formalArgs.flatMap { it.pureInvariants() } +
                     subSignature.formalArgs.flatMap { it.accessInvariants() } +
                     contractVisitor.getPreconditions(ContractVisitorContext(returnVariable, symbol)) +
                     subSignature.stdLibPreConditions()
 
-            override fun getPostconditions(returnVariable: VariableEmbedding) = subSignature.formalArgs.flatMap { it.accessInvariants() } +
+            override fun getEmbeddingPostconditions(returnVariable: VariableEmbedding) = subSignature.formalArgs.flatMap { it.accessInvariants() } +
                     subSignature.params.flatMap { it.dynamicInvariants() } +
                     returnVariable.pureInvariants() +
                     returnVariable.provenInvariants() +

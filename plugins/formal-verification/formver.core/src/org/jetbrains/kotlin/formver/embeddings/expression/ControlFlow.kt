@@ -6,6 +6,7 @@
 package org.jetbrains.kotlin.formver.embeddings.expression
 
 import org.jetbrains.kotlin.formver.asPosition
+import org.jetbrains.kotlin.formver.domains.toViperCondition
 import org.jetbrains.kotlin.formver.embeddings.BooleanTypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.NothingTypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.TypeEmbedding
@@ -18,6 +19,7 @@ import org.jetbrains.kotlin.formver.embeddings.expression.debug.*
 import org.jetbrains.kotlin.formver.linearization.LinearizationContext
 import org.jetbrains.kotlin.formver.linearization.addLabel
 import org.jetbrains.kotlin.formver.linearization.pureToViper
+import org.jetbrains.kotlin.formver.linearization.pureToViperCondition
 import org.jetbrains.kotlin.formver.viper.ast.Exp
 import org.jetbrains.kotlin.formver.viper.ast.Label
 import org.jetbrains.kotlin.formver.viper.ast.Stmt
@@ -44,7 +46,7 @@ data class Block(val exps: List<ExpEmbedding>) : OptionalResultExpEmbedding {
 data class If(val condition: ExpEmbedding, val thenBranch: ExpEmbedding, val elseBranch: ExpEmbedding, override val type: TypeEmbedding) :
     OptionalResultExpEmbedding, DefaultDebugTreeViewImplementation {
     override fun toViperMaybeStoringIn(result: VariableEmbedding?, ctx: LinearizationContext) {
-        val condViper = condition.toViper(ctx)
+        val condViper = condition.toViper(ctx).toViperCondition()
         val thenViper = ctx.asBlock { thenBranch.withType(type).toViperMaybeStoringIn(result, this) }
         val elseViper = ctx.asBlock { elseBranch.withType(type).toViperMaybeStoringIn(result, this) }
         ctx.addStatement(Stmt.If(condViper, thenViper, elseViper, ctx.source.asPosition))
@@ -73,8 +75,8 @@ data class While(
         }
         ctx.addStatement(
             Stmt.While(
-                condVar.toViper(ctx),
-                invariants.pureToViper(ctx.source),
+                condVar.toViper(ctx).toViperCondition(),
+                invariants.pureToViperCondition(ctx.source),
                 bodyBlock,
                 ctx.source.asPosition
             )
@@ -210,7 +212,7 @@ data class FunctionExp(val signature: FullNamedFunctionSignature?, val body: Exp
             // Unfortunately Silicon for some reason does not allow Assumes. However, it doesn't matter as long as the
             // provenInvariants don't contain permissions.
             arg.provenInvariants().forEach { invariant ->
-                ctx.addStatement(Stmt.Inhale(invariant.pureToViper(), ctx.source.asPosition))
+                ctx.addStatement(Stmt.Inhale(invariant.pureToViperCondition(), ctx.source.asPosition))
             }
         }
         body.toViperMaybeStoringIn(result, ctx)

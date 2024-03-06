@@ -7,7 +7,7 @@ package org.jetbrains.kotlin.formver.embeddings.expression
 
 import org.jetbrains.kotlin.KtSourceElement
 import org.jetbrains.kotlin.formver.asPosition
-import org.jetbrains.kotlin.formver.domains.UnitDomain
+import org.jetbrains.kotlin.formver.domains.RuntimeTypeDomain
 import org.jetbrains.kotlin.formver.embeddings.*
 import org.jetbrains.kotlin.formver.embeddings.expression.debug.*
 import org.jetbrains.kotlin.formver.linearization.LinearizationContext
@@ -204,7 +204,7 @@ sealed interface NoResultExpEmbedding : DefaultMaybeStoringInExpEmbedding {
 
     override fun toViper(ctx: LinearizationContext): Exp {
         toViperUnusedResult(ctx)
-        return UnitDomain.element
+        return RuntimeTypeDomain.unitValue()
     }
 }
 
@@ -275,7 +275,7 @@ sealed interface UnitResultExpEmbedding : OnlyToViperExpEmbedding {
 
     override fun toViper(ctx: LinearizationContext): Exp {
         toViperSideEffects(ctx)
-        return UnitDomain.element
+        return RuntimeTypeDomain.unitValue()
     }
 
     fun toViperSideEffects(ctx: LinearizationContext)
@@ -351,8 +351,9 @@ data class FieldAccessPermissions(override val inner: ExpEmbedding, val field: F
     // We consider access permissions to have type Boolean, though this is a bit questionable.
     override val type: TypeEmbedding = BooleanTypeEmbedding
 
-    override fun toViper(ctx: LinearizationContext): Exp =
+    override fun toViper(ctx: LinearizationContext): Exp = RuntimeTypeDomain.boolInjection.toRef(
         inner.toViper(ctx).fieldAccessPredicate(field.toViper(), perm, ctx.source.asPosition)
+    )
 
     // field collides with the field context-sensitive keyword.
     override val debugExtraSubtrees: List<TreeView>

@@ -6,6 +6,7 @@
 package org.jetbrains.kotlin.formver.embeddings.callables
 
 import org.jetbrains.kotlin.formver.domains.RuntimeTypeDomain
+
 import org.jetbrains.kotlin.formver.embeddings.FieldEmbedding
 import org.jetbrains.kotlin.formver.embeddings.LegacyUnspecifiedFunctionTypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.expression.AnonymousVariableEmbedding
@@ -40,7 +41,7 @@ class FieldAccessFunction(
 ) : Function(GetterFunctionName(className, field.name), pos, info, trafos) {
     private val subject = Exp.LocalVar(GetterFunctionSubjectName, Type.Ref)
     private val subjectAccess = Exp.PredicateAccess(className, listOf(subject))
-    override val retType: Type = field.type.viperType
+    override val retType: Type = Type.Ref
     override val includeInDumpPolicy: IncludeInDumpPolicy = IncludeInDumpPolicy.PREDICATE_DUMP
     override val formalArgs: List<Declaration.LocalVarDecl> = listOf(Declaration.LocalVarDecl(GetterFunctionSubjectName, Type.Ref))
     override val pres: List<Exp> = listOf(subjectAccess)
@@ -55,5 +56,5 @@ object DuplicableFunction : BuiltinFunction(SpecialName("duplicable")) {
 }
 
 object SpecialFunctions {
-    val all = listOf(DuplicableFunction) // + RuntimeTypeDomain.accompanyingFunctions()
+    val all = listOf(DuplicableFunction) + RuntimeTypeDomain.accompanyingFunctions()
 }
