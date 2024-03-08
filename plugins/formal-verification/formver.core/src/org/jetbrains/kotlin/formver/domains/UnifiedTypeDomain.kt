@@ -13,7 +13,7 @@ import org.jetbrains.kotlin.formver.viper.ast.*
 const val UNIFIED_TYPE_DOMAIN_NAME = "UnifiedType"
 
 
-class UnifiedTypeDomain(classes: List<ClassTypeEmbedding>) : BuiltinDomain(TYPE_DOMAIN_NAME) {
+class UnifiedTypeDomain(classes: List<ClassTypeEmbedding>) : BuiltinDomain(UNIFIED_TYPE_DOMAIN_NAME) {
     override val typeVars: List<Type.TypeVar> = emptyList()
 
     // Define types that are not dependent on the user defined classes in a companion object.
@@ -22,19 +22,20 @@ class UnifiedTypeDomain(classes: List<ClassTypeEmbedding>) : BuiltinDomain(TYPE_
         val UnifiedType = Type.Domain(DomainName(UNIFIED_TYPE_DOMAIN_NAME).mangled, emptyList())
         val Ref = Type.Ref
 
-        private fun createDomainFunc(funcName: String, args: List<Declaration.LocalVarDecl>, type: Type, unique: Boolean = false) =
-            DomainFunc(DomainFuncName(DomainName(TYPE_DOMAIN_NAME), funcName), args, emptyList(), type, unique)
+        fun createDomainFunc(funcName: String, args: List<Declaration.LocalVarDecl>, type: Type, unique: Boolean = false) =
+            DomainFunc(DomainFuncName(DomainName(UNIFIED_TYPE_DOMAIN_NAME), funcName), args, emptyList(), type, unique)
 
         // variables for readability improving
         private val t = Var("t", UnifiedType)
         private val t1 = Var("t1", UnifiedType)
         private val t2 = Var("t2", UnifiedType)
         private val t3 = Var("t3", UnifiedType)
-        private val r = Var("t", Ref)
+        private val r = Var("r", Ref)
 
         // three basic functions
         /** `isSubtype: (Type, Type) -> Bool` */
         val isSubtype = createDomainFunc("isSubtype", listOf(t1.decl(), t2.decl()), Type.Bool)
+        infix fun Exp.subtype(otherType: Exp) = isSubtype(this, otherType)
 
         /** `typeOf: Ref -> Type` */
         val typeOf = createDomainFunc("typeOf", listOf(r.decl()), UnifiedType)
@@ -44,7 +45,7 @@ class UnifiedTypeDomain(classes: List<ClassTypeEmbedding>) : BuiltinDomain(TYPE_
 
         // many axioms will use `is` which can be represented as composition of `isSubtype` and `typeOf`
         /** `is: (Ref, Type) -> Bool` */
-        fun isOf(elem: Exp, elemType: Exp) = isSubtype(typeOf(elem), elemType)
+        infix fun Exp.isOf(elemType: Exp) = isSubtype(typeOf(this), elemType)
 
         // built-in types function
         val intType = createDomainFunc("intType", emptyList(), UnifiedType, true)
@@ -58,37 +59,73 @@ class UnifiedTypeDomain(classes: List<ClassTypeEmbedding>) : BuiltinDomain(TYPE_
         private fun classTypeFunc(name: MangledName) = createDomainFunc(name.mangled, emptyList(), UnifiedType, true)
 
         // bijections to primitive types
-
-        data class Injection(val injectionName: String, val viperType: Type, val typeFunction: DomainFunc) {
-            private val v = Var("v", viperType)
-            val toRef = createDomainFunc("${injectionName}ToRef", listOf(v.decl()), Ref)
-            val fromRef = createDomainFunc("${injectionName}FromRef", listOf(r.decl()), viperType)
-
-            internal fun AxiomListBuilder.injectionAxioms() {
-                axiom {
-                    Exp.forall(v) { v -> simpleTrigger { isOf(toRef(v), typeFunction()) } }
-                }
-                axiom {
-                    Exp.forall(v) { v ->
-                        val expr = simpleTrigger { fromRef(toRef(v)) }
-                        Exp.EqCmp(expr, v)
-                    }
-                }
-                axiom {
-                    Exp.forall(r) { r ->
-                        val expr = simpleTrigger { toRef(fromRef(r)) }
-                        assumption {
-                            isOf(r, typeFunction())
-                        }
-                        Exp.EqCmp(expr, r)
-                    }
-                }
-            }
-        }
-
         val intInjection = Injection("int", Type.Int, intType)
         val boolInjection = Injection("bool", Type.Bool, boolType)
         val allInjections = listOf(intInjection, boolInjection)
+
+        private val operationImages: MutableList<BuiltinFunction> = mutableListOf()
+        fun accompanyingFunctions(): List<BuiltinFunction> = operationImages
+
+        /**
+         * Creates a Viper function that operates on the images of an injection and registers it.
+         *
+         * @param argsInjection injection that must be applied to the arguments of the binary operation
+         * (note that it must be the same for each of arguments)
+         * @param resultInjection injection that must be applied to the result of binary the operation
+         * (not necessarily the same as `argsInjection`)
+         * @param checkDivisor adds precondition that divisor (second argument) is not zero
+         */
+        private fun createBinaryOperationInjectionImage(
+            name: String,
+            argsInjection: Injection,
+            resultInjection: Injection,
+            checkDivisor: Boolean = false,
+            operation: (Exp, Exp) -> Exp,
+        ) = FunctionBuilder.build(name) {
+            precondition { argument(Type.Ref) isOf argsInjection.typeFunction() }
+            precondition { argument(Type.Ref) isOf argsInjection.typeFunction() }
+            if (checkDivisor) {
+                check(argsInjection == intInjection) { "checkDivisor is only allowed for integers" }
+                precondition { intInjection.fromRef(arg2) ne 0.toExp() }
+            }
+            postcondition { returns(Type.Ref) isOf resultInjection.typeFunction() }
+            val viperResult = operation(argsInjection.fromRef(arg1), argsInjection.fromRef(arg2))
+            postcondition { resultInjection.fromRef(result) eq viperResult }
+            body { resultInjection.toRef(viperResult) }
+        }.also { operationImages.add(it) }
+
+        private fun createUnaryOperationInjectionImage(
+            name: String,
+            injection: Injection,
+            operation: (Exp) -> Exp
+        ) = FunctionBuilder.build(name) {
+            precondition { argument(Type.Ref) isOf injection.typeFunction() }
+            postcondition { returns(Type.Ref) isOf injection.typeFunction() }
+            val viperResult = operation(injection.fromRef(arg1))
+            postcondition { injection.fromRef(result) eq viperResult }
+            body { injection.toRef(viperResult) }
+        }.also { operationImages.add(it) }
+
+        // Ref translations of primitive operations
+        val plusInts = createBinaryOperationInjectionImage("addInts", intInjection, intInjection) { exp1, exp2 -> exp1 + exp2 }
+        val minusInts = createBinaryOperationInjectionImage("minusInts", intInjection, intInjection) { exp1, exp2 -> exp1 - exp2 }
+        val timesInts = createBinaryOperationInjectionImage("timesInts", intInjection, intInjection) { exp1, exp2 -> exp1 * exp2 }
+        val divInts = createBinaryOperationInjectionImage("divInts", intInjection, intInjection, true) { exp1, exp2 ->
+            exp1 / exp2
+        }
+        val remInts = createBinaryOperationInjectionImage("remInts", intInjection, intInjection, true) { exp1, exp2 ->
+            exp1 % exp2
+        }
+        val gtInts = createBinaryOperationInjectionImage("gtInts", intInjection, boolInjection) { exp1, exp2 -> exp1 gt exp2 }
+        val ltInts = createBinaryOperationInjectionImage("ltInts", intInjection, boolInjection) { exp1, exp2 -> exp1 lt exp2 }
+        val geInts = createBinaryOperationInjectionImage("geInts", intInjection, boolInjection) { exp1, exp2 -> exp1 ge exp2 }
+        val leInts = createBinaryOperationInjectionImage("leInts", intInjection, boolInjection) { exp1, exp2 -> exp1 le exp2 }
+        val notBool = createUnaryOperationInjectionImage("notBool", boolInjection) { !it }
+        val andBools = createBinaryOperationInjectionImage("andBools", boolInjection, boolInjection) { exp1, exp2 -> exp1 and exp2 }
+        val orBools = createBinaryOperationInjectionImage("orBools", boolInjection, boolInjection) { exp1, exp2 -> exp1 or exp2 }
+        val impliesBools = createBinaryOperationInjectionImage("impliesBools", boolInjection, boolInjection) { exp1, exp2 ->
+            exp1 implies exp2
+        }
 
         // special values
         val nullValue = createDomainFunc("nullValue", emptyList(), Ref)
@@ -104,61 +141,59 @@ class UnifiedTypeDomain(classes: List<ClassTypeEmbedding>) : BuiltinDomain(TYPE_
 
     override val axioms = AxiomListBuilder.build(this) {
         axiom("subtype_reflexive") {
-            Exp.forall(t) { t -> isSubtype(t, t) }
+            Exp.forall(t) { t -> t subtype t }
         }
         axiom("subtype_transitive") {
             Exp.forall(t1, t2, t3) { t1, t2, t3 ->
                 assumption {
                     compoundTrigger {
-                        subTrigger { isSubtype(t1, t2) }
-                        subTrigger { isSubtype(t2, t3) }
+                        subTrigger { t1 subtype t2 }
+                        subTrigger { t2 subtype t3 }
                     }
                 }
-                isSubtype(t1, t3)
+                t1 subtype t3
             }
         }
         axiom("subtype_antisymmetric") {
             Exp.forall(t1, t2) { t1, t2 ->
                 assumption {
                     compoundTrigger {
-                        subTrigger { isSubtype(t1, t2) }
-                        subTrigger { isSubtype(t2, t1) }
+                        subTrigger { t1 subtype t2 }
+                        subTrigger { t2 subtype t1 }
                     }
                 }
-                Exp.EqCmp(t1, t2)
+                t1 eq t2
             }
         }
         axiom("nullable_idempotent") {
             Exp.forall(t) { t ->
                 val twiceNullable = nullable(nullable(t))
                 simpleTrigger { twiceNullable }
-                Exp.EqCmp(twiceNullable, nullable(t))
+                twiceNullable eq nullable(t)
             }
         }
         axiom("nullable_supertype") {
             Exp.forall(t) { t ->
-                val expr = simpleTrigger { nullable(t) }
-                isSubtype(t, expr)
+                t subtype simpleTrigger { nullable(t) }
             }
         }
         axiom("nullable_preserves_subtype") {
             Exp.forall(t1, t2) { t1, t2 ->
-                val expr = simpleTrigger { isSubtype(nullable(t1), nullable(t2)) }
-                assumption { isSubtype(t1, t2) }
-                expr
+                assumption { t1 subtype t2 }
+                simpleTrigger { nullable(t1) subtype nullable(t2) }
             }
         }
         axiom("nullable_any_supertype") {
             Exp.forall(t) { t ->
-                isSubtype(t, nullable(anyType()))
+                t subtype nullable(anyType())
             }
         }
         nonNullableTypes.forEach {
-            axiom { isSubtype(it(), anyType()) }
+            axiom { it() subtype anyType() }
         }
         axiom("supertype_of_nullable_nothing") {
             Exp.forall(t) { t ->
-                isSubtype(nullable(nothingType()), t)
+                nullable(nothingType()) subtype t
             }
         }
         axiom("any_not_nullable") {
@@ -169,37 +204,39 @@ class UnifiedTypeDomain(classes: List<ClassTypeEmbedding>) : BuiltinDomain(TYPE_
         axiom("null_smartcast_value_level") {
             Exp.forall(r, t) { r, t ->
                 assumption {
-                    simpleTrigger { isOf(r, nullable(t)) }
+                    simpleTrigger { r isOf nullable(t) }
                 }
-                Exp.EqCmp(r, nullValue()) or isOf(r, t)
+                (r eq nullValue()) or (r isOf t)
             }
         }
         axiom("nothing_empty") {
             Exp.forall(r) { r ->
-                !isOf(r, nothingType())
+                !(r isOf nothingType())
             }
         }
         axiom("null_smartcast_type_level") {
             Exp.forall(t1, t2) { t1, t2 ->
                 assumption {
                     compoundTrigger {
-                        isSubtype(t1, anyType())
-                        isSubtype(t1, nullable(t2))
+                        subTrigger { t1 subtype anyType() }
+                        subTrigger { t1 subtype nullable(t2) }
                     }
                 }
-                isSubtype(t1, t2)
+                t1 subtype t2
             }
         }
         axiom("type_of_null") {
-            isOf(nullValue(), nullable(nothingType()))
+            nullValue() isOf nullable(nothingType())
         }
         axiom("type_of_unit") {
-            isOf(unitValue(), unitType())
+            unitValue() isOf unitType()
         }
         axiom("uniqueness_of_unit") {
             Exp.forall(r) { r ->
-                val expr = simpleTrigger { isOf(r, unitType()) }
-                Exp.EqCmp(expr, unitValue())
+                assumption {
+                    simpleTrigger { r isOf unitType() }
+                }
+                r eq unitValue()
             }
         }
         allInjections.forEach {
@@ -208,7 +245,7 @@ class UnifiedTypeDomain(classes: List<ClassTypeEmbedding>) : BuiltinDomain(TYPE_
         classTypes.forEach { (typeEmbedding, typeFunction) ->
             typeEmbedding.superTypes.forEach {
                 classTypes[it]?.let { supertypeFunction ->
-                    isSubtype(typeFunction(), supertypeFunction())
+                    typeFunction() subtype supertypeFunction()
                 }
             }
         }
