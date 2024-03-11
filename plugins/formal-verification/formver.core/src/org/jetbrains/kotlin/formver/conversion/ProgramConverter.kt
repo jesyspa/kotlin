@@ -167,10 +167,8 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
     }
 
     private fun <R> FirPropertySymbol.withConstructorParam(action: FirPropertySymbol.(FirValueParameterSymbol) -> R): R? =
-        this.run {
-            correspondingValueParameterFromPrimaryConstructor?.let { param ->
-                action(param)
-            }
+        correspondingValueParameterFromPrimaryConstructor?.let { param ->
+            action(param)
         }
 
     private fun extractConstructorParamsAsFields(symbol: FirFunctionSymbol<*>): Map<FirValueParameterSymbol, FieldEmbedding> {
