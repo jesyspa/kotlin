@@ -14,6 +14,12 @@ const val UNIFIED_TYPE_DOMAIN_NAME = "UnifiedType"
 
 
 /**
+ * This new domain is designed to replace `NullableDomain`, `TypeDomain` and `CastingDomain` and it is not yet integrated.
+ * To enable its generation in viper output uncomment corresponding lines in
+ * [ProgramConverter](jetbrains://idea/navigate/reference?project=kotlin&path=org/jetbrains/kotlin/formver/conversion/ProgramConverter.kt:70)
+ * and [SpecialFunctions.kt](jetbrains://idea/navigate/reference?project=kotlin&path=org/jetbrains/kotlin/formver/embeddings/callables/SpecialFunctions.kt:58)
+ *
+ * Viper code:
  * ```viper
  *
  * domain UnifiedType  {
@@ -254,6 +260,7 @@ class UnifiedTypeDomain(classes: List<ClassTypeEmbedding>) : BuiltinDomain(UNIFI
 
         /**
          * Creates a Viper function that operates on the images of an injection and registers it.
+         * TODO: decide if body is needed in these functions
          *
          * @param argsInjection injection that must be applied to the arguments of the binary operation
          * (note that it must be the same for each of arguments)
@@ -277,7 +284,7 @@ class UnifiedTypeDomain(classes: List<ClassTypeEmbedding>) : BuiltinDomain(UNIFI
             postcondition { returns(Type.Ref) isOf resultInjection.typeFunction() }
             val viperResult = operation(argsInjection.fromRef(arg1), argsInjection.fromRef(arg2))
             postcondition { resultInjection.fromRef(result) eq viperResult }
-            body { resultInjection.toRef(viperResult) }
+//            body { resultInjection.toRef(viperResult) }
         }.also { operationImages.add(it) }
 
         private fun createUnaryOperationInjectionImage(
@@ -289,7 +296,7 @@ class UnifiedTypeDomain(classes: List<ClassTypeEmbedding>) : BuiltinDomain(UNIFI
             postcondition { returns(Type.Ref) isOf injection.typeFunction() }
             val viperResult = operation(injection.fromRef(arg1))
             postcondition { injection.fromRef(result) eq viperResult }
-            body { injection.toRef(viperResult) }
+//            body { injection.toRef(viperResult) }
         }.also { operationImages.add(it) }
 
         // Ref translations of primitive operations

@@ -55,5 +55,5 @@ object DuplicableFunction : BuiltinFunction(SpecialName("duplicable")) {
 }
 
 object SpecialFunctions {
-    val all = listOf(DuplicableFunction) + UnifiedTypeDomain.accompanyingFunctions()
+    val all = listOf(DuplicableFunction) // + UnifiedTypeDomain.accompanyingFunctions()
 }
