@@ -188,7 +188,6 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
 
     override fun embedFunctionSignature(symbol: FirFunctionSymbol<*>): FunctionSignature {
         val retType = embedType(symbol.resolvedReturnTypeRef.type)
-        val constructorParamSymbolsToFields = extractConstructorParamsAsFields(symbol)
         val receiverType = symbol.receiverType
         return object : FunctionSignature {
             // TODO: figure out whether we want a symbol here and how to get it.
@@ -198,15 +197,6 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
                 FirVariableEmbedding(it.embedName(), embedType(it.resolvedReturnType), it)
             }
             override val returnType = retType
-
-            override fun primaryConstructorInvariants(returnVariable: VariableEmbedding) =
-                params.mapNotNull { param ->
-                    constructorParamSymbolsToFields[param.symbol]?.let { field ->
-                        (field.accessPolicy == AccessPolicy.ALWAYS_READABLE).ifTrue {
-                            EqCmp(FieldAccess(returnVariable, field), param)
-                        }
-                    }
-                }
         }
     }
 
@@ -219,6 +209,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
             override val sourceName: String?
                 get() = super<NamedFunctionSignature>.sourceName
         }
+        val constructorParamSymbolsToFields = extractConstructorParamsAsFields(symbol)
         val contractVisitor = ContractDescriptionConversionVisitor(this@ProgramConverter, subSignature)
 
         return object : FullNamedFunctionSignature, NamedFunctionSignature by subSignature {
@@ -235,6 +226,15 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
                     contractVisitor.getPostconditions(ContractVisitorContext(returnVariable, symbol)) +
                     subSignature.stdLibPostConditions(returnVariable) +
                     primaryConstructorInvariants(returnVariable)
+
+            fun primaryConstructorInvariants(returnVariable: VariableEmbedding) =
+                params.mapNotNull { param ->
+                    constructorParamSymbolsToFields[param.symbol]?.let { field ->
+                        (field.accessPolicy == AccessPolicy.ALWAYS_READABLE).ifTrue {
+                            EqCmp(FieldAccess(returnVariable, field), param)
+                        }
+                    }
+                }
 
             override val declarationSource: KtSourceElement? = symbol.source
         }

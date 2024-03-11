@@ -25,6 +25,4 @@ interface FunctionSignature : CallableSignature {
         get() = receiver?.type
     override val paramTypes: List<TypeEmbedding>
         get() = params.map { it.type }
-
-    fun primaryConstructorInvariants(returnVariable: VariableEmbedding): List<ExpEmbedding>
 }
