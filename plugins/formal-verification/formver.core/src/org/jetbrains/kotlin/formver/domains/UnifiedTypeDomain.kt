@@ -264,7 +264,7 @@ class UnifiedTypeDomain(classes: List<ClassTypeEmbedding>) : BuiltinDomain(UNIFI
          *
          * @param argsInjection injection that must be applied to the arguments of the binary operation
          * (note that it must be the same for each of arguments)
-         * @param resultInjection injection that must be applied to the result of binary the operation
+         * @param resultInjection injection that must be applied to the result of the binary operation
          * (not necessarily the same as `argsInjection`)
          * @param checkDivisor adds precondition that divisor (second argument) is not zero
          */
@@ -360,9 +360,7 @@ class UnifiedTypeDomain(classes: List<ClassTypeEmbedding>) : BuiltinDomain(UNIFI
         }
         axiom("nullable_idempotent") {
             Exp.forall(t) { t ->
-                val twiceNullable = nullable(nullable(t))
-                simpleTrigger { twiceNullable }
-                twiceNullable eq nullable(t)
+                simpleTrigger { nullable(nullable(t)) } eq nullable(t)
             }
         }
         axiom("nullable_supertype") {
@@ -384,9 +382,9 @@ class UnifiedTypeDomain(classes: List<ClassTypeEmbedding>) : BuiltinDomain(UNIFI
         nonNullableTypes.forEach {
             axiom { it() subtype anyType() }
         }
-        axiom("supertype_of_nullable_nothing") {
+        axiom("supertype_of_nothing") {
             Exp.forall(t) { t ->
-                nullable(nothingType()) subtype t
+                nothingType() subtype t
             }
         }
         axiom("any_not_nullable") {
