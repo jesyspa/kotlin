@@ -31,7 +31,7 @@ interface TypeEmbedding {
     /**
      * A Viper expression with the runtime representation of the type.
      *
-     * The Viper values are defined in TypingDomain and are used for casting, subtyping and the `is` operator.
+     * The Viper values are defined in RuntimeTypeDomain and are used for casting, subtyping and the `is` operator.
      */
     val runtimeType: Exp
 
@@ -157,11 +157,19 @@ data object IntTypeEmbedding : TypeEmbedding {
     }
 }
 
-data object BooleanTypeEmbedding : TypeEmbedding {
-    override val runtimeType = RuntimeTypeDomain.boolType()
+sealed class BooleanTypeEmbedding : TypeEmbedding {
     override val name = object : MangledName {
         override val mangled: String = "T_Boolean"
     }
+}
+
+data object SimpleBooleanTypeEmbedding : BooleanTypeEmbedding() {
+    override val runtimeType = RuntimeTypeDomain.boolType()
+}
+
+data object PermissionsContainingBooleanTypeEmbedding : BooleanTypeEmbedding() {
+    override val runtimeType: Exp
+        get() = error("Embeddings containing permissions are not representable in runtime type system.")
 }
 
 data class NullableTypeEmbedding(val elementType: TypeEmbedding) : TypeEmbedding {

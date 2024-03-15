@@ -7,7 +7,7 @@ package org.jetbrains.kotlin.formver.embeddings.expression
 
 import org.jetbrains.kotlin.formver.asPosition
 import org.jetbrains.kotlin.formver.domains.toViperCondition
-import org.jetbrains.kotlin.formver.embeddings.BooleanTypeEmbedding
+import org.jetbrains.kotlin.formver.embeddings.SimpleBooleanTypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.NothingTypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.TypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.UnitTypeEmbedding
@@ -18,7 +18,6 @@ import org.jetbrains.kotlin.formver.embeddings.callables.toMethodCall
 import org.jetbrains.kotlin.formver.embeddings.expression.debug.*
 import org.jetbrains.kotlin.formver.linearization.LinearizationContext
 import org.jetbrains.kotlin.formver.linearization.addLabel
-import org.jetbrains.kotlin.formver.linearization.pureToViper
 import org.jetbrains.kotlin.formver.linearization.pureToViperCondition
 import org.jetbrains.kotlin.formver.viper.ast.Exp
 import org.jetbrains.kotlin.formver.viper.ast.Label
@@ -66,7 +65,7 @@ data class While(
     override val type: TypeEmbedding = UnitTypeEmbedding
 
     override fun toViperSideEffects(ctx: LinearizationContext) {
-        val condVar = ctx.freshAnonVar(BooleanTypeEmbedding)
+        val condVar = ctx.freshAnonVar(SimpleBooleanTypeEmbedding)
         ctx.addLabel(continueLabel)
         condition.toViperStoringIn(condVar, ctx)
         val bodyBlock = ctx.asBlock {
@@ -138,7 +137,7 @@ data class GotoChainNode(val label: Label?, val exp: ExpEmbedding, val next: Lab
 
 data class NonDeterministically(val exp: ExpEmbedding) : UnitResultExpEmbedding, DefaultDebugTreeViewImplementation {
     override fun toViperSideEffects(ctx: LinearizationContext) {
-        val choice = ctx.freshAnonVar(BooleanTypeEmbedding)
+        val choice = ctx.freshAnonVar(SimpleBooleanTypeEmbedding)
         val expViper = ctx.asBlock { exp.toViper(this) }
         ctx.addStatement(Stmt.If(choice.toViper(ctx), expViper, Stmt.Seqn(), ctx.source.asPosition))
     }

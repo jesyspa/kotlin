@@ -35,10 +35,11 @@ class FieldAccessFunction(
     className: MangledName,
     field: FieldEmbedding,
     unfoldingBody: Exp,
-    pos: Position = Position.NoPosition,
-    info: Info = Info.NoInfo,
-    trafos: Trafos = Trafos.NoTrafos,
-) : Function(GetterFunctionName(className, field.name), pos, info, trafos) {
+    override val pos: Position = Position.NoPosition,
+    override val info: Info = Info.NoInfo,
+    override val trafos: Trafos = Trafos.NoTrafos,
+) : Function {
+    override val name = GetterFunctionName(className, field.name)
     private val subject = Exp.LocalVar(GetterFunctionSubjectName, Type.Ref)
     private val subjectAccess = Exp.PredicateAccess(className, listOf(subject))
     override val retType: Type = Type.Ref
@@ -56,5 +57,5 @@ object DuplicableFunction : BuiltinFunction(SpecialName("duplicable")) {
 }
 
 object SpecialFunctions {
-    val all = listOf(DuplicableFunction) + RuntimeTypeDomain.accompanyingFunctions()
+    val all = listOf(DuplicableFunction) + RuntimeTypeDomain.accompanyingFunctions
 }

@@ -6,7 +6,7 @@
 package org.jetbrains.kotlin.formver.embeddings.expression
 
 import org.jetbrains.kotlin.formver.asPosition
-import org.jetbrains.kotlin.formver.embeddings.BooleanTypeEmbedding
+import org.jetbrains.kotlin.formver.embeddings.SimpleBooleanTypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.SourceRole
 import org.jetbrains.kotlin.formver.embeddings.TypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.asInfo
@@ -20,7 +20,7 @@ data class Old(override val inner: ExpEmbedding) : UnaryDirectResultExpEmbedding
 }
 
 data class DuplicableCall(override val inner: ExpEmbedding) : UnaryDirectResultExpEmbedding {
-    override val type: TypeEmbedding = BooleanTypeEmbedding
+    override val type: TypeEmbedding = SimpleBooleanTypeEmbedding
     override fun toViper(ctx: LinearizationContext): Exp =
         DuplicableFunction.toFuncApp(listOf(inner.toViper(ctx)), ctx.source.asPosition, SourceRole.ParamFunctionLeakageCheck.asInfo)
 }

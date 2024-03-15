@@ -103,9 +103,9 @@ abstract class KotlinBooleanSpecialFunction : SpecialKotlinFunction {
     override val packageName: List<String> = listOf("kotlin")
     override val className: String? = "Boolean"
 
-    override val receiverType: TypeEmbedding = BooleanTypeEmbedding
+    override val receiverType: TypeEmbedding = SimpleBooleanTypeEmbedding
     override val paramTypes: List<TypeEmbedding> = emptyList()
-    override val returnType: TypeEmbedding = BooleanTypeEmbedding
+    override val returnType: TypeEmbedding = SimpleBooleanTypeEmbedding
 }
 
 object KotlinBooleanNotFunctionImplementation : KotlinBooleanSpecialFunction() {
@@ -151,7 +151,7 @@ object SpecialVerifyFunction : SpecialKotlinFunction {
     }
 
     override val receiverType: TypeEmbedding? = null
-    override val paramTypes: List<TypeEmbedding> = listOf(BooleanTypeEmbedding)
+    override val paramTypes: List<TypeEmbedding> = listOf(SimpleBooleanTypeEmbedding)
     override val returnType: TypeEmbedding = UnitTypeEmbedding
 }
 

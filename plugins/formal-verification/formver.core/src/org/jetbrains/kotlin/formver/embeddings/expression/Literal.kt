@@ -34,7 +34,7 @@ data class IntLit(val value: Int) : PureExpEmbedding {
 }
 
 data class BooleanLit(val value: Boolean, override val sourceRole: SourceRole? = null) : PureExpEmbedding {
-    override val type = BooleanTypeEmbedding
+    override val type = SimpleBooleanTypeEmbedding
     override fun toViper(source: KtSourceElement?): Exp =
         RuntimeTypeDomain.boolInjection.toRef(Exp.BoolLit(value, source.asPosition, sourceRole.asInfo))
 

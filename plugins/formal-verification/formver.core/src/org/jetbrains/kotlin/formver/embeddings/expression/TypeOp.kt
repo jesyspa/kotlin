@@ -17,7 +17,7 @@ import org.jetbrains.kotlin.formver.viper.ast.Stmt
 
 data class Is(override val inner: ExpEmbedding, val comparisonType: TypeEmbedding, override val sourceRole: SourceRole? = null) :
     UnaryDirectResultExpEmbedding {
-    override val type = BooleanTypeEmbedding
+    override val type = SimpleBooleanTypeEmbedding
 
     override fun toViper(ctx: LinearizationContext) =
         RuntimeTypeDomain.boolInjection.toRef(

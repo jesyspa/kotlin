@@ -6,19 +6,25 @@
 package org.jetbrains.kotlin.formver.viper.ast
 
 import org.jetbrains.kotlin.formver.viper.*
+import java.io.StringBufferInputStream
 
-abstract class Function(
-    val name: MangledName,
-    val pos: Position = Position.NoPosition,
-    val info: Info = Info.NoInfo,
-    val trafos: Trafos = Trafos.NoTrafos,
-) : IntoSilver<viper.silver.ast.Function> {
-    abstract val includeInDumpPolicy: IncludeInDumpPolicy
-    abstract val formalArgs: List<Declaration.LocalVarDecl>
-    abstract val retType: Type
-    open val pres: List<Exp> = listOf()
-    open val posts: List<Exp> = listOf()
-    open val body: Exp? = null
+interface Function: IntoSilver<viper.silver.ast.Function> {
+    val name: MangledName
+    val pos: Position
+        get() = Position.NoPosition
+    val info: Info
+        get() = Info.NoInfo
+    val trafos: Trafos
+        get() = Trafos.NoTrafos
+    val includeInDumpPolicy: IncludeInDumpPolicy
+    val formalArgs: List<Declaration.LocalVarDecl>
+    val retType: Type
+    val pres: List<Exp>
+        get() = listOf()
+    val posts: List<Exp>
+        get() = listOf()
+    val body: Exp?
+        get() = null
 
     override fun toSilver(): viper.silver.ast.Function = viper.silver.ast.Function(
         name.mangled, formalArgs.map { it.toSilver() }.toScalaSeq(),
@@ -31,21 +37,41 @@ abstract class Function(
         pos: Position = Position.NoPosition,
         info: Info = Info.NoInfo,
         trafos: Trafos = Trafos.NoTrafos,
-    ): Exp.FuncApp = Exp.FuncApp(name, args, retType, pos, info, trafos)
+    ): Exp = Exp.FuncApp(name, args, retType, pos, info, trafos)
 
     operator fun invoke(
         vararg args: Exp,
         pos: Position = Position.NoPosition,
         info: Info = Info.NoInfo,
         trafos: Trafos = Trafos.NoTrafos
-    ): Exp.FuncApp = Exp.FuncApp(name, args.toList(), retType, pos, info, trafos)
+    ): Exp = toFuncApp(args.toList(), pos, info, trafos)
 }
 
 abstract class BuiltinFunction(
-    name: MangledName,
-    pos: Position = Position.NoPosition,
-    info: Info = Info.NoInfo,
-    trafos: Trafos = Trafos.NoTrafos,
-) : Function(name, pos, info, trafos) {
+    override val name: MangledName,
+    override val pos: Position = Position.NoPosition,
+    override val info: Info = Info.NoInfo,
+    override val trafos: Trafos = Trafos.NoTrafos,
+) : Function {
     override val includeInDumpPolicy: IncludeInDumpPolicy = IncludeInDumpPolicy.ONLY_IN_FULL_DUMP
+}
+
+class OperatorFunctionMemberAccessError(message: String) : RuntimeException(message)
+fun fakeFunctionError(message: String): Nothing = throw OperatorFunctionMemberAccessError(message)
+
+/**
+ * These are fake functions created for convenient interaction with arithmetic and boolean operations.
+ */
+interface OperatorFunction : Function {
+    override val name: MangledName
+        get() = fakeFunctionError("Names of fake functions should not be accessed.")
+
+    override val includeInDumpPolicy: IncludeInDumpPolicy
+        get() = fakeFunctionError("Fake functions shouldn't be considered for inclusion in viper dumps.")
+
+    override val formalArgs: List<Declaration.LocalVarDecl>
+        get() = fakeFunctionError("Formal args of fake functions should not be accessed.")
+
+    override val retType: Type
+        get() = fakeFunctionError("Returned type of fake functions should not be accessed.")
 }

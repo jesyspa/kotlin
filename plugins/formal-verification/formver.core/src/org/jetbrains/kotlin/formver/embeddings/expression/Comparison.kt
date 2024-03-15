@@ -7,7 +7,7 @@ package org.jetbrains.kotlin.formver.embeddings.expression
 
 import org.jetbrains.kotlin.formver.asPosition
 import org.jetbrains.kotlin.formver.domains.RuntimeTypeDomain
-import org.jetbrains.kotlin.formver.embeddings.BooleanTypeEmbedding
+import org.jetbrains.kotlin.formver.embeddings.SimpleBooleanTypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.SourceRole
 import org.jetbrains.kotlin.formver.embeddings.asInfo
 import org.jetbrains.kotlin.formver.linearization.LinearizationContext
@@ -15,7 +15,7 @@ import org.jetbrains.kotlin.formver.viper.ast.Exp
 
 sealed interface ComparisonExpression : BinaryDirectResultExpEmbedding {
     override val type
-        get() = BooleanTypeEmbedding
+        get() = SimpleBooleanTypeEmbedding
 }
 
 data class LtCmp(

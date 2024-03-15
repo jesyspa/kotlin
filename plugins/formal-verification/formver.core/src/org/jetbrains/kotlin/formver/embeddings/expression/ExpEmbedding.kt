@@ -349,7 +349,7 @@ data class FieldModification(val receiver: ExpEmbedding, val field: FieldEmbeddi
 data class FieldAccessPermissions(override val inner: ExpEmbedding, val field: FieldEmbedding, val perm: PermExp) :
     UnaryDirectResultExpEmbedding {
     // We consider access permissions to have type Boolean, though this is a bit questionable.
-    override val type: TypeEmbedding = BooleanTypeEmbedding
+    override val type: TypeEmbedding = SimpleBooleanTypeEmbedding
 
     override fun toViper(ctx: LinearizationContext): Exp = RuntimeTypeDomain.boolInjection.toRef(
         inner.toViper(ctx).fieldAccessPredicate(field.toViper(), perm, ctx.source.asPosition)
@@ -362,7 +362,7 @@ data class FieldAccessPermissions(override val inner: ExpEmbedding, val field: F
 
 // Ideally we would use the predicate, but due to the possibility of recursion this is inconvenient at present.
 data class PredicateAccessPermissions(val predicateName: MangledName, val args: List<ExpEmbedding>) : DirectResultExpEmbedding {
-    override val type: TypeEmbedding = BooleanTypeEmbedding
+    override val type: TypeEmbedding = SimpleBooleanTypeEmbedding
     override fun toViper(ctx: LinearizationContext): Exp =
         Exp.PredicateAccess(predicateName, args.map { it.toViper(ctx) }, ctx.source.asPosition)
 

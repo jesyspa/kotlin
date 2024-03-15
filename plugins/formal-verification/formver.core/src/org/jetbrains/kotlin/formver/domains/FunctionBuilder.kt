@@ -29,6 +29,13 @@ internal class FunctionBuilder private constructor() {
     val arg2
         get() = formalArgs[1].use()
 
+    val args: List<Exp.LocalVar> = object : AbstractList<Exp.LocalVar>() {
+        override val size: Int
+            get() = formalArgs.size
+
+        override fun get(index: Int) = formalArgs[index].use()
+    }
+
     val result
         get() = Exp.Result(retType)
 

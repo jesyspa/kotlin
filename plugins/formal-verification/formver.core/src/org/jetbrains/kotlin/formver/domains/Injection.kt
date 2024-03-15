@@ -7,6 +7,7 @@ package org.jetbrains.kotlin.formver.domains
 
 import org.jetbrains.kotlin.formver.domains.RuntimeTypeDomain.Companion.isOf
 import org.jetbrains.kotlin.formver.viper.ast.*
+import org.jetbrains.kotlin.formver.viper.ast.Function
 
 /**
  * Produces set of axioms for injections from built-in types in Viper to Ref.
@@ -41,3 +42,34 @@ class Injection(
         }
     }
 }
+
+
+/**
+ * Viper function that operates on the images of an injection.
+ * TODO: decide if body is needed in these functions
+ *
+ * @param argsInjections injections that must be applied to the arguments of the operation
+ * @param resultInjection injection that must be applied to the result of the operation
+ * @param checkDivisor adds precondition that divisor (second argument) is not zero
+ */
+class InjectionImageFunction(
+    name: String,
+    val original: Function,
+    argsInjections: List<Injection>,
+    resultInjection: Injection,
+    checkDivisor: Boolean = false
+): Function by FunctionBuilder.build(name, {
+    argsInjections.forEach {
+        precondition { argument(Type.Ref) isOf it.typeFunction() }
+    }
+    if (checkDivisor) {
+        check(argsInjections.size == 2 && argsInjections[1] == RuntimeTypeDomain.intInjection) {
+            "checkDivisor is only allowed for integer operations with two arguments"
+        }
+        precondition { RuntimeTypeDomain.intInjection.fromRef(args[1]) ne 0.toExp() }
+    }
+    postcondition { returns(Type.Ref) isOf resultInjection.typeFunction() }
+    val viperResult = original.toFuncApp(args)
+    postcondition { resultInjection.fromRef(result) eq viperResult }
+//            body { resultInjection.toRef(viperResult) }
+})
