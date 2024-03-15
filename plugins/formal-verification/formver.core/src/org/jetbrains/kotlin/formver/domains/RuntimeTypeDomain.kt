@@ -10,7 +10,7 @@ import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.formver.viper.ast.*
 
 
-const val UNIFIED_TYPE_DOMAIN_NAME = "UnifiedType"
+const val RUNTIME_TYPE_DOMAIN_NAME = "RuntimeType"
 
 
 /**
@@ -22,24 +22,24 @@ const val UNIFIED_TYPE_DOMAIN_NAME = "UnifiedType"
  * Viper code:
  * ```viper
  *
- * domain UnifiedType  {
+ * domain RuntimeType  {
  *
  *
- *  unique function intType(): UnifiedType
- *  unique function boolType(): UnifiedType
- *  unique function unitType(): UnifiedType
- *  unique function nothingType(): UnifiedType
- *  unique function anyType(): UnifiedType
- *  unique function functionType(): UnifiedType
+ *  unique function intType(): RuntimeType
+ *  unique function boolType(): RuntimeType
+ *  unique function unitType(): RuntimeType
+ *  unique function nothingType(): RuntimeType
+ *  unique function anyType(): RuntimeType
+ *  unique function functionType(): RuntimeType
  *
- *  // unique *Type() : UnifiedType for each user type
+ *  // unique *Type() : RuntimeType for each user type
  *
  *  function nullValue(): Ref
  *  function unitValue(): Ref
  *
- *  function isSubtype(t1: UnifiedType, t2: UnifiedType): Bool
- *  function typeOf(r: Ref): UnifiedType
- *  function nullable(t: UnifiedType): UnifiedType
+ *  function isSubtype(t1: RuntimeType, t2: RuntimeType): Bool
+ *  function typeOf(r: Ref): RuntimeType
+ *  function nullable(t: RuntimeType): RuntimeType
  *
  *
  *  function intToRef(v: Int): Ref
@@ -49,11 +49,11 @@ const val UNIFIED_TYPE_DOMAIN_NAME = "UnifiedType"
  *
  *
  *  axiom subtype_reflexive {
- *    (forall t: UnifiedType ::isSubtype(t, t))
+ *    (forall t: RuntimeType ::isSubtype(t, t))
  *  }
  *
  *  axiom subtype_transitive {
- *    (forall t1: UnifiedType, t2: UnifiedType, t3: UnifiedType ::
+ *    (forall t1: RuntimeType, t2: RuntimeType, t3: RuntimeType ::
  *      { isSubtype(t1, t2), isSubtype(t2, t3) }
  *      isSubtype(t1, t2) &&
  *      isSubtype(t2, t3) ==>
@@ -61,7 +61,7 @@ const val UNIFIED_TYPE_DOMAIN_NAME = "UnifiedType"
  *  }
  *
  *  axiom subtype_antisymmetric {
- *    (forall t1: UnifiedType, t2: UnifiedType ::
+ *    (forall t1: RuntimeType, t2: RuntimeType ::
  *      { isSubtype(t1, t2), isSubtype(t2, t1) }
  *      isSubtype(t1, t2) &&
  *      isSubtype(t2, t1) ==>
@@ -69,27 +69,27 @@ const val UNIFIED_TYPE_DOMAIN_NAME = "UnifiedType"
  *  }
  *
  *  axiom nullable_idempotent {
- *    (forall t: UnifiedType ::
+ *    (forall t: RuntimeType ::
  *      { nullable(nullable(t)) }
  *      nullable(nullable(t)) ==
  *      nullable(t))
  *  }
  *
  *  axiom nullable_supertype {
- *    (forall t: UnifiedType ::
+ *    (forall t: RuntimeType ::
  *      { nullable(t) }
  *      isSubtype(t, nullable(t)))
  *  }
  *
  *  axiom nullable_preserves_subtype {
- *    (forall t1: UnifiedType, t2: UnifiedType ::
+ *    (forall t1: RuntimeType, t2: RuntimeType ::
  *      { isSubtype(nullable(t1), nullable(t2)) }
  *      isSubtype(t1, t2) ==>
  *      isSubtype(nullable(t1), nullable(t2)))
  *  }
  *
  *  axiom nullable_any_supertype {
- *    (forall t: UnifiedType ::isSubtype(t, nullable(anyType())))
+ *    (forall t: RuntimeType ::isSubtype(t, nullable(anyType())))
  *  }
  *
  *  axiom {
@@ -119,17 +119,17 @@ const val UNIFIED_TYPE_DOMAIN_NAME = "UnifiedType"
  *  // isSubtype(*Type(), anyType()) for each user type
  *
  *  axiom supertype_of_nullable_nothing {
- *    (forall t: UnifiedType ::isSubtype(nullable(nothingType()),
+ *    (forall t: RuntimeType ::isSubtype(nullable(nothingType()),
  *      t))
  *  }
  *
  *  axiom any_not_nullable {
- *    (forall t: UnifiedType ::!isSubtype(nullable(t),
+ *    (forall t: RuntimeType ::!isSubtype(nullable(t),
  *      anyType()))
  *  }
  *
  *  axiom null_smartcast_value_level {
- *    (forall r: Ref, t: UnifiedType ::
+ *    (forall r: Ref, t: RuntimeType ::
  *      { isSubtype(typeOf(r), nullable(t)) }
  *      isSubtype(typeOf(r), nullable(t)) ==>
  *      r == nullValue() ||
@@ -141,7 +141,7 @@ const val UNIFIED_TYPE_DOMAIN_NAME = "UnifiedType"
  *  }
  *
  *  axiom null_smartcast_type_level {
- *    (forall t1: UnifiedType, t2: UnifiedType ::
+ *    (forall t1: RuntimeType, t2: RuntimeType ::
  *      { isSubtype(t1, anyType()), isSubtype(t1,
  *      nullable(t2)) }
  *      isSubtype(t1, anyType()) &&
@@ -204,24 +204,23 @@ const val UNIFIED_TYPE_DOMAIN_NAME = "UnifiedType"
  * // same for subtraction, multiplication and so on
  * ```
  */
-
-class UnifiedTypeDomain(classes: List<ClassTypeEmbedding>) : BuiltinDomain(UNIFIED_TYPE_DOMAIN_NAME) {
+class RuntimeTypeDomain(classes: List<ClassTypeEmbedding>) : BuiltinDomain(RUNTIME_TYPE_DOMAIN_NAME) {
     override val typeVars: List<Type.TypeVar> = emptyList()
 
     // Define types that are not dependent on the user defined classes in a companion object.
     // That way other classes can refer to them without having an explicit reference to the concrete TypeDomain.
     companion object {
-        val UnifiedType = Type.Domain(DomainName(UNIFIED_TYPE_DOMAIN_NAME).mangled, emptyList())
+        val RuntimeType = Type.Domain(DomainName(RUNTIME_TYPE_DOMAIN_NAME).mangled, emptyList())
         val Ref = Type.Ref
 
         fun createDomainFunc(funcName: String, args: List<Declaration.LocalVarDecl>, type: Type, unique: Boolean = false) =
-            DomainFunc(DomainFuncName(DomainName(UNIFIED_TYPE_DOMAIN_NAME), funcName), args, emptyList(), type, unique)
+            DomainFunc(DomainFuncName(DomainName(RUNTIME_TYPE_DOMAIN_NAME), funcName), args, emptyList(), type, unique)
 
         // variables for readability improving
-        private val t = Var("t", UnifiedType)
-        private val t1 = Var("t1", UnifiedType)
-        private val t2 = Var("t2", UnifiedType)
-        private val t3 = Var("t3", UnifiedType)
+        private val t = Var("t", RuntimeType)
+        private val t1 = Var("t1", RuntimeType)
+        private val t2 = Var("t2", RuntimeType)
+        private val t3 = Var("t3", RuntimeType)
         private val r = Var("r", Ref)
 
         // three basic functions
@@ -230,25 +229,25 @@ class UnifiedTypeDomain(classes: List<ClassTypeEmbedding>) : BuiltinDomain(UNIFI
         infix fun Exp.subtype(otherType: Exp) = isSubtype(this, otherType)
 
         /** `typeOf: Ref -> Type` */
-        val typeOf = createDomainFunc("typeOf", listOf(r.decl()), UnifiedType)
+        val typeOf = createDomainFunc("typeOf", listOf(r.decl()), RuntimeType)
 
         /** `nullable: Type -> Type` */
-        val nullable = createDomainFunc("nullable", listOf(t.decl()), UnifiedType)
+        val nullable = createDomainFunc("nullable", listOf(t.decl()), RuntimeType)
 
         // many axioms will use `is` which can be represented as composition of `isSubtype` and `typeOf`
         /** `is: (Ref, Type) -> Bool` */
         infix fun Exp.isOf(elemType: Exp) = isSubtype(typeOf(this), elemType)
 
         // built-in types function
-        val intType = createDomainFunc("intType", emptyList(), UnifiedType, true)
-        val boolType = createDomainFunc("boolType", emptyList(), UnifiedType, true)
-        val unitType = createDomainFunc("unitType", emptyList(), UnifiedType, true)
-        val nothingType = createDomainFunc("nothingType", emptyList(), UnifiedType, true)
-        val anyType = createDomainFunc("anyType", emptyList(), UnifiedType, true)
-        val functionType = createDomainFunc("functionType", emptyList(), UnifiedType, true)
+        val intType = createDomainFunc("intType", emptyList(), RuntimeType, true)
+        val boolType = createDomainFunc("boolType", emptyList(), RuntimeType, true)
+        val unitType = createDomainFunc("unitType", emptyList(), RuntimeType, true)
+        val nothingType = createDomainFunc("nothingType", emptyList(), RuntimeType, true)
+        val anyType = createDomainFunc("anyType", emptyList(), RuntimeType, true)
+        val functionType = createDomainFunc("functionType", emptyList(), RuntimeType, true)
 
         // for creation of user types
-        private fun classTypeFunc(name: MangledName) = createDomainFunc(name.mangled, emptyList(), UnifiedType, true)
+        private fun classTypeFunc(name: MangledName) = createDomainFunc(name.mangled, emptyList(), RuntimeType, true)
 
         // bijections to primitive types
         val intInjection = Injection("int", Type.Int, intType)

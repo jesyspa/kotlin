@@ -5,7 +5,7 @@
 
 package org.jetbrains.kotlin.formver.domains
 
-import org.jetbrains.kotlin.formver.domains.UnifiedTypeDomain.Companion.isOf
+import org.jetbrains.kotlin.formver.domains.RuntimeTypeDomain.Companion.isOf
 import org.jetbrains.kotlin.formver.viper.ast.*
 
 /**
@@ -21,8 +21,8 @@ class Injection(
 ) {
     private val v = Var("v", viperType)
     private val r = Var("r", Type.Ref)
-    val toRef = UnifiedTypeDomain.createDomainFunc("${injectionName}ToRef", listOf(v.decl()), Type.Ref)
-    val fromRef = UnifiedTypeDomain.createDomainFunc("${injectionName}FromRef", listOf(r.decl()), viperType)
+    val toRef = RuntimeTypeDomain.createDomainFunc("${injectionName}ToRef", listOf(v.decl()), Type.Ref)
+    val fromRef = RuntimeTypeDomain.createDomainFunc("${injectionName}FromRef", listOf(r.decl()), viperType)
 
     internal fun AxiomListBuilder.injectionAxioms() {
         axiom {

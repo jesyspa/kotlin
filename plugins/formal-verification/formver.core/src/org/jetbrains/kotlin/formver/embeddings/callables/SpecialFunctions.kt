@@ -5,7 +5,7 @@
 
 package org.jetbrains.kotlin.formver.embeddings.callables
 
-import org.jetbrains.kotlin.formver.domains.UnifiedTypeDomain
+import org.jetbrains.kotlin.formver.domains.RuntimeTypeDomain
 import org.jetbrains.kotlin.formver.embeddings.FieldEmbedding
 import org.jetbrains.kotlin.formver.embeddings.LegacyUnspecifiedFunctionTypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.expression.AnonymousVariableEmbedding
@@ -55,5 +55,5 @@ object DuplicableFunction : BuiltinFunction(SpecialName("duplicable")) {
 }
 
 object SpecialFunctions {
-    val all = listOf(DuplicableFunction) // + UnifiedTypeDomain.accompanyingFunctions()
+    val all = listOf(DuplicableFunction) // + RuntimeTypeDomain.accompanyingFunctions()
 }

@@ -67,7 +67,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
                 TypeOfDomain,
                 TypeDomain(classes.values.toList()),
                 AnyDomain,
-//                UnifiedTypeDomain(classes.values.toList())
+//                RuntimeTypeDomain(classes.values.toList())
             ),
             fields = SpecialFields.all.map { it.toViper() } +
                     classes.values.flatMap { it.flatMapUniqueFields { _, field -> listOf(field.toViper()) } }.distinctBy { it.name },
