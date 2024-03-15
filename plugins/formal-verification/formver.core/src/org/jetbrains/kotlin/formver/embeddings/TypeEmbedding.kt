@@ -284,18 +284,13 @@ data class ClassTypeEmbedding(val className: ScopedKotlinName) : TypeEmbedding {
         return getPropertyFunctions + getSuperPropertyFunctions
     }
 
-    private var _runtimeType: Exp.DomainFuncApp? = null
-    fun initRuntimeType(runtimeType: Exp.DomainFuncApp) {
-        check(_runtimeType == null) { "Runtime type of $className is already initialized." }
-    }
-
-    override val runtimeType: Exp
-        get() = _runtimeType ?: error("Runtime type of $className has not been initialized yet.")
-
     // TODO: incorporate generic parameters.
     override val name = object : MangledName {
         override val mangled: String = "T_class_${className.mangled}"
     }
+
+    val runtimeTypeFunc = RuntimeTypeDomain.classTypeFunc(name)
+    override val runtimeType: Exp = runtimeTypeFunc()
 
     override fun findField(name: SimpleKotlinName): FieldEmbedding? = fields[name] ?: findAncestorField(name)
 

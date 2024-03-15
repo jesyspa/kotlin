@@ -247,7 +247,7 @@ class RuntimeTypeDomain(classes: List<ClassTypeEmbedding>) : BuiltinDomain(RUNTI
         val functionType = createDomainFunc("functionType", emptyList(), RuntimeType, true)
 
         // for creation of user types
-        private fun classTypeFunc(name: MangledName) = createDomainFunc(name.mangled, emptyList(), RuntimeType, true)
+        fun classTypeFunc(name: MangledName) = createDomainFunc(name.mangled, emptyList(), RuntimeType, true)
 
         // bijections to primitive types
         val intInjection = Injection("int", Type.Int, intType)
@@ -324,7 +324,7 @@ class RuntimeTypeDomain(classes: List<ClassTypeEmbedding>) : BuiltinDomain(RUNTI
         val unitValue = createDomainFunc("unitValue", emptyList(), Ref)
     }
 
-    val classTypes = classes.associateWith { classTypeFunc(it.className) }
+    val classTypes = classes.associateWith { type -> type.runtimeTypeFunc }
 
     val nonNullableTypes = listOf(intType, boolType, unitType, nothingType, anyType, functionType) + classTypes.values
 
@@ -435,7 +435,9 @@ class RuntimeTypeDomain(classes: List<ClassTypeEmbedding>) : BuiltinDomain(RUNTI
         classTypes.forEach { (typeEmbedding, typeFunction) ->
             typeEmbedding.superTypes.forEach {
                 classTypes[it]?.let { supertypeFunction ->
-                    typeFunction() subtype supertypeFunction()
+                    axiom {
+                        typeFunction() subtype supertypeFunction()
+                    }
                 }
             }
         }
