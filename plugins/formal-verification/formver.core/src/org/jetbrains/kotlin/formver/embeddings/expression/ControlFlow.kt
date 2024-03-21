@@ -211,7 +211,7 @@ data class FunctionExp(val signature: FullNamedFunctionSignature?, val body: Exp
             // Unfortunately Silicon for some reason does not allow Assumes. However, it doesn't matter as long as the
             // provenInvariants don't contain permissions.
             arg.provenInvariants().forEach { invariant ->
-                ctx.addStatement(Stmt.Inhale(invariant.pureToViperCondition(), ctx.source.asPosition))
+                ctx.addStatement(Stmt.Inhale(invariant.pureToViperCondition(ctx.source), ctx.source.asPosition))
             }
         }
         body.toViperMaybeStoringIn(result, ctx)

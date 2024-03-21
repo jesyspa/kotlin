@@ -91,7 +91,7 @@ abstract class InhaleInvariants(val exp: ExpEmbedding) : StoredResultExpEmbeddin
     override fun toViperStoringIn(result: VariableEmbedding, ctx: LinearizationContext) {
         exp.toViperStoringIn(result, ctx)
         for (invariant in invariants.fillHoles(result)) {
-            ctx.addStatement(Stmt.Inhale(invariant.pureToViperCondition(), ctx.source.asPosition))
+            ctx.addStatement(Stmt.Inhale(invariant.pureToViperCondition(ctx.source), ctx.source.asPosition))
         }
     }
 

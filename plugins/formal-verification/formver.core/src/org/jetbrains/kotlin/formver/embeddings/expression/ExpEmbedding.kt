@@ -29,10 +29,17 @@ sealed interface ExpEmbedding {
 
     /**
      * Convert this `ExpEmbedding` into a Viper `Exp`, using the provided context for auxiliary statements and declarations.
+     * This should never be used for assertions inside Viper's `inhale`, `exhale`, `require`, `assert` etc.
      *
      * The `Exp` returned contains the result of the expression.
      */
     fun toViper(ctx: LinearizationContext): Exp
+
+    /**
+     * Convert this `ExpEmbedding` to a pure expression which can be a part of Viper assertion.
+     * This should never produce auxiliary statements.
+     */
+    fun toViperAssertionSubexpression(source: KtSourceElement?): Exp = throw NotImplementedError()
 
     /**
      * Like `toViper`, but store the result in `result`.
