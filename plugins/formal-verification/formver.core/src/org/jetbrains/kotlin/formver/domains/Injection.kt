@@ -46,7 +46,6 @@ class Injection(
 
 /**
  * Viper function that operates on the images of an injection.
- * TODO: decide if body is needed in these functions
  *
  * @param argsInjections injections that must be applied to the arguments of the operation
  * @param resultInjection injection that must be applied to the result of the operation
@@ -59,9 +58,7 @@ class InjectionImageFunction(
     resultInjection: Injection,
     checkDivisor: Boolean = false
 ) : Function by FunctionBuilder.build(name, {
-    argsInjections.forEach {
-        precondition { argument(Type.Ref) isOf it.typeFunction() }
-    }
+    val viperResult = original.toFuncApp(argsInjections.map { it.fromRef(argument(Type.Ref)) })
     if (checkDivisor) {
         check(argsInjections.size == 2 && argsInjections[1] == RuntimeTypeDomain.intInjection) {
             "checkDivisor is only allowed for integer operations with two arguments"
@@ -69,7 +66,5 @@ class InjectionImageFunction(
         precondition { RuntimeTypeDomain.intInjection.fromRef(args[1]) ne 0.toExp() }
     }
     postcondition { returns(Type.Ref) isOf resultInjection.typeFunction() }
-    val viperResult = original.toFuncApp(args.mapIndexed { index, localVar -> argsInjections[index].fromRef(localVar) })
     postcondition { resultInjection.fromRef(result) eq viperResult }
-//            body { resultInjection.toRef(viperResult) }
 })

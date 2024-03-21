@@ -301,6 +301,14 @@ class RuntimeTypeDomain(classes: List<ClassTypeEmbedding>) : BuiltinDomain(RUNTI
                         subTrigger { t2 subtype t3 }
                     }
                 }
+                compoundTrigger {
+                    subTrigger { t1 subtype t2 }
+                    subTrigger { t1 subtype t3 }
+                }
+                compoundTrigger {
+                    subTrigger { t2 subtype t3}
+                    subTrigger { t1 subtype t3}
+                }
                 t1 subtype t3
             }
         }
