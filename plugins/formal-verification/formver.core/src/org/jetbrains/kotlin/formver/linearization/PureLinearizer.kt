@@ -7,6 +7,8 @@ package org.jetbrains.kotlin.formver.linearization
 
 import org.jetbrains.kotlin.KtSourceElement
 import org.jetbrains.kotlin.formver.domains.toViperCondition
+import org.jetbrains.kotlin.formver.embeddings.PermissionsContainingBooleanTypeEmbedding
+import org.jetbrains.kotlin.formver.embeddings.SimpleBooleanTypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.TypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.expression.AnonymousVariableEmbedding
 import org.jetbrains.kotlin.formver.embeddings.expression.ExpEmbedding
@@ -58,7 +60,14 @@ fun ExpEmbedding.pureToViper(source: KtSourceElement? = null): Exp {
     }
 }
 
-fun ExpEmbedding.pureToViperCondition(source: KtSourceElement? = null) = pureToViper(source).toViperCondition()
+fun ExpEmbedding.pureToViperCondition(source: KtSourceElement? = null): Exp {
+    val exp = pureToViper(source)
+    return when (type) {
+        is SimpleBooleanTypeEmbedding -> exp.toViperCondition()
+        is PermissionsContainingBooleanTypeEmbedding -> exp
+        else -> error("Attempt to make a viper condition from non-boolean expression. Embedding debug view:\n${debugTreeView.print()}")
+    }
+}
 
 fun List<ExpEmbedding>.pureToViper(source: KtSourceElement? = null): List<Exp> = map { it.pureToViper(source) }
 

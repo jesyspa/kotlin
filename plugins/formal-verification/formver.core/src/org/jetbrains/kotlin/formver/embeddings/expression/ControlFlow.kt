@@ -139,7 +139,7 @@ data class NonDeterministically(val exp: ExpEmbedding) : UnitResultExpEmbedding,
     override fun toViperSideEffects(ctx: LinearizationContext) {
         val choice = ctx.freshAnonVar(SimpleBooleanTypeEmbedding)
         val expViper = ctx.asBlock { exp.toViper(this) }
-        ctx.addStatement(Stmt.If(choice.toViper(ctx), expViper, Stmt.Seqn(), ctx.source.asPosition))
+        ctx.addStatement(Stmt.If(choice.toViper(ctx).toViperCondition(), expViper, Stmt.Seqn(), ctx.source.asPosition))
     }
 
     override val debugAnonymousSubexpressions: List<ExpEmbedding>

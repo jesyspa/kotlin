@@ -12,6 +12,7 @@ import org.jetbrains.kotlin.formver.embeddings.*
 import org.jetbrains.kotlin.formver.embeddings.expression.debug.*
 import org.jetbrains.kotlin.formver.linearization.LinearizationContext
 import org.jetbrains.kotlin.formver.linearization.pureToViper
+import org.jetbrains.kotlin.formver.linearization.pureToViperCondition
 import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.formver.viper.ast.Exp
 import org.jetbrains.kotlin.formver.viper.ast.PermExp
@@ -336,7 +337,7 @@ data class FieldModification(val receiver: ExpEmbedding, val field: FieldEmbeddi
     override fun toViperSideEffects(ctx: LinearizationContext) {
         val receiverViper = receiver.toViper(ctx)
         val newValueViper = newValue.withType(field.type).toViper(ctx)
-        val invariant = field.accessInvariantForAccess()?.fillHole(ExpWrapper(receiverViper, receiver.type))?.pureToViper(ctx.source)
+        val invariant = field.accessInvariantForAccess()?.fillHole(ExpWrapper(receiverViper, receiver.type))?.pureToViperCondition(ctx.source)
         invariant?.let { ctx.addStatement(Stmt.Inhale(it, ctx.source.asPosition)) }
         ctx.addStatement(Stmt.FieldAssign(Exp.FieldAccess(receiverViper, field.toViper()), newValueViper, ctx.source.asPosition))
         invariant?.let { ctx.addStatement(Stmt.Exhale(it, ctx.source.asPosition)) }
@@ -349,11 +350,10 @@ data class FieldModification(val receiver: ExpEmbedding, val field: FieldEmbeddi
 data class FieldAccessPermissions(override val inner: ExpEmbedding, val field: FieldEmbedding, val perm: PermExp) :
     UnaryDirectResultExpEmbedding {
     // We consider access permissions to have type Boolean, though this is a bit questionable.
-    override val type: TypeEmbedding = SimpleBooleanTypeEmbedding
+    override val type: TypeEmbedding = PermissionsContainingBooleanTypeEmbedding
 
-    override fun toViper(ctx: LinearizationContext): Exp = RuntimeTypeDomain.boolInjection.toRef(
+    override fun toViper(ctx: LinearizationContext): Exp =
         inner.toViper(ctx).fieldAccessPredicate(field.toViper(), perm, ctx.source.asPosition)
-    )
 
     // field collides with the field context-sensitive keyword.
     override val debugExtraSubtrees: List<TreeView>
@@ -362,7 +362,7 @@ data class FieldAccessPermissions(override val inner: ExpEmbedding, val field: F
 
 // Ideally we would use the predicate, but due to the possibility of recursion this is inconvenient at present.
 data class PredicateAccessPermissions(val predicateName: MangledName, val args: List<ExpEmbedding>) : DirectResultExpEmbedding {
-    override val type: TypeEmbedding = SimpleBooleanTypeEmbedding
+    override val type: TypeEmbedding = PermissionsContainingBooleanTypeEmbedding
     override fun toViper(ctx: LinearizationContext): Exp =
         Exp.PredicateAccess(predicateName, args.map { it.toViper(ctx) }, ctx.source.asPosition)
 

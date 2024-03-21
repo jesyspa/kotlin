@@ -58,7 +58,7 @@ class InjectionImageFunction(
     argsInjections: List<Injection>,
     resultInjection: Injection,
     checkDivisor: Boolean = false
-): Function by FunctionBuilder.build(name, {
+) : Function by FunctionBuilder.build(name, {
     argsInjections.forEach {
         precondition { argument(Type.Ref) isOf it.typeFunction() }
     }
@@ -69,7 +69,7 @@ class InjectionImageFunction(
         precondition { RuntimeTypeDomain.intInjection.fromRef(args[1]) ne 0.toExp() }
     }
     postcondition { returns(Type.Ref) isOf resultInjection.typeFunction() }
-    val viperResult = original.toFuncApp(args)
+    val viperResult = original.toFuncApp(args.mapIndexed { index, localVar -> argsInjections[index].fromRef(localVar) })
     postcondition { resultInjection.fromRef(result) eq viperResult }
 //            body { resultInjection.toRef(viperResult) }
 })

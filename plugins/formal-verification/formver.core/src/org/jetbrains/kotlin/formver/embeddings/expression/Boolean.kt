@@ -8,6 +8,7 @@ package org.jetbrains.kotlin.formver.embeddings.expression
 import org.jetbrains.kotlin.formver.asPosition
 import org.jetbrains.kotlin.formver.domains.InjectionImageFunction
 import org.jetbrains.kotlin.formver.domains.RuntimeTypeDomain
+import org.jetbrains.kotlin.formver.domains.toViperCondition
 import org.jetbrains.kotlin.formver.embeddings.*
 import org.jetbrains.kotlin.formver.linearization.LinearizationContext
 import org.jetbrains.kotlin.formver.viper.ast.BuiltinFunction
@@ -23,9 +24,9 @@ sealed interface BinaryBooleanExpression : BinaryDirectResultExpEmbedding {
 
     val refOp: InjectionImageFunction
 
-    fun argToViper(arg: ExpEmbedding, ctx: LinearizationContext) = arg.toViper(ctx).run {
+    private fun argToViper(arg: ExpEmbedding, ctx: LinearizationContext) = arg.toViper(ctx).run {
         if (this@BinaryBooleanExpression.type is PermissionsContainingBooleanTypeEmbedding && arg.type is SimpleBooleanTypeEmbedding) {
-            RuntimeTypeDomain.boolInjection.fromRef(this)
+            this.toViperCondition()
         } else {
             this
         }

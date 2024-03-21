@@ -12,6 +12,7 @@ import org.jetbrains.kotlin.formver.embeddings.callables.CallableSignatureData
 import org.jetbrains.kotlin.formver.embeddings.callables.FieldAccessFunction
 import org.jetbrains.kotlin.formver.embeddings.expression.*
 import org.jetbrains.kotlin.formver.linearization.pureToViper
+import org.jetbrains.kotlin.formver.linearization.pureToViperCondition
 import org.jetbrains.kotlin.formver.names.*
 import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.formver.viper.ast.Exp
@@ -75,10 +76,10 @@ interface TypeEmbedding {
      * We can provide these to Viper as assumptions rather than requiring them to be explicitly proven.
      * An example of this is when other systems (e.g. the type checker) have already proven these.
      *
-     * TODO: This should probably always include the `subtypeInvariant`, but primitive types make that harder.
      * TODO: Can be included in the class predicate when unfolding works
      */
-    fun provenInvariants(): List<TypeInvariantEmbedding> = emptyList()
+    fun provenInvariants(): List<TypeInvariantEmbedding> =
+        listOf(SubTypeInvariantEmbedding(this))
 
     /**
      * Invariants that do not depend on the heap, and so do not need to be repeated
@@ -178,7 +179,6 @@ data class NullableTypeEmbedding(val elementType: TypeEmbedding) : TypeEmbedding
         override val mangled: String = "N" + elementType.name.mangled
     }
 
-    override fun provenInvariants(): List<TypeInvariantEmbedding> = listOf(SubTypeInvariantEmbedding(this))
     override fun accessInvariants(): List<TypeInvariantEmbedding> = elementType.accessInvariants().map { IfNonNullInvariant(it) }
 
     // Note: this function will replace accessInvariants when nested unfold will be implemented
@@ -193,8 +193,6 @@ data class NullableTypeEmbedding(val elementType: TypeEmbedding) : TypeEmbedding
 
 abstract class UnspecifiedFunctionTypeEmbedding : TypeEmbedding {
     override val runtimeType = RuntimeTypeDomain.functionType()
-
-    override fun provenInvariants(): List<TypeInvariantEmbedding> = listOf(SubTypeInvariantEmbedding(this))
 
     override fun accessInvariants(): List<TypeInvariantEmbedding> =
         listOf(FieldAccessTypeInvariantEmbedding(SpecialFields.FunctionObjectCallCounterField, PermExp.FullPerm()))
@@ -269,7 +267,7 @@ data class ClassTypeEmbedding(val className: ScopedKotlinName) : TypeEmbedding {
             .map { PredicateAccessTypeInvariantEmbedding(it.name).fillHole(subjectEmbedding) }
 
         val body = (accessFields + accessFieldPredicates + accessSuperTypesPredicates).toConjunction()
-        return Predicate(name, listOf(subjectEmbedding.toLocalVarDecl()), body.pureToViper())
+        return Predicate(name, listOf(subjectEmbedding.toLocalVarDecl()), body.pureToViperCondition())
     }
 
     // Note: This is a preparation for upcoming pull requests, functions for predicates unfolding are just declared and not used.
@@ -315,5 +313,4 @@ data class ClassTypeEmbedding(val className: ScopedKotlinName) : TypeEmbedding {
     // Note: this function will replace accessInvariants when nested unfold will be implemented
     override fun predicateAccessInvariants(): List<TypeInvariantEmbedding> = listOf(PredicateAccessTypeInvariantEmbedding(name))
 
-    override fun provenInvariants(): List<TypeInvariantEmbedding> = listOf(SubTypeInvariantEmbedding(this))
 }

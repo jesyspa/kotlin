@@ -6,6 +6,8 @@
 package org.jetbrains.kotlin.formver.embeddings.callables
 
 import org.jetbrains.kotlin.formver.domains.RuntimeTypeDomain
+import org.jetbrains.kotlin.formver.domains.RuntimeTypeDomain.Companion.boolType
+import org.jetbrains.kotlin.formver.domains.RuntimeTypeDomain.Companion.isOf
 
 import org.jetbrains.kotlin.formver.embeddings.FieldEmbedding
 import org.jetbrains.kotlin.formver.embeddings.LegacyUnspecifiedFunctionTypeEmbedding
@@ -53,7 +55,9 @@ object DuplicableFunction : BuiltinFunction(SpecialName("duplicable")) {
     private val thisArg = AnonymousVariableEmbedding(0, LegacyUnspecifiedFunctionTypeEmbedding)
 
     override val formalArgs: List<Declaration.LocalVarDecl> = listOf(thisArg.toLocalVarDecl())
-    override val retType: Type = Type.Bool
+    override val retType: Type = Type.Ref
+    override val posts: List<Exp>
+        get() = listOf(Exp.Result(retType) isOf boolType())
 }
 
 object SpecialFunctions {

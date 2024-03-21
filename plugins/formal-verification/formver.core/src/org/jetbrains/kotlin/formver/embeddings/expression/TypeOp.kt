@@ -13,6 +13,7 @@ import org.jetbrains.kotlin.formver.embeddings.expression.debug.debugTreeView
 import org.jetbrains.kotlin.formver.embeddings.expression.debug.withDesignation
 import org.jetbrains.kotlin.formver.linearization.LinearizationContext
 import org.jetbrains.kotlin.formver.linearization.pureToViper
+import org.jetbrains.kotlin.formver.linearization.pureToViperCondition
 import org.jetbrains.kotlin.formver.viper.ast.Stmt
 
 data class Is(override val inner: ExpEmbedding, val comparisonType: TypeEmbedding, override val sourceRole: SourceRole? = null) :
@@ -33,9 +34,13 @@ data class Is(override val inner: ExpEmbedding, val comparisonType: TypeEmbeddin
         get() = listOf(comparisonType.debugTreeView.withDesignation("type"))
 }
 
-// TODO: probably casts need to be more flexible when it comes to containing result-less nodes.
+
+/**
+ * ExpEmbedding to change the TypeEmbedding of an inner ExpEmbedding.
+ * This is needed since most of our invariants require type and hence can be made more precise via Cast.
+ */
 data class Cast(override val inner: ExpEmbedding, override val type: TypeEmbedding) : UnaryDirectResultExpEmbedding {
-    // TODO: we want to assert `inner isOf type` here before making a cast itself
+    // TODO: Do we want to assert `inner isOf type` here before making a cast itself?
     override fun toViper(ctx: LinearizationContext) = inner.toViper(ctx)
     override fun ignoringCasts(): ExpEmbedding = inner.ignoringCasts()
     override fun ignoringCastsAndMetaNodes(): ExpEmbedding = inner.ignoringCastsAndMetaNodes()
@@ -44,7 +49,7 @@ data class Cast(override val inner: ExpEmbedding, override val type: TypeEmbeddi
         get() = listOf(type.debugTreeView.withDesignation("target"))
 }
 
-fun ExpEmbedding.withType(newType: TypeEmbedding): ExpEmbedding = this
+fun ExpEmbedding.withType(newType: TypeEmbedding): ExpEmbedding = if (type == newType) this else Cast(this, newType)
 
 
 /**
@@ -86,7 +91,7 @@ abstract class InhaleInvariants(val exp: ExpEmbedding) : StoredResultExpEmbeddin
     override fun toViperStoringIn(result: VariableEmbedding, ctx: LinearizationContext) {
         exp.toViperStoringIn(result, ctx)
         for (invariant in invariants.fillHoles(result)) {
-            ctx.addStatement(Stmt.Inhale(invariant.pureToViper(), ctx.source.asPosition))
+            ctx.addStatement(Stmt.Inhale(invariant.pureToViperCondition(), ctx.source.asPosition))
         }
     }
 

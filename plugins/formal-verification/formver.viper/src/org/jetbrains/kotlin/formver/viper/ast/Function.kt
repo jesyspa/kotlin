@@ -6,7 +6,6 @@
 package org.jetbrains.kotlin.formver.viper.ast
 
 import org.jetbrains.kotlin.formver.viper.*
-import java.io.StringBufferInputStream
 
 interface Function: IntoSilver<viper.silver.ast.Function> {
     val name: MangledName

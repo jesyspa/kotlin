@@ -18,7 +18,6 @@ import org.jetbrains.kotlin.fir.types.resolvedType
 import org.jetbrains.kotlin.fir.visitors.FirVisitor
 import org.jetbrains.kotlin.formver.UnsupportedFeatureBehaviour
 import org.jetbrains.kotlin.formver.embeddings.SimpleBooleanTypeEmbedding
-import org.jetbrains.kotlin.formver.embeddings.NullableTypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.TypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.UnspecifiedFunctionTypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.callables.FullNamedFunctionSignature
@@ -139,44 +138,15 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext>()
     }
 
     private fun convertEqCmp(left: ExpEmbedding, right: ExpEmbedding): ExpEmbedding {
-        val leftType = left.type
-        val rightType = right.type
-        // TODO: check whether isNullVal can be used here with no loss of generality.
-        // TODO: In all branches, replace the final Eq comparison with a member call function to `left.equals`
-        return when {
-            leftType is NullableTypeEmbedding && rightType !is NullableTypeEmbedding ->
-                share(left) { sharedLeft ->
-                    And(
-                        NeCmp(sharedLeft, NullLit),
-                        EqCmp(sharedLeft.withType(leftType.elementType), right.withType(leftType.elementType)),
-                    )
-                }
-            leftType is NullableTypeEmbedding && rightType is NullableTypeEmbedding ->
-                share(left) { sharedLeft ->
-                    share(right) { sharedRight ->
-                        Or(
-                            And(
-                                EqCmp(sharedLeft, NullLit),
-                                EqCmp(sharedRight, NullLit),
-                            ),
-                            And(
-                                And(
-                                    NeCmp(sharedLeft, NullLit),
-                                    NeCmp(sharedRight, NullLit),
-                                ),
-                                EqCmp(sharedLeft.withType(leftType.elementType), sharedRight.withType(leftType.elementType)),
-                            ),
-                        )
-                    }
-                }
-            else -> EqCmp(left, right.withType(leftType))
-        }
+        //TODO: replace with call to left.equals()
+        return EqCmp(left, right)
     }
 
     override fun visitComparisonExpression(
         comparisonExpression: FirComparisonExpression,
         data: StmtConversionContext,
     ): ExpEmbedding {
+        //TODO: replace with call to all non-Int types
         val dispatchReceiver = checkNotNull(comparisonExpression.compareToCall.dispatchReceiver) {
             "found 'compareTo' call with null receiver"
         }
@@ -206,7 +176,7 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext>()
     ): ExpEmbedding {
         val receiver = implicitInvokeCall.dispatchReceiver as? FirPropertyAccessExpression
             ?: throw NotImplementedError("Implicit invoke calls only support a limited range of receivers at the moment.")
-         val receiverSymbol = receiver.calleeReference.toResolvedSymbol<FirBasedSymbol<*>>()!!
+        val receiverSymbol = receiver.calleeReference.toResolvedSymbol<FirBasedSymbol<*>>()!!
         val args = implicitInvokeCall.argumentList.arguments.map(data::convert)
         return when (val exp = data.embedLocalSymbol(receiverSymbol).ignoringMetaNodes()) {
             is LambdaExp -> {
