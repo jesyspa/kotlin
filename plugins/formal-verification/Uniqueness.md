@@ -6,16 +6,16 @@ Let's consider the following Hoare formula:
 
 _{x = true} y := false {x = true}_
 
-If _x_ and _y_ refers to the same
+If _x_ and _y_ refer to the same
 reference (they are aliased) the formula is not valid. \
-Aliasing is not only a problem for formal verification, but also for the programmer resulting in mysterious bugs as
+Aliasing is not only a problem for formal verification, but also results in mysterious bugs for the programmer, as
 variables change their values seemingly on their own.
 
-The set of (object address) values associated with variables during the execution of a method is a context. It is only
+Once again, according to [The Geneva Convention][1], the set of (object address) values associated with variables during the execution of a
+method is a context. It is only
 meaningful to speak of aliasing occurring within some context; if two instance variables refer to a single object, but
 one of them belongs to an object that cannot be reached from anywhere in the system, then the
-aliasing is irrelevant.
-
+aliasing is irrelevant. \
 Within any method, objects may be accessed through paths rooted at any of:
 
 - Self
@@ -25,13 +25,13 @@ Within any method, objects may be accessed through paths rooted at any of:
 - A (global) variable accessible from the method scope
 - A local method variable bounded to any of the above
 
-An object is **aliased** with respect to some context if two or more such paths to it exist.
+An object is **aliased** with respect to some context if two or more such paths to that object exist.
 
 # Aliasing in Kotlin
 
 ## Smart casts
 
-The aliasing issue is evident in Kotlin, as the language does not impose any restrictions on it. In the following
+The aliasing issue is evident in Kotlin, as the language does not impose any restrictions on aliasing. In the following
 example, the compiler is unable to execute a seemingly obvious smart cast from the user's perspective. However, the
 compiler's analysis is accurate, as `x` may be aliased, and another thread could potentially modify the `x.n` field.
 
@@ -86,26 +86,24 @@ the value is read. The destruction preserves the _uniqueness invariant_.
 
 ## Alias Burying and relaxation of uniqueness invariant
 
-Ensuring the _uniqueness invariant_ requires unique variables to be set null every time they are
-read. [Alias burying][2] keeps the uniqueness invariant but only require it to be true when it is needed. So the
-uniqueness invariant is thus not actually true at every point in the program, but the points when it is false are
-‘uninteresting’.
+Ensuring the _uniqueness invariant_ requires unique variables to be set to null every time they are
+read. [Alias burying][2] keeps the uniqueness invariant but only requires it to be true when it is needed.
+
+The uniqueness invariant, therefore, is not actually true at every point in the program. However, the points when it is false are
+‘uninteresting’. That is, a unique variable, once read, is never read again, or it's eventually re-assigned before being read again.
 
 ## Annotations sets
 
-- All fields and return values must be annotated with either `Unique` or `Shared`.
-- Method parameters (including the receiver) must be annotated with one of these annotations:
-  `Unique`, `Borrowed`, `Shared`. \
-  Moreover, a parameter can be both `Unique` and `Shared`.
+- All fields and return values can be annotated as `Unique`. If a field or a return value is not annotated
+  with `Unique`, it is considered to be shared.
+- Method parameters (including the receiver) can be annotated with one or both of these annotations:
+  `Unique`, `Borrowed`. Also in this case, absence of annotations means that the parameter is shared.
 - [Existing literature][4] shows that in systems similar to ours, annotations on
   fields, return values and parameters are enough to infer annotation for local variable declarations.
-
-[//]: # (- It should be possible to infer annotations of variable declarations)
 
 ## Annotations meaning
 
 - `Unique` denotes ownership, the value is only stored at this location.
-- A `Shared` annotation denotes that the variable can be accessed by outside objects, untracked aliases may exist.
 - `Borrowed` method parameter ensures that no further aliases are created by the method.
 
 ## Smart casts and uniqueness
@@ -143,9 +141,7 @@ fun main() {
 ## Checking annotations
 
 [Solving Shape-Analysis Problems in Languages with Destructive Updating][3] is the approach used by the authors
-of [Alias Burying][2] to statically check the correctness of uniqueness annotations. However, the formal verification
-plugin that we are developing is based on separation logic and should also be able to check the correctness of these
-annotations.
+of [Alias Burying][2] to statically check the correctness of uniqueness annotations.
 
 ## Example
 
