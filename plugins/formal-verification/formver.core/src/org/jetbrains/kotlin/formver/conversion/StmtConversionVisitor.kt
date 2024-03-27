@@ -17,7 +17,7 @@ import org.jetbrains.kotlin.fir.types.coneType
 import org.jetbrains.kotlin.fir.types.resolvedType
 import org.jetbrains.kotlin.fir.visitors.FirVisitor
 import org.jetbrains.kotlin.formver.UnsupportedFeatureBehaviour
-import org.jetbrains.kotlin.formver.embeddings.SimpleBooleanTypeEmbedding
+import org.jetbrains.kotlin.formver.embeddings.BooleanTypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.TypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.UnspecifiedFunctionTypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.callables.FullNamedFunctionSignature
@@ -261,8 +261,8 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext>()
         val left = data.convert(binaryLogicExpression.leftOperand)
         val right = data.convert(binaryLogicExpression.rightOperand)
         return when (binaryLogicExpression.kind) {
-            LogicOperationKind.AND -> If(left, right, BooleanLit(false), SimpleBooleanTypeEmbedding)
-            LogicOperationKind.OR -> If(left, BooleanLit(true), right, SimpleBooleanTypeEmbedding)
+            LogicOperationKind.AND -> If(left, right, BooleanLit(false), BooleanTypeEmbedding)
+            LogicOperationKind.OR -> If(left, BooleanLit(true), right, BooleanTypeEmbedding)
         }
     }
 

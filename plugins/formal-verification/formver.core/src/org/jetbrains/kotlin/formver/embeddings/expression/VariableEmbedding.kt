@@ -18,7 +18,7 @@ import org.jetbrains.kotlin.formver.names.AnonymousName
 import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.formver.viper.ast.*
 
-sealed interface VariableEmbedding : PureExpEmbedding, PropertyAccessEmbedding {
+sealed interface VariableEmbedding : PureExpEmbedding, PropertyAccessEmbedding, DefaultToBuiltinExpEmbedding {
     val name: MangledName
     override val type: TypeEmbedding
 

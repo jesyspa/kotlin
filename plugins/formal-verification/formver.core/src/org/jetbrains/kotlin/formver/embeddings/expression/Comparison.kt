@@ -6,8 +6,9 @@
 package org.jetbrains.kotlin.formver.embeddings.expression
 
 import org.jetbrains.kotlin.formver.asPosition
+import org.jetbrains.kotlin.formver.domains.InjectionImageFunction
 import org.jetbrains.kotlin.formver.domains.RuntimeTypeDomain
-import org.jetbrains.kotlin.formver.embeddings.SimpleBooleanTypeEmbedding
+import org.jetbrains.kotlin.formver.embeddings.BooleanTypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.SourceRole
 import org.jetbrains.kotlin.formver.embeddings.asInfo
 import org.jetbrains.kotlin.formver.linearization.LinearizationContext
@@ -15,43 +16,40 @@ import org.jetbrains.kotlin.formver.viper.ast.Exp
 
 sealed interface ComparisonExpression : BinaryDirectResultExpEmbedding {
     override val type
-        get() = SimpleBooleanTypeEmbedding
+        get() = BooleanTypeEmbedding
 }
+sealed interface IntComparisonExpression : OperationBaseExpEmbedding, ComparisonExpression
 
 data class LtCmp(
     override val left: ExpEmbedding,
     override val right: ExpEmbedding,
     override val sourceRole: SourceRole? = null,
-) : ComparisonExpression {
-    override fun toViper(ctx: LinearizationContext) =
-        RuntimeTypeDomain.ltInts(left.toViper(ctx), right.toViper(ctx), pos = ctx.source.asPosition, info = sourceRole.asInfo)
+) : IntComparisonExpression {
+    override val objectsOperation: InjectionImageFunction = RuntimeTypeDomain.ltInts
 }
 
 data class LeCmp(
     override val left: ExpEmbedding,
     override val right: ExpEmbedding,
     override val sourceRole: SourceRole? = null,
-) : ComparisonExpression {
-    override fun toViper(ctx: LinearizationContext) =
-        RuntimeTypeDomain.leInts(left.toViper(ctx), right.toViper(ctx), pos = ctx.source.asPosition, info = sourceRole.asInfo)
+) : IntComparisonExpression {
+    override val objectsOperation: InjectionImageFunction = RuntimeTypeDomain.leInts
 }
 
 data class GtCmp(
     override val left: ExpEmbedding,
     override val right: ExpEmbedding,
     override val sourceRole: SourceRole? = null,
-) : ComparisonExpression {
-    override fun toViper(ctx: LinearizationContext) =
-        RuntimeTypeDomain.gtInts(left.toViper(ctx), right.toViper(ctx), pos = ctx.source.asPosition, info = sourceRole.asInfo)
+) : IntComparisonExpression {
+    override val objectsOperation: InjectionImageFunction = RuntimeTypeDomain.gtInts
 }
 
 data class GeCmp(
     override val left: ExpEmbedding,
     override val right: ExpEmbedding,
     override val sourceRole: SourceRole? = null,
-) : ComparisonExpression {
-    override fun toViper(ctx: LinearizationContext) =
-        RuntimeTypeDomain.geInts(left.toViper(ctx), right.toViper(ctx), pos = ctx.source.asPosition, info = sourceRole.asInfo)
+) : IntComparisonExpression {
+    override val objectsOperation: InjectionImageFunction = RuntimeTypeDomain.geInts
 }
 
 data class EqCmp(

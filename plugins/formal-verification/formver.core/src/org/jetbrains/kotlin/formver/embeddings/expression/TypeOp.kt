@@ -12,13 +12,11 @@ import org.jetbrains.kotlin.formver.embeddings.expression.debug.TreeView
 import org.jetbrains.kotlin.formver.embeddings.expression.debug.debugTreeView
 import org.jetbrains.kotlin.formver.embeddings.expression.debug.withDesignation
 import org.jetbrains.kotlin.formver.linearization.LinearizationContext
-import org.jetbrains.kotlin.formver.linearization.pureToViper
-import org.jetbrains.kotlin.formver.linearization.pureToViperCondition
 import org.jetbrains.kotlin.formver.viper.ast.Stmt
 
 data class Is(override val inner: ExpEmbedding, val comparisonType: TypeEmbedding, override val sourceRole: SourceRole? = null) :
-    UnaryDirectResultExpEmbedding {
-    override val type = SimpleBooleanTypeEmbedding
+    UnaryDirectResultExpEmbedding, DefaultToBuiltinExpEmbedding {
+    override val type = BooleanTypeEmbedding
 
     override fun toViper(ctx: LinearizationContext) =
         RuntimeTypeDomain.boolInjection.toRef(
@@ -39,7 +37,8 @@ data class Is(override val inner: ExpEmbedding, val comparisonType: TypeEmbeddin
  * ExpEmbedding to change the TypeEmbedding of an inner ExpEmbedding.
  * This is needed since most of our invariants require type and hence can be made more precise via Cast.
  */
-data class Cast(override val inner: ExpEmbedding, override val type: TypeEmbedding) : UnaryDirectResultExpEmbedding {
+data class Cast(override val inner: ExpEmbedding, override val type: TypeEmbedding) : UnaryDirectResultExpEmbedding,
+    DefaultToBuiltinExpEmbedding {
     // TODO: Do we want to assert `inner isOf type` here before making a cast itself?
     override fun toViper(ctx: LinearizationContext) = inner.toViper(ctx)
     override fun ignoringCasts(): ExpEmbedding = inner.ignoringCasts()
@@ -91,7 +90,7 @@ abstract class InhaleInvariants(val exp: ExpEmbedding) : StoredResultExpEmbeddin
     override fun toViperStoringIn(result: VariableEmbedding, ctx: LinearizationContext) {
         exp.toViperStoringIn(result, ctx)
         for (invariant in invariants.fillHoles(result)) {
-            ctx.addStatement(Stmt.Inhale(invariant.pureToViperCondition(ctx.source), ctx.source.asPosition))
+            ctx.addStatement(Stmt.Inhale(invariant.toViperBuiltinType(ctx), ctx.source.asPosition))
         }
     }
 

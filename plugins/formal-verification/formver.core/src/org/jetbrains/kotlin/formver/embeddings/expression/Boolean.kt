@@ -6,42 +6,13 @@
 package org.jetbrains.kotlin.formver.embeddings.expression
 
 import org.jetbrains.kotlin.formver.asPosition
-import org.jetbrains.kotlin.formver.domains.InjectionImageFunction
 import org.jetbrains.kotlin.formver.domains.RuntimeTypeDomain
-import org.jetbrains.kotlin.formver.domains.toViperCondition
 import org.jetbrains.kotlin.formver.embeddings.*
 import org.jetbrains.kotlin.formver.linearization.LinearizationContext
-import org.jetbrains.kotlin.formver.viper.ast.BuiltinFunction
-import org.jetbrains.kotlin.formver.viper.ast.*
 
-sealed interface BinaryBooleanExpression : BinaryDirectResultExpEmbedding {
-    override val type: BooleanTypeEmbedding
-        get() = when {
-            left.type is PermissionsContainingBooleanTypeEmbedding -> PermissionsContainingBooleanTypeEmbedding
-            right.type is PermissionsContainingBooleanTypeEmbedding -> PermissionsContainingBooleanTypeEmbedding
-            else -> SimpleBooleanTypeEmbedding
-        }
-
-    val refOp: InjectionImageFunction
-
-    private fun argToViper(arg: ExpEmbedding, ctx: LinearizationContext) = arg.toViper(ctx).run {
-        if (this@BinaryBooleanExpression.type is PermissionsContainingBooleanTypeEmbedding && arg.type is SimpleBooleanTypeEmbedding) {
-            this.toViperCondition()
-        } else {
-            this
-        }
-    }
-
-    override fun toViper(ctx: LinearizationContext): Exp {
-        val leftExp = argToViper(left, ctx)
-        val rightExp = argToViper(right, ctx)
-        val appliedOp = if (type is PermissionsContainingBooleanTypeEmbedding) {
-            refOp.original
-        } else {
-            refOp
-        }
-        return appliedOp(leftExp, rightExp, pos = ctx.source.asPosition, info = sourceRole.asInfo)
-    }
+sealed interface BinaryBooleanExpression : OperationBaseExpEmbedding {
+    override val type
+        get() = BooleanTypeEmbedding
 }
 
 data class And(
@@ -49,7 +20,7 @@ data class And(
     override val right: ExpEmbedding,
     override val sourceRole: SourceRole? = null,
 ) : BinaryBooleanExpression {
-    override val refOp
+    override val objectsOperation
         get() = RuntimeTypeDomain.andBools
 }
 
@@ -58,8 +29,7 @@ data class Or(
     override val right: ExpEmbedding,
     override val sourceRole: SourceRole? = null,
 ) : BinaryBooleanExpression {
-    override val refOp
-        get() = RuntimeTypeDomain.orBools
+    override val objectsOperation = RuntimeTypeDomain.orBools
 }
 
 data class Implies(
@@ -67,15 +37,14 @@ data class Implies(
     override val right: ExpEmbedding,
     override val sourceRole: SourceRole? = null,
 ) : BinaryBooleanExpression {
-    override val refOp
-        get() = RuntimeTypeDomain.impliesBools
+    override val objectsOperation = RuntimeTypeDomain.impliesBools
 }
 
 data class Not(
     override val inner: ExpEmbedding,
     override val sourceRole: SourceRole? = null
 ) : UnaryDirectResultExpEmbedding {
-    override val type = SimpleBooleanTypeEmbedding
+    override val type = BooleanTypeEmbedding
     override fun toViper(ctx: LinearizationContext) =
         RuntimeTypeDomain.notBool(inner.toViper(ctx), pos = ctx.source.asPosition, info = sourceRole.asInfo)
 }

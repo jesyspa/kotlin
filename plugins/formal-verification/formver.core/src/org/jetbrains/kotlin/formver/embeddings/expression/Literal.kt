@@ -22,7 +22,7 @@ data object UnitLit : UnitResultExpEmbedding {
         get() = PlaintextLeaf("Unit")
 }
 
-data class IntLit(val value: Int) : PureExpEmbedding {
+data class IntLit(val value: Int) : PureExpEmbedding, DefaultToBuiltinExpEmbedding {
     override val type = IntTypeEmbedding
     override fun toViper(source: KtSourceElement?): Exp = RuntimeTypeDomain.intInjection.toRef(Exp.IntLit(value, source.asPosition))
 
@@ -33,8 +33,9 @@ data class IntLit(val value: Int) : PureExpEmbedding {
         get() = listOf(PlaintextLeaf(value.toString()))
 }
 
-data class BooleanLit(val value: Boolean, override val sourceRole: SourceRole? = null) : PureExpEmbedding {
-    override val type = SimpleBooleanTypeEmbedding
+data class BooleanLit(val value: Boolean, override val sourceRole: SourceRole? = null) : PureExpEmbedding,
+    DefaultToBuiltinExpEmbedding {
+    override val type = BooleanTypeEmbedding
     override fun toViper(source: KtSourceElement?): Exp =
         RuntimeTypeDomain.boolInjection.toRef(Exp.BoolLit(value, source.asPosition, sourceRole.asInfo))
 

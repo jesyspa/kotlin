@@ -10,7 +10,6 @@ import org.jetbrains.kotlin.formver.asPosition
 import org.jetbrains.kotlin.formver.embeddings.NothingTypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.TypeEmbedding
 import org.jetbrains.kotlin.formver.linearization.LinearizationContext
-import org.jetbrains.kotlin.formver.linearization.pureToViperCondition
 import org.jetbrains.kotlin.formver.viper.ast.Exp
 import org.jetbrains.kotlin.formver.viper.ast.Stmt
 
@@ -19,7 +18,7 @@ import org.jetbrains.kotlin.formver.viper.ast.Stmt
  * We will eventually want to solve this somehow, but there are still open design questions there, so for now this wrapper will
  * do the job.
  */
-data class ExpWrapper(val value: Exp, override val type: TypeEmbedding) : PureExpEmbedding {
+data class ExpWrapper(val value: Exp, override val type: TypeEmbedding) : PureExpEmbedding, DefaultToBuiltinExpEmbedding {
     override fun toViper(source: KtSourceElement?): Exp = value
 }
 
@@ -35,7 +34,7 @@ data object ErrorExp : NoResultExpEmbedding, DefaultDebugTreeViewImplementation 
 
 data class Assert(val exp: ExpEmbedding) : UnitResultExpEmbedding, DefaultDebugTreeViewImplementation {
     override fun toViperSideEffects(ctx: LinearizationContext) {
-        ctx.addStatement(Stmt.Assert(exp.pureToViperCondition(ctx.source), ctx.source.asPosition))
+        ctx.addStatement(Stmt.Assert(exp.toViperBuiltinType(ctx), ctx.source.asPosition))
     }
 
     override val debugAnonymousSubexpressions: List<ExpEmbedding>
@@ -50,7 +49,7 @@ data class Assert(val exp: ExpEmbedding) : UnitResultExpEmbedding, DefaultDebugT
  */
 data class InhaleDirect(val exp: ExpEmbedding) : UnitResultExpEmbedding, DefaultDebugTreeViewImplementation {
     override fun toViperSideEffects(ctx: LinearizationContext) {
-        ctx.addStatement(Stmt.Inhale(exp.pureToViperCondition(ctx.source), ctx.source.asPosition))
+        ctx.addStatement(Stmt.Inhale(exp.toViperBuiltinType(ctx), ctx.source.asPosition))
     }
 
     override val debugAnonymousSubexpressions: List<ExpEmbedding>

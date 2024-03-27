@@ -8,7 +8,7 @@ package org.jetbrains.kotlin.formver.embeddings.callables
 import org.jetbrains.kotlin.KtSourceElement
 import org.jetbrains.kotlin.formver.asPosition
 import org.jetbrains.kotlin.formver.embeddings.expression.*
-import org.jetbrains.kotlin.formver.linearization.pureToViperCondition
+import org.jetbrains.kotlin.formver.linearization.pureToViper
 import org.jetbrains.kotlin.formver.viper.ast.Stmt
 import org.jetbrains.kotlin.formver.viper.ast.Exp
 import org.jetbrains.kotlin.formver.viper.ast.UserMethod
@@ -28,13 +28,13 @@ interface FullNamedFunctionSignature : NamedFunctionSignature {
      * Preconditions of function in form of Viper `Exp`s of type `Bool`.
      */
     fun getViperPreconditions(returnVariable: VariableEmbedding): List<Exp> =
-        getEmbeddingPreconditions(returnVariable).pureToViperCondition()
+        getEmbeddingPreconditions(returnVariable).pureToViper(toBuiltin = true)
 
     /**
      * Postconditions of function in form of Viper `Exp`s of type `Bool`.
      */
     fun getViperPostconditions(returnVariable: VariableEmbedding): List<Exp> =
-        getEmbeddingPostconditions(returnVariable).pureToViperCondition()
+        getEmbeddingPostconditions(returnVariable).pureToViper(toBuiltin = true)
 
     val declarationSource: KtSourceElement?
 }

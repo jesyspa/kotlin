@@ -12,7 +12,6 @@ import org.jetbrains.kotlin.formver.embeddings.callables.CallableSignatureData
 import org.jetbrains.kotlin.formver.embeddings.callables.FieldAccessFunction
 import org.jetbrains.kotlin.formver.embeddings.expression.*
 import org.jetbrains.kotlin.formver.linearization.pureToViper
-import org.jetbrains.kotlin.formver.linearization.pureToViperCondition
 import org.jetbrains.kotlin.formver.names.*
 import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.formver.viper.ast.Exp
@@ -158,20 +157,15 @@ data object IntTypeEmbedding : TypeEmbedding {
     }
 }
 
-sealed class BooleanTypeEmbedding : TypeEmbedding {
+
+data object BooleanTypeEmbedding : TypeEmbedding {
+    override val runtimeType = RuntimeTypeDomain.boolType()
     override val name = object : MangledName {
         override val mangled: String = "T_Boolean"
     }
 }
 
-data object SimpleBooleanTypeEmbedding : BooleanTypeEmbedding() {
-    override val runtimeType = RuntimeTypeDomain.boolType()
-}
 
-data object PermissionsContainingBooleanTypeEmbedding : BooleanTypeEmbedding() {
-    override val runtimeType: Exp
-        get() = error("Embeddings containing permissions are not representable in runtime type system.")
-}
 
 data class NullableTypeEmbedding(val elementType: TypeEmbedding) : TypeEmbedding {
     override val runtimeType = RuntimeTypeDomain.nullable(elementType.runtimeType)
@@ -267,7 +261,7 @@ data class ClassTypeEmbedding(val className: ScopedKotlinName) : TypeEmbedding {
             .map { PredicateAccessTypeInvariantEmbedding(it.name).fillHole(subjectEmbedding) }
 
         val body = (accessFields + accessFieldPredicates + accessSuperTypesPredicates).toConjunction()
-        return Predicate(name, listOf(subjectEmbedding.toLocalVarDecl()), body.pureToViperCondition())
+        return Predicate(name, listOf(subjectEmbedding.toLocalVarDecl()), body.pureToViper(toBuiltin = true))
     }
 
     // Note: This is a preparation for upcoming pull requests, functions for predicates unfolding are just declared and not used.
@@ -275,7 +269,7 @@ data class ClassTypeEmbedding(val className: ScopedKotlinName) : TypeEmbedding {
         val receiver = PlaceholderVariableEmbedding(GetterFunctionSubjectName, this)
         val getPropertyFunctions = fields.values
             .filter { field -> field.accessPolicy != AccessPolicy.ALWAYS_INHALE_EXHALE }
-            .map { field -> FieldAccessFunction(name, field, FieldAccess(receiver, field).pureToViper()) }
+            .map { field -> FieldAccessFunction(name, field, FieldAccess(receiver, field).pureToViper(toBuiltin = false)) }
         val getSuperPropertyFunctions = classSuperTypes.flatMap {
             it.flatMapUniqueFields { _, field ->
                 if (field.accessPolicy != AccessPolicy.ALWAYS_INHALE_EXHALE) {

@@ -130,7 +130,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         type is ConeTypeParameterType -> NullableTypeEmbedding(AnyTypeEmbedding)
         type.isUnit -> UnitTypeEmbedding
         type.isInt -> IntTypeEmbedding
-        type.isBoolean -> SimpleBooleanTypeEmbedding
+        type.isBoolean -> BooleanTypeEmbedding
         type.isNothing -> NothingTypeEmbedding
         type.isSomeFunctionType(session) -> {
             val receiverType: TypeEmbedding? = type.receiverType(session)?.let { embedType(it) }
