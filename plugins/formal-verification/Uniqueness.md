@@ -300,15 +300,14 @@ collections may look something like the following:
 myList.map { ... }.filter { ... }
 ```
 
-Both `map` and `filter` will create a new list to store the
-(intermediate) results.
-For the result of `map` in particular, we know that the list
-will only be used once, and so `filter` could operate
-in-place.
-
-By providing overloads on these functions that operate on
-unique and non-unique lists, we can reuse the list when
-we know that it cannot be observed later in the code.
+The existing implementations of `map` and `filter` will
+create a new list to store the results.
+However, if the passed-in list is unique then this is
+unnecessary: the list can be modified in place instead.
+By providing uniqueness annotations and allowing functions
+to be overloaded based on uniqueness, we could define
+variants of these standard library functions that reuse the
+list, thereby improving performance.
 
 ## Connection to Valhalla and immutability
 
