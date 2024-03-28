@@ -310,9 +310,30 @@ By providing overloads on these functions that operate on
 unique and non-unique lists, we can reuse the list when
 we know that it cannot be observed later in the code.
 
+## Connection to Valhalla and immutability
+
+One related development in the Java world is [Project
+Valhalla][7], which will bring value types to the JVM.
+These are types that do not support object identify: the
+user is not given any guarantees on whether two references
+refer to the same object, or to two separate objects with
+the same values.
+Value objects are also required to only have immutable
+members.
+
+Due to this immutability, marking a value object as unique
+does not have any immediate impact in the system we have
+described now: all information available about the values
+can be known without uniqueness.
+However, if we extend the system to allow uniqueness
+annotations on member properties, there may be interactions
+between the two systems.
+
+
 [1]: https://dl.acm.org/doi/pdf/10.1145/130943.130947
 [2]: https://onlinelibrary.wiley.com/doi/abs/10.1002/spe.370
 [3]: https://dl.acm.org/doi/pdf/10.1145/271510.271517
 [4]: https://arxiv.org/pdf/2309.05637.pdf
 [5]: https://dl.acm.org/doi/10.5555/2554511
 [6]: https://kotlinlang.org/spec/type-inference.html#smart-cast-sink-stability
+[7]: https://openjdk.org/projects/valhalla/
