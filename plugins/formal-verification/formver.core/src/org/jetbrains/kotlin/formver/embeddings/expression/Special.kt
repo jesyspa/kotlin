@@ -25,7 +25,7 @@ data class ExpWrapper(val value: Exp, override val type: TypeEmbedding) : PureEx
 data object ErrorExp : NoResultExpEmbedding, DefaultDebugTreeViewImplementation {
     override val type: TypeEmbedding = NothingTypeEmbedding
     override fun toViperUnusedResult(ctx: LinearizationContext) {
-        ctx.addStatement(Stmt.Inhale(Exp.BoolLit(false), ctx.source.asPosition))
+        ctx.addStatement(Stmt.Inhale(Exp.BoolLit(false, ctx.source.asPosition), ctx.source.asPosition))
     }
 
     override val debugAnonymousSubexpressions: List<ExpEmbedding>

@@ -24,7 +24,12 @@ data object UnitLit : UnitResultExpEmbedding {
 
 data class IntLit(val value: Int) : PureExpEmbedding, DefaultToBuiltinExpEmbedding {
     override val type = IntTypeEmbedding
-    override fun toViper(source: KtSourceElement?): Exp = RuntimeTypeDomain.intInjection.toRef(Exp.IntLit(value, source.asPosition))
+    override fun toViper(source: KtSourceElement?): Exp =
+        RuntimeTypeDomain.intInjection.toRef(
+            Exp.IntLit(value, source.asPosition, sourceRole.asInfo),
+            pos = source.asPosition,
+            info = sourceRole.asInfo
+        )
 
     override val debugName: String
         get() = "Int"
@@ -37,7 +42,11 @@ data class BooleanLit(val value: Boolean, override val sourceRole: SourceRole? =
     DefaultToBuiltinExpEmbedding {
     override val type = BooleanTypeEmbedding
     override fun toViper(source: KtSourceElement?): Exp =
-        RuntimeTypeDomain.boolInjection.toRef(Exp.BoolLit(value, source.asPosition, sourceRole.asInfo))
+        RuntimeTypeDomain.boolInjection.toRef(
+            Exp.BoolLit(value, source.asPosition, sourceRole.asInfo),
+            pos = source.asPosition,
+            info = sourceRole.asInfo
+        )
 
     override val debugName: String
         get() = "Boolean"

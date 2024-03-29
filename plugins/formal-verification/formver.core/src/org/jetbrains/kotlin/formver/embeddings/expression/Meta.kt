@@ -6,6 +6,7 @@
 package org.jetbrains.kotlin.formver.embeddings.expression
 
 import org.jetbrains.kotlin.KtSourceElement
+import org.jetbrains.kotlin.formver.asPosition
 import org.jetbrains.kotlin.formver.embeddings.TypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.expression.debug.NamedBranchingNode
 import org.jetbrains.kotlin.formver.embeddings.expression.debug.PlaintextLeaf
@@ -91,11 +92,11 @@ data class Shared(val inner: ExpEmbedding) : StoredResultExpEmbedding, DefaultTo
     override fun toViper(ctx: LinearizationContext): Exp = context.tryInitShared { inner.toViper(ctx) }
 
     override fun toViperStoringIn(result: VariableEmbedding, ctx: LinearizationContext) {
-        context.tryInitShared { inner.toViperStoringIn(result, ctx); result.toLocalVarUse() }
+        context.tryInitShared { inner.toViperStoringIn(result, ctx); result.toLocalVarUse(ctx.source.asPosition) }
     }
 
     override fun toViperUnusedResult(ctx: LinearizationContext) {
-        context.tryInitShared { inner.toViperUnusedResult(ctx); UnitLit.pureToViper(toBuiltin = false) }
+        context.tryInitShared { inner.toViperUnusedResult(ctx); UnitLit.pureToViper(toBuiltin = false, ctx.source) }
     }
 
     override fun ignoringMetaNodes() = inner

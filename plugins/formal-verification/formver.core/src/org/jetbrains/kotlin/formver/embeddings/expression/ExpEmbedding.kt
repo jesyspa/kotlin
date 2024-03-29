@@ -244,7 +244,7 @@ sealed interface NoResultExpEmbedding : DefaultMaybeStoringInExpEmbedding, Defau
 
     override fun toViper(ctx: LinearizationContext): Exp {
         toViperUnusedResult(ctx)
-        return RuntimeTypeDomain.unitValue()
+        return RuntimeTypeDomain.unitValue(pos = ctx.source.asPosition)
     }
 }
 
@@ -319,7 +319,7 @@ sealed interface UnitResultExpEmbedding : OnlyToViperExpEmbedding {
 
     override fun toViper(ctx: LinearizationContext): Exp {
         toViperSideEffects(ctx)
-        return RuntimeTypeDomain.unitValue()
+        return RuntimeTypeDomain.unitValue(pos = ctx.source.asPosition)
     }
 
     fun toViperSideEffects(ctx: LinearizationContext)

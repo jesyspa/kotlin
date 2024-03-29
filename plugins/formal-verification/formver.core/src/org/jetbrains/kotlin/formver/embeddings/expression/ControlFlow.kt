@@ -6,10 +6,7 @@
 package org.jetbrains.kotlin.formver.embeddings.expression
 
 import org.jetbrains.kotlin.formver.asPosition
-import org.jetbrains.kotlin.formver.embeddings.BooleanTypeEmbedding
-import org.jetbrains.kotlin.formver.embeddings.NothingTypeEmbedding
-import org.jetbrains.kotlin.formver.embeddings.TypeEmbedding
-import org.jetbrains.kotlin.formver.embeddings.UnitTypeEmbedding
+import org.jetbrains.kotlin.formver.embeddings.*
 import org.jetbrains.kotlin.formver.embeddings.callables.FullNamedFunctionSignature
 import org.jetbrains.kotlin.formver.embeddings.callables.InvokeFunctionObjectMethod
 import org.jetbrains.kotlin.formver.embeddings.callables.NamedFunctionSignature
@@ -185,7 +182,8 @@ data class InvokeFunctionObject(val receiver: ExpEmbedding, val args: List<ExpEm
             InvokeFunctionObjectMethod.toMethodCall(
                 listOf(receiverViper),
                 listOf(),
-                ctx.source.asPosition
+                ctx.source.asPosition,
+                sourceRole.asInfo
             )
         )
         // TODO: figure out which exactly invariants we want here
@@ -211,7 +209,7 @@ data class FunctionExp(val signature: FullNamedFunctionSignature?, val body: Exp
             // Unfortunately Silicon for some reason does not allow Assumes. However, it doesn't matter as long as the
             // provenInvariants don't contain permissions.
             arg.provenInvariants().forEach { invariant ->
-                ctx.addStatement(Stmt.Inhale(invariant.toViperBuiltinType(ctx), ctx.source.asPosition))
+                ctx.addStatement(Stmt.Inhale(invariant.toViperBuiltinType(ctx), ctx.source.asPosition, sourceRole.asInfo))
             }
         }
         body.toViperMaybeStoringIn(result, ctx)
