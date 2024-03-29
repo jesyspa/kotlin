@@ -89,6 +89,8 @@ sealed interface DefaultToBuiltinExpEmbedding : ExpEmbedding {
             is IntTypeEmbedding -> RuntimeTypeDomain.intInjection
             else -> return exp
         }
+        // optimisation here is widely used, in such `ExpEmbedding`s like `Is`
+        // (which is very common when inhaling)
         return if (exp is Exp.DomainFuncApp && exp.function == injection.toRef)
             exp.args[0]
         else injection.fromRef(exp)

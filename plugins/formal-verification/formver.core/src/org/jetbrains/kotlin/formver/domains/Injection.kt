@@ -47,6 +47,10 @@ class Injection(
 /**
  * Viper function that operates on the images of an injection.
  *
+ * For example, if `original` Viper function operates on `Int` and returns `Bool`,
+ * then resulting `InjectionImageFunction` will take `Ref` of type `intType()` as an argument
+ * and return `Ref` of type `boolType()`.
+ *
  * @param argsInjections injections that must be applied to the arguments of the operation
  * @param resultInjection injection that must be applied to the result of the operation
  * @param checkDivisor adds precondition that divisor (second argument) is not zero
