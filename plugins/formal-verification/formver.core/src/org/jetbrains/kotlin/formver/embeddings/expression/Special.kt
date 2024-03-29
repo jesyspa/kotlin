@@ -18,7 +18,7 @@ import org.jetbrains.kotlin.formver.viper.ast.Stmt
  * We will eventually want to solve this somehow, but there are still open design questions there, so for now this wrapper will
  * do the job.
  */
-data class ExpWrapper(val value: Exp, override val type: TypeEmbedding) : PureExpEmbedding, DefaultToBuiltinExpEmbedding {
+data class ExpWrapper(val value: Exp, override val type: TypeEmbedding) : PureExpEmbedding {
     override fun toViper(source: KtSourceElement?): Exp = value
 }
 

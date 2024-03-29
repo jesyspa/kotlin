@@ -9,6 +9,7 @@ import org.jetbrains.kotlin.formver.asPosition
 import org.jetbrains.kotlin.formver.domains.RuntimeTypeDomain
 import org.jetbrains.kotlin.formver.embeddings.*
 import org.jetbrains.kotlin.formver.linearization.LinearizationContext
+import org.jetbrains.kotlin.formver.viper.ast.Exp
 
 sealed interface BinaryBooleanExpression : OperationBaseExpEmbedding {
     override val type
@@ -47,6 +48,9 @@ data class Not(
     override val type = BooleanTypeEmbedding
     override fun toViper(ctx: LinearizationContext) =
         RuntimeTypeDomain.notBool(inner.toViper(ctx), pos = ctx.source.asPosition, info = sourceRole.asInfo)
+
+    override fun toViperBuiltinType(ctx: LinearizationContext): Exp =
+        Exp.Not(inner.toViperBuiltinType(ctx), pos = ctx.source.asPosition, info = sourceRole.asInfo)
 }
 
 fun List<ExpEmbedding>.toConjunction(): ExpEmbedding =

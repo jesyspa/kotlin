@@ -409,8 +409,3 @@ class RuntimeTypeDomain(classes: List<ClassTypeEmbedding>) : BuiltinDomain(RUNTI
         }
     }
 }
-
-fun Exp.toViperCondition(): Exp =
-    if (this is Exp.DomainFuncApp && function == RuntimeTypeDomain.boolInjection.toRef)
-        args[0]
-    else RuntimeTypeDomain.boolInjection.fromRef(this)

@@ -283,6 +283,10 @@ sealed interface PassthroughExpEmbedding : ExpEmbedding {
 
     override fun toViper(ctx: LinearizationContext): Exp = withPassthroughHook(ctx) { inner.toViper(this) }
 
+    override fun toViperBuiltinType(ctx: LinearizationContext): Exp = withPassthroughHook(ctx) {
+        inner.toViperBuiltinType(ctx)
+    }
+
     override fun toViperStoringIn(result: VariableEmbedding, ctx: LinearizationContext) {
         withPassthroughHook(ctx) {
             inner.toViperStoringIn(result, this)

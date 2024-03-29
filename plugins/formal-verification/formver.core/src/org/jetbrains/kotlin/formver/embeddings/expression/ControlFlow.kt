@@ -6,7 +6,6 @@
 package org.jetbrains.kotlin.formver.embeddings.expression
 
 import org.jetbrains.kotlin.formver.asPosition
-import org.jetbrains.kotlin.formver.domains.toViperCondition
 import org.jetbrains.kotlin.formver.embeddings.BooleanTypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.NothingTypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.TypeEmbedding
@@ -139,7 +138,7 @@ data class NonDeterministically(val exp: ExpEmbedding) : UnitResultExpEmbedding,
     override fun toViperSideEffects(ctx: LinearizationContext) {
         val choice = ctx.freshAnonVar(BooleanTypeEmbedding)
         val expViper = ctx.asBlock { exp.toViper(this) }
-        ctx.addStatement(Stmt.If(choice.toViper(ctx).toViperCondition(), expViper, Stmt.Seqn(), ctx.source.asPosition))
+        ctx.addStatement(Stmt.If(choice.toViperBuiltinType(ctx), expViper, Stmt.Seqn(), ctx.source.asPosition))
     }
 
     override val debugAnonymousSubexpressions: List<ExpEmbedding>

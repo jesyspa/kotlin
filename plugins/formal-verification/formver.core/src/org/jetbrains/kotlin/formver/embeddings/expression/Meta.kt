@@ -15,8 +15,7 @@ import org.jetbrains.kotlin.formver.linearization.LinearizationContext
 import org.jetbrains.kotlin.formver.linearization.pureToViper
 import org.jetbrains.kotlin.formver.viper.ast.Exp
 
-data class WithPosition(override val inner: ExpEmbedding, val source: KtSourceElement) : PassthroughExpEmbedding,
-    DefaultToBuiltinExpEmbedding {
+data class WithPosition(override val inner: ExpEmbedding, val source: KtSourceElement) : PassthroughExpEmbedding {
     override fun <R> withPassthroughHook(ctx: LinearizationContext, action: LinearizationContext.() -> R): R =
         ctx.withPosition(source, action)
 
@@ -49,8 +48,7 @@ fun ExpEmbedding.withPosition(source: KtSourceElement?): ExpEmbedding =
  *
  * This class should be used via the `share` function below. Do not do anything funny, or it will not work.
  */
-data class SharingContext(override val inner: ExpEmbedding) : PassthroughExpEmbedding,
-    DefaultToBuiltinExpEmbedding {
+data class SharingContext(override val inner: ExpEmbedding) : PassthroughExpEmbedding {
     var sharedExp: Exp? = null
 
     override fun <R> withPassthroughHook(ctx: LinearizationContext, action: LinearizationContext.() -> R): R =

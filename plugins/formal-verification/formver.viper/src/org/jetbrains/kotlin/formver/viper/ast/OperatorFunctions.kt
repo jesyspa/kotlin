@@ -106,7 +106,7 @@ data object EqAny : OperatorFunction {
 data object NeAny : OperatorFunction {
     override fun toFuncApp(args: List<Exp>, pos: Position, info: Info, trafos: Trafos): Exp {
         check(args.size == 2)
-        return Exp.EqCmp(args[0], args[1], pos, info, trafos)
+        return Exp.NeCmp(args[0], args[1], pos, info, trafos)
     }
 }
 
