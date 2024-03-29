@@ -96,3 +96,17 @@ data object LtInts : OperatorFunction {
     }
 }
 
+data object EqAny : OperatorFunction {
+    override fun toFuncApp(args: List<Exp>, pos: Position, info: Info, trafos: Trafos): Exp {
+        check(args.size == 2)
+        return Exp.EqCmp(args[0], args[1], pos, info, trafos)
+    }
+}
+
+data object NeAny : OperatorFunction {
+    override fun toFuncApp(args: List<Exp>, pos: Position, info: Info, trafos: Trafos): Exp {
+        check(args.size == 2)
+        return Exp.EqCmp(args[0], args[1], pos, info, trafos)
+    }
+}
+

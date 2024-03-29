@@ -7,7 +7,7 @@ package org.jetbrains.kotlin.formver.viper.ast
 
 import org.jetbrains.kotlin.formver.viper.*
 
-interface Function: IntoSilver<viper.silver.ast.Function> {
+interface Function : IntoSilver<viper.silver.ast.Function> {
     val name: MangledName
     val pos: Position
         get() = Position.NoPosition
@@ -56,6 +56,7 @@ abstract class BuiltinFunction(
 }
 
 class OperatorFunctionMemberAccessError(message: String) : RuntimeException(message)
+
 fun fakeFunctionError(message: String): Nothing = throw OperatorFunctionMemberAccessError(message)
 
 /**
@@ -66,7 +67,7 @@ interface OperatorFunction : Function {
         get() = fakeFunctionError("Names of fake functions should not be accessed.")
 
     override val includeInDumpPolicy: IncludeInDumpPolicy
-        get() = fakeFunctionError("Fake functions shouldn't be considered for inclusion in viper dumps.")
+        get() = fakeFunctionError("Fake functions shouldn't be considered for inclusion in Viper dumps.")
 
     override val formalArgs: List<Declaration.LocalVarDecl>
         get() = fakeFunctionError("Formal args of fake functions should not be accessed.")
