@@ -64,7 +64,7 @@ data class SafeCast(val exp: ExpEmbedding, val targetType: TypeEmbedding) : Stor
     override fun toViperStoringIn(result: VariableEmbedding, ctx: LinearizationContext) {
         val expViper = exp.toViper(ctx)
         val expWrapped = ExpWrapper(expViper, exp.type)
-        val conditional = If(expWrapped.notNullCmp(), expWrapped, NullLit, type)
+        val conditional = If(Is(expWrapped, targetType), Cast(expWrapped, targetType), NullLit, type)
         conditional.toViperStoringIn(result, ctx)
     }
 
