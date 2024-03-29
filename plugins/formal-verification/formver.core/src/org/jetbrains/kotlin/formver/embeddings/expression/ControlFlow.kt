@@ -127,7 +127,7 @@ data class GotoChainNode(val label: Label?, val exp: ExpEmbedding, val next: Lab
     override fun toViperMaybeStoringIn(result: VariableEmbedding?, ctx: LinearizationContext) {
         label?.let { ctx.addLabel(it) }
         exp.toViperMaybeStoringIn(result, ctx)
-        ctx.addStatement(next.toGoto())
+        ctx.addStatement(next.toGoto(ctx.source.asPosition))
     }
 
     override val debugTreeView: TreeView

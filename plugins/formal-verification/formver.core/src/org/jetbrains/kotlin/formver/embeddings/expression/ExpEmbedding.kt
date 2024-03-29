@@ -93,7 +93,7 @@ sealed interface DefaultToBuiltinExpEmbedding : ExpEmbedding {
         // (which is very common when inhaling)
         return if (exp is Exp.DomainFuncApp && exp.function == injection.toRef)
             exp.args[0]
-        else injection.fromRef(exp)
+        else injection.fromRef(exp, pos = ctx.source.asPosition, info = sourceRole.asInfo)
     }
 }
 
@@ -361,7 +361,7 @@ data class FieldAccess(val receiver: ExpEmbedding, val field: FieldEmbedding) : 
     override fun toViperStoringIn(result: VariableEmbedding, ctx: LinearizationContext) {
         val receiverViper = receiver.toViper(ctx)
         val fieldAccess = PrimitiveFieldAccess(ExpWrapper(receiverViper, receiver.type), field)
-        val invariant = accessInvariant?.fillHole(ExpWrapper(receiverViper, receiver.type))?.toViperBuiltinType(ctx)
+        val invariant = accessInvariant?.fillHole(ExpWrapper(receiverViper, receiver.type))?.pureToViper(toBuiltin = true, ctx.source)
         invariant?.let { ctx.addStatement(Stmt.Inhale(it, ctx.source.asPosition)) }
         ctx.addStatement(Stmt.assign(result.toViper(ctx), fieldAccess.pureToViper(toBuiltin = false, ctx.source), ctx.source.asPosition))
         invariant?.let { ctx.addStatement(Stmt.Exhale(it, ctx.source.asPosition)) }
@@ -382,7 +382,8 @@ data class FieldModification(val receiver: ExpEmbedding, val field: FieldEmbeddi
     override fun toViperSideEffects(ctx: LinearizationContext) {
         val receiverViper = receiver.toViper(ctx)
         val newValueViper = newValue.withType(field.type).toViper(ctx)
-        val invariant = field.accessInvariantForAccess()?.fillHole(ExpWrapper(receiverViper, receiver.type))?.toViperBuiltinType(ctx)
+        val invariant =
+            field.accessInvariantForAccess()?.fillHole(ExpWrapper(receiverViper, receiver.type))?.pureToViper(toBuiltin = true, ctx.source)
         invariant?.let { ctx.addStatement(Stmt.Inhale(it, ctx.source.asPosition)) }
         ctx.addStatement(Stmt.FieldAssign(Exp.FieldAccess(receiverViper, field.toViper()), newValueViper, ctx.source.asPosition))
         invariant?.let { ctx.addStatement(Stmt.Exhale(it, ctx.source.asPosition)) }
