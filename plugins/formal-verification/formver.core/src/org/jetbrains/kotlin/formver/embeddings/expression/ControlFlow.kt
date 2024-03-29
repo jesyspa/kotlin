@@ -189,7 +189,7 @@ data class InvokeFunctionObject(val receiver: ExpEmbedding, val args: List<ExpEm
             )
         )
         // TODO: figure out which exactly invariants we want here
-        return variable.withProvenInvariants().toViper(ctx)
+        return variable.withAccessAndProvenInvariants().toViper(ctx)
     }
 
     override val debugTreeView: TreeView
