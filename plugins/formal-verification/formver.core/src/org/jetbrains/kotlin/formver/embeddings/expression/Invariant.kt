@@ -10,7 +10,7 @@ import org.jetbrains.kotlin.formver.embeddings.BooleanTypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.SourceRole
 import org.jetbrains.kotlin.formver.embeddings.TypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.asInfo
-import org.jetbrains.kotlin.formver.embeddings.callables.DuplicableFunction
+import org.jetbrains.kotlin.formver.embeddings.callables.SpecialFunctions
 import org.jetbrains.kotlin.formver.linearization.LinearizationContext
 import org.jetbrains.kotlin.formver.viper.ast.Exp
 
@@ -21,7 +21,13 @@ data class Old(override val inner: ExpEmbedding) : UnaryDirectResultExpEmbedding
 
 data class DuplicableCall(override val inner: ExpEmbedding) : UnaryDirectResultExpEmbedding {
     override val type: TypeEmbedding = BooleanTypeEmbedding
+
+    override val sourceRole = SourceRole.ParamFunctionLeakageCheck(
+        inner.ignoringCastsAndMetaNodes().sourceRole as? SourceRole.FirSymbolHolder
+            ?: error("Parameter of a duplicable function must be a fir symbol.")
+    )
+
     override fun toViper(ctx: LinearizationContext): Exp =
-        DuplicableFunction(inner.toViper(ctx), pos = ctx.source.asPosition, info = SourceRole.ParamFunctionLeakageCheck.asInfo)
+        SpecialFunctions.duplicableFunction(inner.toViper(ctx), pos = ctx.source.asPosition, info = sourceRole.asInfo)
 }
 

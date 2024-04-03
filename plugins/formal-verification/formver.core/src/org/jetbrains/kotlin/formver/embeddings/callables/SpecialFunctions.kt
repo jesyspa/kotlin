@@ -5,16 +5,13 @@
 
 package org.jetbrains.kotlin.formver.embeddings.callables
 
+import org.jetbrains.kotlin.formver.domains.FunctionBuilder
 import org.jetbrains.kotlin.formver.domains.RuntimeTypeDomain
 import org.jetbrains.kotlin.formver.domains.RuntimeTypeDomain.Companion.boolType
 import org.jetbrains.kotlin.formver.domains.RuntimeTypeDomain.Companion.isOf
-
 import org.jetbrains.kotlin.formver.embeddings.FieldEmbedding
-import org.jetbrains.kotlin.formver.embeddings.LegacyUnspecifiedFunctionTypeEmbedding
-import org.jetbrains.kotlin.formver.embeddings.expression.AnonymousVariableEmbedding
 import org.jetbrains.kotlin.formver.names.GetterFunctionName
 import org.jetbrains.kotlin.formver.names.GetterFunctionSubjectName
-import org.jetbrains.kotlin.formver.names.SpecialName
 import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.formver.viper.ast.*
 import org.jetbrains.kotlin.formver.viper.ast.Function
@@ -51,15 +48,12 @@ class FieldAccessFunction(
     override val body: Exp = Exp.Unfolding(subjectAccess, unfoldingBody)
 }
 
-object DuplicableFunction : BuiltinFunction(SpecialName("duplicable")) {
-    private val thisArg = AnonymousVariableEmbedding(0, LegacyUnspecifiedFunctionTypeEmbedding)
-
-    override val formalArgs: List<Declaration.LocalVarDecl> = listOf(thisArg.toLocalVarDecl())
-    override val retType: Type = Type.Ref
-    override val posts: List<Exp>
-        get() = listOf(Exp.Result(retType) isOf boolType())
-}
-
 object SpecialFunctions {
-    val all = listOf(DuplicableFunction) + RuntimeTypeDomain.accompanyingFunctions
+    val duplicableFunction = FunctionBuilder.build("duplicable") {
+        argument(Type.Ref)
+        postcondition {
+            returns(Type.Ref) isOf boolType()
+        }
+    }
+    val all = listOf(duplicableFunction) + RuntimeTypeDomain.accompanyingFunctions
 }
