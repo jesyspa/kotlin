@@ -92,11 +92,11 @@ data class Shared(val inner: ExpEmbedding) : StoredResultExpEmbedding, DefaultTo
     override fun toViper(ctx: LinearizationContext): Exp = context.tryInitShared { inner.toViper(ctx) }
 
     override fun toViperStoringIn(result: VariableEmbedding, ctx: LinearizationContext) {
-        context.tryInitShared { inner.toViperStoringIn(result, ctx); result.toLocalVarUse(ctx.source.asPosition) }
+        context.tryInitShared { inner.toViperStoringIn(result, ctx); result.toLocalVarUse() }
     }
 
     override fun toViperUnusedResult(ctx: LinearizationContext) {
-        context.tryInitShared { inner.toViperUnusedResult(ctx); UnitLit.pureToViper(toBuiltin = false, ctx.source) }
+        context.tryInitShared { inner.toViperUnusedResult(ctx); UnitLit.pureToViper(toBuiltin = false) }
     }
 
     override fun ignoringMetaNodes() = inner

@@ -12,6 +12,7 @@ import org.jetbrains.kotlin.formver.embeddings.expression.debug.TreeView
 import org.jetbrains.kotlin.formver.embeddings.expression.debug.debugTreeView
 import org.jetbrains.kotlin.formver.embeddings.expression.debug.withDesignation
 import org.jetbrains.kotlin.formver.linearization.LinearizationContext
+import org.jetbrains.kotlin.formver.linearization.pureToViper
 import org.jetbrains.kotlin.formver.viper.ast.Stmt
 
 data class Is(override val inner: ExpEmbedding, val comparisonType: TypeEmbedding, override val sourceRole: SourceRole? = null) :
@@ -21,11 +22,13 @@ data class Is(override val inner: ExpEmbedding, val comparisonType: TypeEmbeddin
     override fun toViper(ctx: LinearizationContext) =
         RuntimeTypeDomain.boolInjection.toRef(
             RuntimeTypeDomain.isSubtype(
-                RuntimeTypeDomain.typeOf(inner.toViper(ctx)),
+                RuntimeTypeDomain.typeOf(inner.toViper(ctx), pos = ctx.source.asPosition),
                 comparisonType.runtimeType,
                 pos = ctx.source.asPosition,
                 info = sourceRole.asInfo
-            )
+            ),
+            pos = ctx.source.asPosition,
+            info = sourceRole.asInfo
         )
 
     override val debugExtraSubtrees: List<TreeView>
@@ -64,7 +67,7 @@ data class SafeCast(val exp: ExpEmbedding, val targetType: TypeEmbedding) : Stor
     override fun toViperStoringIn(result: VariableEmbedding, ctx: LinearizationContext) {
         val expViper = exp.toViper(ctx)
         val expWrapped = ExpWrapper(expViper, exp.type)
-        val conditional = If(Is(expWrapped, targetType), Cast(expWrapped, targetType), NullLit, type)
+        val conditional = If(Is(expWrapped, targetType), expWrapped, NullLit, type)
         conditional.toViperStoringIn(result, ctx)
     }
 
@@ -90,7 +93,7 @@ abstract class InhaleInvariants(val exp: ExpEmbedding) : StoredResultExpEmbeddin
     override fun toViperStoringIn(result: VariableEmbedding, ctx: LinearizationContext) {
         exp.toViperStoringIn(result, ctx)
         for (invariant in invariants.fillHoles(result)) {
-            ctx.addStatement(Stmt.Inhale(invariant.toViperBuiltinType(ctx), ctx.source.asPosition))
+            ctx.addStatement(Stmt.Inhale(invariant.pureToViper(toBuiltin = true, ctx.source), ctx.source.asPosition))
         }
     }
 

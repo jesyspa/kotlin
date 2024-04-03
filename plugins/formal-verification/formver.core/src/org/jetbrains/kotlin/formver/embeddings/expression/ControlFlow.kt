@@ -182,8 +182,7 @@ data class InvokeFunctionObject(val receiver: ExpEmbedding, val args: List<ExpEm
             InvokeFunctionObjectMethod.toMethodCall(
                 listOf(receiverViper),
                 listOf(),
-                ctx.source.asPosition,
-                sourceRole.asInfo
+                ctx.source.asPosition
             )
         )
         // TODO: figure out which exactly invariants we want here
@@ -209,7 +208,7 @@ data class FunctionExp(val signature: FullNamedFunctionSignature?, val body: Exp
             // Unfortunately Silicon for some reason does not allow Assumes. However, it doesn't matter as long as the
             // provenInvariants don't contain permissions.
             arg.provenInvariants().forEach { invariant ->
-                ctx.addStatement(Stmt.Inhale(invariant.toViperBuiltinType(ctx), ctx.source.asPosition, sourceRole.asInfo))
+                ctx.addStatement(Stmt.Inhale(invariant.toViperBuiltinType(ctx), ctx.source.asPosition))
             }
         }
         body.toViperMaybeStoringIn(result, ctx)
