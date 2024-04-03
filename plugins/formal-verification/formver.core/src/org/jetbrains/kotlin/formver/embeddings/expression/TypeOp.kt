@@ -16,7 +16,7 @@ import org.jetbrains.kotlin.formver.linearization.pureToViper
 import org.jetbrains.kotlin.formver.viper.ast.Stmt
 
 data class Is(override val inner: ExpEmbedding, val comparisonType: TypeEmbedding, override val sourceRole: SourceRole? = null) :
-    UnaryDirectResultExpEmbedding, DefaultToBuiltinExpEmbedding {
+    UnaryDirectResultExpEmbedding {
     override val type = BooleanTypeEmbedding
 
     override fun toViper(ctx: LinearizationContext) =
@@ -40,8 +40,7 @@ data class Is(override val inner: ExpEmbedding, val comparisonType: TypeEmbeddin
  * ExpEmbedding to change the TypeEmbedding of an inner ExpEmbedding.
  * This is needed since most of our invariants require type and hence can be made more precise via Cast.
  */
-data class Cast(override val inner: ExpEmbedding, override val type: TypeEmbedding) : UnaryDirectResultExpEmbedding,
-    DefaultToBuiltinExpEmbedding {
+data class Cast(override val inner: ExpEmbedding, override val type: TypeEmbedding) : UnaryDirectResultExpEmbedding {
     // TODO: Do we want to assert `inner isOf type` here before making a cast itself?
     override fun toViper(ctx: LinearizationContext) = inner.toViper(ctx)
     override fun ignoringCasts(): ExpEmbedding = inner.ignoringCasts()

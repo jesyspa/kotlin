@@ -14,12 +14,12 @@ import org.jetbrains.kotlin.formver.embeddings.callables.DuplicableFunction
 import org.jetbrains.kotlin.formver.linearization.LinearizationContext
 import org.jetbrains.kotlin.formver.viper.ast.Exp
 
-data class Old(override val inner: ExpEmbedding) : UnaryDirectResultExpEmbedding, DefaultToBuiltinExpEmbedding {
+data class Old(override val inner: ExpEmbedding) : UnaryDirectResultExpEmbedding {
     override val type: TypeEmbedding = inner.type
     override fun toViper(ctx: LinearizationContext): Exp = Exp.Old(inner.toViper(ctx), ctx.source.asPosition)
 }
 
-data class DuplicableCall(override val inner: ExpEmbedding) : UnaryDirectResultExpEmbedding, DefaultToBuiltinExpEmbedding {
+data class DuplicableCall(override val inner: ExpEmbedding) : UnaryDirectResultExpEmbedding {
     override val type: TypeEmbedding = BooleanTypeEmbedding
     override fun toViper(ctx: LinearizationContext): Exp =
         DuplicableFunction(inner.toViper(ctx), pos = ctx.source.asPosition, info = SourceRole.ParamFunctionLeakageCheck.asInfo)

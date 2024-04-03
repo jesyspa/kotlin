@@ -22,7 +22,7 @@ class LambdaExp(
     val signature: FunctionSignature,
     val function: FirAnonymousFunction,
     private val parentCtx: MethodConversionContext,
-) : CallableEmbedding, StoredResultExpEmbedding, DefaultToBuiltinExpEmbedding,
+) : CallableEmbedding, StoredResultExpEmbedding,
     FunctionSignature by signature {
     override val type: TypeEmbedding = FunctionTypeEmbedding(signature.asData)
 
