@@ -3,12 +3,11 @@ method global$fun_nested_call$fun_take$fun_take$T_Int$return$T_Int$return$T_Int(
   returns (ret$0: Ref)
   requires acc(local$g.special$function_object_call_counter, write)
   ensures acc(local$g.special$function_object_call_counter, write)
-  ensures dom$RuntimeType$intFromRef(old(local$g.special$function_object_call_counter)) <=
-    dom$RuntimeType$intFromRef(local$g.special$function_object_call_counter)
+  ensures old(local$g.special$function_object_call_counter) <=
+    local$g.special$function_object_call_counter
   ensures dom$RuntimeType$isSubtype(dom$RuntimeType$typeOf(ret$0), dom$RuntimeType$intType())
-  ensures dom$RuntimeType$intFromRef(local$g.special$function_object_call_counter) ==
-    dom$RuntimeType$intFromRef(old(local$g.special$function_object_call_counter)) +
-    1
+  ensures local$g.special$function_object_call_counter ==
+    old(local$g.special$function_object_call_counter) + 1
 {
   var ret$1: Ref
   var ret$2: Ref
@@ -43,12 +42,11 @@ method global$fun_double_call$fun_take$fun_take$T_Int$return$T_Int$return$T_Int(
   returns (ret$0: Ref)
   requires acc(local$g.special$function_object_call_counter, write)
   ensures acc(local$g.special$function_object_call_counter, write)
-  ensures dom$RuntimeType$intFromRef(old(local$g.special$function_object_call_counter)) <=
-    dom$RuntimeType$intFromRef(local$g.special$function_object_call_counter)
+  ensures old(local$g.special$function_object_call_counter) <=
+    local$g.special$function_object_call_counter
   ensures dom$RuntimeType$isSubtype(dom$RuntimeType$typeOf(ret$0), dom$RuntimeType$intType())
-  ensures dom$RuntimeType$intFromRef(local$g.special$function_object_call_counter) <=
-    dom$RuntimeType$intFromRef(old(local$g.special$function_object_call_counter)) +
-    1
+  ensures local$g.special$function_object_call_counter <=
+    old(local$g.special$function_object_call_counter) + 1
 {
   var ret$1: Ref
   var ret$2: Ref

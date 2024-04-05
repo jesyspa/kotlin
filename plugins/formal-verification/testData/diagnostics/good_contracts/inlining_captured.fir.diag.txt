@@ -3,12 +3,11 @@ method global$fun_single_call$fun_take$fun_take$T_Int$return$T_Int$return$T_Int(
   returns (ret$0: Ref)
   requires acc(local$g.special$function_object_call_counter, write)
   ensures acc(local$g.special$function_object_call_counter, write)
-  ensures dom$RuntimeType$intFromRef(old(local$g.special$function_object_call_counter)) <=
-    dom$RuntimeType$intFromRef(local$g.special$function_object_call_counter)
+  ensures old(local$g.special$function_object_call_counter) <=
+    local$g.special$function_object_call_counter
   ensures dom$RuntimeType$isSubtype(dom$RuntimeType$typeOf(ret$0), dom$RuntimeType$intType())
-  ensures dom$RuntimeType$intFromRef(local$g.special$function_object_call_counter) ==
-    dom$RuntimeType$intFromRef(old(local$g.special$function_object_call_counter)) +
-    1
+  ensures local$g.special$function_object_call_counter ==
+    old(local$g.special$function_object_call_counter) + 1
 {
   var ret$1: Ref
   var ret$2: Ref
@@ -39,17 +38,15 @@ method global$fun_double_call$fun_take$fun_take$T_Int$return$T_Int$fun_take$T_In
   requires acc(local$g.special$function_object_call_counter, write)
   ensures acc(local$f.special$function_object_call_counter, write)
   ensures acc(local$g.special$function_object_call_counter, write)
-  ensures dom$RuntimeType$intFromRef(old(local$f.special$function_object_call_counter)) <=
-    dom$RuntimeType$intFromRef(local$f.special$function_object_call_counter)
-  ensures dom$RuntimeType$intFromRef(old(local$g.special$function_object_call_counter)) <=
-    dom$RuntimeType$intFromRef(local$g.special$function_object_call_counter)
+  ensures old(local$f.special$function_object_call_counter) <=
+    local$f.special$function_object_call_counter
+  ensures old(local$g.special$function_object_call_counter) <=
+    local$g.special$function_object_call_counter
   ensures dom$RuntimeType$isSubtype(dom$RuntimeType$typeOf(ret$0), dom$RuntimeType$intType())
-  ensures dom$RuntimeType$intFromRef(local$f.special$function_object_call_counter) ==
-    dom$RuntimeType$intFromRef(old(local$f.special$function_object_call_counter)) +
-    1
-  ensures dom$RuntimeType$intFromRef(local$g.special$function_object_call_counter) ==
-    dom$RuntimeType$intFromRef(old(local$g.special$function_object_call_counter)) +
-    1
+  ensures local$f.special$function_object_call_counter ==
+    old(local$f.special$function_object_call_counter) + 1
+  ensures local$g.special$function_object_call_counter ==
+    old(local$g.special$function_object_call_counter) + 1
 {
   var ret$1: Ref
   var ret$2: Ref
@@ -86,17 +83,15 @@ method global$fun_nested_call$fun_take$fun_take$T_Int$return$T_Int$fun_take$T_In
   requires acc(local$g.special$function_object_call_counter, write)
   ensures acc(local$f.special$function_object_call_counter, write)
   ensures acc(local$g.special$function_object_call_counter, write)
-  ensures dom$RuntimeType$intFromRef(old(local$f.special$function_object_call_counter)) <=
-    dom$RuntimeType$intFromRef(local$f.special$function_object_call_counter)
-  ensures dom$RuntimeType$intFromRef(old(local$g.special$function_object_call_counter)) <=
-    dom$RuntimeType$intFromRef(local$g.special$function_object_call_counter)
+  ensures old(local$f.special$function_object_call_counter) <=
+    local$f.special$function_object_call_counter
+  ensures old(local$g.special$function_object_call_counter) <=
+    local$g.special$function_object_call_counter
   ensures dom$RuntimeType$isSubtype(dom$RuntimeType$typeOf(ret$0), dom$RuntimeType$intType())
-  ensures dom$RuntimeType$intFromRef(local$f.special$function_object_call_counter) ==
-    dom$RuntimeType$intFromRef(old(local$f.special$function_object_call_counter)) +
-    1
-  ensures dom$RuntimeType$intFromRef(local$g.special$function_object_call_counter) ==
-    dom$RuntimeType$intFromRef(old(local$g.special$function_object_call_counter)) +
-    1
+  ensures local$f.special$function_object_call_counter ==
+    old(local$f.special$function_object_call_counter) + 1
+  ensures local$g.special$function_object_call_counter ==
+    old(local$g.special$function_object_call_counter) + 1
 {
   var ret$1: Ref
   var ret$2: Ref
@@ -130,12 +125,11 @@ method global$fun_non_local_return$fun_take$fun_take$$return$T_Unit$return$T_Int
   returns (ret$0: Ref)
   requires acc(local$g.special$function_object_call_counter, write)
   ensures acc(local$g.special$function_object_call_counter, write)
-  ensures dom$RuntimeType$intFromRef(old(local$g.special$function_object_call_counter)) <=
-    dom$RuntimeType$intFromRef(local$g.special$function_object_call_counter)
+  ensures old(local$g.special$function_object_call_counter) <=
+    local$g.special$function_object_call_counter
   ensures dom$RuntimeType$isSubtype(dom$RuntimeType$typeOf(ret$0), dom$RuntimeType$intType())
-  ensures dom$RuntimeType$intFromRef(local$g.special$function_object_call_counter) ==
-    dom$RuntimeType$intFromRef(old(local$g.special$function_object_call_counter)) +
-    1
+  ensures local$g.special$function_object_call_counter ==
+    old(local$g.special$function_object_call_counter) + 1
 {
   var ret$1: Ref
   var ret$2: Ref

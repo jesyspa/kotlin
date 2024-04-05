@@ -3,8 +3,8 @@ method global$fun_unknown$fun_take$fun_take$T_Int$return$T_Int$return$T_Int(loca
   returns (ret$0: Ref)
   requires acc(local$f.special$function_object_call_counter, write)
   ensures acc(local$f.special$function_object_call_counter, write)
-  ensures dom$RuntimeType$intFromRef(old(local$f.special$function_object_call_counter)) <=
-    dom$RuntimeType$intFromRef(local$f.special$function_object_call_counter)
+  ensures old(local$f.special$function_object_call_counter) <=
+    local$f.special$function_object_call_counter
   ensures dom$RuntimeType$isSubtype(dom$RuntimeType$typeOf(ret$0), dom$RuntimeType$intType())
   ensures true
 {
@@ -24,12 +24,11 @@ method global$fun_at_most_once$fun_take$fun_take$T_Int$return$T_Int$return$T_Int
   returns (ret$0: Ref)
   requires acc(local$f.special$function_object_call_counter, write)
   ensures acc(local$f.special$function_object_call_counter, write)
-  ensures dom$RuntimeType$intFromRef(old(local$f.special$function_object_call_counter)) <=
-    dom$RuntimeType$intFromRef(local$f.special$function_object_call_counter)
+  ensures old(local$f.special$function_object_call_counter) <=
+    local$f.special$function_object_call_counter
   ensures dom$RuntimeType$isSubtype(dom$RuntimeType$typeOf(ret$0), dom$RuntimeType$intType())
-  ensures dom$RuntimeType$intFromRef(local$f.special$function_object_call_counter) <=
-    dom$RuntimeType$intFromRef(old(local$f.special$function_object_call_counter)) +
-    1
+  ensures local$f.special$function_object_call_counter <=
+    old(local$f.special$function_object_call_counter) + 1
 {
   var anonymous$0: Ref
   var anonymous$1: Ref
@@ -47,12 +46,11 @@ method global$fun_exactly_once$fun_take$fun_take$T_Int$return$T_Int$return$T_Int
   returns (ret$0: Ref)
   requires acc(local$f.special$function_object_call_counter, write)
   ensures acc(local$f.special$function_object_call_counter, write)
-  ensures dom$RuntimeType$intFromRef(old(local$f.special$function_object_call_counter)) <=
-    dom$RuntimeType$intFromRef(local$f.special$function_object_call_counter)
+  ensures old(local$f.special$function_object_call_counter) <=
+    local$f.special$function_object_call_counter
   ensures dom$RuntimeType$isSubtype(dom$RuntimeType$typeOf(ret$0), dom$RuntimeType$intType())
-  ensures dom$RuntimeType$intFromRef(local$f.special$function_object_call_counter) ==
-    dom$RuntimeType$intFromRef(old(local$f.special$function_object_call_counter)) +
-    1
+  ensures local$f.special$function_object_call_counter ==
+    old(local$f.special$function_object_call_counter) + 1
 {
   var anonymous$0: Ref
   var anonymous$1: Ref
@@ -70,11 +68,11 @@ method global$fun_at_least_once$fun_take$fun_take$T_Int$return$T_Int$return$T_In
   returns (ret$0: Ref)
   requires acc(local$f.special$function_object_call_counter, write)
   ensures acc(local$f.special$function_object_call_counter, write)
-  ensures dom$RuntimeType$intFromRef(old(local$f.special$function_object_call_counter)) <=
-    dom$RuntimeType$intFromRef(local$f.special$function_object_call_counter)
+  ensures old(local$f.special$function_object_call_counter) <=
+    local$f.special$function_object_call_counter
   ensures dom$RuntimeType$isSubtype(dom$RuntimeType$typeOf(ret$0), dom$RuntimeType$intType())
-  ensures dom$RuntimeType$intFromRef(local$f.special$function_object_call_counter) >
-    dom$RuntimeType$intFromRef(old(local$f.special$function_object_call_counter))
+  ensures local$f.special$function_object_call_counter >
+    old(local$f.special$function_object_call_counter)
 {
   inhale dom$RuntimeType$isSubtype(dom$RuntimeType$typeOf(local$f), dom$RuntimeType$functionType())
   ret$0 := global$fun_exactly_once$fun_take$fun_take$T_Int$return$T_Int$return$T_Int(local$f)
@@ -86,12 +84,11 @@ method global$fun_exactly_once$fun_take$fun_take$T_Int$return$T_Int$return$T_Int
   returns (ret: Ref)
   requires acc(local$f.special$function_object_call_counter, write)
   ensures acc(local$f.special$function_object_call_counter, write)
-  ensures dom$RuntimeType$intFromRef(old(local$f.special$function_object_call_counter)) <=
-    dom$RuntimeType$intFromRef(local$f.special$function_object_call_counter)
+  ensures old(local$f.special$function_object_call_counter) <=
+    local$f.special$function_object_call_counter
   ensures dom$RuntimeType$isSubtype(dom$RuntimeType$typeOf(ret), dom$RuntimeType$intType())
-  ensures dom$RuntimeType$intFromRef(local$f.special$function_object_call_counter) ==
-    dom$RuntimeType$intFromRef(old(local$f.special$function_object_call_counter)) +
-    1
+  ensures local$f.special$function_object_call_counter ==
+    old(local$f.special$function_object_call_counter) + 1
 
 
 /calls_in_place.kt:(800,809): info: Generated Viper text for loopWhile:
@@ -99,11 +96,11 @@ method global$fun_loopWhile$fun_take$fun_take$$return$T_Boolean$return$T_Unit(lo
   returns (ret$0: Ref)
   requires acc(local$lambda.special$function_object_call_counter, write)
   ensures acc(local$lambda.special$function_object_call_counter, write)
-  ensures dom$RuntimeType$intFromRef(old(local$lambda.special$function_object_call_counter)) <=
-    dom$RuntimeType$intFromRef(local$lambda.special$function_object_call_counter)
+  ensures old(local$lambda.special$function_object_call_counter) <=
+    local$lambda.special$function_object_call_counter
   ensures dom$RuntimeType$isSubtype(dom$RuntimeType$typeOf(ret$0), dom$RuntimeType$unitType())
-  ensures dom$RuntimeType$intFromRef(local$lambda.special$function_object_call_counter) >
-    dom$RuntimeType$intFromRef(old(local$lambda.special$function_object_call_counter))
+  ensures local$lambda.special$function_object_call_counter >
+    old(local$lambda.special$function_object_call_counter)
 {
   var anonymous$0: Ref
   var anonymous$1: Ref
@@ -117,11 +114,11 @@ method global$fun_loopWhile$fun_take$fun_take$$return$T_Boolean$return$T_Unit(lo
   anonymous$0 := anonymous$2
   while (dom$RuntimeType$boolFromRef(anonymous$0))
     invariant acc(local$lambda.special$function_object_call_counter, write)
-    invariant dom$RuntimeType$intFromRef(old(local$lambda.special$function_object_call_counter)) <=
-      dom$RuntimeType$intFromRef(local$lambda.special$function_object_call_counter)
+    invariant old(local$lambda.special$function_object_call_counter) <=
+      local$lambda.special$function_object_call_counter
     invariant dom$RuntimeType$isSubtype(dom$RuntimeType$typeOf(ret$0), dom$RuntimeType$unitType())
-    invariant dom$RuntimeType$intFromRef(local$lambda.special$function_object_call_counter) >
-      dom$RuntimeType$intFromRef(old(local$lambda.special$function_object_call_counter))
+    invariant local$lambda.special$function_object_call_counter >
+      old(local$lambda.special$function_object_call_counter)
   {
     var anonymous$3: Ref
     var anonymous$4: Ref
@@ -139,11 +136,11 @@ method global$fun_loopUntil$fun_take$fun_take$$return$T_Boolean$return$T_Unit(lo
   returns (ret$0: Ref)
   requires acc(local$lambda.special$function_object_call_counter, write)
   ensures acc(local$lambda.special$function_object_call_counter, write)
-  ensures dom$RuntimeType$intFromRef(old(local$lambda.special$function_object_call_counter)) <=
-    dom$RuntimeType$intFromRef(local$lambda.special$function_object_call_counter)
+  ensures old(local$lambda.special$function_object_call_counter) <=
+    local$lambda.special$function_object_call_counter
   ensures dom$RuntimeType$isSubtype(dom$RuntimeType$typeOf(ret$0), dom$RuntimeType$unitType())
-  ensures dom$RuntimeType$intFromRef(local$lambda.special$function_object_call_counter) >
-    dom$RuntimeType$intFromRef(old(local$lambda.special$function_object_call_counter))
+  ensures local$lambda.special$function_object_call_counter >
+    old(local$lambda.special$function_object_call_counter)
 {
   var anonymous$0: Ref
   var anonymous$1: Ref
@@ -159,11 +156,11 @@ method global$fun_loopUntil$fun_take$fun_take$$return$T_Boolean$return$T_Unit(lo
   anonymous$0 := special$notBool(anonymous$1)
   while (dom$RuntimeType$boolFromRef(anonymous$0))
     invariant acc(local$lambda.special$function_object_call_counter, write)
-    invariant dom$RuntimeType$intFromRef(old(local$lambda.special$function_object_call_counter)) <=
-      dom$RuntimeType$intFromRef(local$lambda.special$function_object_call_counter)
+    invariant old(local$lambda.special$function_object_call_counter) <=
+      local$lambda.special$function_object_call_counter
     invariant dom$RuntimeType$isSubtype(dom$RuntimeType$typeOf(ret$0), dom$RuntimeType$unitType())
-    invariant dom$RuntimeType$intFromRef(local$lambda.special$function_object_call_counter) >
-      dom$RuntimeType$intFromRef(old(local$lambda.special$function_object_call_counter))
+    invariant local$lambda.special$function_object_call_counter >
+      old(local$lambda.special$function_object_call_counter)
   {
     var anonymous$4: Ref
     var anonymous$5: Ref
@@ -183,12 +180,11 @@ method global$fun_run$fun_take$fun_take$$return$NT_Any$return$NT_Any(local$block
   returns (ret$0: Ref)
   requires acc(local$block.special$function_object_call_counter, write)
   ensures acc(local$block.special$function_object_call_counter, write)
-  ensures dom$RuntimeType$intFromRef(old(local$block.special$function_object_call_counter)) <=
-    dom$RuntimeType$intFromRef(local$block.special$function_object_call_counter)
+  ensures old(local$block.special$function_object_call_counter) <=
+    local$block.special$function_object_call_counter
   ensures dom$RuntimeType$isSubtype(dom$RuntimeType$typeOf(ret$0), dom$RuntimeType$nullable(dom$RuntimeType$anyType()))
-  ensures dom$RuntimeType$intFromRef(local$block.special$function_object_call_counter) ==
-    dom$RuntimeType$intFromRef(old(local$block.special$function_object_call_counter)) +
-    1
+  ensures local$block.special$function_object_call_counter ==
+    old(local$block.special$function_object_call_counter) + 1
 {
   var anonymous$0: Ref
   var anonymous$1: Ref

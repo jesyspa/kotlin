@@ -196,8 +196,8 @@ abstract class UnspecifiedFunctionTypeEmbedding : TypeEmbedding {
     object CallCounterMonotonicTypeInvariantEmbedding : TypeInvariantEmbedding {
         override fun fillHole(exp: ExpEmbedding): ExpEmbedding =
             LeCmp(
-                Old(FieldAccess(exp, SpecialFields.FunctionObjectCallCounterField)),
-                FieldAccess(exp, SpecialFields.FunctionObjectCallCounterField)
+                Old(FunctionObjectCallsPrimitiveAccess(exp)),
+                FunctionObjectCallsPrimitiveAccess(exp)
             )
     }
 }

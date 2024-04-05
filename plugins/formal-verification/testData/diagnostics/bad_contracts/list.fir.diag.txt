@@ -26,7 +26,7 @@ method pkg$kotlin$collections$class_List$fun_get$fun_take$T_class_pkg$kotlin$col
   ensures dom$RuntimeType$intFromRef(this.special$size) >= 0
   ensures dom$RuntimeType$isSubtype(dom$RuntimeType$typeOf(ret), dom$RuntimeType$intType())
   ensures dom$RuntimeType$intFromRef(this.special$size) ==
-    dom$RuntimeType$intFromRef(old(this.special$size))
+    old(dom$RuntimeType$intFromRef(this.special$size))
 
 
 method pkg$kotlin$collections$global$fun_emptyList$fun_take$$return$T_class_pkg$kotlin$collections$global$class_List()
@@ -67,7 +67,7 @@ method pkg$kotlin$collections$class_List$fun_get$fun_take$T_class_pkg$kotlin$col
   ensures dom$RuntimeType$intFromRef(this.special$size) >= 0
   ensures dom$RuntimeType$isSubtype(dom$RuntimeType$typeOf(ret), dom$RuntimeType$intType())
   ensures dom$RuntimeType$intFromRef(this.special$size) ==
-    dom$RuntimeType$intFromRef(old(this.special$size))
+    old(dom$RuntimeType$intFromRef(this.special$size))
 
 
 method pkg$kotlin$collections$global$fun_emptyList$fun_take$$return$T_class_pkg$kotlin$collections$global$class_List()
@@ -113,7 +113,7 @@ method pkg$kotlin$collections$class_List$fun_get$fun_take$T_class_pkg$kotlin$col
   ensures dom$RuntimeType$intFromRef(this.special$size) >= 0
   ensures dom$RuntimeType$isSubtype(dom$RuntimeType$typeOf(ret), dom$RuntimeType$intType())
   ensures dom$RuntimeType$intFromRef(this.special$size) ==
-    dom$RuntimeType$intFromRef(old(this.special$size))
+    old(dom$RuntimeType$intFromRef(this.special$size))
 
 
 /list.kt:(315,328): warning: Invalid index for list 'l', the index may be less than zero.
@@ -149,7 +149,7 @@ method pkg$kotlin$collections$class_MutableList$fun_add$fun_take$T_class_pkg$kot
   ensures dom$RuntimeType$intFromRef(this.special$size) >= 0
   ensures dom$RuntimeType$isSubtype(dom$RuntimeType$typeOf(ret), dom$RuntimeType$boolType())
   ensures dom$RuntimeType$intFromRef(this.special$size) ==
-    dom$RuntimeType$intFromRef(old(this.special$size)) + 1
+    old(dom$RuntimeType$intFromRef(this.special$size)) + 1
 
 
 method pkg$kotlin$collections$class_MutableList$fun_get$fun_take$T_class_pkg$kotlin$collections$global$class_MutableList$T_Int$return$T_Int(this: Ref,
@@ -164,7 +164,7 @@ method pkg$kotlin$collections$class_MutableList$fun_get$fun_take$T_class_pkg$kot
   ensures dom$RuntimeType$intFromRef(this.special$size) >= 0
   ensures dom$RuntimeType$isSubtype(dom$RuntimeType$typeOf(ret), dom$RuntimeType$intType())
   ensures dom$RuntimeType$intFromRef(this.special$size) ==
-    dom$RuntimeType$intFromRef(old(this.special$size))
+    old(dom$RuntimeType$intFromRef(this.special$size))
 
 
 /list.kt:(406,410): warning: Invalid index for list 'l', the index may be greater than the list's size.
@@ -201,7 +201,7 @@ method pkg$kotlin$collections$class_List$fun_subList$fun_take$T_class_pkg$kotlin
   ensures acc(ret.special$size, write)
   ensures dom$RuntimeType$intFromRef(ret.special$size) >= 0
   ensures dom$RuntimeType$intFromRef(this.special$size) ==
-    dom$RuntimeType$intFromRef(old(this.special$size))
+    old(dom$RuntimeType$intFromRef(this.special$size))
   ensures dom$RuntimeType$intFromRef(ret.special$size) ==
     dom$RuntimeType$intFromRef(local$toIndex) -
     dom$RuntimeType$intFromRef(local$fromIndex)
@@ -249,7 +249,7 @@ method pkg$kotlin$collections$class_List$fun_subList$fun_take$T_class_pkg$kotlin
   ensures acc(ret.special$size, write)
   ensures dom$RuntimeType$intFromRef(ret.special$size) >= 0
   ensures dom$RuntimeType$intFromRef(this.special$size) ==
-    dom$RuntimeType$intFromRef(old(this.special$size))
+    old(dom$RuntimeType$intFromRef(this.special$size))
   ensures dom$RuntimeType$intFromRef(ret.special$size) ==
     dom$RuntimeType$intFromRef(local$toIndex) -
     dom$RuntimeType$intFromRef(local$fromIndex)

@@ -4,8 +4,8 @@ method global$fun_unit_function$fun_take$fun_take$$return$T_Unit$return$T_Unit(l
   requires acc(local$f.special$function_object_call_counter, write)
   requires special$duplicable(local$f)
   ensures acc(local$f.special$function_object_call_counter, write)
-  ensures dom$RuntimeType$intFromRef(old(local$f.special$function_object_call_counter)) <=
-    dom$RuntimeType$intFromRef(local$f.special$function_object_call_counter)
+  ensures old(local$f.special$function_object_call_counter) <=
+    local$f.special$function_object_call_counter
   ensures dom$RuntimeType$isSubtype(dom$RuntimeType$typeOf(ret$0), dom$RuntimeType$unitType())
 {
   inhale dom$RuntimeType$isSubtype(dom$RuntimeType$typeOf(local$f), dom$RuntimeType$functionType())
@@ -19,8 +19,8 @@ method global$fun_function_object_call$fun_take$fun_take$T_Boolean$T_Int$return$
   requires acc(local$g.special$function_object_call_counter, write)
   requires special$duplicable(local$g)
   ensures acc(local$g.special$function_object_call_counter, write)
-  ensures dom$RuntimeType$intFromRef(old(local$g.special$function_object_call_counter)) <=
-    dom$RuntimeType$intFromRef(local$g.special$function_object_call_counter)
+  ensures old(local$g.special$function_object_call_counter) <=
+    local$g.special$function_object_call_counter
   ensures dom$RuntimeType$isSubtype(dom$RuntimeType$typeOf(ret$0), dom$RuntimeType$intType())
 {
   var anonymous$0: Ref
@@ -44,10 +44,10 @@ method global$fun_function_object_nested_call$fun_take$fun_take$T_Int$return$T_I
   requires special$duplicable(local$g)
   ensures acc(local$f.special$function_object_call_counter, write)
   ensures acc(local$g.special$function_object_call_counter, write)
-  ensures dom$RuntimeType$intFromRef(old(local$f.special$function_object_call_counter)) <=
-    dom$RuntimeType$intFromRef(local$f.special$function_object_call_counter)
-  ensures dom$RuntimeType$intFromRef(old(local$g.special$function_object_call_counter)) <=
-    dom$RuntimeType$intFromRef(local$g.special$function_object_call_counter)
+  ensures old(local$f.special$function_object_call_counter) <=
+    local$f.special$function_object_call_counter
+  ensures old(local$g.special$function_object_call_counter) <=
+    local$g.special$function_object_call_counter
   ensures dom$RuntimeType$isSubtype(dom$RuntimeType$typeOf(ret$0), dom$RuntimeType$intType())
 {
   var anonymous$0: Ref

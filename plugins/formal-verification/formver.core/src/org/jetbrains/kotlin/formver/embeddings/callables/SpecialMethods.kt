@@ -5,7 +5,6 @@
 
 package org.jetbrains.kotlin.formver.embeddings.callables
 
-import org.jetbrains.kotlin.formver.conversion.SpecialFields
 import org.jetbrains.kotlin.formver.embeddings.LegacyUnspecifiedFunctionTypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.expression.*
 import org.jetbrains.kotlin.formver.linearization.pureToViper
@@ -16,10 +15,11 @@ import org.jetbrains.kotlin.formver.viper.ast.Exp
 
 object InvokeFunctionObjectMethod : BuiltInMethod(SpecialName("invoke_function_object")) {
     private val thisArg = AnonymousVariableEmbedding(0, LegacyUnspecifiedFunctionTypeEmbedding)
-    private val counterAccess = FieldAccess(thisArg, SpecialFields.FunctionObjectCallCounterField)
+    private val counterAccess = FunctionObjectCallsPrimitiveAccess(thisArg)
+
     private val calls = EqCmp(
         Add(Old(counterAccess), IntLit(1)),
-        FieldAccess(thisArg, SpecialFields.FunctionObjectCallCounterField)
+        counterAccess
     )
 
     override val formalArgs: List<Declaration.LocalVarDecl> = listOf(thisArg.toLocalVarDecl())

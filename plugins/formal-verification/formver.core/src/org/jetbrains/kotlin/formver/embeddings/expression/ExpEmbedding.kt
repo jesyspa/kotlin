@@ -75,7 +75,7 @@ sealed interface ExpEmbedding {
 sealed class ToViperBuiltinMisuseError(msg: String) : RuntimeException(msg)
 
 class ToViperBuiltinOnlyError(exp: ExpEmbedding) :
-    ToViperBuiltinMisuseError("${exp.debugTreeView} can only be translated to Viper built-in type")
+    ToViperBuiltinMisuseError("${exp.debugTreeView.print()} can only be translated to Viper built-in type")
 
 /**
  * `ExpEmbedding` with default translation from Ref to Viper built-in type.

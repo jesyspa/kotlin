@@ -68,7 +68,7 @@ method pkg$kotlin$collections$class_List$fun_get$fun_take$T_class_pkg$kotlin$col
   ensures dom$RuntimeType$intFromRef(this.special$size) >= 0
   ensures dom$RuntimeType$isSubtype(dom$RuntimeType$typeOf(ret), dom$RuntimeType$intType())
   ensures dom$RuntimeType$intFromRef(this.special$size) ==
-    dom$RuntimeType$intFromRef(old(this.special$size))
+    old(dom$RuntimeType$intFromRef(this.special$size))
 
 
 method pkg$kotlin$collections$class_List$fun_isEmpty$fun_take$T_class_pkg$kotlin$collections$global$class_List$return$T_Boolean(this: Ref)
@@ -79,7 +79,7 @@ method pkg$kotlin$collections$class_List$fun_isEmpty$fun_take$T_class_pkg$kotlin
   ensures dom$RuntimeType$intFromRef(this.special$size) >= 0
   ensures dom$RuntimeType$isSubtype(dom$RuntimeType$typeOf(ret), dom$RuntimeType$boolType())
   ensures dom$RuntimeType$intFromRef(this.special$size) ==
-    dom$RuntimeType$intFromRef(old(this.special$size))
+    old(dom$RuntimeType$intFromRef(this.special$size))
   ensures dom$RuntimeType$boolFromRef(ret) ==>
     dom$RuntimeType$intFromRef(this.special$size) == 0
   ensures !dom$RuntimeType$boolFromRef(ret) ==>
@@ -102,7 +102,7 @@ method pkg$kotlin$collections$class_List$fun_subList$fun_take$T_class_pkg$kotlin
   ensures acc(ret.special$size, write)
   ensures dom$RuntimeType$intFromRef(ret.special$size) >= 0
   ensures dom$RuntimeType$intFromRef(this.special$size) ==
-    dom$RuntimeType$intFromRef(old(this.special$size))
+    old(dom$RuntimeType$intFromRef(this.special$size))
   ensures dom$RuntimeType$intFromRef(ret.special$size) ==
     dom$RuntimeType$intFromRef(local$toIndex) -
     dom$RuntimeType$intFromRef(local$fromIndex)
@@ -184,4 +184,4 @@ method pkg$kotlin$collections$class_List$fun_get$fun_take$T_class_pkg$kotlin$col
   ensures dom$RuntimeType$intFromRef(this.special$size) >= 0
   ensures dom$RuntimeType$isSubtype(dom$RuntimeType$typeOf(ret), dom$RuntimeType$intType())
   ensures dom$RuntimeType$intFromRef(this.special$size) ==
-    dom$RuntimeType$intFromRef(old(this.special$size))
+    old(dom$RuntimeType$intFromRef(this.special$size))

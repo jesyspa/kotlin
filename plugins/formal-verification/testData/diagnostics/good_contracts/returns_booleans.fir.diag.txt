@@ -132,7 +132,7 @@ method pkg$kotlin$collections$class_Collection$fun_isEmpty$fun_take$T_class_pkg$
   ensures dom$RuntimeType$intFromRef(this.special$size) >= 0
   ensures dom$RuntimeType$isSubtype(dom$RuntimeType$typeOf(ret), dom$RuntimeType$boolType())
   ensures dom$RuntimeType$intFromRef(this.special$size) ==
-    dom$RuntimeType$intFromRef(old(this.special$size))
+    old(dom$RuntimeType$intFromRef(this.special$size))
   ensures dom$RuntimeType$boolFromRef(ret) ==>
     dom$RuntimeType$intFromRef(this.special$size) == 0
   ensures !dom$RuntimeType$boolFromRef(ret) ==>

@@ -6,10 +6,8 @@
 package org.jetbrains.kotlin.formver.embeddings.expression
 
 import org.jetbrains.kotlin.formver.asPosition
-import org.jetbrains.kotlin.formver.embeddings.BooleanTypeEmbedding
-import org.jetbrains.kotlin.formver.embeddings.SourceRole
-import org.jetbrains.kotlin.formver.embeddings.TypeEmbedding
-import org.jetbrains.kotlin.formver.embeddings.asInfo
+import org.jetbrains.kotlin.formver.conversion.SpecialFields.FunctionObjectCallCounterField
+import org.jetbrains.kotlin.formver.embeddings.*
 import org.jetbrains.kotlin.formver.embeddings.callables.SpecialFunctions
 import org.jetbrains.kotlin.formver.linearization.LinearizationContext
 import org.jetbrains.kotlin.formver.viper.ast.Exp
@@ -17,6 +15,7 @@ import org.jetbrains.kotlin.formver.viper.ast.Exp
 data class Old(override val inner: ExpEmbedding) : UnaryDirectResultExpEmbedding {
     override val type: TypeEmbedding = inner.type
     override fun toViper(ctx: LinearizationContext): Exp = Exp.Old(inner.toViper(ctx), ctx.source.asPosition)
+    override fun toViperBuiltinType(ctx: LinearizationContext): Exp = Exp.Old(inner.toViperBuiltinType(ctx), ctx.source.asPosition)
 }
 
 data class DuplicableCall(override val inner: ExpEmbedding) : UnaryDirectResultExpEmbedding, OnlyToBuiltinTypeExpEmbedding {
@@ -29,5 +28,14 @@ data class DuplicableCall(override val inner: ExpEmbedding) : UnaryDirectResultE
 
     override fun toViperBuiltinType(ctx: LinearizationContext): Exp =
         SpecialFunctions.duplicableFunction(inner.toViper(ctx), pos = ctx.source.asPosition, info = sourceRole.asInfo)
+}
+
+data class FunctionObjectCallsPrimitiveAccess(override val inner: ExpEmbedding) : UnaryDirectResultExpEmbedding,
+    OnlyToBuiltinTypeExpEmbedding {
+    override val type = IntTypeEmbedding
+
+    override fun toViperBuiltinType(ctx: LinearizationContext): Exp =
+        Exp.FieldAccess(inner.toViper(ctx), FunctionObjectCallCounterField.toViper(), pos = ctx.source.asPosition)
+
 }
 

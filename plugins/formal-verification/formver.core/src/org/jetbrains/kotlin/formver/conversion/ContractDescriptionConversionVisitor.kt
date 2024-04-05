@@ -137,7 +137,7 @@ class ContractDescriptionConversionVisitor(
         data: ContractVisitorContext,
     ): ExpEmbedding {
         val param = callsEffect.valueParameterReference.accept(this, data)
-        val callsFieldAccess = FieldAccess(param, SpecialFields.FunctionObjectCallCounterField)
+        val callsFieldAccess = FunctionObjectCallsPrimitiveAccess(param)
         val targetLambdaByCallsEffect = callsEffect.valueParameterReference.getTargetParameter(data)
         val sourceRole = SourceRole.CallsInPlaceEffect(targetLambdaByCallsEffect, callsEffect.kind)
         return when (callsEffect.kind) {

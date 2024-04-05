@@ -200,7 +200,7 @@ domain dom$RuntimeType  {
 
 field class_Foo$member_x: Ref
 
-field special$function_object_call_counter: Ref
+field special$function_object_call_counter: Int
 
 function T_class_global$class_Foo$get$class_Foo$member_x(special$get$function$subject: Ref): Ref
   requires acc(T_class_global$class_Foo(special$get$function$subject), write)
@@ -317,9 +317,8 @@ method global$fun_f$fun_take$$return$T_Unit() returns (ret$0: Ref)
 method special$invoke_function_object(anonymous$0: Ref)
   requires acc(anonymous$0.special$function_object_call_counter, write)
   ensures acc(anonymous$0.special$function_object_call_counter, write)
-  ensures dom$RuntimeType$intFromRef(old(anonymous$0.special$function_object_call_counter)) +
-    1 ==
-    dom$RuntimeType$intFromRef(anonymous$0.special$function_object_call_counter)
+  ensures old(anonymous$0.special$function_object_call_counter) + 1 ==
+    anonymous$0.special$function_object_call_counter
 
 
 /full_viper_dump.kt:(134,135): info: Generated ExpEmbedding for global$fun_f$fun_take$$return$T_Unit:

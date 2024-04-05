@@ -3,12 +3,11 @@ method global$fun_incorrect_at_most_once$fun_take$fun_take$T_Int$return$T_Int$re
   returns (ret$0: Ref)
   requires acc(local$f.special$function_object_call_counter, write)
   ensures acc(local$f.special$function_object_call_counter, write)
-  ensures dom$RuntimeType$intFromRef(old(local$f.special$function_object_call_counter)) <=
-    dom$RuntimeType$intFromRef(local$f.special$function_object_call_counter)
+  ensures old(local$f.special$function_object_call_counter) <=
+    local$f.special$function_object_call_counter
   ensures dom$RuntimeType$isSubtype(dom$RuntimeType$typeOf(ret$0), dom$RuntimeType$intType())
-  ensures dom$RuntimeType$intFromRef(local$f.special$function_object_call_counter) <=
-    dom$RuntimeType$intFromRef(old(local$f.special$function_object_call_counter)) +
-    1
+  ensures local$f.special$function_object_call_counter <=
+    old(local$f.special$function_object_call_counter) + 1
 {
   var anonymous$0: Ref
   var anonymous$1: Ref
@@ -27,8 +26,8 @@ method global$fun_unknown$fun_take$fun_take$T_Int$return$T_Int$return$T_Int(loca
   returns (ret: Ref)
   requires acc(local$f.special$function_object_call_counter, write)
   ensures acc(local$f.special$function_object_call_counter, write)
-  ensures dom$RuntimeType$intFromRef(old(local$f.special$function_object_call_counter)) <=
-    dom$RuntimeType$intFromRef(local$f.special$function_object_call_counter)
+  ensures old(local$f.special$function_object_call_counter) <=
+    local$f.special$function_object_call_counter
   ensures dom$RuntimeType$isSubtype(dom$RuntimeType$typeOf(ret), dom$RuntimeType$intType())
   ensures true
 
@@ -40,12 +39,11 @@ method global$fun_incorrect_exactly_once$fun_take$fun_take$T_Int$return$T_Int$re
   returns (ret$0: Ref)
   requires acc(local$f.special$function_object_call_counter, write)
   ensures acc(local$f.special$function_object_call_counter, write)
-  ensures dom$RuntimeType$intFromRef(old(local$f.special$function_object_call_counter)) <=
-    dom$RuntimeType$intFromRef(local$f.special$function_object_call_counter)
+  ensures old(local$f.special$function_object_call_counter) <=
+    local$f.special$function_object_call_counter
   ensures dom$RuntimeType$isSubtype(dom$RuntimeType$typeOf(ret$0), dom$RuntimeType$intType())
-  ensures dom$RuntimeType$intFromRef(local$f.special$function_object_call_counter) ==
-    dom$RuntimeType$intFromRef(old(local$f.special$function_object_call_counter)) +
-    1
+  ensures local$f.special$function_object_call_counter ==
+    old(local$f.special$function_object_call_counter) + 1
 {
   var anonymous$0: Ref
   var anonymous$1: Ref
@@ -70,11 +68,11 @@ method global$fun_incorrect_at_least_once$fun_take$fun_take$T_Int$return$T_Int$r
   returns (ret$0: Ref)
   requires acc(local$f.special$function_object_call_counter, write)
   ensures acc(local$f.special$function_object_call_counter, write)
-  ensures dom$RuntimeType$intFromRef(old(local$f.special$function_object_call_counter)) <=
-    dom$RuntimeType$intFromRef(local$f.special$function_object_call_counter)
+  ensures old(local$f.special$function_object_call_counter) <=
+    local$f.special$function_object_call_counter
   ensures dom$RuntimeType$isSubtype(dom$RuntimeType$typeOf(ret$0), dom$RuntimeType$intType())
-  ensures dom$RuntimeType$intFromRef(local$f.special$function_object_call_counter) >
-    dom$RuntimeType$intFromRef(old(local$f.special$function_object_call_counter))
+  ensures local$f.special$function_object_call_counter >
+    old(local$f.special$function_object_call_counter)
 {
   inhale dom$RuntimeType$isSubtype(dom$RuntimeType$typeOf(local$f), dom$RuntimeType$functionType())
   ret$0 := global$fun_unknown$fun_take$fun_take$T_Int$return$T_Int$return$T_Int(local$f)
@@ -86,8 +84,8 @@ method global$fun_unknown$fun_take$fun_take$T_Int$return$T_Int$return$T_Int(loca
   returns (ret: Ref)
   requires acc(local$f.special$function_object_call_counter, write)
   ensures acc(local$f.special$function_object_call_counter, write)
-  ensures dom$RuntimeType$intFromRef(old(local$f.special$function_object_call_counter)) <=
-    dom$RuntimeType$intFromRef(local$f.special$function_object_call_counter)
+  ensures old(local$f.special$function_object_call_counter) <=
+    local$f.special$function_object_call_counter
   ensures dom$RuntimeType$isSubtype(dom$RuntimeType$typeOf(ret), dom$RuntimeType$intType())
   ensures true
 
@@ -105,12 +103,11 @@ method global$fun_incorrect_exactly_once_with_catch$fun_take$fun_take$$return$T_
   returns (ret$0: Ref)
   requires acc(local$f.special$function_object_call_counter, write)
   ensures acc(local$f.special$function_object_call_counter, write)
-  ensures dom$RuntimeType$intFromRef(old(local$f.special$function_object_call_counter)) <=
-    dom$RuntimeType$intFromRef(local$f.special$function_object_call_counter)
+  ensures old(local$f.special$function_object_call_counter) <=
+    local$f.special$function_object_call_counter
   ensures dom$RuntimeType$isSubtype(dom$RuntimeType$typeOf(ret$0), dom$RuntimeType$unitType())
-  ensures dom$RuntimeType$intFromRef(local$f.special$function_object_call_counter) ==
-    dom$RuntimeType$intFromRef(old(local$f.special$function_object_call_counter)) +
-    1
+  ensures local$f.special$function_object_call_counter ==
+    old(local$f.special$function_object_call_counter) + 1
 {
   var anonymous$0: Ref
   var anonymous$1: Ref
@@ -153,12 +150,11 @@ method global$fun_incorrect_exactly_once_with_call_in_catch$fun_take$fun_take$$r
   returns (ret$0: Ref)
   requires acc(local$f.special$function_object_call_counter, write)
   ensures acc(local$f.special$function_object_call_counter, write)
-  ensures dom$RuntimeType$intFromRef(old(local$f.special$function_object_call_counter)) <=
-    dom$RuntimeType$intFromRef(local$f.special$function_object_call_counter)
+  ensures old(local$f.special$function_object_call_counter) <=
+    local$f.special$function_object_call_counter
   ensures dom$RuntimeType$isSubtype(dom$RuntimeType$typeOf(ret$0), dom$RuntimeType$unitType())
-  ensures dom$RuntimeType$intFromRef(local$f.special$function_object_call_counter) ==
-    dom$RuntimeType$intFromRef(old(local$f.special$function_object_call_counter)) +
-    1
+  ensures local$f.special$function_object_call_counter ==
+    old(local$f.special$function_object_call_counter) + 1
 {
   var anonymous$0: Ref
   var anonymous$1: Ref
