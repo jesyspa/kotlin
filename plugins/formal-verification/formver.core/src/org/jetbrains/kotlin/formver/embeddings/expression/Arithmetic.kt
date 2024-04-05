@@ -20,21 +20,21 @@ data class Add(
     override val left: ExpEmbedding,
     override val right: ExpEmbedding,
 ) : IntArithmeticExpression {
-    override val objectsOperation = RuntimeTypeDomain.plusInts
+    override val refsOperation = RuntimeTypeDomain.plusInts
 }
 
 data class Sub(
     override val left: ExpEmbedding,
     override val right: ExpEmbedding,
 ) : IntArithmeticExpression {
-    override val objectsOperation = RuntimeTypeDomain.minusInts
+    override val refsOperation = RuntimeTypeDomain.minusInts
 }
 
 data class Mul(
     override val left: ExpEmbedding,
     override val right: ExpEmbedding,
 ) : IntArithmeticExpression {
-    override val objectsOperation = RuntimeTypeDomain.timesInts
+    override val refsOperation = RuntimeTypeDomain.timesInts
 }
 
 // TODO: handle separately, inhale rhs != 0
@@ -42,12 +42,12 @@ data class Div(
     override val left: ExpEmbedding,
     override val right: ExpEmbedding,
 ) : IntArithmeticExpression {
-    override val objectsOperation = RuntimeTypeDomain.divInts
+    override val refsOperation = RuntimeTypeDomain.divInts
 }
 
 data class Mod(
     override val left: ExpEmbedding,
     override val right: ExpEmbedding,
 ) : IntArithmeticExpression {
-    override val objectsOperation = RuntimeTypeDomain.remInts
+    override val refsOperation = RuntimeTypeDomain.remInts
 }

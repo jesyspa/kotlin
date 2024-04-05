@@ -21,7 +21,7 @@ data class And(
     override val right: ExpEmbedding,
     override val sourceRole: SourceRole? = null,
 ) : BinaryBooleanExpression {
-    override val objectsOperation
+    override val refsOperation
         get() = RuntimeTypeDomain.andBools
 }
 
@@ -30,7 +30,7 @@ data class Or(
     override val right: ExpEmbedding,
     override val sourceRole: SourceRole? = null,
 ) : BinaryBooleanExpression {
-    override val objectsOperation = RuntimeTypeDomain.orBools
+    override val refsOperation = RuntimeTypeDomain.orBools
 }
 
 data class Implies(
@@ -38,7 +38,7 @@ data class Implies(
     override val right: ExpEmbedding,
     override val sourceRole: SourceRole? = null,
 ) : BinaryBooleanExpression {
-    override val objectsOperation = RuntimeTypeDomain.impliesBools
+    override val refsOperation = RuntimeTypeDomain.impliesBools
 }
 
 data class Not(

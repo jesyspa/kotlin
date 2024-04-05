@@ -27,7 +27,7 @@ sealed interface ExpEmbedding {
         get() = null
 
     /**
-     * Convert this `ExpEmbedding` into a Viper `Exp`, using the provided context for auxiliary statements and declarations.
+     * Convert this `ExpEmbedding` into a Viper `Exp` of type `Ref`, using the provided context for auxiliary statements and declarations.
      * This should never be used for assertions inside Viper's `inhale`, `exhale`, `require`, `assert` etc.
      *
      * The `Exp` returned contains the result of the expression.
@@ -50,6 +50,10 @@ sealed interface ExpEmbedding {
 
     /**
      * Use in contexts where Viper assertions are needed, e.g. `inhale`, `require`, `ensure`.
+     *
+     * Tries to return built-in Viper Type (`Bool`, `Int`) instead of `Ref` which is used by default for the representation of objects.
+     * When impossible still returns `Ref`. Note that this function should never fail unlike `toViper` which can't convert some `ExpEmbedding`s
+     * e.g. access permissions.
      */
     fun toViperBuiltinType(ctx: LinearizationContext): Exp
 
@@ -84,11 +88,7 @@ class ToViperBuiltinOnlyError(exp: ExpEmbedding) :
 sealed interface DefaultToBuiltinExpEmbedding : ExpEmbedding {
     override fun toViperBuiltinType(ctx: LinearizationContext): Exp {
         val exp = toViper(ctx)
-        val injection = when (type) {
-            is BooleanTypeEmbedding -> RuntimeTypeDomain.boolInjection
-            is IntTypeEmbedding -> RuntimeTypeDomain.intInjection
-            else -> return exp
-        }
+        val injection = type.injectionOr { return exp }
         // optimisation here is widely used, in such `ExpEmbedding`s like `Is`
         // (which is very common when inhaling)
         return if (exp is Exp.DomainFuncApp && exp.function == injection.toRef)

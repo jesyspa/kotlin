@@ -308,3 +308,10 @@ data class ClassTypeEmbedding(val className: ScopedKotlinName) : TypeEmbedding {
     override fun predicateAccessInvariants(): List<TypeInvariantEmbedding> = listOf(PredicateAccessTypeInvariantEmbedding(name))
 
 }
+
+
+inline fun TypeEmbedding.injectionOr(default: () -> Injection): Injection = when(this) {
+    IntTypeEmbedding -> RuntimeTypeDomain.intInjection
+    BooleanTypeEmbedding -> RuntimeTypeDomain.boolInjection
+    else -> default()
+}

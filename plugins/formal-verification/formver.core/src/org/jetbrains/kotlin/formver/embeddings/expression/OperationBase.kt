@@ -12,16 +12,16 @@ import org.jetbrains.kotlin.formver.linearization.LinearizationContext
 import org.jetbrains.kotlin.formver.viper.ast.Exp
 
 interface OperationBaseExpEmbedding : BinaryDirectResultExpEmbedding {
-    val objectsOperation: InjectionImageFunction
-    val builtinOperation
-        get() = objectsOperation.original
+    val refsOperation: InjectionImageFunction
+    val builtinsOperation
+        get() = refsOperation.original
 
     override fun toViper(ctx: LinearizationContext): Exp {
-        return objectsOperation(left.toViper(ctx), right.toViper(ctx), pos = ctx.source.asPosition, info = sourceRole.asInfo)
+        return refsOperation(left.toViper(ctx), right.toViper(ctx), pos = ctx.source.asPosition, info = sourceRole.asInfo)
     }
 
     override fun toViperBuiltinType(ctx: LinearizationContext): Exp {
-        return builtinOperation(
+        return builtinsOperation(
             left.toViperBuiltinType(ctx),
             right.toViperBuiltinType(ctx),
             pos = ctx.source.asPosition,
