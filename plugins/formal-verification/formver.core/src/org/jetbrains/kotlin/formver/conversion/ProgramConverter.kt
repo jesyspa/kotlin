@@ -211,13 +211,13 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         val contractVisitor = ContractDescriptionConversionVisitor(this@ProgramConverter, subSignature)
 
         return object : FullNamedFunctionSignature, NamedFunctionSignature by subSignature {
-            override fun getEmbeddingPreconditions(returnVariable: VariableEmbedding) =
+            override fun getPreconditions(returnVariable: VariableEmbedding) =
                 subSignature.formalArgs.flatMap { it.pureInvariants() } +
                         subSignature.formalArgs.flatMap { it.accessInvariants() } +
                         contractVisitor.getPreconditions(ContractVisitorContext(returnVariable, symbol)) +
                         subSignature.stdLibPreConditions()
 
-            override fun getEmbeddingPostconditions(returnVariable: VariableEmbedding) =
+            override fun getPostconditions(returnVariable: VariableEmbedding) =
                 subSignature.formalArgs.flatMap { it.accessInvariants() } +
                         subSignature.params.flatMap { it.dynamicInvariants() } +
                         returnVariable.pureInvariants() +

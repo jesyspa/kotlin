@@ -207,7 +207,7 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext>()
         val condition = data.convert(whileLoop.condition)
         val returnTarget = data.defaultResolvedReturnTarget
         val invariants = when (val sig = data.signature) {
-            is FullNamedFunctionSignature -> sig.getEmbeddingPostconditions(returnTarget.variable)
+            is FullNamedFunctionSignature -> sig.getPostconditions(returnTarget.variable)
             else -> listOf()
         }
         return data.withFreshWhile(whileLoop.label) {

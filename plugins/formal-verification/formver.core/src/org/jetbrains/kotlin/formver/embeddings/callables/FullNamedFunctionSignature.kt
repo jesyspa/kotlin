@@ -10,31 +10,18 @@ import org.jetbrains.kotlin.formver.asPosition
 import org.jetbrains.kotlin.formver.embeddings.expression.*
 import org.jetbrains.kotlin.formver.linearization.pureToViper
 import org.jetbrains.kotlin.formver.viper.ast.Stmt
-import org.jetbrains.kotlin.formver.viper.ast.Exp
 import org.jetbrains.kotlin.formver.viper.ast.UserMethod
 
 interface FullNamedFunctionSignature : NamedFunctionSignature {
     /**
      * Preconditions of function in form of `ExpEmbedding`s with type `boolType()`.
      */
-    fun getEmbeddingPreconditions(returnVariable: VariableEmbedding): List<ExpEmbedding>
+    fun getPreconditions(returnVariable: VariableEmbedding): List<ExpEmbedding>
 
     /**
      * Postconditions of function in form of `ExpEmbedding`s with type `boolType()`.
      */
-    fun getEmbeddingPostconditions(returnVariable: VariableEmbedding): List<ExpEmbedding>
-
-    /**
-     * Preconditions of function in form of Viper `Exp`s of type `Bool`.
-     */
-    fun getViperPreconditions(returnVariable: VariableEmbedding): List<Exp> =
-        getEmbeddingPreconditions(returnVariable).pureToViper(toBuiltin = true)
-
-    /**
-     * Postconditions of function in form of Viper `Exp`s of type `Bool`.
-     */
-    fun getViperPostconditions(returnVariable: VariableEmbedding): List<Exp> =
-        getEmbeddingPostconditions(returnVariable).pureToViper(toBuiltin = true)
+    fun getPostconditions(returnVariable: VariableEmbedding): List<ExpEmbedding>
 
     val declarationSource: KtSourceElement?
 }
@@ -46,8 +33,8 @@ fun FullNamedFunctionSignature.toViperMethod(
     name,
     formalArgs.map { it.toLocalVarDecl() },
     returnVariable.toLocalVarDecl(),
-    getViperPreconditions(returnVariable),
-    getViperPostconditions(returnVariable),
+    getPreconditions(returnVariable).pureToViper(toBuiltin = true),
+    getPostconditions(returnVariable).pureToViper(toBuiltin = true),
     body,
     declarationSource.asPosition
 )
