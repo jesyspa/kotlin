@@ -52,8 +52,8 @@ method global$fun_isNullOrEmptyWrong$fun_take$NT_class_pkg$kotlin$global$class_C
   if (!(local$seq == dom$RuntimeType$nullValue())) {
     var anonymous$0: Ref
     anonymous$0 := pkg$kotlin$class_CharSequence$getter_length(local$seq)
-    ret$0 := special$notBool(dom$RuntimeType$boolToRef(anonymous$0 ==
-      dom$RuntimeType$intToRef(0)))
+    ret$0 := special$notBool(dom$RuntimeType$boolToRef(dom$RuntimeType$intFromRef(anonymous$0) ==
+      0))
   } else {
     ret$0 := dom$RuntimeType$boolToRef(false)}
   goto label$ret$0

@@ -29,8 +29,7 @@ method global$fun_safe_binary_search$fun_take$T_class_pkg$kotlin$collections$glo
     var anonymous$2: Ref
     anonymous$2 := pkg$kotlin$collections$class_List$fun_get$fun_take$T_class_pkg$kotlin$collections$global$class_List$T_Int$return$T_Int(local$arr,
       local0$mid)
-    if (dom$RuntimeType$intFromRef(anonymous$2) ==
-    dom$RuntimeType$intFromRef(local$target)) {
+    if (anonymous$2 == local$target) {
       ret$0 := dom$RuntimeType$boolToRef(true)
     } else {
       var anonymous$3: Ref
@@ -152,8 +151,7 @@ method global$fun_unsafe_binary_search_fixed$fun_take$T_class_pkg$kotlin$collect
   local0$mid := special$plusInts(local$left, anonymous$3)
   anonymous$4 := pkg$kotlin$collections$class_List$fun_get$fun_take$T_class_pkg$kotlin$collections$global$class_List$T_Int$return$T_Int(local$arr,
     local0$mid)
-  if (dom$RuntimeType$intFromRef(anonymous$4) ==
-  dom$RuntimeType$intFromRef(local$target)) {
+  if (anonymous$4 == local$target) {
     ret$0 := dom$RuntimeType$boolToRef(true)
   } else {
     var anonymous$5: Ref

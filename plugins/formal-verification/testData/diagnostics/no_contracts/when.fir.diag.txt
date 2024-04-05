@@ -202,8 +202,7 @@ method global$fun_when_subject_val_nested$fun_take$$return$T_Unit()
     } else {
       var local6$z: Ref
       local6$z := dom$RuntimeType$intToRef(1)
-      if (dom$RuntimeType$intFromRef(local6$z) ==
-      dom$RuntimeType$intFromRef(local3$y)) {
+      if (local6$z == local3$y) {
         anonymous$0 := dom$RuntimeType$intToRef(2)
       } elseif (dom$RuntimeType$intFromRef(local6$z) ==
       dom$RuntimeType$intFromRef(local1$x) + 1) {
@@ -211,8 +210,7 @@ method global$fun_when_subject_val_nested$fun_take$$return$T_Unit()
       } else {
         anonymous$0 := dom$RuntimeType$intToRef(4)}
     }
-    if (dom$RuntimeType$intFromRef(local1$x) ==
-    dom$RuntimeType$intFromRef(anonymous$0)) {
+    if (local1$x == anonymous$0) {
     }
   }
   label label$ret$0

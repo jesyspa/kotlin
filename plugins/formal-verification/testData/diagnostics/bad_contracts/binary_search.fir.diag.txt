@@ -31,8 +31,7 @@ method global$fun_mid_increased_by_one$fun_take$T_class_pkg$kotlin$collections$g
     var anonymous$3: Ref
     anonymous$3 := pkg$kotlin$collections$class_List$fun_get$fun_take$T_class_pkg$kotlin$collections$global$class_List$T_Int$return$T_Int(local$arr,
       local0$mid)
-    if (dom$RuntimeType$intFromRef(anonymous$3) ==
-    dom$RuntimeType$intFromRef(local$target)) {
+    if (anonymous$3 == local$target) {
       ret$0 := dom$RuntimeType$boolToRef(true)
     } else {
       var anonymous$4: Ref
@@ -145,8 +144,7 @@ method global$fun_mid_decreased_by_one$fun_take$T_class_pkg$kotlin$collections$g
     var anonymous$3: Ref
     anonymous$3 := pkg$kotlin$collections$class_List$fun_get$fun_take$T_class_pkg$kotlin$collections$global$class_List$T_Int$return$T_Int(local$arr,
       local0$mid)
-    if (dom$RuntimeType$intFromRef(anonymous$3) ==
-    dom$RuntimeType$intFromRef(local$target)) {
+    if (anonymous$3 == local$target) {
       ret$0 := dom$RuntimeType$boolToRef(true)
     } else {
       var anonymous$4: Ref
@@ -257,8 +255,7 @@ method global$fun_mid_decreased_by_one_in_rec_call$fun_take$T_class_pkg$kotlin$c
     var anonymous$2: Ref
     anonymous$2 := pkg$kotlin$collections$class_List$fun_get$fun_take$T_class_pkg$kotlin$collections$global$class_List$T_Int$return$T_Int(local$arr,
       local0$mid)
-    if (dom$RuntimeType$intFromRef(anonymous$2) ==
-    dom$RuntimeType$intFromRef(local$target)) {
+    if (anonymous$2 == local$target) {
       ret$0 := dom$RuntimeType$boolToRef(true)
     } else {
       var anonymous$3: Ref
@@ -368,8 +365,7 @@ method global$fun_unsafe_binary_search$fun_take$T_class_pkg$kotlin$collections$g
   local0$mid := special$plusInts(local$left, anonymous$0)
   anonymous$1 := pkg$kotlin$collections$class_List$fun_get$fun_take$T_class_pkg$kotlin$collections$global$class_List$T_Int$return$T_Int(local$arr,
     local0$mid)
-  if (dom$RuntimeType$intFromRef(anonymous$1) ==
-  dom$RuntimeType$intFromRef(local$target)) {
+  if (anonymous$1 == local$target) {
     ret$0 := dom$RuntimeType$boolToRef(true)
   } else {
     var anonymous$2: Ref

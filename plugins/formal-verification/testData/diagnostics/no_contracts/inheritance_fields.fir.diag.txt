@@ -61,8 +61,7 @@ method class_SecondBackingFieldClass$constructor$fun_take$T_Int$return$T_class_g
   returns (ret: Ref)
   ensures dom$RuntimeType$isSubtype(dom$RuntimeType$typeOf(ret), dom$RuntimeType$T_class_global$class_SecondBackingFieldClass())
   ensures acc(ret.class_FirstBackingFieldClass$member_x, wildcard)
-  ensures dom$RuntimeType$intFromRef(ret.class_FirstBackingFieldClass$member_x) ==
-    dom$RuntimeType$intFromRef(local$x)
+  ensures ret.class_FirstBackingFieldClass$member_x == local$x
 
 
 method global$fun_createBFsAndNoBF$fun_take$$return$T_Unit()
