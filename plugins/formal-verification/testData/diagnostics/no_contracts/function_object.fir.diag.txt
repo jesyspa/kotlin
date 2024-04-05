@@ -2,7 +2,7 @@
 method global$fun_unit_function$fun_take$fun_take$$return$T_Unit$return$T_Unit(local$f: Ref)
   returns (ret$0: Ref)
   requires acc(local$f.special$function_object_call_counter, write)
-  requires dom$RuntimeType$boolFromRef(special$duplicable(local$f))
+  requires special$duplicable(local$f)
   ensures acc(local$f.special$function_object_call_counter, write)
   ensures dom$RuntimeType$intFromRef(old(local$f.special$function_object_call_counter)) <=
     dom$RuntimeType$intFromRef(local$f.special$function_object_call_counter)
@@ -17,7 +17,7 @@ method global$fun_unit_function$fun_take$fun_take$$return$T_Unit$return$T_Unit(l
 method global$fun_function_object_call$fun_take$fun_take$T_Boolean$T_Int$return$T_Int$return$T_Int(local$g: Ref)
   returns (ret$0: Ref)
   requires acc(local$g.special$function_object_call_counter, write)
-  requires dom$RuntimeType$boolFromRef(special$duplicable(local$g))
+  requires special$duplicable(local$g)
   ensures acc(local$g.special$function_object_call_counter, write)
   ensures dom$RuntimeType$intFromRef(old(local$g.special$function_object_call_counter)) <=
     dom$RuntimeType$intFromRef(local$g.special$function_object_call_counter)
@@ -40,8 +40,8 @@ method global$fun_function_object_nested_call$fun_take$fun_take$T_Int$return$T_I
   returns (ret$0: Ref)
   requires acc(local$f.special$function_object_call_counter, write)
   requires acc(local$g.special$function_object_call_counter, write)
-  requires dom$RuntimeType$boolFromRef(special$duplicable(local$f))
-  requires dom$RuntimeType$boolFromRef(special$duplicable(local$g))
+  requires special$duplicable(local$f)
+  requires special$duplicable(local$g)
   ensures acc(local$f.special$function_object_call_counter, write)
   ensures acc(local$g.special$function_object_call_counter, write)
   ensures dom$RuntimeType$intFromRef(old(local$f.special$function_object_call_counter)) <=

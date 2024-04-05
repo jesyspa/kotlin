@@ -2,7 +2,7 @@
 method global$fun_capture_arg$fun_take$fun_take$T_Int$return$T_Int$return$T_Int(local$g: Ref)
   returns (ret$0: Ref)
   requires acc(local$g.special$function_object_call_counter, write)
-  requires dom$RuntimeType$boolFromRef(special$duplicable(local$g))
+  requires special$duplicable(local$g)
   ensures acc(local$g.special$function_object_call_counter, write)
   ensures dom$RuntimeType$intFromRef(old(local$g.special$function_object_call_counter)) <=
     dom$RuntimeType$intFromRef(local$g.special$function_object_call_counter)

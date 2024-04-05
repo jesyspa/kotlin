@@ -222,8 +222,7 @@ function special$divInts(arg1: Ref, arg2: Ref): Ref
     dom$RuntimeType$intFromRef(arg1) / dom$RuntimeType$intFromRef(arg2)
 
 
-function special$duplicable(arg1: Ref): Ref
-  ensures dom$RuntimeType$isSubtype(dom$RuntimeType$typeOf(result), dom$RuntimeType$boolType())
+function special$duplicable(arg1: Ref): Bool
 
 
 function special$geInts(arg1: Ref, arg2: Ref): Ref

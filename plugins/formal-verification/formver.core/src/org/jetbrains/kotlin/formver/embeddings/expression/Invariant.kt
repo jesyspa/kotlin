@@ -19,7 +19,7 @@ data class Old(override val inner: ExpEmbedding) : UnaryDirectResultExpEmbedding
     override fun toViper(ctx: LinearizationContext): Exp = Exp.Old(inner.toViper(ctx), ctx.source.asPosition)
 }
 
-data class DuplicableCall(override val inner: ExpEmbedding) : UnaryDirectResultExpEmbedding {
+data class DuplicableCall(override val inner: ExpEmbedding) : UnaryDirectResultExpEmbedding, OnlyToBuiltinTypeExpEmbedding {
     override val type: TypeEmbedding = BooleanTypeEmbedding
 
     override val sourceRole = SourceRole.ParamFunctionLeakageCheck(
@@ -27,7 +27,7 @@ data class DuplicableCall(override val inner: ExpEmbedding) : UnaryDirectResultE
             ?: error("Parameter of a duplicable function must be a fir symbol.")
     )
 
-    override fun toViper(ctx: LinearizationContext): Exp =
+    override fun toViperBuiltinType(ctx: LinearizationContext): Exp =
         SpecialFunctions.duplicableFunction(inner.toViper(ctx), pos = ctx.source.asPosition, info = sourceRole.asInfo)
 }
 

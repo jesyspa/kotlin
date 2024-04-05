@@ -50,10 +50,8 @@ class FieldAccessFunction(
 
 object SpecialFunctions {
     val duplicableFunction = FunctionBuilder.build("duplicable") {
-        argument(Type.Ref)
-        postcondition {
-            returns(Type.Ref) isOf boolType()
-        }
+        argument { Type.Ref }
+        returns { Type.Bool }
     }
     val all = listOf(duplicableFunction) + RuntimeTypeDomain.accompanyingFunctions
 }

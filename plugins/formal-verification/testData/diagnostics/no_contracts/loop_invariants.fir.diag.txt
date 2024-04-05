@@ -2,7 +2,7 @@
 method global$fun_dynamic_lambda_invariant$fun_take$fun_take$$return$T_Int$return$T_Unit(local$f: Ref)
   returns (ret$0: Ref)
   requires acc(local$f.special$function_object_call_counter, write)
-  requires dom$RuntimeType$boolFromRef(special$duplicable(local$f))
+  requires special$duplicable(local$f)
   ensures acc(local$f.special$function_object_call_counter, write)
   ensures dom$RuntimeType$intFromRef(old(local$f.special$function_object_call_counter)) <=
     dom$RuntimeType$intFromRef(local$f.special$function_object_call_counter)
@@ -39,7 +39,7 @@ method global$fun_returns_boolean$fun_take$$return$T_Boolean()
 method global$fun_function_assignment$fun_take$fun_take$$return$T_Int$return$T_Unit(local$f: Ref)
   returns (ret$0: Ref)
   requires acc(local$f.special$function_object_call_counter, write)
-  requires dom$RuntimeType$boolFromRef(special$duplicable(local$f))
+  requires special$duplicable(local$f)
   ensures acc(local$f.special$function_object_call_counter, write)
   ensures dom$RuntimeType$intFromRef(old(local$f.special$function_object_call_counter)) <=
     dom$RuntimeType$intFromRef(local$f.special$function_object_call_counter)
@@ -80,8 +80,8 @@ method global$fun_conditional_function_assignment$fun_take$T_Boolean$fun_take$$r
   returns (ret$0: Ref)
   requires acc(local$f.special$function_object_call_counter, write)
   requires acc(local$h.special$function_object_call_counter, write)
-  requires dom$RuntimeType$boolFromRef(special$duplicable(local$f))
-  requires dom$RuntimeType$boolFromRef(special$duplicable(local$h))
+  requires special$duplicable(local$f)
+  requires special$duplicable(local$h)
   ensures acc(local$f.special$function_object_call_counter, write)
   ensures acc(local$h.special$function_object_call_counter, write)
   ensures dom$RuntimeType$intFromRef(old(local$f.special$function_object_call_counter)) <=
