@@ -57,7 +57,7 @@ class Injection(
  */
 class InjectionImageFunction(
     name: String,
-    val original: Function,
+    val original: Applicable,
     argsInjections: List<Injection>,
     resultInjection: Injection,
     checkDivisor: Boolean = false

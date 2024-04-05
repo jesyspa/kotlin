@@ -7,7 +7,18 @@ package org.jetbrains.kotlin.formver.viper.ast
 
 import org.jetbrains.kotlin.formver.viper.*
 
-interface Function : IntoSilver<viper.silver.ast.Function> {
+
+/**
+ * We want to deal with Viper's binary operators, functions and domain functions in a similar manner, hence introducing this common interface.
+ */
+interface Applicable {
+    fun toFuncApp(args: List<Exp>, pos: Position = Position.NoPosition, info: Info = Info.NoInfo, trafos: Trafos = Trafos.NoTrafos): Exp
+
+    operator fun invoke(vararg args: Exp, pos: Position = Position.NoPosition, info: Info = Info.NoInfo, trafos: Trafos = Trafos.NoTrafos) =
+        toFuncApp(args.toList(), pos, info, trafos)
+}
+
+interface Function : IntoSilver<viper.silver.ast.Function>, Applicable {
     val name: MangledName
     val pos: Position
         get() = Position.NoPosition
@@ -31,19 +42,12 @@ interface Function : IntoSilver<viper.silver.ast.Function> {
         pos.toSilver(), info.toSilver(), trafos.toSilver()
     )
 
-    fun toFuncApp(
+    override fun toFuncApp(
         args: List<Exp>,
-        pos: Position = Position.NoPosition,
-        info: Info = Info.NoInfo,
-        trafos: Trafos = Trafos.NoTrafos,
-    ): Exp = Exp.FuncApp(name, args, retType, pos, info, trafos)
-
-    operator fun invoke(
-        vararg args: Exp,
-        pos: Position = Position.NoPosition,
-        info: Info = Info.NoInfo,
-        trafos: Trafos = Trafos.NoTrafos
-    ): Exp = toFuncApp(args.toList(), pos, info, trafos)
+        pos: Position,
+        info: Info,
+        trafos: Trafos,
+    ): Exp.FuncApp = Exp.FuncApp(name, args, retType, pos, info, trafos)
 }
 
 abstract class BuiltinFunction(
@@ -55,23 +59,8 @@ abstract class BuiltinFunction(
     override val includeInDumpPolicy: IncludeInDumpPolicy = IncludeInDumpPolicy.ONLY_IN_FULL_DUMP
 }
 
-class OperatorFunctionMemberAccessError(message: String) : RuntimeException(message)
-
-fun fakeFunctionError(message: String): Nothing = throw OperatorFunctionMemberAccessError(message)
 
 /**
- * These are fake functions created for convenient interaction with arithmetic and boolean operations.
+ * These are function-like classes which are not translated to Viper as function calls but as arithmetic and/or boolean operations.
  */
-interface OperatorFunction : Function {
-    override val name: MangledName
-        get() = fakeFunctionError("Names of fake functions should not be accessed.")
-
-    override val includeInDumpPolicy: IncludeInDumpPolicy
-        get() = fakeFunctionError("Fake functions shouldn't be considered for inclusion in Viper dumps.")
-
-    override val formalArgs: List<Declaration.LocalVarDecl>
-        get() = fakeFunctionError("Formal args of fake functions should not be accessed.")
-
-    override val retType: Type
-        get() = fakeFunctionError("Returned type of fake functions should not be accessed.")
-}
+interface Operator : Applicable

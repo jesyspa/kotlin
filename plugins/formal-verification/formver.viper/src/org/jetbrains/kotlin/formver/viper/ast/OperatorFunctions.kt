@@ -5,105 +5,105 @@
 
 package org.jetbrains.kotlin.formver.viper.ast
 
-data object PlusInts : OperatorFunction {
+data object PlusInts : Operator {
     override fun toFuncApp(args: List<Exp>, pos: Position, info: Info, trafos: Trafos): Exp {
         check(args.size == 2)
         return Exp.Add(args[0], args[1], pos, info, trafos)
     }
 }
 
-data object MinusInts : OperatorFunction {
+data object MinusInts : Operator {
     override fun toFuncApp(args: List<Exp>, pos: Position, info: Info, trafos: Trafos): Exp {
         check(args.size == 2)
         return Exp.Sub(args[0], args[1], pos, info, trafos)
     }
 }
 
-data object TimesInts : OperatorFunction {
+data object TimesInts : Operator {
     override fun toFuncApp(args: List<Exp>, pos: Position, info: Info, trafos: Trafos): Exp {
         check(args.size == 2)
         return Exp.Mul(args[0], args[1], pos, info, trafos)
     }
 }
 
-data object DivInts : OperatorFunction {
+data object DivInts : Operator {
     override fun toFuncApp(args: List<Exp>, pos: Position, info: Info, trafos: Trafos): Exp {
         check(args.size == 2)
         return Exp.Div(args[0], args[1], pos, info, trafos)
     }
 }
 
-data object RemInts : OperatorFunction {
+data object RemInts : Operator {
     override fun toFuncApp(args: List<Exp>, pos: Position, info: Info, trafos: Trafos): Exp {
         check(args.size == 2)
         return Exp.Mod(args[0], args[1], pos, info, trafos)
     }
 }
 
-data object NotBool : OperatorFunction {
+data object NotBool : Operator {
     override fun toFuncApp(args: List<Exp>, pos: Position, info: Info, trafos: Trafos): Exp {
         check(args.size == 1)
         return Exp.Not(args[0], pos, info, trafos)
     }
 }
 
-data object AndBools : OperatorFunction {
+data object AndBools : Operator {
     override fun toFuncApp(args: List<Exp>, pos: Position, info: Info, trafos: Trafos): Exp {
         check(args.size == 2)
         return Exp.And(args[0], args[1], pos, info, trafos)
     }
 }
 
-data object OrBools : OperatorFunction {
+data object OrBools : Operator {
     override fun toFuncApp(args: List<Exp>, pos: Position, info: Info, trafos: Trafos): Exp {
         check(args.size == 2)
         return Exp.Or(args[0], args[1], pos, info, trafos)
     }
 }
 
-data object ImpliesBools : OperatorFunction {
+data object ImpliesBools : Operator {
     override fun toFuncApp(args: List<Exp>, pos: Position, info: Info, trafos: Trafos): Exp {
         check(args.size == 2)
         return Exp.Implies(args[0], args[1], pos, info, trafos)
     }
 }
 
-data object GeInts : OperatorFunction {
+data object GeInts : Operator {
     override fun toFuncApp(args: List<Exp>, pos: Position, info: Info, trafos: Trafos): Exp {
         check(args.size == 2)
         return Exp.GeCmp(args[0], args[1], pos, info, trafos)
     }
 }
 
-data object LeInts : OperatorFunction {
+data object LeInts : Operator {
     override fun toFuncApp(args: List<Exp>, pos: Position, info: Info, trafos: Trafos): Exp {
         check(args.size == 2)
         return Exp.LeCmp(args[0], args[1], pos, info, trafos)
     }
 }
 
-data object GtInts : OperatorFunction {
+data object GtInts : Operator {
     override fun toFuncApp(args: List<Exp>, pos: Position, info: Info, trafos: Trafos): Exp {
         check(args.size == 2)
         return Exp.GtCmp(args[0], args[1], pos, info, trafos)
     }
 }
 
-data object LtInts : OperatorFunction {
+data object LtInts : Operator {
     override fun toFuncApp(args: List<Exp>, pos: Position, info: Info, trafos: Trafos): Exp {
         check(args.size == 2)
         return Exp.LtCmp(args[0], args[1], pos, info, trafos)
     }
 }
 
-data object EqAny : OperatorFunction {
+data object EqAny : Operator {
     override fun toFuncApp(args: List<Exp>, pos: Position, info: Info, trafos: Trafos): Exp {
         check(args.size == 2)
         return Exp.EqCmp(args[0], args[1], pos, info, trafos)
     }
 }
 
-data object NeAny : OperatorFunction {
+data object NeAny : Operator {
     override fun toFuncApp(args: List<Exp>, pos: Position, info: Info, trafos: Trafos): Exp {
         check(args.size == 2)
         return Exp.NeCmp(args[0], args[1], pos, info, trafos)

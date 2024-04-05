@@ -12,16 +12,16 @@ import org.jetbrains.kotlin.formver.embeddings.BooleanTypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.SourceRole
 import org.jetbrains.kotlin.formver.embeddings.asInfo
 import org.jetbrains.kotlin.formver.linearization.LinearizationContext
+import org.jetbrains.kotlin.formver.viper.ast.Operator
 import org.jetbrains.kotlin.formver.viper.ast.EqAny
 import org.jetbrains.kotlin.formver.viper.ast.Exp
 import org.jetbrains.kotlin.formver.viper.ast.NeAny
-import org.jetbrains.kotlin.formver.viper.ast.OperatorFunction
 
 sealed interface AnyComparisonExpression : BinaryDirectResultExpEmbedding {
     override val type
         get() = BooleanTypeEmbedding
 
-    val comparisonOperation: OperatorFunction
+    val comparisonOperation: Operator
 
     override fun toViper(ctx: LinearizationContext): Exp =
         RuntimeTypeDomain.boolInjection.toRef(
