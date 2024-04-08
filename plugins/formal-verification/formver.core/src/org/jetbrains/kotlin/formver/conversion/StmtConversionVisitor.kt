@@ -89,7 +89,7 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext>()
         return if (branch.condition is FirElseIfTrueCondition) {
             data.withNewScope { convert(branch.result) }
         } else {
-            val cond = data.convert(branch.condition)
+            val cond = data.convert(branch.condition).withType(BooleanTypeEmbedding)
             val thenExp = data.withNewScope { convert(branch.result) }
             val elseExp = convertWhenBranches(whenBranches, type, data)
             If(cond, thenExp, elseExp, type)
@@ -204,7 +204,7 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext>()
     }
 
     override fun visitWhileLoop(whileLoop: FirWhileLoop, data: StmtConversionContext): ExpEmbedding {
-        val condition = data.convert(whileLoop.condition)
+        val condition = data.convert(whileLoop.condition).withType(BooleanTypeEmbedding)
         val returnTarget = data.defaultResolvedReturnTarget
         val invariants = when (val sig = data.signature) {
             is FullNamedFunctionSignature -> sig.getPostconditions(returnTarget.variable)
