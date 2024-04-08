@@ -16,7 +16,7 @@ import org.jetbrains.kotlin.formver.viper.ast.*
  * After `argument` clause arguments can be used via `args` List.
  * After `returns` clause result can be used via `result`.
  */
-internal class FunctionBuilder private constructor() {
+class FunctionBuilder private constructor() {
     private val pres = mutableListOf<Exp>()
     private val posts = mutableListOf<Exp>()
     private val formalArgs = mutableListOf<Var>()

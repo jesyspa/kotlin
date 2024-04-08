@@ -12,6 +12,28 @@ import org.jetbrains.kotlin.formver.viper.ast.Function
 /**
  * Produces set of axioms for injections from built-in types in Viper to Ref.
  *
+ * Example for Bool:
+ *   ```viper
+ *   axiom {
+ *     (forall v: Bool ::
+ *       { isSubtype(typeOf(boolToRef(v)), boolType()) }
+ *       isSubtype(typeOf(boolToRef(v)), boolType()))
+ *   }
+ *
+ *   axiom {
+ *     (forall v: Bool ::
+ *       { boolFromRef(boolToRef(v)) }
+ *       boolFromRef(boolToRef(v)) == v)
+ *   }
+ *
+ *   axiom {
+ *     (forall r: Ref ::
+ *       { boolToRef(boolFromRef(r)) }
+ *       isSubtype(typeOf(r), boolType()) ==>
+ *       boolToRef(boolFromRef(r)) == r)
+ *   }
+ *   ```
+ *
  * @param viperType: built-in type which needs to be mapped
  * @param typeFunction: representation of that type as a domain func
  */
@@ -51,24 +73,28 @@ class Injection(
  * then resulting `InjectionImageFunction` will take `Ref` of type `intType()` as an argument
  * and return `Ref` of type `boolType()`.
  *
+ *   ```viper
+ *   function special$divInts(arg1: Ref, arg2: Ref): Ref
+ *     requires dom$RuntimeType$intFromRef(arg2) != 0
+ *     ensures dom$RuntimeType$isSubtype(dom$RuntimeType$typeOf(result), dom$RuntimeType$intType())
+ *     ensures dom$RuntimeType$intFromRef(result) ==
+ *       dom$RuntimeType$intFromRef(arg1) / dom$RuntimeType$intFromRef(arg2)
+ *   ```
+ *
  * @param argsInjections injections that must be applied to the arguments of the operation
  * @param resultInjection injection that must be applied to the result of the operation
- * @param checkDivisor adds precondition that divisor (second argument) is not zero
+ * @param additionalConditions allows to add additional preconditions and/or postconditions
  */
 class InjectionImageFunction(
     name: String,
     val original: Applicable,
     argsInjections: List<Injection>,
     resultInjection: Injection,
-    checkDivisor: Boolean = false
+    additionalConditions: FunctionBuilder.() -> Unit = { }
 ) : Function by FunctionBuilder.build(name, {
     val viperResult = original.toFuncApp(argsInjections.map { it.fromRef(argument(Type.Ref)) })
-    if (checkDivisor) {
-        check(argsInjections.size == 2 && argsInjections[1] == RuntimeTypeDomain.intInjection) {
-            "checkDivisor is only allowed for integer operations with two arguments"
-        }
-        precondition { RuntimeTypeDomain.intInjection.fromRef(args[1]) ne 0.toExp() }
-    }
-    postcondition { returns(Type.Ref) isOf resultInjection.typeFunction() }
+    returns(Type.Ref)
+    postcondition { result isOf resultInjection.typeFunction() }
     postcondition { resultInjection.fromRef(result) eq viperResult }
+    additionalConditions()
 })

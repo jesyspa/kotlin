@@ -262,8 +262,16 @@ class RuntimeTypeDomain(classes: List<ClassTypeEmbedding>) : BuiltinDomain(RUNTI
         val plusInts = InjectionImageFunction("plusInts", PlusInts, bothArgsInts, intInjection)
         val minusInts = InjectionImageFunction("minusInts", MinusInts, bothArgsInts, intInjection)
         val timesInts = InjectionImageFunction("timesInts", TimesInts, bothArgsInts, intInjection)
-        val divInts = InjectionImageFunction("divInts", DivInts, bothArgsInts, intInjection, checkDivisor = true)
-        val remInts = InjectionImageFunction("remInts", RemInts, bothArgsInts, intInjection, checkDivisor = true)
+        val divInts = InjectionImageFunction("divInts", DivInts, bothArgsInts, intInjection) {
+            precondition {
+                intInjection.fromRef(args[1]) ne 0.toExp()
+            }
+        }
+        val remInts = InjectionImageFunction("remInts", RemInts, bothArgsInts, intInjection) {
+            precondition {
+                intInjection.fromRef(args[1]) ne 0.toExp()
+            }
+        }
         val gtInts = InjectionImageFunction("gtInts", GtInts, bothArgsInts, boolInjection)
         val ltInts = InjectionImageFunction("ltInts", LtInts, bothArgsInts, boolInjection)
         val geInts = InjectionImageFunction("geInts", GeInts, bothArgsInts, boolInjection)
