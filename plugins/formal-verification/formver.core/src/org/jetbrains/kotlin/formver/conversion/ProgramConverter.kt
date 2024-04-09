@@ -6,6 +6,7 @@
 package org.jetbrains.kotlin.formver.conversion
 
 import org.jetbrains.kotlin.KtSourceElement
+import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.declarations.FirSimpleFunction
 import org.jetbrains.kotlin.fir.declarations.impl.FirDefaultPropertyGetter
@@ -107,7 +108,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
                 // `ProgramConverter`.
 
                 // Phase 1
-                val newEmbedding = ClassTypeEmbedding(className)
+                val newEmbedding = ClassTypeEmbedding(className, symbol.classKind == ClassKind.INTERFACE)
                 classes[className] = newEmbedding
 
                 // Phase 2

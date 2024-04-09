@@ -1,0 +1,218 @@
+/predicates_access.kt:(223,246): info: Generated Viper text for accessSuperTypeProperty:
+field class_A$member_a: Int
+
+field class_B$member_b: Int
+
+field class_C$member_x: Ref
+
+field class_C$member_y: Ref
+
+function T_class_global$class_A$get$class_A$member_a(special$get$function$subject: Ref): Int
+  requires acc(T_class_global$class_A(special$get$function$subject), wildcard)
+{
+  (unfolding acc(T_class_global$class_A(special$get$function$subject), wildcard) in
+    special$get$function$subject.class_A$member_a)
+}
+
+function T_class_global$class_B$get$class_A$member_a(special$get$function$subject: Ref): Int
+  requires acc(T_class_global$class_B(special$get$function$subject), wildcard)
+{
+  (unfolding acc(T_class_global$class_B(special$get$function$subject), wildcard) in
+    T_class_global$class_A$get$class_A$member_a(special$get$function$subject))
+}
+
+function T_class_global$class_B$get$class_B$member_b(special$get$function$subject: Ref): Int
+  requires acc(T_class_global$class_B(special$get$function$subject), wildcard)
+{
+  (unfolding acc(T_class_global$class_B(special$get$function$subject), wildcard) in
+    special$get$function$subject.class_B$member_b)
+}
+
+function T_class_global$class_C$get$class_A$member_a(special$get$function$subject: Ref): Int
+  requires acc(T_class_global$class_C(special$get$function$subject), wildcard)
+{
+  (unfolding acc(T_class_global$class_C(special$get$function$subject), wildcard) in
+    T_class_global$class_B$get$class_A$member_a(special$get$function$subject))
+}
+
+function T_class_global$class_C$get$class_B$member_b(special$get$function$subject: Ref): Int
+  requires acc(T_class_global$class_C(special$get$function$subject), wildcard)
+{
+  (unfolding acc(T_class_global$class_C(special$get$function$subject), wildcard) in
+    T_class_global$class_B$get$class_B$member_b(special$get$function$subject))
+}
+
+function T_class_global$class_C$get$class_C$member_x(special$get$function$subject: Ref): Ref
+  requires acc(T_class_global$class_C(special$get$function$subject), wildcard)
+{
+  (unfolding acc(T_class_global$class_C(special$get$function$subject), wildcard) in
+    special$get$function$subject.class_C$member_x)
+}
+
+predicate T_class_global$class_A(special$class$predicate$subject: Ref) {
+  acc(special$class$predicate$subject.class_A$member_a, wildcard)
+}
+
+predicate T_class_global$class_B(special$class$predicate$subject: Ref) {
+  acc(special$class$predicate$subject.class_B$member_b, wildcard) &&
+  acc(T_class_global$class_A(special$class$predicate$subject), wildcard)
+}
+
+predicate T_class_global$class_C(special$class$predicate$subject: Ref) {
+  acc(special$class$predicate$subject.class_C$member_x, wildcard) &&
+  acc(T_class_global$class_A(special$class$predicate$subject.class_C$member_x), wildcard) &&
+  acc(T_class_global$class_D(special$class$predicate$subject), wildcard) &&
+  acc(T_class_global$class_B(special$class$predicate$subject), wildcard)
+}
+
+predicate T_class_global$class_D(special$class$predicate$subject: Ref) {
+  true
+}
+
+method class_D$getter_d(this: Ref) returns (ret: Int)
+  requires acc(T_class_global$class_D(this), wildcard)
+  ensures acc(T_class_global$class_D(this), wildcard)
+
+
+method global$fun_accessSuperTypeProperty$fun_take$T_class_global$class_C$return$T_Unit(local$c: Ref)
+  returns (ret$0: dom$Unit)
+  requires acc(T_class_global$class_C(local$c), wildcard)
+  ensures acc(T_class_global$class_C(local$c), wildcard)
+{
+  var local0$temp: Int
+  inhale dom$Type$isSubtype((dom$TypeOf$typeOf(local$c): dom$Type), dom$Type$global$class_C())
+  unfold acc(T_class_global$class_C(local$c), wildcard)
+  unfold acc(T_class_global$class_B(local$c), wildcard)
+  unfold acc(T_class_global$class_A(local$c), wildcard)
+  local0$temp := local$c.class_A$member_a
+  label label$ret$0
+}
+
+/predicates_access.kt:(294,306): info: Generated Viper text for accessNested:
+field class_A$member_a: Int
+
+field class_B$member_b: Int
+
+field class_C$member_x: Ref
+
+field class_C$member_y: Ref
+
+function T_class_global$class_A$get$class_A$member_a(special$get$function$subject: Ref): Int
+  requires acc(T_class_global$class_A(special$get$function$subject), wildcard)
+{
+  (unfolding acc(T_class_global$class_A(special$get$function$subject), wildcard) in
+    special$get$function$subject.class_A$member_a)
+}
+
+function T_class_global$class_B$get$class_A$member_a(special$get$function$subject: Ref): Int
+  requires acc(T_class_global$class_B(special$get$function$subject), wildcard)
+{
+  (unfolding acc(T_class_global$class_B(special$get$function$subject), wildcard) in
+    T_class_global$class_A$get$class_A$member_a(special$get$function$subject))
+}
+
+function T_class_global$class_B$get$class_B$member_b(special$get$function$subject: Ref): Int
+  requires acc(T_class_global$class_B(special$get$function$subject), wildcard)
+{
+  (unfolding acc(T_class_global$class_B(special$get$function$subject), wildcard) in
+    special$get$function$subject.class_B$member_b)
+}
+
+function T_class_global$class_C$get$class_A$member_a(special$get$function$subject: Ref): Int
+  requires acc(T_class_global$class_C(special$get$function$subject), wildcard)
+{
+  (unfolding acc(T_class_global$class_C(special$get$function$subject), wildcard) in
+    T_class_global$class_B$get$class_A$member_a(special$get$function$subject))
+}
+
+function T_class_global$class_C$get$class_B$member_b(special$get$function$subject: Ref): Int
+  requires acc(T_class_global$class_C(special$get$function$subject), wildcard)
+{
+  (unfolding acc(T_class_global$class_C(special$get$function$subject), wildcard) in
+    T_class_global$class_B$get$class_B$member_b(special$get$function$subject))
+}
+
+function T_class_global$class_C$get$class_C$member_x(special$get$function$subject: Ref): Ref
+  requires acc(T_class_global$class_C(special$get$function$subject), wildcard)
+{
+  (unfolding acc(T_class_global$class_C(special$get$function$subject), wildcard) in
+    special$get$function$subject.class_C$member_x)
+}
+
+predicate T_class_global$class_A(special$class$predicate$subject: Ref) {
+  acc(special$class$predicate$subject.class_A$member_a, wildcard)
+}
+
+predicate T_class_global$class_B(special$class$predicate$subject: Ref) {
+  acc(special$class$predicate$subject.class_B$member_b, wildcard) &&
+  acc(T_class_global$class_A(special$class$predicate$subject), wildcard)
+}
+
+predicate T_class_global$class_C(special$class$predicate$subject: Ref) {
+  acc(special$class$predicate$subject.class_C$member_x, wildcard) &&
+  acc(T_class_global$class_A(special$class$predicate$subject.class_C$member_x), wildcard) &&
+  acc(T_class_global$class_D(special$class$predicate$subject), wildcard) &&
+  acc(T_class_global$class_B(special$class$predicate$subject), wildcard)
+}
+
+predicate T_class_global$class_D(special$class$predicate$subject: Ref) {
+  true
+}
+
+method class_D$getter_d(this: Ref) returns (ret: Int)
+  requires acc(T_class_global$class_D(this), wildcard)
+  ensures acc(T_class_global$class_D(this), wildcard)
+
+
+method global$fun_accessNested$fun_take$T_class_global$class_C$return$T_Unit(local$c: Ref)
+  returns (ret$0: dom$Unit)
+  requires acc(T_class_global$class_C(local$c), wildcard)
+  ensures acc(T_class_global$class_C(local$c), wildcard)
+{
+  var local0$temp: Int
+  var anonymous$0: Ref
+  inhale dom$Type$isSubtype((dom$TypeOf$typeOf(local$c): dom$Type), dom$Type$global$class_C())
+  unfold acc(T_class_global$class_C(local$c), wildcard)
+  anonymous$0 := local$c.class_C$member_x
+  inhale dom$Type$isSubtype((dom$TypeOf$typeOf(anonymous$0): dom$Type), dom$Type$global$class_A())
+  unfold acc(T_class_global$class_A(anonymous$0), wildcard)
+  local0$temp := anonymous$0.class_A$member_a
+  label label$ret$0
+}
+
+/predicates_access.kt:(356,370): info: Generated Viper text for accessNullable:
+field class_A$member_a: Int
+
+function T_class_global$class_A$get$class_A$member_a(special$get$function$subject: Ref): Int
+  requires acc(T_class_global$class_A(special$get$function$subject), wildcard)
+{
+  (unfolding acc(T_class_global$class_A(special$get$function$subject), wildcard) in
+    special$get$function$subject.class_A$member_a)
+}
+
+predicate T_class_global$class_A(special$class$predicate$subject: Ref) {
+  acc(special$class$predicate$subject.class_A$member_a, wildcard)
+}
+
+method global$fun_accessNullable$fun_take$NT_class_global$class_A$return$T_Unit(local$x: dom$Nullable[Ref])
+  returns (ret$0: dom$Unit)
+  requires local$x != (dom$Nullable$null(): dom$Nullable[Ref]) ==>
+    acc(T_class_global$class_A((dom$Casting$cast(local$x, dom$Type$global$class_A()): Ref)), wildcard)
+  ensures local$x != (dom$Nullable$null(): dom$Nullable[Ref]) ==>
+    acc(T_class_global$class_A((dom$Casting$cast(local$x, dom$Type$global$class_A()): Ref)), wildcard)
+{
+  var local0$n: Int
+  inhale dom$Type$isSubtype((dom$TypeOf$typeOf(local$x): dom$Type), dom$Type$special$Nullable(dom$Type$global$class_A()))
+  if (!(local$x == (dom$Nullable$null(): dom$Nullable[Ref]) &&
+  (dom$Nullable$null(): dom$Nullable[dom$Unit]) ==
+  (dom$Nullable$null(): dom$Nullable[dom$Unit]) ||
+  local$x != (dom$Nullable$null(): dom$Nullable[Ref]) &&
+  (dom$Nullable$null(): dom$Nullable[dom$Unit]) !=
+  (dom$Nullable$null(): dom$Nullable[dom$Unit]) &&
+  (dom$Casting$cast(local$x, dom$Type$global$class_A()): Ref) ==
+  (dom$Casting$cast((dom$Nullable$null(): dom$Nullable[dom$Unit]), dom$Type$global$class_A()): Ref))) {
+    unfold acc(T_class_global$class_A((dom$Casting$cast(local$x, dom$Type$global$class_A()): Ref)), wildcard)
+    local0$n := (dom$Casting$cast(local$x, dom$Type$global$class_A()): Ref).class_A$member_a
+  }
+  label label$ret$0
+}

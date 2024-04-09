@@ -7,6 +7,7 @@ package org.jetbrains.kotlin.formver.embeddings.expression
 
 import org.jetbrains.kotlin.KtSourceElement
 import org.jetbrains.kotlin.formver.asPosition
+import org.jetbrains.kotlin.formver.conversion.AccessPolicy
 import org.jetbrains.kotlin.formver.domains.RuntimeTypeDomain
 import org.jetbrains.kotlin.formver.embeddings.*
 import org.jetbrains.kotlin.formver.embeddings.expression.debug.*
@@ -360,8 +361,17 @@ data class FieldAccess(val receiver: ExpEmbedding, val field: FieldEmbedding) : 
 
     override fun toViperStoringIn(result: VariableEmbedding, ctx: LinearizationContext) {
         val receiverViper = receiver.toViper(ctx)
-        val fieldAccess = PrimitiveFieldAccess(ExpWrapper(receiverViper, receiver.type), field)
-        val invariant = accessInvariant?.fillHole(ExpWrapper(receiverViper, receiver.type))?.pureToViper(toBuiltin = true, ctx.source)
+        val receiverWrapper = ExpWrapper(receiverViper, receiver.type)
+        val fieldAccess = PrimitiveFieldAccess(receiverWrapper, field)
+        val invariant = accessInvariant?.fillHole(receiverWrapper)?.pureToViper(toBuiltin = true, ctx.source)
+        // If the field is immutable, it is necessary to unfold predicates
+        if (field.accessPolicy == AccessPolicy.ALWAYS_READABLE && field is UserFieldEmbedding) {
+            val hierarchyPath = (receiver.type as? ClassTypeEmbedding)?.hierarchyUnfoldPath(field.name)
+            hierarchyPath?.forEach {
+                val predAcc = it.predicateAccessInvariant().fillHole(receiverWrapper).pureToViper(ctx.source) as? Exp.PredicateAccess
+                predAcc?.let { ctx.addStatement(Stmt.Unfold(predAcc)) }
+            }
+        }
         invariant?.let { ctx.addStatement(Stmt.Inhale(it, ctx.source.asPosition)) }
         ctx.addStatement(Stmt.assign(result.toViper(ctx), fieldAccess.pureToViper(toBuiltin = false, ctx.source), ctx.source.asPosition))
         invariant?.let { ctx.addStatement(Stmt.Exhale(it, ctx.source.asPosition)) }
@@ -407,10 +417,11 @@ data class FieldAccessPermissions(override val inner: ExpEmbedding, val field: F
 }
 
 // Ideally we would use the predicate, but due to the possibility of recursion this is inconvenient at present.
-data class PredicateAccessPermissions(val predicateName: MangledName, val args: List<ExpEmbedding>) : OnlyToBuiltinTypeExpEmbedding {
+data class PredicateAccessPermissions(val predicateName: MangledName, val args: List<ExpEmbedding>, val perm: PermExp) :
+    OnlyToBuiltinTypeExpEmbedding {
     override val type: TypeEmbedding = BooleanTypeEmbedding
     override fun toViperBuiltinType(ctx: LinearizationContext): Exp =
-        Exp.PredicateAccess(predicateName, args.map { it.toViper(ctx) }, ctx.source.asPosition)
+        Exp.PredicateAccess(predicateName, args.map { it.toViper(ctx) }, perm, ctx.source.asPosition)
 
     override val subexpressions: List<ExpEmbedding>
         get() = args

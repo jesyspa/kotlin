@@ -40,7 +40,7 @@ class FieldAccessFunction(
 ) : Function {
     override val name = GetterFunctionName(className, field.name)
     private val subject = Exp.LocalVar(GetterFunctionSubjectName, Type.Ref)
-    private val subjectAccess = Exp.PredicateAccess(className, listOf(subject))
+    private val subjectAccess = Exp.PredicateAccess(className, listOf(subject), PermExp.WildcardPerm())
     override val retType: Type = Type.Ref
     override val includeInDumpPolicy: IncludeInDumpPolicy = IncludeInDumpPolicy.PREDICATE_DUMP
     override val formalArgs: List<Declaration.LocalVarDecl> = listOf(Declaration.LocalVarDecl(GetterFunctionSubjectName, Type.Ref))
