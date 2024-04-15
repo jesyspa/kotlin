@@ -9,7 +9,6 @@ import org.jetbrains.kotlin.formver.conversion.AccessPolicy
 import org.jetbrains.kotlin.formver.conversion.SpecialFields
 import org.jetbrains.kotlin.formver.domains.*
 import org.jetbrains.kotlin.formver.embeddings.callables.CallableSignatureData
-import org.jetbrains.kotlin.formver.embeddings.callables.FieldAccessFunction
 import org.jetbrains.kotlin.formver.embeddings.expression.*
 import org.jetbrains.kotlin.formver.linearization.pureToViper
 import org.jetbrains.kotlin.formver.names.*
@@ -17,7 +16,6 @@ import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.formver.viper.ast.Exp
 import org.jetbrains.kotlin.formver.viper.ast.PermExp
 import org.jetbrains.kotlin.formver.viper.ast.Predicate
-import org.jetbrains.kotlin.formver.viper.ast.Type
 import org.jetbrains.kotlin.utils.addToStdlib.ifTrue
 
 /**
@@ -166,7 +164,6 @@ data object BooleanTypeEmbedding : TypeEmbedding {
 }
 
 
-
 data class NullableTypeEmbedding(val elementType: TypeEmbedding) : TypeEmbedding {
     override val runtimeType = RuntimeTypeDomain.nullable(elementType.runtimeType)
     override val name = object : MangledName {
@@ -247,42 +244,25 @@ data class ClassTypeEmbedding(val className: ScopedKotlinName, val isInterface: 
     private fun initPredicate(): Predicate {
         val subjectEmbedding = PlaceholderVariableEmbedding(ClassPredicateSubjectName, this)
         val accessFields = fields.values
-            .filter { it.accessPolicy == AccessPolicy.ALWAYS_READABLE }
-            .flatMap { it.accessInvariantsForParameter().fillHoles(subjectEmbedding) }
+            .mapNotNull { it.accessInvariantsForPredicate()?.fillHole(subjectEmbedding) }
 
         // For the moment ALWAYS_WRITEABLE fields with some class type do not exist.
         // Whether to include them here will need to be considered in the future.
         // We need to pass in the field access since the predicates are simply the ones for the type.
         val accessFieldPredicates = fields.values
             .filter { it.accessPolicy == AccessPolicy.ALWAYS_READABLE }
-            .mapNotNull { it.type.predicateAccessInvariant()?.fillHole(FieldAccess(subjectEmbedding, it)) }
+            .mapNotNull { it.type.predicateAccessInvariant()?.fillHole(PrimitiveFieldAccess(subjectEmbedding, it)) }
+
+        val fieldsProvenInvariants = fields.values
+            .filter { it.accessPolicy == AccessPolicy.ALWAYS_READABLE }
+            .flatMap { it.type.provenInvariants().fillHoles(PrimitiveFieldAccess(subjectEmbedding, it)) }
 
         val accessSuperTypesPredicates = superTypes
             .filterIsInstance<ClassTypeEmbedding>()
             .map { PredicateAccessTypeInvariantEmbedding(it.name, PermExp.WildcardPerm()).fillHole(subjectEmbedding) }
 
-        val body = (accessFields + accessFieldPredicates + accessSuperTypesPredicates).toConjunction()
+        val body = (accessFields + accessFieldPredicates + accessSuperTypesPredicates + fieldsProvenInvariants).toConjunction()
         return Predicate(name, listOf(subjectEmbedding.toLocalVarDecl()), body.pureToViper(toBuiltin = true))
-    }
-
-    // Note: This is a preparation for upcoming pull requests, functions for predicates unfolding are just declared and not used.
-    fun getterFunctions(): List<FieldAccessFunction> {
-        val receiver = PlaceholderVariableEmbedding(GetterFunctionSubjectName, this)
-        val getPropertyFunctions = fields.values
-            .filter { field -> field.accessPolicy == AccessPolicy.ALWAYS_READABLE }
-            .map { field -> FieldAccessFunction(name, field, FieldAccess(receiver, field).pureToViper(toBuiltin = false)) }
-        val getSuperPropertyFunctions = classSuperTypes.flatMap {
-            it.flatMapUniqueFields { _, field ->
-                if (field.accessPolicy == AccessPolicy.ALWAYS_READABLE) {
-                    val unfoldingBody =
-                        Exp.FuncApp(GetterFunctionName(it.name, field.name), listOf(receiver.toLocalVarUse()), Type.Ref)
-                    listOf(FieldAccessFunction(name, field, unfoldingBody))
-                } else {
-                    listOf()
-                }
-            }
-        }
-        return getPropertyFunctions + getSuperPropertyFunctions
     }
 
     // TODO: incorporate generic parameters.
@@ -310,8 +290,8 @@ data class ClassTypeEmbedding(val className: ScopedKotlinName, val isInterface: 
         PredicateAccessTypeInvariantEmbedding(name, PermExp.WildcardPerm())
 
     // Returns the list of classes in a hierarchy that need to be unfolded in order to access the given field
-    fun hierarchyUnfoldPath(fieldName: ScopedKotlinName): List<ClassTypeEmbedding> {
-        return if (fieldName.scope is ClassScope) {
+    fun hierarchyUnfoldPath(fieldName: MangledName): List<ClassTypeEmbedding> {
+        return if (fieldName is ScopedKotlinName && fieldName.scope is ClassScope) {
             if (fieldName.scope.className == className.name) {
                 listOf(this)
             } else {
@@ -329,7 +309,7 @@ data class ClassTypeEmbedding(val className: ScopedKotlinName, val isInterface: 
 }
 
 
-inline fun TypeEmbedding.injectionOr(default: () -> Injection): Injection = when(this) {
+inline fun TypeEmbedding.injectionOr(default: () -> Injection): Injection = when (this) {
     IntTypeEmbedding -> RuntimeTypeDomain.intInjection
     BooleanTypeEmbedding -> RuntimeTypeDomain.boolInjection
     else -> default()

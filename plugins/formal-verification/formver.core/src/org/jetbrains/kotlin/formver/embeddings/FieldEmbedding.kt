@@ -21,6 +21,8 @@ interface FieldEmbedding {
     val type: TypeEmbedding
     val viperType: Type
     val accessPolicy: AccessPolicy
+    val unfoldToAccess: Boolean
+        get() = false
     val includeInShortDump: Boolean
     val symbol: FirPropertySymbol?
         get() = null
@@ -31,11 +33,8 @@ interface FieldEmbedding {
 
     fun accessInvariantsForParameter(): List<TypeInvariantEmbedding> =
         when (accessPolicy) {
-            AccessPolicy.ALWAYS_INHALE_EXHALE -> listOf()
-            AccessPolicy.ALWAYS_READABLE -> listOf(
-                FieldAccessTypeInvariantEmbedding(this, PermExp.WildcardPerm())
-            )
             AccessPolicy.ALWAYS_WRITEABLE -> listOf(FieldAccessTypeInvariantEmbedding(this, PermExp.FullPerm()))
+            AccessPolicy.ALWAYS_INHALE_EXHALE, AccessPolicy.ALWAYS_READABLE -> listOf()
         } + extraAccessInvariantsForParameter()
 
     fun accessInvariantForAccess(): TypeInvariantEmbedding? =
@@ -43,15 +42,23 @@ interface FieldEmbedding {
             AccessPolicy.ALWAYS_INHALE_EXHALE -> FieldAccessTypeInvariantEmbedding(this, PermExp.FullPerm())
             AccessPolicy.ALWAYS_READABLE, AccessPolicy.ALWAYS_WRITEABLE -> null
         }
+
+    fun accessInvariantsForPredicate(): TypeInvariantEmbedding? =
+        when (accessPolicy) {
+            AccessPolicy.ALWAYS_READABLE -> FieldAccessTypeInvariantEmbedding(this, PermExp.WildcardPerm())
+            AccessPolicy.ALWAYS_INHALE_EXHALE, AccessPolicy.ALWAYS_WRITEABLE -> null
+        }
 }
 
 class UserFieldEmbedding(
     override val name: ScopedKotlinName,
     override val type: TypeEmbedding,
-    override val symbol: FirPropertySymbol
+    override val symbol: FirPropertySymbol,
 ) : FieldEmbedding {
     override val viperType = Type.Ref
     override val accessPolicy: AccessPolicy = if (symbol.isVal) AccessPolicy.ALWAYS_READABLE else AccessPolicy.ALWAYS_INHALE_EXHALE
+    override val unfoldToAccess: Boolean
+        get() = accessPolicy == AccessPolicy.ALWAYS_READABLE
     override val includeInShortDump: Boolean = true
 }
 

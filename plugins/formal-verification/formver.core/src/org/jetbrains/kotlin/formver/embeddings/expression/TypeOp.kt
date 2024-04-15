@@ -123,7 +123,7 @@ fun ExpEmbedding.withAccessInvariants(): ExpEmbedding = InhaleAccess(this).simpl
 
 class InhaleAccessAndProven(exp: ExpEmbedding) : InhaleInvariants(exp) {
     override val invariants: List<TypeInvariantEmbedding>
-        get() = type.accessInvariants() + type.provenInvariants()
+        get() = type.accessInvariants() + type.provenInvariants() + listOfNotNull(type.predicateAccessInvariant())
 }
 
 fun ExpEmbedding.withAccessAndProvenInvariants(): ExpEmbedding = InhaleAccessAndProven(this).simplified

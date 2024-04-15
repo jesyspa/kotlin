@@ -7,7 +7,6 @@ package org.jetbrains.kotlin.formver.embeddings.expression
 
 import org.jetbrains.kotlin.KtSourceElement
 import org.jetbrains.kotlin.formver.asPosition
-import org.jetbrains.kotlin.formver.conversion.AccessPolicy
 import org.jetbrains.kotlin.formver.domains.RuntimeTypeDomain
 import org.jetbrains.kotlin.formver.embeddings.*
 import org.jetbrains.kotlin.formver.embeddings.expression.debug.*
@@ -352,7 +351,7 @@ data class FieldAccess(val receiver: ExpEmbedding, val field: FieldEmbedding) : 
         get() = accessInvariant == null
 
     override fun toViper(ctx: LinearizationContext): Exp {
-        if (noInvariants) return Exp.FieldAccess(receiver.toViper(ctx), field.toViper(), ctx.source.asPosition)
+        if (noInvariants && !field.unfoldToAccess) return Exp.FieldAccess(receiver.toViper(ctx), field.toViper(), ctx.source.asPosition)
 
         val variable = ctx.freshAnonVar(type)
         toViperStoringIn(variable, ctx)
@@ -362,19 +361,23 @@ data class FieldAccess(val receiver: ExpEmbedding, val field: FieldEmbedding) : 
     override fun toViperStoringIn(result: VariableEmbedding, ctx: LinearizationContext) {
         val receiverViper = receiver.toViper(ctx)
         val receiverWrapper = ExpWrapper(receiverViper, receiver.type)
+        // If the field is immutable, it is necessary to unfold predicates
+        if (field.unfoldToAccess) unfoldHierarchy(receiverWrapper, ctx)
+
         val fieldAccess = PrimitiveFieldAccess(receiverWrapper, field)
         val invariant = accessInvariant?.fillHole(receiverWrapper)?.pureToViper(toBuiltin = true, ctx.source)
-        // If the field is immutable, it is necessary to unfold predicates
-        if (field.accessPolicy == AccessPolicy.ALWAYS_READABLE && field is UserFieldEmbedding) {
-            val hierarchyPath = (receiver.type as? ClassTypeEmbedding)?.hierarchyUnfoldPath(field.name)
-            hierarchyPath?.forEach {
-                val predAcc = it.predicateAccessInvariant().fillHole(receiverWrapper).pureToViper(ctx.source) as? Exp.PredicateAccess
-                predAcc?.let { ctx.addStatement(Stmt.Unfold(predAcc)) }
-            }
-        }
         invariant?.let { ctx.addStatement(Stmt.Inhale(it, ctx.source.asPosition)) }
         ctx.addStatement(Stmt.assign(result.toViper(ctx), fieldAccess.pureToViper(toBuiltin = false, ctx.source), ctx.source.asPosition))
         invariant?.let { ctx.addStatement(Stmt.Exhale(it, ctx.source.asPosition)) }
+    }
+
+    private fun unfoldHierarchy(receiverWrapper: ExpEmbedding, ctx: LinearizationContext) {
+        val hierarchyPath = (receiver.type as? ClassTypeEmbedding)?.hierarchyUnfoldPath(field.name)
+        hierarchyPath?.forEach {
+            val predAcc = it.predicateAccessInvariant().fillHole(receiverWrapper)
+                .pureToViper(toBuiltin = true, ctx.source) as? Exp.PredicateAccess
+            predAcc?.let { x -> ctx.addStatement(Stmt.Unfold(x)) }
+        }
     }
 
     override fun toViperUnusedResult(ctx: LinearizationContext) {

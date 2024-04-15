@@ -251,7 +251,12 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext>()
     ): ExpEmbedding {
         val exp = data.convert(smartCastExpression.originalExpression)
         val newType = data.embedType(smartCastExpression.smartcastType.coneType)
-        return exp.withType(newType)
+        // If the smart-cast is from A? to A, then is not necessary to inhale invariants
+        return if (exp.type.getNonNullable() == newType) {
+            exp.withType(newType)
+        } else {
+            exp.withType(newType).withAccessAndProvenInvariants()
+        }
     }
 
     override fun visitBinaryLogicExpression(

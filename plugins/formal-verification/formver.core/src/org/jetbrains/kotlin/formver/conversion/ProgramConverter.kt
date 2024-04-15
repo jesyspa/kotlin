@@ -64,7 +64,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
             domains = listOf(RuntimeTypeDomain(classes.values.toList())),
             fields = SpecialFields.all.map { it.toViper() } +
                     classes.values.flatMap { it.flatMapUniqueFields { _, field -> listOf(field.toViper()) } }.distinctBy { it.name },
-            functions = SpecialFunctions.all + classes.values.flatMap { it.getterFunctions() }.distinctBy { it.name },
+            functions = SpecialFunctions.all,
             methods = SpecialMethods.all + methods.values.mapNotNull { it.viperMethod }.toList(),
             predicates = classes.values.map { it.predicate }
         )
@@ -199,7 +199,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         }
     }
 
-    private val FirRegularClassSymbol.propertySymbols : List<FirPropertySymbol>
+    private val FirRegularClassSymbol.propertySymbols: List<FirPropertySymbol>
         get() = this.declarationSymbols.filterIsInstance<FirPropertySymbol>()
 
     private fun embedFullSignature(symbol: FirFunctionSymbol<*>): FullNamedFunctionSignature {
