@@ -255,7 +255,7 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext>()
         return if (exp.type.getNonNullable() == newType) {
             exp.withType(newType)
         } else {
-            exp.withType(newType).withAccessAndProvenInvariants()
+            exp.withType(newType).withAccessInvariants()
         }
     }
 

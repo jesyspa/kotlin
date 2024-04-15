@@ -232,7 +232,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
                 params.mapNotNull { param ->
                     constructorParamSymbolsToFields[param.symbol]?.let { field ->
                         (field.accessPolicy == AccessPolicy.ALWAYS_READABLE).ifTrue {
-                            EqCmp(FieldAccess(returnVariable, field), param)
+                            EqCmp(PrimitiveFieldAccess(returnVariable, field), param)
                         }
                     }
                 }
