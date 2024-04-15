@@ -28,3 +28,26 @@ fun <!VIPER_TEXT!>accessNullable<!>(x: A?){
         n = x.a
     }
 }
+
+@AlwaysVerify
+fun <!VIPER_TEXT!>accessCast<!>(x: A){
+    var n: Int
+    n = (x as B).b
+}
+
+@AlwaysVerify
+fun <!VIPER_TEXT!>accessSafeCast<!>(x: A){
+    var n: Int = 0
+    val y = x as? B
+    if(y != null){
+        n = y.b
+    }
+}
+
+@AlwaysVerify
+fun <!VIPER_TEXT!>accessSmartCast<!>(x: A){
+    var n: Int = 0
+    if(x is B){
+        n = x.b
+    }
+}
