@@ -289,15 +289,16 @@ data class ClassTypeEmbedding(val className: ScopedKotlinName, val isInterface: 
     override fun predicateAccessInvariant() =
         PredicateAccessTypeInvariantEmbedding(name, PermExp.WildcardPerm())
 
-    // Returns the list of classes in a hierarchy that need to be unfolded in order to access the given field
-    fun hierarchyUnfoldPath(fieldName: MangledName): List<ClassTypeEmbedding> {
-        return if (fieldName is ScopedKotlinName && fieldName.scope is ClassScope) {
+    // Returns the sequence of classes in a hierarchy that need to be unfolded in order to access the given field
+    fun hierarchyUnfoldPath(fieldName: MangledName): Sequence<ClassTypeEmbedding> = sequence {
+        if (fieldName is ScopedKotlinName && fieldName.scope is ClassScope) {
             if (fieldName.scope.className == className.name) {
-                listOf(this)
+                yield(this@ClassTypeEmbedding)
             } else {
                 val sup = superTypes.firstOrNull { it is ClassTypeEmbedding && !it.isInterface }
                 if (sup is ClassTypeEmbedding) {
-                    listOf(this) + sup.hierarchyUnfoldPath(fieldName)
+                    yield(this@ClassTypeEmbedding)
+                    yieldAll(sup.hierarchyUnfoldPath(fieldName))
                 } else {
                     throw IllegalArgumentException("Reached top of the hierarchy without finding the field")
                 }
