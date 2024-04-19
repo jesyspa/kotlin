@@ -373,10 +373,10 @@ data class FieldAccess(val receiver: ExpEmbedding, val field: FieldEmbedding) : 
 
     private fun unfoldHierarchy(receiverWrapper: ExpEmbedding, ctx: LinearizationContext) {
         val hierarchyPath = (receiver.type as? ClassTypeEmbedding)?.hierarchyUnfoldPath(field.name)
-        hierarchyPath?.forEach {
-            val predAcc = it.predicateAccessInvariant().fillHole(receiverWrapper)
+        hierarchyPath?.forEach { classType ->
+            val predAcc = classType.predicateAccessInvariant().fillHole(receiverWrapper)
                 .pureToViper(toBuiltin = true, ctx.source) as? Exp.PredicateAccess
-            predAcc?.let { x -> ctx.addStatement(Stmt.Unfold(x)) }
+            predAcc?.let { ctx.addStatement(Stmt.Unfold(it)) }
         }
     }
 

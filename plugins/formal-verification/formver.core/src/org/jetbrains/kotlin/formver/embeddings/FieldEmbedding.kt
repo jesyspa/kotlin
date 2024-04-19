@@ -21,6 +21,8 @@ interface FieldEmbedding {
     val type: TypeEmbedding
     val viperType: Type
     val accessPolicy: AccessPolicy
+
+    // If true, it is necessary to unfold the predicate of the receiver before accessing the field
     val unfoldToAccess: Boolean
         get() = false
     val includeInShortDump: Boolean
