@@ -255,6 +255,7 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext>()
         return if (exp.type.getNonNullable() == newType) {
             exp.withType(newType)
         } else {
+            // TODO: when there is a cast from B to A, only inhale invariants of A - invariants of B
             exp.withType(newType).withAccessInvariants()
         }
     }
