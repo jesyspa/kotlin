@@ -22,7 +22,7 @@ import org.jetbrains.kotlin.name.Name
 fun CallableId.embedScopeName(): NameScope =
     when (val id = this.classId) {
         null -> GlobalScope(packageName)
-        else -> ClassScope(packageName, ClassKotlinName(id.relativeClassName))
+        else -> DefaultClassScope(packageName, ClassKotlinName(id.relativeClassName))
     }
 
 fun CallableId.embedScoped(name: KotlinName) = ScopedKotlinName(embedScopeName(), name)
@@ -37,7 +37,16 @@ fun CallableId.embedExtensionSetterName(type: TypeEmbedding): ScopedKotlinName =
     embedScopedWithType(type, ExtensionSetterKotlinName(callableName))
 
 fun CallableId.embedLocalPropertyName(): KotlinName = SimpleKotlinName(callableName)
-fun CallableId.embedMemberPropertyName(): ScopedKotlinName = embedScoped(MemberKotlinName(callableName))
+fun CallableId.embedMemberPropertyName(isPrivate: Boolean): ScopedKotlinName {
+    val id = classId ?: error("Embedding non-member property $callableName as a member.")
+    val className = ClassKotlinName(id.relativeClassName)
+    val packageName = packageName
+    val scope =
+        if (isPrivate) PrivatePropertyClassScope(packageName, className)
+        else PropertyClassScope(packageName, className)
+    return ScopedKotlinName(scope, MemberKotlinName(callableName))
+}
+
 fun CallableId.embedUnscopedPropertyName(): SimpleKotlinName = SimpleKotlinName(callableName)
 fun CallableId.embedFunctionName(type: TypeEmbedding): ScopedKotlinName =
     embedScopedWithType(type, FunctionKotlinName(callableName))

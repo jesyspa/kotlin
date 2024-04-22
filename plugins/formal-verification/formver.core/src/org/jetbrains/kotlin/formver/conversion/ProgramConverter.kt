@@ -7,6 +7,7 @@ package org.jetbrains.kotlin.formver.conversion
 
 import org.jetbrains.kotlin.KtSourceElement
 import org.jetbrains.kotlin.descriptors.ClassKind
+import org.jetbrains.kotlin.descriptors.Visibilities
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.declarations.FirSimpleFunction
 import org.jetbrains.kotlin.fir.declarations.impl.FirDefaultPropertyGetter
@@ -63,7 +64,8 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         get() = Program(
             domains = listOf(RuntimeTypeDomain(classes.values.toList())),
             fields = SpecialFields.all.map { it.toViper() } +
-                    classes.values.flatMap { it.flatMapUniqueFields { _, field -> listOf(field.toViper()) } }.distinctBy { it.name },
+                    classes.values.flatMap { it.flatMapUniqueFields { _, field -> listOf(field.toViper()) } }
+                        .distinctBy { it.name.mangled },
             functions = SpecialFunctions.all,
             methods = SpecialMethods.all + methods.values.mapNotNull { it.viperMethod }.toList(),
             predicates = classes.values.map { it.predicate }
@@ -164,7 +166,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
     } else {
         // Ensure that the class has been processed.
         embedType(symbol.dispatchReceiverType!!)
-        properties[symbol.callableId.embedMemberPropertyName()] ?: error("Unknown property ${symbol.callableId}")
+        properties[symbol.embedMemberPropertyName()] ?: error("Unknown property ${symbol.callableId}")
     }
 
     private fun <R> FirPropertySymbol.withConstructorParam(action: FirPropertySymbol.(FirValueParameterSymbol) -> R): R? =
@@ -253,16 +255,20 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
             return symbol.dispatchReceiverType ?: symbol.resolvedReceiverTypeRef?.type
         }
 
+    private fun FirPropertySymbol.embedMemberPropertyName() = this.callableId.embedMemberPropertyName(
+        Visibilities.isPrivate(this.visibility)
+    )
+
     /**
      * Construct and register the field embedding for this property's backing field, if any exists.
      */
     private fun processBackingFields(symbol: FirPropertySymbol, embedding: ClassTypeEmbedding): Pair<SimpleKotlinName, FieldEmbedding>? {
         val unscopedName = symbol.callableId.embedUnscopedPropertyName()
-        val name = symbol.callableId.embedMemberPropertyName()
+        val scopedName = symbol.embedMemberPropertyName()
         embedding.findAncestorField(unscopedName)?.let { return null }
-        val backingField = name.specialEmbedding() ?: symbol.hasBackingField.ifTrue {
+        val backingField = scopedName.specialEmbedding() ?: symbol.hasBackingField.ifTrue {
             UserFieldEmbedding(
-                name,
+                scopedName,
                 embedType(symbol.resolvedReturnType),
                 symbol
             )
@@ -275,7 +281,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
      */
     private fun processProperty(symbol: FirPropertySymbol, embedding: ClassTypeEmbedding) {
         val unscopedName = symbol.callableId.embedUnscopedPropertyName()
-        val name = symbol.callableId.embedMemberPropertyName()
+        val name = symbol.embedMemberPropertyName()
         val backingField = embedding.findField(unscopedName)
         val getter: GetterEmbedding? = symbol.getterSymbol?.let { embedGetter(it, backingField) }
         val setter: SetterEmbedding? = symbol.setterSymbol?.let { embedSetter(it, backingField) }
