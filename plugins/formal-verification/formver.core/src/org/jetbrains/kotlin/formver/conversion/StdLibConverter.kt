@@ -18,7 +18,7 @@ fun VariableEmbedding.increasedSize(amount: Int): ExpEmbedding =
     EqCmp(FieldAccess(this, ListSizeFieldEmbedding), Add(Old(FieldAccess(this, ListSizeFieldEmbedding)), IntLit(amount)))
 
 fun NamedFunctionSignature.stdLibPreConditions(): List<ExpEmbedding> =
-    NameMatcher.match(this.name) {
+    NameMatcher.matchClassScope(this.name) {
         ifInCollectionsPkg {
             ifFunctionName("get") {
                 val receiver = receiver!!
@@ -51,7 +51,7 @@ fun NamedFunctionSignature.stdLibPreConditions(): List<ExpEmbedding> =
     }
 
 fun NamedFunctionSignature.stdLibPostConditions(returnVariable: VariableEmbedding): List<ExpEmbedding> =
-    NameMatcher.match(this.name) {
+    NameMatcher.matchClassScope(this.name) {
         val receiver = receiver
         ifInCollectionsPkg {
             ifFunctionName("emptyList") {

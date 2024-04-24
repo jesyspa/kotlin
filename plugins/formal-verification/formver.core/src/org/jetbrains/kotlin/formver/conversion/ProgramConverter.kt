@@ -29,6 +29,7 @@ import org.jetbrains.kotlin.formver.linearization.SharedLinearizationState
 import org.jetbrains.kotlin.formver.names.*
 import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.formver.viper.ast.Program
+import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.utils.addToStdlib.ifTrue
 
 /**
@@ -41,7 +42,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
     ProgramConversionContext {
     private val methods: MutableMap<MangledName, FunctionEmbedding> = SpecialKotlinFunctions.byName.toMutableMap()
     private val classes: MutableMap<MangledName, ClassTypeEmbedding> = mutableMapOf()
-    private val properties: MutableMap<MangledName, PropertyEmbedding> = mutableMapOf()
+    private val properties: MutableMap<CallableId, PropertyEmbedding> = mutableMapOf()
 
     // Cast is valid since we check that values are not null. We specify the type for `filterValues` explicitly to ensure there's no
     // loss of type information earlier.
@@ -63,9 +64,12 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
     val program: Program
         get() = Program(
             domains = listOf(RuntimeTypeDomain(classes.values.toList())),
-            fields = SpecialFields.all.map { it.toViper() } +
-                    classes.values.flatMap { it.flatMapUniqueFields { _, field -> listOf(field.toViper()) } }
-                        .distinctBy { it.name.mangled },
+            fields = SpecialFields.all.map { it.toViper() } + properties.mapNotNull {
+                when (val getter = it.value.getter) {
+                    is BackingFieldGetter -> getter.field.toViper()
+                    else -> null
+                }
+            }.distinctBy { it.name.mangled },
             functions = SpecialFunctions.all,
             methods = SpecialMethods.all + methods.values.mapNotNull { it.viperMethod }.toList(),
             predicates = classes.values.map { it.predicate }
@@ -166,7 +170,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
     } else {
         // Ensure that the class has been processed.
         embedType(symbol.dispatchReceiverType!!)
-        properties[symbol.embedMemberPropertyName()] ?: error("Unknown property ${symbol.callableId}")
+        properties[symbol.callableId] ?: error("Unknown property ${symbol.callableId}")
     }
 
     private fun <R> FirPropertySymbol.withConstructorParam(action: FirPropertySymbol.(FirValueParameterSymbol) -> R): R? =
@@ -262,11 +266,15 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
     /**
      * Construct and register the field embedding for this property's backing field, if any exists.
      */
+    @OptIn(SymbolInternals::class)
     private fun processBackingFields(symbol: FirPropertySymbol, embedding: ClassTypeEmbedding): Pair<SimpleKotlinName, FieldEmbedding>? {
         val unscopedName = symbol.callableId.embedUnscopedPropertyName()
         val scopedName = symbol.embedMemberPropertyName()
-        embedding.findAncestorField(unscopedName)?.let { return null }
-        val backingField = scopedName.specialEmbedding() ?: symbol.hasBackingField.ifTrue {
+        // TODO: decide if we create fields for properties with only default getter or setter, but not both
+        val fieldIsAllowed = symbol.hasBackingField
+                && symbol.getterSymbol?.fir is FirDefaultPropertyGetter
+                && (symbol.isFinal || symbol.resolvedReceiverTypeRef?.type?.toRegularClassSymbol(session)?.isFinal == true)
+        val backingField = scopedName.specialEmbedding(embedding) ?: fieldIsAllowed.ifTrue {
             UserFieldEmbedding(
                 scopedName,
                 embedType(symbol.resolvedReturnType),
@@ -281,11 +289,11 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
      */
     private fun processProperty(symbol: FirPropertySymbol, embedding: ClassTypeEmbedding) {
         val unscopedName = symbol.callableId.embedUnscopedPropertyName()
-        val name = symbol.embedMemberPropertyName()
         val backingField = embedding.findField(unscopedName)
         val getter: GetterEmbedding? = symbol.getterSymbol?.let { embedGetter(it, backingField) }
         val setter: SetterEmbedding? = symbol.setterSymbol?.let { embedSetter(it, backingField) }
-        properties[name] = PropertyEmbedding(getter, setter)
+        val propertyEmbedding = PropertyEmbedding(getter, setter)
+        properties[symbol.callableId] = propertyEmbedding
     }
 
     @OptIn(SymbolInternals::class)

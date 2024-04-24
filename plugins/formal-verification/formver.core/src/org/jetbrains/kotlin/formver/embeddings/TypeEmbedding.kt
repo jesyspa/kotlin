@@ -273,9 +273,7 @@ data class ClassTypeEmbedding(val className: ScopedKotlinName, val isInterface: 
     val runtimeTypeFunc = RuntimeTypeDomain.classTypeFunc(name)
     override val runtimeType: Exp = runtimeTypeFunc()
 
-    override fun findField(name: SimpleKotlinName): FieldEmbedding? = fields[name] ?: findAncestorField(name)
-
-    fun findAncestorField(name: SimpleKotlinName): FieldEmbedding? = superTypes.firstNotNullOfOrNull { it.findField(name) }
+    override fun findField(name: SimpleKotlinName): FieldEmbedding? = fields[name]
 
     override fun <R> flatMapFields(action: (SimpleKotlinName, FieldEmbedding) -> List<R>): List<R> =
         superTypes.flatMap { it.flatMapFields(action) } + fields.flatMap { (name, field) -> action(name, field) }
@@ -315,3 +313,16 @@ inline fun TypeEmbedding.injectionOr(default: () -> Injection): Injection = when
     BooleanTypeEmbedding -> RuntimeTypeDomain.boolInjection
     else -> default()
 }
+
+private val TypeEmbedding.isCollectionInterface: Boolean
+    get() = if (this !is ClassTypeEmbedding) false else NameMatcher.matchGlobalScope(this.className) {
+        ifIsCollectionInterface {
+            return true
+        }
+        return false
+    }
+
+val TypeEmbedding.isCollectionInheritor: Boolean
+    get() = if (this !is ClassTypeEmbedding) false else isCollectionInterface || superTypes.any {
+        it.isCollectionInheritor
+    }

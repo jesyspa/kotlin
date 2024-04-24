@@ -9,9 +9,10 @@ import org.jetbrains.kotlin.fir.symbols.impl.FirPropertySymbol
 import org.jetbrains.kotlin.formver.conversion.AccessPolicy
 import org.jetbrains.kotlin.formver.embeddings.expression.*
 import org.jetbrains.kotlin.formver.names.*
-import org.jetbrains.kotlin.formver.names.NameMatcher
+import org.jetbrains.kotlin.formver.names.ClassScopeNameMatcher
 import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.formver.viper.ast.*
+import org.jetbrains.kotlin.utils.addToStdlib.ifTrue
 
 /**
  * Embedding of a backing field of a property.
@@ -79,11 +80,11 @@ object ListSizeFieldEmbedding : FieldEmbedding {
     }
 }
 
-fun ScopedKotlinName.specialEmbedding(): FieldEmbedding? =
-    NameMatcher.match(this) {
-        ifIsCollectionInterface {
-            ifMemberName("size") {
-                return ListSizeFieldEmbedding
+fun ScopedKotlinName.specialEmbedding(embedding: ClassTypeEmbedding): FieldEmbedding? =
+    NameMatcher.matchClassScope(this) {
+        ifMemberName("size") {
+            return embedding.isCollectionInheritor.ifTrue {
+                ListSizeFieldEmbedding
             }
         }
         return null

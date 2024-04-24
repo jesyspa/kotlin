@@ -45,8 +45,7 @@ data class PropertyClassScope(override val packageName: FqName, override val cla
 }
 
 data class PrivatePropertyClassScope(override val packageName: FqName, override val className: ClassKotlinName) : ClassScope {
-    override val suffix = className.mangled + "_private_property"
-    override val mangled = "private_property"
+    override val suffix = className.mangled + "_private"
 }
 
 data object ParameterScope : NameScope {
