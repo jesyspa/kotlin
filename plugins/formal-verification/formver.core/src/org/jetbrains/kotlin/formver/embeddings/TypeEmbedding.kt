@@ -314,15 +314,27 @@ inline fun TypeEmbedding.injectionOr(default: () -> Injection): Injection = when
     else -> default()
 }
 
-private val TypeEmbedding.isCollectionInterface: Boolean
-    get() = if (this !is ClassTypeEmbedding) false else NameMatcher.matchGlobalScope(this.className) {
-        ifIsCollectionInterface {
-            return true
+private fun TypeEmbedding.isCollectionTypeNamed(name: String): Boolean =
+    if (this !is ClassTypeEmbedding) false
+    else NameMatcher.matchGlobalScope(this.className) {
+        ifInCollectionsPkg {
+            ifClassName(name) {
+                return true
+            }
         }
         return false
     }
 
-val TypeEmbedding.isCollectionInheritor: Boolean
-    get() = if (this !is ClassTypeEmbedding) false else isCollectionInterface || superTypes.any {
-        it.isCollectionInheritor
+fun TypeEmbedding.isInheritorOfCollectionTypeNamed(name: String): Boolean =
+    if (this !is ClassTypeEmbedding) false else isCollectionTypeNamed(name) || superTypes.any {
+        it.isInheritorOfCollectionTypeNamed(name)
     }
+
+val TypeEmbedding.isCollectionInheritor
+    get() = isInheritorOfCollectionTypeNamed("Collection")
+
+val TypeEmbedding.isListInheritor
+    get() = isInheritorOfCollectionTypeNamed("List")
+
+val TypeEmbedding.isMutableListInheritor
+    get() = isInheritorOfCollectionTypeNamed("MutableList")

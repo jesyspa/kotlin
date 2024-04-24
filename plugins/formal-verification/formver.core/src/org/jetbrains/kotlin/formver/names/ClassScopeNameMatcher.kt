@@ -53,6 +53,11 @@ internal class ClassScopeNameMatcher(name: MangledName) : NameMatcher(name) {
 
     override val className = (scopedName?.scope as? ClassScope)?.className
 
+    inline fun ifNoReceiver(action: NameMatcher.() -> Unit) {
+        if (className == null)
+            action()
+    }
+
     inline fun ifFunctionName(name: String, action: ClassScopeNameMatcher.() -> Unit) {
         if (scopedName?.name == FunctionKotlinName(Name.identifier(name)))
             this.action()

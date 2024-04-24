@@ -66,10 +66,10 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
             domains = listOf(RuntimeTypeDomain(classes.values.toList())),
             fields = SpecialFields.all.map { it.toViper() } + properties.mapNotNull {
                 when (val getter = it.value.getter) {
-                    is BackingFieldGetter -> getter.field.toViper()
+                    is BackingFieldGetter -> getter.field
                     else -> null
                 }
-            }.distinctBy { it.name.mangled },
+            }.distinctBy { it.name.mangled }.map { it.toViper() },
             functions = SpecialFunctions.all,
             methods = SpecialMethods.all + methods.values.mapNotNull { it.viperMethod }.toList(),
             predicates = classes.values.map { it.predicate }
@@ -122,7 +122,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
 
                 // Phase 3
                 val properties = symbol.propertySymbols
-                newEmbedding.initFields(properties.mapNotNull { processBackingFields(it, newEmbedding) }.toMap())
+                newEmbedding.initFields(properties.mapNotNull { processBackingFields(it, symbol) }.toMap())
 
                 // Phase 4
                 properties.forEach { processProperty(it, newEmbedding) }
@@ -267,13 +267,17 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
      * Construct and register the field embedding for this property's backing field, if any exists.
      */
     @OptIn(SymbolInternals::class)
-    private fun processBackingFields(symbol: FirPropertySymbol, embedding: ClassTypeEmbedding): Pair<SimpleKotlinName, FieldEmbedding>? {
+    private fun processBackingFields(
+        symbol: FirPropertySymbol,
+        classSymbol: FirRegularClassSymbol
+    ): Pair<SimpleKotlinName, FieldEmbedding>? {
+        val embedding = embedClass(classSymbol)
         val unscopedName = symbol.callableId.embedUnscopedPropertyName()
         val scopedName = symbol.embedMemberPropertyName()
         // TODO: decide if we create fields for properties with only default getter or setter, but not both
         val fieldIsAllowed = symbol.hasBackingField
                 && symbol.getterSymbol?.fir is FirDefaultPropertyGetter
-                && (symbol.isFinal || symbol.resolvedReceiverTypeRef?.type?.toRegularClassSymbol(session)?.isFinal == true)
+                && (symbol.isFinal || classSymbol.isFinal)
         val backingField = scopedName.specialEmbedding(embedding) ?: fieldIsAllowed.ifTrue {
             UserFieldEmbedding(
                 scopedName,
