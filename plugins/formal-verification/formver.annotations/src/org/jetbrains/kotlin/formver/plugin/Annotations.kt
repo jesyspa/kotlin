@@ -11,7 +11,7 @@ annotation class AlwaysVerify
 annotation class DumpExpEmbeddings
 
 // We annotate the function to indicate that the return value is unique
-@Target(AnnotationTarget.VALUE_PARAMETER, AnnotationTarget.FUNCTION)
+@Target(AnnotationTarget.VALUE_PARAMETER, AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY)
 annotation class Unique
 @Target(AnnotationTarget.VALUE_PARAMETER)
 annotation class Borrowed
