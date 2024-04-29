@@ -333,8 +333,3 @@ fun TypeEmbedding.isInheritorOfCollectionTypeNamed(name: String): Boolean =
 val TypeEmbedding.isCollectionInheritor
     get() = isInheritorOfCollectionTypeNamed("Collection")
 
-val TypeEmbedding.isListInheritor
-    get() = isInheritorOfCollectionTypeNamed("List")
-
-val TypeEmbedding.isMutableListInheritor
-    get() = isInheritorOfCollectionTypeNamed("MutableList")

@@ -1,0 +1,114 @@
+/multiple_interfaces.kt:(210,219): info: Generated Viper text for takeFirst:
+method class_First$getter_field(this: Ref) returns (ret: Ref)
+  requires acc(T_class_global$class_First(this), wildcard)
+  ensures acc(T_class_global$class_First(this), wildcard)
+  ensures dom$RuntimeType$isSubtype(dom$RuntimeType$typeOf(ret), dom$RuntimeType$intType())
+
+
+method class_First$setter_field(this: Ref, local$value: Ref)
+  returns (ret: Ref)
+  requires acc(T_class_global$class_First(this), wildcard)
+  ensures acc(T_class_global$class_First(this), wildcard)
+  ensures dom$RuntimeType$isSubtype(dom$RuntimeType$typeOf(ret), dom$RuntimeType$unitType())
+
+
+method global$fun_takeFirst$fun_take$T_class_global$class_First$return$T_Unit(local$first: Ref)
+  returns (ret$0: Ref)
+  requires acc(T_class_global$class_First(local$first), wildcard)
+  ensures acc(T_class_global$class_First(local$first), wildcard)
+  ensures dom$RuntimeType$isSubtype(dom$RuntimeType$typeOf(ret$0), dom$RuntimeType$unitType())
+{
+  inhale dom$RuntimeType$isSubtype(dom$RuntimeType$typeOf(local$first), dom$RuntimeType$T_class_global$class_First())
+  ret$0 := dom$RuntimeType$unitValue()
+  label label$ret$0
+}
+
+/multiple_interfaces.kt:(241,251): info: Generated Viper text for takeSecond:
+method class_Second$getter_field(this: Ref) returns (ret: Ref)
+  requires acc(T_class_global$class_Second(this), wildcard)
+  ensures acc(T_class_global$class_Second(this), wildcard)
+  ensures dom$RuntimeType$isSubtype(dom$RuntimeType$typeOf(ret), dom$RuntimeType$intType())
+
+
+method class_Second$setter_field(this: Ref, local$value: Ref)
+  returns (ret: Ref)
+  requires acc(T_class_global$class_Second(this), wildcard)
+  ensures acc(T_class_global$class_Second(this), wildcard)
+  ensures dom$RuntimeType$isSubtype(dom$RuntimeType$typeOf(ret), dom$RuntimeType$unitType())
+
+
+method global$fun_takeSecond$fun_take$T_class_global$class_Second$return$T_Unit(local$second: Ref)
+  returns (ret$0: Ref)
+  requires acc(T_class_global$class_Second(local$second), wildcard)
+  ensures acc(T_class_global$class_Second(local$second), wildcard)
+  ensures dom$RuntimeType$isSubtype(dom$RuntimeType$typeOf(ret$0), dom$RuntimeType$unitType())
+{
+  inhale dom$RuntimeType$isSubtype(dom$RuntimeType$typeOf(local$second), dom$RuntimeType$T_class_global$class_Second())
+  ret$0 := dom$RuntimeType$unitValue()
+  label label$ret$0
+}
+
+/multiple_interfaces.kt:(376,386): info: Generated Viper text for createImpl:
+field property$member_field: Ref
+
+method class_First$getter_field(this: Ref) returns (ret: Ref)
+  requires acc(T_class_global$class_First(this), wildcard)
+  ensures acc(T_class_global$class_First(this), wildcard)
+  ensures dom$RuntimeType$isSubtype(dom$RuntimeType$typeOf(ret), dom$RuntimeType$intType())
+
+
+method class_First$setter_field(this: Ref, local$value: Ref)
+  returns (ret: Ref)
+  requires acc(T_class_global$class_First(this), wildcard)
+  ensures acc(T_class_global$class_First(this), wildcard)
+  ensures dom$RuntimeType$isSubtype(dom$RuntimeType$typeOf(ret), dom$RuntimeType$unitType())
+
+
+method class_Impl$constructor$fun_take$$return$T_class_global$class_Impl()
+  returns (ret: Ref)
+  ensures dom$RuntimeType$isSubtype(dom$RuntimeType$typeOf(ret), dom$RuntimeType$T_class_global$class_Impl())
+  ensures acc(T_class_global$class_Impl(ret), wildcard)
+
+
+method class_Second$getter_field(this: Ref) returns (ret: Ref)
+  requires acc(T_class_global$class_Second(this), wildcard)
+  ensures acc(T_class_global$class_Second(this), wildcard)
+  ensures dom$RuntimeType$isSubtype(dom$RuntimeType$typeOf(ret), dom$RuntimeType$intType())
+
+
+method class_Second$setter_field(this: Ref, local$value: Ref)
+  returns (ret: Ref)
+  requires acc(T_class_global$class_Second(this), wildcard)
+  ensures acc(T_class_global$class_Second(this), wildcard)
+  ensures dom$RuntimeType$isSubtype(dom$RuntimeType$typeOf(ret), dom$RuntimeType$unitType())
+
+
+method global$fun_createImpl$fun_take$$return$T_Unit() returns (ret$0: Ref)
+  ensures dom$RuntimeType$isSubtype(dom$RuntimeType$typeOf(ret$0), dom$RuntimeType$unitType())
+  ensures true
+{
+  var local0$impl: Ref
+  var anonymous$0: Ref
+  var anonymous$1: Ref
+  ret$0 := dom$RuntimeType$unitValue()
+  local0$impl := class_Impl$constructor$fun_take$$return$T_class_global$class_Impl()
+  anonymous$0 := global$fun_takeFirst$fun_take$T_class_global$class_First$return$T_Unit(local0$impl)
+  anonymous$1 := global$fun_takeSecond$fun_take$T_class_global$class_Second$return$T_Unit(local0$impl)
+  label label$ret$0
+}
+
+method global$fun_takeFirst$fun_take$T_class_global$class_First$return$T_Unit(local$first: Ref)
+  returns (ret: Ref)
+  requires acc(T_class_global$class_First(local$first), wildcard)
+  ensures acc(T_class_global$class_First(local$first), wildcard)
+  ensures dom$RuntimeType$isSubtype(dom$RuntimeType$typeOf(ret), dom$RuntimeType$unitType())
+
+
+method global$fun_takeSecond$fun_take$T_class_global$class_Second$return$T_Unit(local$second: Ref)
+  returns (ret: Ref)
+  requires acc(T_class_global$class_Second(local$second), wildcard)
+  ensures acc(T_class_global$class_Second(local$second), wildcard)
+  ensures dom$RuntimeType$isSubtype(dom$RuntimeType$typeOf(ret), dom$RuntimeType$unitType())
+
+
+/multiple_interfaces.kt:(456,471): warning: Viper verification error: The precondition of method global$fun_takeFirst$fun_take$T_class_global$class_First$return$T_Unit might not hold. There might be insufficient permission to access T_class_global$class_First(local0$impl)
