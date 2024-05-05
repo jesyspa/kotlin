@@ -274,9 +274,9 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         val embedding = embedClass(classSymbol)
         val unscopedName = symbol.callableId.embedUnscopedPropertyName()
         val scopedName = symbol.embedMemberPropertyName()
-        // TODO: decide if we create fields for properties with only default getter or setter, but not both
         val fieldIsAllowed = symbol.hasBackingField
-                && symbol.getterSymbol?.fir is FirDefaultPropertyGetter
+                && (symbol.getterSymbol?.fir is FirDefaultPropertyGetter ||
+                symbol.setterSymbol?.fir is FirDefaultPropertySetter)
                 && (symbol.isFinal || classSymbol.isFinal)
         val backingField = scopedName.specialEmbedding(embedding) ?: fieldIsAllowed.ifTrue {
             UserFieldEmbedding(

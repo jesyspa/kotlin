@@ -402,6 +402,12 @@ public class FirLightTreeFormVerPluginDiagnosticsTestGenerated extends AbstractF
     }
 
     @Test
+    @TestMetadata("multiple_interfaces.kt")
+    public void testMultiple_interfaces() {
+      runTest("plugins/formal-verification/testData/diagnostics/no_contracts/multiple_interfaces.kt");
+    }
+
+    @Test
     @TestMetadata("non-local-returns.kt")
     public void testNon_local_returns() {
       runTest("plugins/formal-verification/testData/diagnostics/no_contracts/non-local-returns.kt");

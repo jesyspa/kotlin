@@ -6,16 +6,12 @@
 package org.jetbrains.kotlin.formver.conversion
 
 import org.jetbrains.kotlin.fir.FirLabel
-import org.jetbrains.kotlin.fir.declarations.getNonSubsumedOverriddenSymbols
-import org.jetbrains.kotlin.fir.declarations.utils.isActual
+import org.jetbrains.kotlin.fir.declarations.utils.isFinal
 import org.jetbrains.kotlin.fir.expressions.FirBlock
 import org.jetbrains.kotlin.fir.expressions.FirCatch
 import org.jetbrains.kotlin.fir.expressions.FirPropertyAccessExpression
 import org.jetbrains.kotlin.fir.expressions.FirStatement
-import org.jetbrains.kotlin.fir.isIntersectionOverride
 import org.jetbrains.kotlin.fir.references.symbol
-import org.jetbrains.kotlin.fir.references.toResolvedPropertySymbol
-import org.jetbrains.kotlin.fir.symbols.SymbolInternals
 import org.jetbrains.kotlin.fir.symbols.impl.FirIntersectionOverridePropertySymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirPropertySymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirValueParameterSymbol
@@ -28,6 +24,9 @@ import org.jetbrains.kotlin.formver.embeddings.callables.FunctionSignature
 import org.jetbrains.kotlin.formver.embeddings.expression.*
 import org.jetbrains.kotlin.formver.viper.ast.Label
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.utils.addToStdlib.ifFalse
+import org.jetbrains.kotlin.utils.addToStdlib.ifTrue
+import org.jetbrains.kotlin.utils.filterIsInstanceAnd
 
 /**
  * Interface for statement conversion.
@@ -78,24 +77,59 @@ fun StmtConversionContext.declareAnonVar(type: TypeEmbedding, initializer: ExpEm
     Declare(freshAnonVar(type), initializer)
 
 
+val FirIntersectionOverridePropertySymbol.propertyIntersections
+    get() = intersections.filterIsInstanceAnd<FirPropertySymbol> { it.isVal == isVal }
+
+/**
+ * Tries to find final property symbol actually declared in some class instead of
+ * (potentially) fake property symbol.
+ * Note that if some property is found it is fixed since
+ * 1. there can't be two non-abstract properties which don't subsume each other
+ * in the hierarchy (kotlin disallows that) and final properties can't be abstract;
+ * 2. final property can't subsume other final property as that means final property
+ * is overridden.
+ */
+fun FirPropertySymbol.findFinalParentProperty(): FirPropertySymbol? =
+    if (this !is FirIntersectionOverridePropertySymbol)
+        isFinal.ifTrue { this }
+    else propertyIntersections.firstNotNullOfOrNull { it.findFinalParentProperty() }
+
+fun FirPropertySymbol.findSomeParentProperty(): FirPropertySymbol =
+    if (this is FirIntersectionOverridePropertySymbol)
+        propertyIntersections.first().findSomeParentProperty()
+    else this
+
+/**
+ * Returns some property symbol actually declared in some class instead of
+ * (potentially) fake property symbol. If possible, final symbol will be found.
+ *
+ * Note that we don't care much which non-final symbol to choose since we don't
+ * generate Viper fields for them anyway.
+ */
+fun FirPropertySymbol.findFinalOrSomeParentProperty() =
+    findFinalParentProperty() ?: findSomeParentProperty()
+
 fun StmtConversionContext.embedPropertyAccess(accessExpression: FirPropertyAccessExpression): PropertyAccessEmbedding =
     when (val calleeSymbol = accessExpression.calleeReference.symbol) {
         is FirValueParameterSymbol -> embedParameter(calleeSymbol).asPropertyAccess()
-        is FirPropertySymbol -> when {
-            accessExpression.dispatchReceiver != null -> {
-                when (calleeSymbol) {
-                    is FirIntersectionOverridePropertySymbol -> {
-                        check(!calleeSymbol.containsMultipleNonSubsumed)
-                    }
+        is FirPropertySymbol -> {
+            // There probably might be a case when the chosen symbol
+            // is not of the narrowest type possible.
+            // Since it already means that no final properties
+            // were found, cast won't do much harm.
+            val type = embedType(calleeSymbol.resolvedReturnType)
+            when {
+                accessExpression.dispatchReceiver != null -> {
+                    val actualPropertySymbol = calleeSymbol.findFinalOrSomeParentProperty()
+                    val property = embedProperty(actualPropertySymbol)
+                    ClassPropertyAccess(convert(accessExpression.dispatchReceiver!!), property, type)
                 }
-                val property = embedProperty(calleeSymbol)
-                ClassPropertyAccess(convert(accessExpression.dispatchReceiver!!), property)
+                accessExpression.extensionReceiver != null -> {
+                    val property = embedProperty(calleeSymbol)
+                    ClassPropertyAccess(convert(accessExpression.extensionReceiver!!), property, type)
+                }
+                else -> embedLocalProperty(calleeSymbol)
             }
-            accessExpression.extensionReceiver != null -> {
-                val property = embedProperty(calleeSymbol)
-                ClassPropertyAccess(convert(accessExpression.extensionReceiver!!), property)
-            }
-            else -> embedLocalProperty(calleeSymbol)
         }
         else -> error("Property access symbol $calleeSymbol has unsupported type.")
     }

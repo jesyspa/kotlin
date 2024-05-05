@@ -1,61 +1,111 @@
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 import org.jetbrains.kotlin.formver.plugin.NeverVerify
+import org.jetbrains.kotlin.formver.plugin.NeverConvert
 
-interface First {
+/*
+All parent classes are enumerated in this test to
+keep names of implementation classes laconic.
+ */
+
+interface InterfaceWithImplementation1 {
     val field: Int
         get() {
-            "Computing..."
             return 0
         }
 }
 
-interface Second {
+interface InterfaceWithoutImplementation2 {
     val field: Int
 }
 
-abstract class Third {
+interface AnyInterfaceWithoutImplementation5 {
+    val field: Any
+}
+
+interface InheritingInterfaceWithoutImplementation6:
+    AnyInterfaceWithoutImplementation5, InterfaceWithoutImplementation2
+
+abstract class AbstractWithFinalImplementation3 {
     val field: Int = 0
 }
 
-@NeverVerify
-fun <!VIPER_TEXT!>takeFirst<!>(first: First) {
-    first.field
+abstract class AbstractWithOpenImplementation4 {
+    open val field: Int = 0
 }
 
-@NeverVerify
-fun <!VIPER_TEXT!>takeSecond<!>(second: Second) {
-    second.field
+fun <!VIPER_TEXT!>take1<!>(obj: InterfaceWithImplementation1) {
+    obj.field
 }
 
-@NeverVerify
-fun <!VIPER_TEXT!>takeThird<!>(third: Third) {
-    third.field
+fun <!VIPER_TEXT!>take2<!>(obj: InterfaceWithoutImplementation2) {
+    obj.field
 }
 
-class Impl12: First, Second {
+fun <!VIPER_TEXT!>take3<!>(obj: AbstractWithFinalImplementation3) {
+    obj.field
+}
+
+fun <!VIPER_TEXT!>take4<!>(obj: AbstractWithOpenImplementation4) {
+    obj.field
+}
+
+class Impl12: InterfaceWithImplementation1, InterfaceWithoutImplementation2 {
     override val field: Int = 0
 }
 
-class Impl3: Third()
-class Impl23: Second, Third()
+class Impl3: AbstractWithFinalImplementation3()
+class Impl23: InheritingInterfaceWithoutImplementation6, AbstractWithFinalImplementation3()
+
+class Impl24: InterfaceWithoutImplementation2, AbstractWithOpenImplementation4()
+
+class Impl14: InterfaceWithImplementation1, AbstractWithOpenImplementation4() {
+    override val field: Int = 0
+}
+
+@NeverConvert
+fun create6() = object : InheritingInterfaceWithoutImplementation6 {
+    override val field: Int = 0
+}
 
 @OptIn(ExperimentalContracts::class)
+@Suppress("USELESS_IS_CHECK")
 fun <!VIPER_TEXT!>createImpls<!>(): Boolean{
     contract {
         returns(false) implies false
     }
     val impl12 = Impl12()
     val start12 = impl12.field
-    takeFirst(impl12)
-    takeSecond(impl12)
+    take1(impl12)
+    take2(impl12)
+
     val impl23 = Impl23()
     val start23 = impl23.field
-    takeSecond(impl23)
-    takeThird(impl23)
+    take2(impl23)
+    take3(impl23)
+
     val impl3 = Impl3()
     val start3 = impl3.field
-    takeThird(impl3)
-    return start12 == impl12.field && start23 == impl23.field && start3 = impl3.field
+    take3(impl3)
+
+    //TODO: it seems that we should be able to prove start == finish here
+    val impl24 = Impl24()
+    val start24 = impl24.field
+    take2(impl24)
+    take4(impl24)
+
+    val impl14 = Impl14()
+    val start14 = impl14.field
+    take1(impl14)
+    take4(impl14)
+
+    val impl6 = create6()
+    val start6 = impl6.field
+
+    return start12 == impl12.field
+        && start23 == impl23.field
+        && start3 == impl3.field
+        && start14 == impl14.field
+        && start6 is Int
 }
 
