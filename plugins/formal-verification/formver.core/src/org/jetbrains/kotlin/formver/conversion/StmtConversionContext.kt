@@ -6,11 +6,17 @@
 package org.jetbrains.kotlin.formver.conversion
 
 import org.jetbrains.kotlin.fir.FirLabel
+import org.jetbrains.kotlin.fir.declarations.getNonSubsumedOverriddenSymbols
+import org.jetbrains.kotlin.fir.declarations.utils.isActual
 import org.jetbrains.kotlin.fir.expressions.FirBlock
 import org.jetbrains.kotlin.fir.expressions.FirCatch
 import org.jetbrains.kotlin.fir.expressions.FirPropertyAccessExpression
 import org.jetbrains.kotlin.fir.expressions.FirStatement
+import org.jetbrains.kotlin.fir.isIntersectionOverride
 import org.jetbrains.kotlin.fir.references.symbol
+import org.jetbrains.kotlin.fir.references.toResolvedPropertySymbol
+import org.jetbrains.kotlin.fir.symbols.SymbolInternals
+import org.jetbrains.kotlin.fir.symbols.impl.FirIntersectionOverridePropertySymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirPropertySymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirValueParameterSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirVariableSymbol
@@ -71,11 +77,17 @@ fun StmtConversionContext.declareLocalVariable(symbol: FirVariableSymbol<*>, ini
 fun StmtConversionContext.declareAnonVar(type: TypeEmbedding, initializer: ExpEmbedding?): Declare =
     Declare(freshAnonVar(type), initializer)
 
+
 fun StmtConversionContext.embedPropertyAccess(accessExpression: FirPropertyAccessExpression): PropertyAccessEmbedding =
     when (val calleeSymbol = accessExpression.calleeReference.symbol) {
         is FirValueParameterSymbol -> embedParameter(calleeSymbol).asPropertyAccess()
         is FirPropertySymbol -> when {
             accessExpression.dispatchReceiver != null -> {
+                when (calleeSymbol) {
+                    is FirIntersectionOverridePropertySymbol -> {
+                        check(!calleeSymbol.containsMultipleNonSubsumed)
+                    }
+                }
                 val property = embedProperty(calleeSymbol)
                 ClassPropertyAccess(convert(accessExpression.dispatchReceiver!!), property)
             }

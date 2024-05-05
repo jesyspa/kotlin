@@ -234,7 +234,7 @@ data class FunctionExp(val signature: FullNamedFunctionSignature?, val body: Exp
             // Ideally we would want to assume these rather than inhale them to prevent inconsistencies with permissions.
             // Unfortunately Silicon for some reason does not allow Assumes. However, it doesn't matter as long as the
             // provenInvariants don't contain permissions.
-            arg.provenInvariants().forEach { invariant ->
+            (arg.provenInvariants() + listOfNotNull(arg.predicateAccessInvariant())).forEach { invariant ->
                 ctx.addStatement(Stmt.Inhale(invariant.toViperBuiltinType(ctx), ctx.source.asPosition))
             }
         }

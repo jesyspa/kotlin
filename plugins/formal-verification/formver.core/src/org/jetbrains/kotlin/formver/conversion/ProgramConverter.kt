@@ -229,7 +229,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
                         subSignature.params.flatMap { it.dynamicInvariants() } +
                         returnVariable.pureInvariants() +
                         returnVariable.provenInvariants() +
-                        returnVariable.accessInvariants() +
+                        returnVariable.allAccessInvariants() +
                         contractVisitor.getPostconditions(ContractVisitorContext(returnVariable, symbol)) +
                         subSignature.stdLibPostConditions(returnVariable) +
                         listOfNotNull(primaryConstructorInvariants(returnVariable))
