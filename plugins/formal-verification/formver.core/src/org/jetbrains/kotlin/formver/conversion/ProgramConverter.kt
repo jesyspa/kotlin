@@ -65,8 +65,10 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         get() = Program(
             domains = listOf(RuntimeTypeDomain(classes.values.toList())),
             fields = SpecialFields.all.map { it.toViper() } + properties.mapNotNull {
-                when (val getter = it.value.getter) {
-                    is BackingFieldGetter -> getter.field
+                val property = it.value
+                when {
+                    property.getter is BackingFieldGetter -> property.getter.field
+                    property.setter is BackingFieldSetter -> property.setter.field
                     else -> null
                 }
             }.distinctBy { it.name.mangled }.map { it.toViper() },
