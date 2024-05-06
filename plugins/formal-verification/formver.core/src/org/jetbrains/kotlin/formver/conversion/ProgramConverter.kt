@@ -42,7 +42,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
     ProgramConversionContext {
     private val methods: MutableMap<MangledName, FunctionEmbedding> = SpecialKotlinFunctions.byName.toMutableMap()
     private val classes: MutableMap<MangledName, ClassTypeEmbedding> = mutableMapOf()
-    private val properties: MutableMap<CallableId, PropertyEmbedding> = mutableMapOf()
+    private val properties: MutableMap<MangledName, PropertyEmbedding> = mutableMapOf()
 
     // Cast is valid since we check that values are not null. We specify the type for `filterValues` explicitly to ensure there's no
     // loss of type information earlier.
@@ -172,7 +172,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
     } else {
         // Ensure that the class has been processed.
         embedType(symbol.dispatchReceiverType!!)
-        properties[symbol.callableId] ?: error("Unknown property ${symbol.callableId}")
+        properties[symbol.embedMemberPropertyName()] ?: error("Unknown property ${symbol.callableId}")
     }
 
     private fun <R> FirPropertySymbol.withConstructorParam(action: FirPropertySymbol.(FirValueParameterSymbol) -> R): R? =
@@ -299,7 +299,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         val getter: GetterEmbedding? = symbol.getterSymbol?.let { embedGetter(it, backingField) }
         val setter: SetterEmbedding? = symbol.setterSymbol?.let { embedSetter(it, backingField) }
         val propertyEmbedding = PropertyEmbedding(getter, setter)
-        properties[symbol.callableId] = propertyEmbedding
+        properties[symbol.embedMemberPropertyName()] = propertyEmbedding
     }
 
     @OptIn(SymbolInternals::class)
