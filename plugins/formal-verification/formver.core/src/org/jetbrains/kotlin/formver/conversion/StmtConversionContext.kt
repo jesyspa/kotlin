@@ -109,6 +109,23 @@ fun FirPropertySymbol.findSomeParentProperty(): FirPropertySymbol =
 fun FirPropertySymbol.findFinalOrSomeParentProperty() =
     findFinalParentProperty() ?: findSomeParentProperty()
 
+
+/**
+ * This is a key function when looking up properties.
+ * It translates a kotlin `receiver.field` expression to an `ExpEmbedding`.
+ *
+ * Note that in FIR this `field` may be represented as `FirIntersectionOverridePropertySymbol`
+ * which is necessary when the property could hypothetically inherit from multiple sources.
+ * However, we don't register such symbols in the context. Hence, some advanced logic is needed here.
+ *
+ * In order to find a correct property (i.e. actually registered in the current context),
+ * dfs-like algorithm on `FirIntersectionOverridePropertySymbol`s is run, which first tries
+ * to check if this property is final (in this case we would want to use fields).
+ *
+ * If final field is not found, it just returns some registered property from the hierarchy and casts it
+ * to the necessary type since we don't care for now which exactly getter/setter to use in this case.
+ * Correct type is guaranteed by downcast.
+ */
 fun StmtConversionContext.embedPropertyAccess(accessExpression: FirPropertyAccessExpression): PropertyAccessEmbedding =
     when (val calleeSymbol = accessExpression.calleeReference.symbol) {
         is FirValueParameterSymbol -> embedParameter(calleeSymbol).asPropertyAccess()

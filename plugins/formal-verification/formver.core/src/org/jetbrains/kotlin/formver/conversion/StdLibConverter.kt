@@ -10,10 +10,10 @@ import org.jetbrains.kotlin.formver.embeddings.callables.NamedFunctionSignature
 import org.jetbrains.kotlin.formver.embeddings.expression.*
 import org.jetbrains.kotlin.formver.names.NameMatcher
 
-fun VariableEmbedding.sameSize(): ExpEmbedding =
+private fun VariableEmbedding.sameSize(): ExpEmbedding =
     EqCmp(FieldAccess(this, ListSizeFieldEmbedding), Old(FieldAccess(this, ListSizeFieldEmbedding)))
 
-fun VariableEmbedding.increasedSize(amount: Int): ExpEmbedding =
+private fun VariableEmbedding.increasedSize(amount: Int): ExpEmbedding =
     EqCmp(FieldAccess(this, ListSizeFieldEmbedding), Add(Old(FieldAccess(this, ListSizeFieldEmbedding)), IntLit(amount)))
 
 sealed interface StdLibReceiverInterface {
@@ -64,23 +64,23 @@ sealed interface StdLibCondition {
     }
 }
 
-sealed interface StdLibPreCondition : StdLibCondition {
+sealed interface StdLibPrecondition : StdLibCondition {
     companion object {
-        val all = listOf(GetPreCondition, SubListPreCondition)
+        val all = listOf(GetPrecondition, SubListPrecondition)
     }
 
     fun getEmbeddings(function: NamedFunctionSignature): List<ExpEmbedding>
 }
 
-sealed interface StdLibPostCondition : StdLibCondition {
+sealed interface StdLibPostcondition : StdLibCondition {
     companion object {
-        val all = listOf(EmptyListPostCondition, IsEmptyPostCondition, GetPostCondition, SubListPostCondition, AddPostCondition)
+        val all = listOf(EmptyListPostcondition, IsEmptyPostcondition, GetPostcondition, SubListPostcondition, AddPostcondition)
     }
 
     fun getEmbeddings(returnVariable: VariableEmbedding, function: NamedFunctionSignature): List<ExpEmbedding>
 }
 
-data object GetPreCondition : StdLibPreCondition {
+data object GetPrecondition : StdLibPrecondition {
     override fun getEmbeddings(function: NamedFunctionSignature): List<ExpEmbedding> {
         val receiver = function.receiver!!
         val indexArg = function.formalArgs[1]
@@ -102,7 +102,7 @@ data object GetPreCondition : StdLibPreCondition {
     override val functionName = "get"
 }
 
-data object SubListPreCondition : StdLibPreCondition {
+data object SubListPrecondition : StdLibPrecondition {
     override fun getEmbeddings(function: NamedFunctionSignature): List<ExpEmbedding> {
         val receiver = function.receiver!!
         val fromIndexArg = function.formalArgs[1]
@@ -118,7 +118,7 @@ data object SubListPreCondition : StdLibPreCondition {
     override val functionName = "subList"
 }
 
-data object EmptyListPostCondition : StdLibPostCondition {
+data object EmptyListPostcondition : StdLibPostcondition {
     override fun getEmbeddings(returnVariable: VariableEmbedding, function: NamedFunctionSignature): List<ExpEmbedding> {
         return listOf(
             EqCmp(FieldAccess(returnVariable, ListSizeFieldEmbedding), IntLit(0))
@@ -129,7 +129,7 @@ data object EmptyListPostCondition : StdLibPostCondition {
     override val functionName = "emptyList"
 }
 
-data object IsEmptyPostCondition : StdLibPostCondition {
+data object IsEmptyPostcondition : StdLibPostcondition {
     override fun getEmbeddings(returnVariable: VariableEmbedding, function: NamedFunctionSignature): List<ExpEmbedding> {
         val receiver = function.receiver!!
         return listOf(
@@ -143,7 +143,7 @@ data object IsEmptyPostCondition : StdLibPostCondition {
     override val functionName = "isEmpty"
 }
 
-data object GetPostCondition : StdLibPostCondition {
+data object GetPostcondition : StdLibPostcondition {
     override fun getEmbeddings(returnVariable: VariableEmbedding, function: NamedFunctionSignature): List<ExpEmbedding> {
         return listOf(function.receiver!!.sameSize())
     }
@@ -152,7 +152,7 @@ data object GetPostCondition : StdLibPostCondition {
     override val functionName = "get"
 }
 
-data object SubListPostCondition : StdLibPostCondition {
+data object SubListPostcondition : StdLibPostcondition {
     override fun getEmbeddings(returnVariable: VariableEmbedding, function: NamedFunctionSignature): List<ExpEmbedding> {
         val fromIndexArg = function.formalArgs[1]
         val toIndexArg = function.formalArgs[2]
@@ -166,7 +166,7 @@ data object SubListPostCondition : StdLibPostCondition {
     override val functionName = "subList"
 }
 
-data object AddPostCondition : StdLibPostCondition {
+data object AddPostcondition : StdLibPostcondition {
     override fun getEmbeddings(returnVariable: VariableEmbedding, function: NamedFunctionSignature): List<ExpEmbedding> {
         return listOf(function.receiver!!.increasedSize(1))
     }
@@ -175,12 +175,12 @@ data object AddPostCondition : StdLibPostCondition {
     override val functionName = "add"
 }
 
-fun NamedFunctionSignature.stdLibPreConditions(): List<ExpEmbedding> {
-    StdLibPreCondition.all.groupBy {
+fun NamedFunctionSignature.stdLibPreconditions(): List<ExpEmbedding> {
+    StdLibPrecondition.all.groupBy {
         it.stdLibInterface
-    }.forEach { (stdLibInterface, preConditions) ->
+    }.forEach { (stdLibInterface, preconditions) ->
         if (stdLibInterface.match(this)) {
-            preConditions.forEach {
+            preconditions.forEach {
                 if (it.match(this)) {
                     return it.getEmbeddings(this)
                 }
@@ -191,12 +191,12 @@ fun NamedFunctionSignature.stdLibPreConditions(): List<ExpEmbedding> {
 }
 
 
-fun NamedFunctionSignature.stdLibPostConditions(returnVariable: VariableEmbedding): List<ExpEmbedding> {
-    StdLibPostCondition.all.groupBy {
+fun NamedFunctionSignature.stdLibPostconditions(returnVariable: VariableEmbedding): List<ExpEmbedding> {
+    StdLibPostcondition.all.groupBy {
         it.stdLibInterface
-    }.forEach { (stdLibInterface, postConditions) ->
+    }.forEach { (stdLibInterface, postconditions) ->
         if (stdLibInterface.match(this)) {
-            postConditions.forEach {
+            postconditions.forEach {
                 if (it.match(this)) {
                     return it.getEmbeddings(returnVariable, this)
                 }

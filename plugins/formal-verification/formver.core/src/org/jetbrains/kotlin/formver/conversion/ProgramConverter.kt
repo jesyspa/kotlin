@@ -29,7 +29,6 @@ import org.jetbrains.kotlin.formver.linearization.SharedLinearizationState
 import org.jetbrains.kotlin.formver.names.*
 import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.formver.viper.ast.Program
-import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.utils.addToStdlib.ifTrue
 
 /**
@@ -124,7 +123,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
 
                 // Phase 3
                 val properties = symbol.propertySymbols
-                newEmbedding.initFields(properties.mapNotNull { processBackingFields(it, symbol) }.toMap())
+                newEmbedding.initFields(properties.mapNotNull { processBackingField(it, symbol) }.toMap())
 
                 // Phase 4
                 properties.forEach { processProperty(it, newEmbedding) }
@@ -224,7 +223,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
                 subSignature.formalArgs.flatMap { it.pureInvariants() } +
                         subSignature.formalArgs.flatMap { it.accessInvariants() } +
                         contractVisitor.getPreconditions(ContractVisitorContext(returnVariable, symbol)) +
-                        subSignature.stdLibPreConditions()
+                        subSignature.stdLibPreconditions()
 
             override fun getPostconditions(returnVariable: VariableEmbedding) =
                 subSignature.formalArgs.flatMap { it.accessInvariants() } +
@@ -233,7 +232,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
                         returnVariable.provenInvariants() +
                         returnVariable.allAccessInvariants() +
                         contractVisitor.getPostconditions(ContractVisitorContext(returnVariable, symbol)) +
-                        subSignature.stdLibPostConditions(returnVariable) +
+                        subSignature.stdLibPostconditions(returnVariable) +
                         listOfNotNull(primaryConstructorInvariants(returnVariable))
 
             fun primaryConstructorInvariants(returnVariable: VariableEmbedding): ExpEmbedding? {
@@ -265,11 +264,19 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         Visibilities.isPrivate(this.visibility)
     )
 
+    @OptIn(SymbolInternals::class)
+    private val FirPropertySymbol.isCustom: Boolean
+        get() {
+            val getter = getterSymbol?.fir
+            val setter = setterSymbol?.fir
+            return if (isVal) getter !is FirDefaultPropertyGetter
+            else getter !is FirDefaultPropertyGetter || setter !is FirDefaultPropertySetter
+        }
+
     /**
      * Construct and register the field embedding for this property's backing field, if any exists.
      */
-    @OptIn(SymbolInternals::class)
-    private fun processBackingFields(
+    private fun processBackingField(
         symbol: FirPropertySymbol,
         classSymbol: FirRegularClassSymbol
     ): Pair<SimpleKotlinName, FieldEmbedding>? {
@@ -277,8 +284,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         val unscopedName = symbol.callableId.embedUnscopedPropertyName()
         val scopedName = symbol.embedMemberPropertyName()
         val fieldIsAllowed = symbol.hasBackingField
-                && (symbol.getterSymbol?.fir is FirDefaultPropertyGetter ||
-                symbol.setterSymbol?.fir is FirDefaultPropertySetter)
+                && !symbol.isCustom
                 && (symbol.isFinal || classSymbol.isFinal)
         val backingField = scopedName.specialEmbedding(embedding) ?: fieldIsAllowed.ifTrue {
             UserFieldEmbedding(
@@ -292,6 +298,9 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
 
     /**
      * Construct and register the property embedding (i.e. getter + setter) for this property.
+     *
+     * Note that the property either has associated Viper field (and then it is used to access the value) or not (in this case methods are used).
+     * The field is only used for final properties with default getter and default setter (if any).
      */
     private fun processProperty(symbol: FirPropertySymbol, embedding: ClassTypeEmbedding) {
         val unscopedName = symbol.callableId.embedUnscopedPropertyName()
