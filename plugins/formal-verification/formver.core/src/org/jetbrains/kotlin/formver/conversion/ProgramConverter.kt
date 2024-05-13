@@ -219,6 +219,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         val contractVisitor = ContractDescriptionConversionVisitor(this@ProgramConverter, subSignature)
 
         return object : FullNamedFunctionSignature, NamedFunctionSignature by subSignature {
+            // TODO (inhale vs require) Decide if `predicateAccessInvariant` should be required rather than inhaled in the beginning of the body.
             override fun getPreconditions(returnVariable: VariableEmbedding) =
                 subSignature.formalArgs.flatMap { it.pureInvariants() } +
                         subSignature.formalArgs.flatMap { it.accessInvariants() } +
