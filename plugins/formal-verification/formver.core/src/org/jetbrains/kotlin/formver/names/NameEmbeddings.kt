@@ -40,7 +40,6 @@ fun CallableId.embedLocalPropertyName(): KotlinName = SimpleKotlinName(callableN
 fun CallableId.embedMemberPropertyName(isPrivate: Boolean): ScopedKotlinName {
     val id = classId ?: error("Embedding non-member property $callableName as a member.")
     val className = ClassKotlinName(id.relativeClassName)
-    val packageName = packageName
     val scope =
         if (isPrivate) PrivatePropertyClassScope(packageName, className)
         else PropertyClassScope(packageName, className)
