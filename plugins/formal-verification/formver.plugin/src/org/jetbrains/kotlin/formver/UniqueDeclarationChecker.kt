@@ -24,9 +24,10 @@ import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 
-sealed class UniquenessLevel
-data object Unique : UniquenessLevel()
-data object Shared : UniquenessLevel()
+enum class UniquenessLevel {
+    Unique,
+    Shared
+}
 
 class UniqueDeclarationChecker(private val session: FirSession) : FirSimpleFunctionChecker(MppCheckerKind.Common) {
 
@@ -36,7 +37,7 @@ class UniqueDeclarationChecker(private val session: FirSession) : FirSimpleFunct
     private val uniqueId: ClassId = getAnnotationId("Unique")
 
     private fun getUniqueLevelFromExpression(expression: FirExpression, context: Map<FirVariable, UniquenessLevel>): UniquenessLevel {
-        return Shared
+        return UniquenessLevel.Shared
     }
 
     @OptIn(SymbolInternals::class)
@@ -48,16 +49,16 @@ class UniqueDeclarationChecker(private val session: FirSession) : FirSimpleFunct
             // iterate through all parameters and checker their annotation
             declaration.valueParameters.forEach { parameter ->
                 if (parameter.hasAnnotation(uniqueId, session)) {
-                    uniquenessContext[parameter] = Unique
+                    uniquenessContext[parameter] = UniquenessLevel.Unique
                 } else {
-                    uniquenessContext[parameter] = Shared
+                    uniquenessContext[parameter] = UniquenessLevel.Shared
                 }
             }
 
             // analyze the function body
             val body = declaration.body ?: return
             body.statements.forEach { statement: FirStatement ->
-                // check if statement is a function all, otherwise, continue
+                // check if statement is a function call, otherwise, continue
                 if (statement is FirFunctionCall) {
                     val functionReference = statement.calleeReference as FirResolvedNamedReference
                     val functionDeclaration = functionReference.resolvedSymbol.fir as FirSimpleFunction
@@ -69,7 +70,7 @@ class UniqueDeclarationChecker(private val session: FirSession) : FirSimpleFunct
                         val parameter = functionParameters[i]
                         if (!parameter.hasAnnotation(uniqueId, session)) continue
                         val argument = functionArguments[i]
-                        if (getUniqueLevelFromExpression(argument, uniquenessContext) == Shared) {
+                        if (getUniqueLevelFromExpression(argument, uniquenessContext) == UniquenessLevel.Shared) {
                             reporter.reportOn(argument.source, PluginErrors.UNIQUENESS_VIOLATION, parameter.name.asString(), context)
                         }
                     }
