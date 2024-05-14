@@ -32,6 +32,8 @@ object FormalVerificationConfigurationKeys {
         CompilerConfigurationKey.create("conversion targets selection")
     val VERIFICATION_TARGETS_SELECTION: CompilerConfigurationKey<TargetsSelection> =
         CompilerConfigurationKey.create("verification targets selection")
+    val CHECK_UNIQUE: CompilerConfigurationKey<CheckUnique> =
+        CompilerConfigurationKey.create("check unique")
 }
 
 class FormalVerificationCommandLineProcessor : CommandLineProcessor {

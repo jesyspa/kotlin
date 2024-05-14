@@ -31,7 +31,11 @@ class FormalVerificationPluginComponentRegistrar : CompilerPluginRegistrar() {
             FormalVerificationConfigurationKeys.VERIFICATION_TARGETS_SELECTION,
             TargetsSelection.defaultBehaviour()
         )
-        val config = PluginConfiguration(logLevel, errorStyle, behaviour, conversionSelection, verificationSelection)
+        val checkUnique = configuration.get(
+            FormalVerificationConfigurationKeys.CHECK_UNIQUE,
+            CheckUnique.defaultBehaviour()
+        )
+        val config = PluginConfiguration(logLevel, errorStyle, behaviour, conversionSelection, verificationSelection, checkUnique)
         FirExtensionRegistrarAdapter.registerExtension(FormalVerificationPluginExtensionRegistrar(config))
     }
 }

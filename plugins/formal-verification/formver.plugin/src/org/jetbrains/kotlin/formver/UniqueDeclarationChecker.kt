@@ -29,7 +29,8 @@ enum class UniquenessLevel {
     Shared
 }
 
-class UniqueDeclarationChecker(private val session: FirSession) : FirSimpleFunctionChecker(MppCheckerKind.Common) {
+class UniqueDeclarationChecker(private val session: FirSession, private val config: PluginConfiguration) :
+    FirSimpleFunctionChecker(MppCheckerKind.Common) {
 
     private fun getAnnotationId(name: String): ClassId =
         ClassId(FqName.fromSegments(listOf("org", "jetbrains", "kotlin", "formver", "plugin")), Name.identifier(name))
@@ -42,6 +43,7 @@ class UniqueDeclarationChecker(private val session: FirSession) : FirSimpleFunct
 
     @OptIn(SymbolInternals::class)
     override fun check(declaration: FirSimpleFunction, context: CheckerContext, reporter: DiagnosticReporter) {
+        if (config.checkUnique == CheckUnique.NEVER_CHECK) return
         val errorCollector = ErrorCollector()
         try {
             // uniquenessContext is a map from variable to its uniqueness level
