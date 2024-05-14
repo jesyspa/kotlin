@@ -5,8 +5,6 @@
 
 package org.jetbrains.kotlin.formver
 
-import org.jetbrains.kotlin.formver.TargetsSelection.TARGETS_WITH_CONTRACT
-
 enum class CheckUnique {
     ALWAYS_CHECK, NEVER_CHECK;
 
