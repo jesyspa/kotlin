@@ -11,7 +11,6 @@ class PluginConfiguration(
     val behaviour: UnsupportedFeatureBehaviour,
     val conversionSelection: TargetsSelection,
     val verificationSelection: TargetsSelection,
-    val checkUnique: CheckUnique
 ) {
     init {
         require(conversionSelection >= verificationSelection) {

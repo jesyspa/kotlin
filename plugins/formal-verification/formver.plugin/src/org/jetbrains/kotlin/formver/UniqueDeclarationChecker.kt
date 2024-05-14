@@ -43,7 +43,6 @@ class UniqueDeclarationChecker(private val session: FirSession, private val conf
 
     @OptIn(SymbolInternals::class)
     override fun check(declaration: FirSimpleFunction, context: CheckerContext, reporter: DiagnosticReporter) {
-        if (config.checkUnique == CheckUnique.NEVER_CHECK) return
         val errorCollector = ErrorCollector()
         try {
             // uniquenessContext is a map from variable to its uniqueness level

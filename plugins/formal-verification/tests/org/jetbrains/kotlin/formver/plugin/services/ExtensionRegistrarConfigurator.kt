@@ -13,7 +13,7 @@ import org.jetbrains.kotlin.formver.plugin.services.FormVerDirectives.ALWAYS_VAL
 import org.jetbrains.kotlin.formver.plugin.services.FormVerDirectives.FULL_VIPER_DUMP
 import org.jetbrains.kotlin.formver.plugin.services.FormVerDirectives.NEVER_VALIDATE
 import org.jetbrains.kotlin.formver.plugin.services.FormVerDirectives.RENDER_PREDICATES
-import org.jetbrains.kotlin.formver.plugin.services.FormVerDirectives.SKIP_UNIQUE_CHECK
+import org.jetbrains.kotlin.formver.plugin.services.FormVerDirectives.UNIQUE_CHECK
 import org.jetbrains.kotlin.test.directives.model.DirectivesContainer
 import org.jetbrains.kotlin.test.directives.model.SimpleDirectivesContainer
 import org.jetbrains.kotlin.test.model.TestModule
@@ -40,17 +40,16 @@ class ExtensionRegistrarConfigurator(testServices: TestServices) : EnvironmentCo
             NEVER_VALIDATE in module.directives -> TargetsSelection.NO_TARGETS
             else -> TargetsSelection.TARGETS_WITH_CONTRACT
         }
-        val checkUnique = when {
-            SKIP_UNIQUE_CHECK in module.directives -> CheckUnique.NEVER_CHECK
-            else -> CheckUnique.ALWAYS_CHECK
+        val conversionSelection = when {
+            UNIQUE_CHECK in module.directives -> TargetsSelection.NO_TARGETS
+            else -> TargetsSelection.ALL_TARGETS
         }
         val config = PluginConfiguration(
             logLevel,
             errorStyle,
             UnsupportedFeatureBehaviour.THROW_EXCEPTION,
-            conversionSelection = TargetsSelection.ALL_TARGETS,
-            verificationSelection = verificationSelection,
-            checkUnique = checkUnique
+            conversionSelection = conversionSelection,
+            verificationSelection = verificationSelection
         )
         FirExtensionRegistrarAdapter.registerExtension(FormalVerificationPluginExtensionRegistrar(config))
     }
@@ -73,7 +72,7 @@ object FormVerDirectives : SimpleDirectivesContainer() {
         description = "Never validate functions"
     )
 
-    val SKIP_UNIQUE_CHECK by directive(
-        description = "Skip uniqueness checking"
+    val UNIQUE_CHECK by directive(
+        description = "Do uniqueness checking"
     )
 }
