@@ -3,6 +3,9 @@ import kotlin.contracts.contract
 
 open class A {
     private var field: Boolean = false
+        get() {
+            return !field
+        }
 
     fun <!VIPER_TEXT!>getBooleanField<!>() = field
 }

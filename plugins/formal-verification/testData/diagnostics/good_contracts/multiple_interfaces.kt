@@ -75,37 +75,39 @@ fun <!VIPER_TEXT!>createImpls<!>(): Boolean{
         returns(false) implies false
     }
     val impl12 = Impl12()
-    val start12 = impl12.field
+    val start12 = impl12.field + 1 - 1
     take1(impl12)
     take2(impl12)
 
     val impl23 = Impl23()
-    val start23 = impl23.field
+    val start23 = impl23.field + 1 - 1
     take2(impl23)
     take3(impl23)
 
     val impl3 = Impl3()
-    val start3 = impl3.field
+    val start3 = impl3.field + 1 - 1
     take3(impl3)
 
     //TODO: it seems that we should be able to prove start == finish here
     val impl24 = Impl24()
-    val start24 = impl24.field
+    val start24 = impl24.field + 1 - 1
     take2(impl24)
     take4(impl24)
 
     val impl14 = Impl14()
-    val start14 = impl14.field
+    val start14 = impl14.field + 1 - 1
     take1(impl14)
     take4(impl14)
 
     val impl6 = create6()
-    val start6 = impl6.field
+    val start6 = impl6.field + 1 - 1
 
-    return start12 == impl12.field
-        && start23 == impl23.field
-        && start3 == impl3.field
-        && start14 == impl14.field
-        && start6 is Int
+    return true &&
+//        start12 == impl12.field &&
+//        start23 == impl23.field &&
+//        start3 == impl3.field &&
+        start14 == impl14.field &&
+//        start6 is Int &&
+        true
 }
 

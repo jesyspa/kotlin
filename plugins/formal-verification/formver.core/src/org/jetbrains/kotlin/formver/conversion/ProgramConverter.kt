@@ -72,7 +72,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
                 }
             }.distinctBy { it.name.mangled }.map { it.toViper() },
             functions = SpecialFunctions.all,
-            methods = SpecialMethods.all + methods.values.mapNotNull { it.viperMethod }.toList(),
+            methods = SpecialMethods.all + methods.values.mapNotNull { it.viperMethod }.distinctBy { it.name.mangled },
             predicates = classes.values.map { it.predicate }
         )
 
@@ -90,6 +90,23 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         val new = UserFunctionEmbedding(processCallable(symbol, signature))
         methods[signature.name] = new
         return new
+    }
+
+    private fun embedAccessorFunction(symbol: FirPropertyAccessorSymbol): FunctionEmbedding {
+        val name = symbol.embedName(this)
+        return methods.getOrPut(name) {
+            val signature = object : FullNamedFunctionSignature, FunctionSignature by embedFunctionSignature(symbol) {
+                override fun getPreconditions(returnVariable: VariableEmbedding) = emptyList<ExpEmbedding>()
+                override fun getPostconditions(returnVariable: VariableEmbedding) = emptyList<ExpEmbedding>()
+
+                override val sourceName: String? = super<FullNamedFunctionSignature>.sourceName
+                override val returnType = if (symbol.isGetter) AnyTypeEmbedding else UnitTypeEmbedding
+                override val declarationSource: KtSourceElement? = symbol.source
+                override val name: MangledName = name
+            }
+            val callable = processCallable(symbol, signature)
+            UserFunctionEmbedding(callable)
+        }
     }
 
     override fun embedFunction(symbol: FirFunctionSymbol<*>): FunctionEmbedding =
@@ -317,7 +334,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         if (symbol.fir is FirDefaultPropertyGetter && backingField != null) {
             BackingFieldGetter(backingField)
         } else {
-            CustomGetter(embedFunction(symbol))
+            CustomGetter(embedAccessorFunction(symbol))
         }
 
     @OptIn(SymbolInternals::class)
@@ -325,7 +342,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         if (symbol.fir is FirDefaultPropertySetter && backingField != null) {
             BackingFieldSetter(backingField)
         } else {
-            CustomSetter(embedFunction(symbol))
+            CustomSetter(embedAccessorFunction(symbol))
         }
 
     @OptIn(SymbolInternals::class)

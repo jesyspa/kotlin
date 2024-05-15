@@ -5,6 +5,8 @@
 
 package org.jetbrains.kotlin.formver.names
 
+import org.jetbrains.kotlin.descriptors.Visibilities
+import org.jetbrains.kotlin.fir.declarations.utils.visibility
 import org.jetbrains.kotlin.fir.symbols.impl.*
 import org.jetbrains.kotlin.formver.conversion.ProgramConversionContext
 import org.jetbrains.kotlin.formver.embeddings.TypeEmbedding
@@ -37,14 +39,19 @@ fun CallableId.embedExtensionSetterName(type: TypeEmbedding): ScopedKotlinName =
     embedScopedWithType(type, ExtensionSetterKotlinName(callableName))
 
 fun CallableId.embedLocalPropertyName(): KotlinName = SimpleKotlinName(callableName)
-fun CallableId.embedMemberPropertyName(isPrivate: Boolean): ScopedKotlinName {
+
+private fun CallableId.embedMemberPropertyNameBase(isPrivate: Boolean, withAction: (Name) -> KotlinName): ScopedKotlinName {
     val id = classId ?: error("Embedding non-member property $callableName as a member.")
     val className = ClassKotlinName(id.relativeClassName)
     val scope =
         if (isPrivate) PrivatePropertyClassScope(packageName, className)
         else PropertyClassScope(packageName, className)
-    return ScopedKotlinName(scope, MemberKotlinName(callableName))
+    return ScopedKotlinName(scope, withAction(callableName))
 }
+
+fun CallableId.embedMemberPropertyName(isPrivate: Boolean) = embedMemberPropertyNameBase(isPrivate, ::MemberKotlinName)
+fun CallableId.embedMemberGetterName(isPrivate: Boolean) = embedMemberPropertyNameBase(isPrivate, ::GetterKotlinName)
+fun CallableId.embedMemberSetterName(isPrivate: Boolean) = embedMemberPropertyNameBase(isPrivate, ::SetterKotlinName)
 
 fun CallableId.embedUnscopedPropertyName(): SimpleKotlinName = SimpleKotlinName(callableName)
 fun CallableId.embedFunctionName(type: TypeEmbedding): ScopedKotlinName =
@@ -60,10 +67,13 @@ fun FirPropertyAccessorSymbol.embedName(ctx: ProgramConversionContext): ScopedKo
         isSetter -> propertySymbol.callableId.embedExtensionSetterName(ctx.embedType(this))
         else -> error("An extension property must be a setter or a getter!")
     }
-    false -> when {
-        isGetter -> propertySymbol.callableId.embedGetterName()
-        isSetter -> propertySymbol.callableId.embedSetterName()
-        else -> error("A property accessor must be a setter or a getter!")
+    false -> {
+        val isPrivate = Visibilities.isPrivate(propertySymbol.visibility)
+        when {
+            isGetter -> propertySymbol.callableId.embedMemberGetterName(isPrivate)
+            isSetter -> propertySymbol.callableId.embedMemberSetterName(isPrivate)
+            else -> error("A property accessor must be a setter or a getter!")
+        }
     }
 }
 
