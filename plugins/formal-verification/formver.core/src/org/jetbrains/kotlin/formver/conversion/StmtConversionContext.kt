@@ -134,8 +134,7 @@ fun StmtConversionContext.embedPropertyAccess(accessExpression: FirPropertyAcces
             val type = embedType(calleeSymbol.resolvedReturnType)
             when {
                 accessExpression.dispatchReceiver != null -> {
-                    val actualPropertySymbol = calleeSymbol.findFinalOrSomeParentProperty()
-                    val property = embedProperty(actualPropertySymbol)
+                    val property = embedProperty(calleeSymbol)
                     ClassPropertyAccess(convert(accessExpression.dispatchReceiver!!), property, type)
                 }
                 accessExpression.extensionReceiver != null -> {

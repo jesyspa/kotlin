@@ -188,7 +188,15 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
     } else {
         // Ensure that the class has been processed.
         embedType(symbol.dispatchReceiverType!!)
-        properties[symbol.embedMemberPropertyName()] ?: error("Unknown property ${symbol.callableId}")
+        properties.getOrPut(symbol.embedMemberPropertyName()) {
+            check(symbol is FirIntersectionOverridePropertySymbol) {
+                "Unknown property ${symbol.callableId}."
+            }
+            PropertyEmbedding(
+                symbol.getterSymbol?.let { embedGetter(it, null) },
+                symbol.setterSymbol?.let { embedSetter(it, null) },
+            )
+        }
     }
 
     private fun <R> FirPropertySymbol.withConstructorParam(action: FirPropertySymbol.(FirValueParameterSymbol) -> R): R? =
