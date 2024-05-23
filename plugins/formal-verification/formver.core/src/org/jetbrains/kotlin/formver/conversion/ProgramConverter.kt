@@ -23,11 +23,13 @@ import org.jetbrains.kotlin.formver.domains.*
 import org.jetbrains.kotlin.formver.embeddings.*
 import org.jetbrains.kotlin.formver.embeddings.callables.*
 import org.jetbrains.kotlin.formver.embeddings.expression.*
+import org.jetbrains.kotlin.formver.isCustom
 import org.jetbrains.kotlin.formver.linearization.Linearizer
 import org.jetbrains.kotlin.formver.linearization.SeqnBuilder
 import org.jetbrains.kotlin.formver.linearization.SharedLinearizationState
 import org.jetbrains.kotlin.formver.names.*
 import org.jetbrains.kotlin.formver.viper.MangledName
+import org.jetbrains.kotlin.formver.viper.ast.Method
 import org.jetbrains.kotlin.formver.viper.ast.Program
 import org.jetbrains.kotlin.utils.addToStdlib.ifTrue
 
@@ -92,20 +94,23 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         return new
     }
 
-    private fun embedAccessorFunction(symbol: FirPropertyAccessorSymbol): FunctionEmbedding {
-        val name = symbol.embedName(this)
+    private fun embedGetterFunction(symbol: FirPropertySymbol): FunctionEmbedding {
+        val name = symbol.embedGetterName(this)
         return methods.getOrPut(name) {
-            val signature = object : FullNamedFunctionSignature, FunctionSignature by embedFunctionSignature(symbol) {
-                override fun getPreconditions(returnVariable: VariableEmbedding) = emptyList<ExpEmbedding>()
-                override fun getPostconditions(returnVariable: VariableEmbedding) = emptyList<ExpEmbedding>()
+            val signature = GetterFunctionSignature(name, symbol)
+            UserFunctionEmbedding(
+                NonInlineNamedFunction(signature)
+            )
+        }
+    }
 
-                override val sourceName: String? = super<FullNamedFunctionSignature>.sourceName
-                override val returnType = if (symbol.isGetter) AnyTypeEmbedding else UnitTypeEmbedding
-                override val declarationSource: KtSourceElement? = symbol.source
-                override val name: MangledName = name
-            }
-            val callable = processCallable(symbol, signature)
-            UserFunctionEmbedding(callable)
+    private fun embedSetterFunction(symbol: FirPropertySymbol): FunctionEmbedding {
+        val name = symbol.embedSetterName(this)
+        return methods.getOrPut(name) {
+            val signature = SetterFunctionSignature(name, symbol)
+            UserFunctionEmbedding(
+                NonInlineNamedFunction(signature)
+            )
         }
     }
 
@@ -181,10 +186,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
     override fun embedType(symbol: FirFunctionSymbol<*>): TypeEmbedding = FunctionTypeEmbedding(embedFunctionSignature(symbol).asData)
 
     override fun embedProperty(symbol: FirPropertySymbol): PropertyEmbedding = if (symbol.isExtension) {
-        PropertyEmbedding(
-            symbol.getterSymbol?.let { embedGetter(it, null) },
-            symbol.setterSymbol?.let { embedSetter(it, null) },
-        )
+        embedCustomProperty(symbol)
     } else {
         // Ensure that the class has been processed.
         embedType(symbol.dispatchReceiverType!!)
@@ -192,10 +194,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
             check(symbol is FirIntersectionOverridePropertySymbol) {
                 "Unknown property ${symbol.callableId}."
             }
-            PropertyEmbedding(
-                symbol.getterSymbol?.let { embedGetter(it, null) },
-                symbol.setterSymbol?.let { embedSetter(it, null) },
-            )
+            embedCustomProperty(symbol)
         }
     }
 
@@ -290,15 +289,6 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         Visibilities.isPrivate(this.visibility)
     )
 
-    @OptIn(SymbolInternals::class)
-    private val FirPropertySymbol.isCustom: Boolean
-        get() {
-            val getter = getterSymbol?.fir
-            val setter = setterSymbol?.fir
-            return if (isVal) getter !is FirDefaultPropertyGetter
-            else getter !is FirDefaultPropertyGetter || setter !is FirDefaultPropertySetter
-        }
-
     /**
      * Construct and register the field embedding for this property's backing field, if any exists.
      */
@@ -331,26 +321,30 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
     private fun processProperty(symbol: FirPropertySymbol, embedding: ClassTypeEmbedding) {
         val unscopedName = symbol.callableId.embedUnscopedPropertyName()
         val backingField = embedding.findField(unscopedName)
-        val getter: GetterEmbedding? = symbol.getterSymbol?.let { embedGetter(it, backingField) }
-        val setter: SetterEmbedding? = symbol.setterSymbol?.let { embedSetter(it, backingField) }
+        val getter: GetterEmbedding = embedGetter(symbol, backingField)
+        val setter: SetterEmbedding? = symbol.isVar.ifTrue { embedSetter(symbol, backingField) }
         val propertyEmbedding = PropertyEmbedding(getter, setter)
         properties[symbol.embedMemberPropertyName()] = propertyEmbedding
     }
 
-    @OptIn(SymbolInternals::class)
-    private fun embedGetter(symbol: FirPropertyAccessorSymbol, backingField: FieldEmbedding?): GetterEmbedding =
-        if (symbol.fir is FirDefaultPropertyGetter && backingField != null) {
+    private fun embedCustomProperty(symbol: FirPropertySymbol) =
+        PropertyEmbedding(
+            embedGetter(symbol, null),
+            symbol.isVar.ifTrue { embedSetter(symbol, null) }
+        )
+
+    private fun embedGetter(symbol: FirPropertySymbol, backingField: FieldEmbedding?): GetterEmbedding =
+        if (backingField != null) {
             BackingFieldGetter(backingField)
         } else {
-            CustomGetter(embedAccessorFunction(symbol))
+            CustomGetter(embedGetterFunction(symbol))
         }
 
-    @OptIn(SymbolInternals::class)
-    private fun embedSetter(symbol: FirPropertyAccessorSymbol, backingField: FieldEmbedding?): SetterEmbedding =
-        if (symbol.fir is FirDefaultPropertySetter && backingField != null) {
+    private fun embedSetter(symbol: FirPropertySymbol, backingField: FieldEmbedding?): SetterEmbedding =
+        if (backingField != null) {
             BackingFieldSetter(backingField)
         } else {
-            CustomSetter(embedAccessorFunction(symbol))
+            CustomSetter(embedSetterFunction(symbol))
         }
 
     @OptIn(SymbolInternals::class)

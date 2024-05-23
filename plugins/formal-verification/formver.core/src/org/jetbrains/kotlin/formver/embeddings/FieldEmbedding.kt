@@ -9,7 +9,6 @@ import org.jetbrains.kotlin.fir.symbols.impl.FirPropertySymbol
 import org.jetbrains.kotlin.formver.conversion.AccessPolicy
 import org.jetbrains.kotlin.formver.embeddings.expression.*
 import org.jetbrains.kotlin.formver.names.*
-import org.jetbrains.kotlin.formver.names.ClassScopeNameMatcher
 import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.formver.viper.ast.*
 import org.jetbrains.kotlin.utils.addToStdlib.ifTrue

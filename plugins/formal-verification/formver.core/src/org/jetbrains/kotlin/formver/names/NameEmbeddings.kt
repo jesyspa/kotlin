@@ -61,27 +61,22 @@ fun Name.embedScopedLocalName(scope: Int) = ScopedKotlinName(LocalScope(scope), 
 fun Name.embedParameterName() = ScopedKotlinName(ParameterScope, SimpleKotlinName(this))
 
 fun FirValueParameterSymbol.embedName(): ScopedKotlinName = ScopedKotlinName(ParameterScope, SimpleKotlinName(name))
-fun FirPropertyAccessorSymbol.embedName(ctx: ProgramConversionContext): ScopedKotlinName = when (propertySymbol.isExtension) {
-    true -> when {
-        isGetter -> propertySymbol.callableId.embedExtensionGetterName(ctx.embedType(this))
-        isSetter -> propertySymbol.callableId.embedExtensionSetterName(ctx.embedType(this))
-        else -> error("An extension property must be a setter or a getter!")
-    }
-    false -> {
-        val isPrivate = Visibilities.isPrivate(propertySymbol.visibility)
-        when {
-            isGetter -> propertySymbol.callableId.embedMemberGetterName(isPrivate)
-            isSetter -> propertySymbol.callableId.embedMemberSetterName(isPrivate)
-            else -> error("A property accessor must be a setter or a getter!")
-        }
-    }
+
+fun FirPropertySymbol.embedGetterName(ctx: ProgramConversionContext): ScopedKotlinName = when (isExtension) {
+    true -> callableId.embedExtensionGetterName(ctx.embedType(getterSymbol!!))
+    false -> callableId.embedMemberGetterName(Visibilities.isPrivate(visibility))
+}
+
+fun FirPropertySymbol.embedSetterName(ctx: ProgramConversionContext): ScopedKotlinName = when (isExtension) {
+    true -> callableId.embedExtensionSetterName(ctx.embedType(setterSymbol ?: error("Embedding setter of read-only extension property.")))
+    false -> callableId.embedMemberSetterName(Visibilities.isPrivate(visibility))
 }
 
 fun FirConstructorSymbol.embedName(ctx: ProgramConversionContext): ScopedKotlinName =
     callableId.embedScopedWithType(ctx.embedType(this), ConstructorKotlinName)
 
 fun FirFunctionSymbol<*>.embedName(ctx: ProgramConversionContext): ScopedKotlinName = when (this) {
-    is FirPropertyAccessorSymbol -> embedName(ctx)
+    is FirPropertyAccessorSymbol -> if (isGetter) propertySymbol.embedGetterName(ctx) else propertySymbol.embedSetterName(ctx)
     is FirConstructorSymbol -> embedName(ctx)
     else -> callableId.embedFunctionName(ctx.embedType(this))
 }

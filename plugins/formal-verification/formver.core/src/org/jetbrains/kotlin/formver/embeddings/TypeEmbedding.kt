@@ -148,6 +148,8 @@ data object AnyTypeEmbedding : TypeEmbedding {
     override fun provenInvariants(): List<TypeInvariantEmbedding> = listOf(SubTypeInvariantEmbedding(this))
 }
 
+data object NullableAnyTypeEmbedding : TypeEmbedding by NullableTypeEmbedding(AnyTypeEmbedding)
+
 data object IntTypeEmbedding : TypeEmbedding {
     override val runtimeType = RuntimeTypeDomain.intType()
     override val name = object : MangledName {
