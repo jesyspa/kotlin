@@ -143,10 +143,10 @@ data class NonDeterministically(val exp: ExpEmbedding) : UnitResultExpEmbedding,
 data class UnfoldingClassPredicateEmbedding(val predicated: VariableEmbedding, override val inner: ExpEmbedding) :
     UnaryDirectResultExpEmbedding {
     override val type: TypeEmbedding = inner.type
-    fun toViper(ctx: LinearizationContext, action: ExpEmbedding.() -> Exp): Exp {
+    private fun toViperImpl(ctx: LinearizationContext, action: ExpEmbedding.() -> Exp): Exp {
         val predicatedType = predicated.type
         check(predicatedType is ClassTypeEmbedding) {
-            "Built-in types do not have predicates"
+            "Built-in types do not have predicates."
         }
         return Exp.Unfolding(
             Exp.PredicateAccess(
@@ -160,11 +160,11 @@ data class UnfoldingClassPredicateEmbedding(val predicated: VariableEmbedding, o
         )
     }
 
-    override fun toViper(ctx: LinearizationContext): Exp = toViper(ctx) {
+    override fun toViper(ctx: LinearizationContext): Exp = toViperImpl(ctx) {
         toViper(ctx)
     }
 
-    override fun toViperBuiltinType(ctx: LinearizationContext): Exp  = toViper(ctx) {
+    override fun toViperBuiltinType(ctx: LinearizationContext): Exp = toViperImpl(ctx) {
         toViperBuiltinType(ctx)
     }
 }
