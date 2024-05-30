@@ -285,10 +285,6 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
             return symbol.dispatchReceiverType ?: symbol.resolvedReceiverTypeRef?.type
         }
 
-    private fun FirPropertySymbol.embedMemberPropertyName() = this.callableId.embedMemberPropertyName(
-        Visibilities.isPrivate(this.visibility)
-    )
-
     /**
      * Construct and register the field embedding for this property's backing field, if any exists.
      */
@@ -298,7 +294,9 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
     ): Pair<SimpleKotlinName, FieldEmbedding>? {
         val embedding = embedClass(classSymbol)
         val unscopedName = symbol.callableId.embedUnscopedPropertyName()
-        val scopedName = symbol.embedMemberPropertyName()
+        val scopedName = symbol.callableId.embedMemberBackingFieldName(
+            Visibilities.isPrivate(symbol.visibility)
+        )
         val fieldIsAllowed = symbol.hasBackingField
                 && !symbol.isCustom
                 && (symbol.isFinal || classSymbol.isFinal)

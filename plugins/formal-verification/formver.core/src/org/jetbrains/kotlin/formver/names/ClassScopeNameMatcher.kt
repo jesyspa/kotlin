@@ -63,8 +63,8 @@ internal class ClassScopeNameMatcher(name: MangledName) : NameMatcher(name) {
             this.action()
     }
 
-    inline fun ifMemberName(name: String, action: ClassScopeNameMatcher.() -> Unit) {
-        if (scopedName?.name == MemberKotlinName(Name.identifier(name)))
+    inline fun ifBackingFieldName(name: String, action: ClassScopeNameMatcher.() -> Unit) {
+        if (scopedName?.name == BackingFieldKotlinName(Name.identifier(name)))
             this.action()
     }
 }

@@ -39,12 +39,12 @@ data class DefaultClassScope(override val packageName: FqName, override val clas
  * We do not want to mangle field names with class and package, hence introducing
  * this special `NameScope`. Note that it still needs package and class for other purposes.
  */
-data class PropertyClassScope(override val packageName: FqName, override val className: ClassKotlinName) : ClassScope {
-    override val suffix = className.mangled + "_property"
-    override val mangled = "property"
+data class PublicClassScope(override val packageName: FqName, override val className: ClassKotlinName) : ClassScope {
+    override val suffix = className.mangled + "_public"
+    override val mangled = "public"
 }
 
-data class PrivatePropertyClassScope(override val packageName: FqName, override val className: ClassKotlinName) : ClassScope {
+data class PrivateClassScope(override val packageName: FqName, override val className: ClassKotlinName) : ClassScope {
     override val suffix = className.mangled + "_private"
 }
 

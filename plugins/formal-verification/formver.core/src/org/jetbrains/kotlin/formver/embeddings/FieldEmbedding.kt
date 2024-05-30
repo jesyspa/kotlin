@@ -81,7 +81,7 @@ object ListSizeFieldEmbedding : FieldEmbedding {
 
 fun ScopedKotlinName.specialEmbedding(embedding: ClassTypeEmbedding): FieldEmbedding? =
     NameMatcher.matchClassScope(this) {
-        ifMemberName("size") {
+        ifBackingFieldName("size") {
             return embedding.isCollectionInheritor.ifTrue {
                 ListSizeFieldEmbedding
             }
