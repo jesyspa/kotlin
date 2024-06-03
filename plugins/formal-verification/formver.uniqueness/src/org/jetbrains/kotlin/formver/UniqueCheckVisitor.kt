@@ -6,9 +6,9 @@
 package org.jetbrains.kotlin.formver
 
 import org.jetbrains.kotlin.fir.FirElement
-import org.jetbrains.kotlin.fir.declarations.FirFunction
 import org.jetbrains.kotlin.fir.declarations.FirSimpleFunction
 import org.jetbrains.kotlin.fir.declarations.hasAnnotation
+import org.jetbrains.kotlin.fir.expressions.FirBlock
 import org.jetbrains.kotlin.fir.expressions.FirFunctionCall
 import org.jetbrains.kotlin.fir.expressions.arguments
 import org.jetbrains.kotlin.fir.expressions.toResolvedCallableSymbol
@@ -20,9 +20,20 @@ import org.jetbrains.kotlin.text
 object UniqueCheckVisitor : FirVisitor<UniqueLevel, UniqueCheckerContext>() {
     override fun visitElement(element: FirElement, data: UniqueCheckerContext): UniqueLevel = UniqueLevel.Shared
 
-    override fun visitFunction(function: FirFunction, data: UniqueCheckerContext): UniqueLevel {
-        function.body?.accept(this, data)
+    override fun visitSimpleFunction(simpleFunction: FirSimpleFunction, data: UniqueCheckerContext): UniqueLevel {
+        simpleFunction.body?.accept(this, data)
         // Function definition don't have to return a unique level
+        return UniqueLevel.Shared
+    }
+
+    override fun visitBlock(block: FirBlock, data: UniqueCheckerContext): UniqueLevel {
+        block.statements.forEach { statement ->
+            when (statement) {
+                is FirFunctionCall -> {
+                    statement.accept(this, data)
+                }
+            }
+        }
         return UniqueLevel.Shared
     }
 
@@ -33,9 +44,10 @@ object UniqueCheckVisitor : FirVisitor<UniqueLevel, UniqueCheckerContext>() {
         val requiredUniqueLevel = data.resolveParameterUnique(symbol as FirFunctionSymbol<*>)
         // Skip merge of context for now
         val arguments = functionCall.arguments
-        for ((index, argument) in arguments.withIndex()) {
+        arguments.forEachIndexed { index, argument ->
             val requiredUnique = requiredUniqueLevel[index]
             if (requiredUnique == UniqueLevel.Unique && visitExpression(argument, data) == UniqueLevel.Shared) {
+                data.errorCollector.addErrorInfo("... while checking uniqueness level for ${functionCall.source.text}")
                 throw IllegalArgumentException("uniqueness level not match $argument")
             }
         }
