@@ -5,5 +5,56 @@
 
 package org.jetbrains.kotlin.formver
 
-class UniqueCheckVisitor {
+import org.jetbrains.kotlin.fir.FirElement
+import org.jetbrains.kotlin.fir.declarations.FirFunction
+import org.jetbrains.kotlin.fir.declarations.FirSimpleFunction
+import org.jetbrains.kotlin.fir.declarations.hasAnnotation
+import org.jetbrains.kotlin.fir.expressions.FirFunctionCall
+import org.jetbrains.kotlin.fir.expressions.arguments
+import org.jetbrains.kotlin.fir.expressions.toResolvedCallableSymbol
+import org.jetbrains.kotlin.fir.symbols.SymbolInternals
+import org.jetbrains.kotlin.fir.symbols.impl.FirFunctionSymbol
+import org.jetbrains.kotlin.fir.visitors.FirVisitor
+import org.jetbrains.kotlin.text
+
+object UniqueCheckVisitor : FirVisitor<UniqueLevel, UniqueCheckerContext>() {
+    override fun visitElement(element: FirElement, data: UniqueCheckerContext): UniqueLevel = UniqueLevel.Shared
+
+    override fun visitFunction(function: FirFunction, data: UniqueCheckerContext): UniqueLevel {
+        function.body?.accept(this, data)
+        // Function definition don't have to return a unique level
+        return UniqueLevel.Shared
+    }
+
+    @OptIn(SymbolInternals::class)
+    override fun visitFunctionCall(functionCall: FirFunctionCall, data: UniqueCheckerContext): UniqueLevel {
+        // To keep is simple, assume a functionCall always return Shared for now
+        val symbol = functionCall.toResolvedCallableSymbol()
+        val requiredUniqueLevel = data.resolveParameterUnique(symbol as FirFunctionSymbol<*>)
+        // Skip merge of context for now
+        val arguments = functionCall.arguments
+        for ((index, argument) in arguments.withIndex()) {
+            val requiredUnique = requiredUniqueLevel[index]
+            if (requiredUnique == UniqueLevel.Unique && visitExpression(argument, data) == UniqueLevel.Shared) {
+                throw IllegalArgumentException("uniqueness level not match $argument")
+            }
+        }
+
+        val callee = functionCall.toResolvedCallableSymbol()?.fir as FirSimpleFunction
+        if (callee.hasAnnotation(data.uniqueId, data.session)) {
+            return UniqueLevel.Unique
+        }
+        return UniqueLevel.Shared
+    }
+}
+
+object UniquenessCheckExceptionWrapper : FirVisitor<UniqueLevel, UniqueCheckerContext>() {
+    override fun visitElement(element: FirElement, data: UniqueCheckerContext): UniqueLevel {
+        try {
+            return element.accept(UniqueCheckVisitor, data)
+        } catch (e: Exception) {
+            data.errorCollector.addErrorInfo("... while checking uniqueness level for ${element.source.text}")
+            throw e
+        }
+    }
 }
