@@ -23,7 +23,7 @@ class UniqueDeclarationChecker(private val session: FirSession, private val conf
             declaration.accept(UniquenessCheckExceptionWrapper, uniqueCheckerContext)
         } catch (e: Exception) {
             val error = errorCollector.formatErrorWithInfos(e.message ?: "No message provided")
-            reporter.reportOn(declaration.source, PluginErrors.INTERNAL_ERROR, error, context)
+            reporter.reportOn(declaration.source, PluginErrors.UNIQUENESS_VIOLATION, error, context)
         }
     }
 }

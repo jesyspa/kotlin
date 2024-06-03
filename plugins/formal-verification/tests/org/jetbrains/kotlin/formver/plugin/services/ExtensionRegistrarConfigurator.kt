@@ -13,7 +13,7 @@ import org.jetbrains.kotlin.formver.plugin.services.FormVerDirectives.ALWAYS_VAL
 import org.jetbrains.kotlin.formver.plugin.services.FormVerDirectives.FULL_VIPER_DUMP
 import org.jetbrains.kotlin.formver.plugin.services.FormVerDirectives.NEVER_VALIDATE
 import org.jetbrains.kotlin.formver.plugin.services.FormVerDirectives.RENDER_PREDICATES
-import org.jetbrains.kotlin.formver.plugin.services.FormVerDirectives.UNIQUE_CHECK
+import org.jetbrains.kotlin.formver.plugin.services.FormVerDirectives.UNIQUE_CHECK_ONLY
 import org.jetbrains.kotlin.test.directives.model.DirectivesContainer
 import org.jetbrains.kotlin.test.directives.model.SimpleDirectivesContainer
 import org.jetbrains.kotlin.test.model.TestModule
@@ -37,11 +37,11 @@ class ExtensionRegistrarConfigurator(testServices: TestServices) : EnvironmentCo
         val errorStyle = ErrorStyle.USER_FRIENDLY
         val verificationSelection = when {
             ALWAYS_VALIDATE in module.directives -> TargetsSelection.ALL_TARGETS
-            NEVER_VALIDATE in module.directives -> TargetsSelection.NO_TARGETS
+            NEVER_VALIDATE in module.directives || UNIQUE_CHECK_ONLY in module.directives -> TargetsSelection.NO_TARGETS
             else -> TargetsSelection.TARGETS_WITH_CONTRACT
         }
         val conversionSelection = when {
-            UNIQUE_CHECK in module.directives -> TargetsSelection.NO_TARGETS
+            UNIQUE_CHECK_ONLY in module.directives -> TargetsSelection.NO_TARGETS
             else -> TargetsSelection.ALL_TARGETS
         }
         val config = PluginConfiguration(
@@ -72,7 +72,7 @@ object FormVerDirectives : SimpleDirectivesContainer() {
         description = "Never validate functions"
     )
 
-    val UNIQUE_CHECK by directive(
+    val UNIQUE_CHECK_ONLY by directive(
         description = "Do uniqueness checking"
     )
 }

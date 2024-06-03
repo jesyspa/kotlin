@@ -1,5 +1,4 @@
-// UNIQUE_CHECK
-// NEVER_VALIDATE
+// UNIQUE_CHECK_ONLY
 
 import org.jetbrains.kotlin.formver.plugin.NeverConvert
 import org.jetbrains.kotlin.formver.plugin.NeverVerify

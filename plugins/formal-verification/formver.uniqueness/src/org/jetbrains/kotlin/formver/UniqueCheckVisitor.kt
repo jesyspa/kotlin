@@ -47,8 +47,7 @@ object UniqueCheckVisitor : FirVisitor<UniqueLevel, UniqueCheckerContext>() {
         arguments.forEachIndexed { index, argument ->
             val requiredUnique = requiredUniqueLevel[index]
             if (requiredUnique == UniqueLevel.Unique && visitExpression(argument, data) == UniqueLevel.Shared) {
-                data.errorCollector.addErrorInfo("... while checking uniqueness level for ${functionCall.source.text}")
-                throw IllegalArgumentException("uniqueness level not match $argument")
+                throw IllegalArgumentException("uniqueness level not match ${argument.source.text}")
             }
         }
 
