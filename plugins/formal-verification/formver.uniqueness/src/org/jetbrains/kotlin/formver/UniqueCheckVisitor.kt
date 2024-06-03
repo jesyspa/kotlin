@@ -41,7 +41,7 @@ object UniqueCheckVisitor : FirVisitor<UniqueLevel, UniqueCheckerContext>() {
     override fun visitFunctionCall(functionCall: FirFunctionCall, data: UniqueCheckerContext): UniqueLevel {
         // To keep is simple, assume a functionCall always return Shared for now
         val symbol = functionCall.toResolvedCallableSymbol()
-        val requiredUniqueLevel = data.resolveParameterUnique(symbol as FirFunctionSymbol<*>)
+        val requiredUniqueLevel = data.resolveParameterListUnique(symbol as FirFunctionSymbol<*>)
         // Skip merge of context for now
         val arguments = functionCall.arguments
         arguments.forEachIndexed { index, argument ->

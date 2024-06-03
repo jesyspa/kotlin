@@ -28,7 +28,7 @@ class UniqueChecker(
         get() = getAnnotationId("Unique")
 
     @OptIn(SymbolInternals::class)
-    override fun resolveParameterUnique(symbol: FirFunctionSymbol<*>): List<UniqueLevel> {
+    override fun resolveParameterListUnique(symbol: FirFunctionSymbol<*>): List<UniqueLevel> {
         val params = (symbol.fir as FirSimpleFunction).valueParameters
         return params.map { par ->
             if (par.hasAnnotation(uniqueId, session)) {

@@ -16,5 +16,5 @@ interface UniqueCheckerContext {
 
     val uniqueId: ClassId
 
-    fun resolveParameterUnique(symbol: FirFunctionSymbol<*>): List<UniqueLevel>
+    fun resolveParameterListUnique(symbol: FirFunctionSymbol<*>): List<UniqueLevel>
 }
