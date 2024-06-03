@@ -14,6 +14,7 @@ interface UniqueCheckerContext {
     val errorCollector: ErrorCollector
     val session: FirSession
 
+    // for visitor to do has unique annotation check
     val uniqueId: ClassId
 
     fun resolveParameterListUnique(symbol: FirFunctionSymbol<*>): List<UniqueLevel>
