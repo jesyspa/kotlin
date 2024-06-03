@@ -6,10 +6,8 @@
 package org.jetbrains.kotlin.formver
 
 import org.jetbrains.kotlin.fir.FirSession
-import org.jetbrains.kotlin.fir.declarations.FirSimpleFunction
+import org.jetbrains.kotlin.fir.declarations.FirDeclaration
 import org.jetbrains.kotlin.fir.declarations.hasAnnotation
-import org.jetbrains.kotlin.fir.symbols.SymbolInternals
-import org.jetbrains.kotlin.fir.symbols.impl.FirFunctionSymbol
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
@@ -24,18 +22,13 @@ class UniqueChecker(
     private fun getAnnotationId(name: String): ClassId =
         ClassId(FqName.fromSegments(listOf("org", "jetbrains", "kotlin", "formver", "plugin")), Name.identifier(name))
 
-    override val uniqueId: ClassId
+    private val uniqueId: ClassId
         get() = getAnnotationId("Unique")
 
-    @OptIn(SymbolInternals::class)
-    override fun resolveParameterListUnique(symbol: FirFunctionSymbol<*>): List<UniqueLevel> {
-        val params = (symbol.fir as FirSimpleFunction).valueParameters
-        return params.map { par ->
-            if (par.hasAnnotation(uniqueId, session)) {
-                UniqueLevel.Unique
-            } else {
-                UniqueLevel.Shared
-            }
+    override fun resolveUniqueAnnotation(declaration: FirDeclaration): UniqueLevel {
+        if (declaration.hasAnnotation(uniqueId, session)) {
+            return UniqueLevel.Unique
         }
+        return UniqueLevel.Shared
     }
 }

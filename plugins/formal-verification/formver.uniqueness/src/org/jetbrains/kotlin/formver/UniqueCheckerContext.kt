@@ -6,16 +6,12 @@
 package org.jetbrains.kotlin.formver
 
 import org.jetbrains.kotlin.fir.FirSession
-import org.jetbrains.kotlin.fir.symbols.impl.FirFunctionSymbol
-import org.jetbrains.kotlin.name.ClassId
+import org.jetbrains.kotlin.fir.declarations.FirDeclaration
 
 interface UniqueCheckerContext {
     val config: PluginConfiguration
     val errorCollector: ErrorCollector
     val session: FirSession
 
-    // for visitor to do has unique annotation check
-    val uniqueId: ClassId
-
-    fun resolveParameterListUnique(symbol: FirFunctionSymbol<*>): List<UniqueLevel>
+    fun resolveUniqueAnnotation(declaration: FirDeclaration): UniqueLevel
 }

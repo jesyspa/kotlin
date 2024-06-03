@@ -7,7 +7,6 @@ package org.jetbrains.kotlin.formver
 
 import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.declarations.FirSimpleFunction
-import org.jetbrains.kotlin.fir.declarations.hasAnnotation
 import org.jetbrains.kotlin.fir.expressions.FirBlock
 import org.jetbrains.kotlin.fir.expressions.FirFunctionCall
 import org.jetbrains.kotlin.fir.expressions.arguments
@@ -41,21 +40,19 @@ object UniqueCheckVisitor : FirVisitor<UniqueLevel, UniqueCheckerContext>() {
     override fun visitFunctionCall(functionCall: FirFunctionCall, data: UniqueCheckerContext): UniqueLevel {
         // To keep is simple, assume a functionCall always return Shared for now
         val symbol = functionCall.toResolvedCallableSymbol()
-        val requiredUniqueLevel = data.resolveParameterListUnique(symbol as FirFunctionSymbol<*>)
+        val params = (symbol as FirFunctionSymbol<*>).fir.valueParameters
+        val requiredUniqueLevels = params.map { data.resolveUniqueAnnotation(it) }
         // Skip merge of context for now
         val arguments = functionCall.arguments
         arguments.forEachIndexed { index, argument ->
-            val requiredUnique = requiredUniqueLevel[index]
+            val requiredUnique = requiredUniqueLevels[index]
             if (requiredUnique == UniqueLevel.Unique && visitExpression(argument, data) == UniqueLevel.Shared) {
                 throw IllegalArgumentException("uniqueness level not match ${argument.source.text}")
             }
         }
 
         val callee = functionCall.toResolvedCallableSymbol()?.fir as FirSimpleFunction
-        if (callee.hasAnnotation(data.uniqueId, data.session)) {
-            return UniqueLevel.Unique
-        }
-        return UniqueLevel.Shared
+        return data.resolveUniqueAnnotation(callee)
     }
 }
 
