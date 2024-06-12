@@ -35,12 +35,16 @@ class PureLinearizer(override val source: KtSourceElement?) : LinearizationConte
         throw PureLinearizerMisuseException("withNewScopeToBlock")
     }
 
-    override fun addStatement(buildStmt: () -> Stmt) {
+    override fun addStatement(buildStmt: LinearizationContext.() -> Stmt) {
         throw PureLinearizerMisuseException("addStatement")
     }
 
     override fun addDeclaration(decl: Declaration) {
         throw PureLinearizerMisuseException("addDeclaration")
+    }
+
+    override fun addModifier(mod: StmtModifier) {
+        throw PureLinearizerMisuseException("addModifier")
     }
 }
 

@@ -27,8 +27,10 @@ interface LinearizationContext {
     fun asBlock(action: LinearizationContext.() -> Unit): Stmt.Seqn
     fun <R> withPosition(newSource: KtSourceElement, action: LinearizationContext.() -> R): R
 
-    fun addStatement(buildStmt: () -> Stmt)
+    fun addStatement(buildStmt: LinearizationContext.() -> Stmt)
     fun addDeclaration(decl: Declaration)
+
+    fun addModifier(mod: StmtModifier)
 }
 
 fun LinearizationContext.addLabel(label: Label) {

@@ -6,9 +6,11 @@
 package org.jetbrains.kotlin.formver.linearization
 
 import org.jetbrains.kotlin.KtSourceElement
+import org.jetbrains.kotlin.formver.asPosition
 import org.jetbrains.kotlin.formver.embeddings.TypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.expression.AnonymousVariableEmbedding
 import org.jetbrains.kotlin.formver.viper.ast.Declaration
+import org.jetbrains.kotlin.formver.viper.ast.Position
 import org.jetbrains.kotlin.formver.viper.ast.Stmt
 
 /**
@@ -18,6 +20,7 @@ data class Linearizer(
     val state: SharedLinearizationState,
     val seqnBuilder: SeqnBuilder,
     override val source: KtSourceElement?,
+    val stmtModifierTracker: StmtModifierTracker? = null
 ) : LinearizationContext {
     override fun freshAnonVar(type: TypeEmbedding): AnonymousVariableEmbedding {
         val variable = state.freshAnonVar(type)
@@ -34,11 +37,25 @@ data class Linearizer(
     override fun <R> withPosition(newSource: KtSourceElement, action: LinearizationContext.() -> R): R =
         copy(source = newSource).action()
 
-    override fun addStatement(buildStmt: () -> Stmt) {
-        seqnBuilder.addStatement(buildStmt())
+    override fun addStatement(buildStmt: LinearizationContext.() -> Stmt) {
+        val addStatementContext = object : AddStatementContext {
+            override val position: Position = source.asPosition
+            override fun addImmediateStatement(statement: Stmt) {
+                seqnBuilder.addStatement(statement)
+            }
+        }
+        val newTracker = StmtModifierTracker()
+        val stmt = copy(stmtModifierTracker = newTracker).buildStmt()
+        newTracker.applyOnEntry(addStatementContext)
+        seqnBuilder.addStatement(stmt)
+        newTracker.applyOnExit(addStatementContext)
     }
 
     override fun addDeclaration(decl: Declaration) {
         seqnBuilder.addDeclaration(decl)
+    }
+
+    override fun addModifier(mod: StmtModifier) {
+        stmtModifierTracker?.add(mod) ?: error("Not in a statement")
     }
 }
