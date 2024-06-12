@@ -35,16 +35,13 @@ class PureLinearizer(override val source: KtSourceElement?) : LinearizationConte
         throw PureLinearizerMisuseException("withNewScopeToBlock")
     }
 
-    override fun addStatement(stmt: Stmt) {
+    override fun addStatement(buildStmt: () -> Stmt) {
         throw PureLinearizerMisuseException("addStatement")
     }
 
     override fun addDeclaration(decl: Declaration) {
         throw PureLinearizerMisuseException("addDeclaration")
     }
-
-    override val block: Stmt.Seqn
-        get() = throw PureLinearizerMisuseException("block")
 }
 
 fun ExpEmbedding.pureToViper(toBuiltin: Boolean, source: KtSourceElement? = null): Exp {

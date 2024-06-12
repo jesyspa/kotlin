@@ -8,6 +8,7 @@ package org.jetbrains.kotlin.formver.linearization
 import org.jetbrains.kotlin.KtSourceElement
 import org.jetbrains.kotlin.formver.embeddings.TypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.expression.AnonymousVariableEmbedding
+import org.jetbrains.kotlin.formver.viper.ast.Declaration
 import org.jetbrains.kotlin.formver.viper.ast.Stmt
 
 /**
@@ -17,7 +18,7 @@ data class Linearizer(
     val state: SharedLinearizationState,
     val seqnBuilder: SeqnBuilder,
     override val source: KtSourceElement?,
-) : LinearizationContext, SeqnBuildContext by seqnBuilder {
+) : LinearizationContext {
     override fun freshAnonVar(type: TypeEmbedding): AnonymousVariableEmbedding {
         val variable = state.freshAnonVar(type)
         addDeclaration(variable.toLocalVarDecl())
@@ -32,4 +33,12 @@ data class Linearizer(
 
     override fun <R> withPosition(newSource: KtSourceElement, action: LinearizationContext.() -> R): R =
         copy(source = newSource).action()
+
+    override fun addStatement(buildStmt: () -> Stmt) {
+        seqnBuilder.addStatement(buildStmt())
+    }
+
+    override fun addDeclaration(decl: Declaration) {
+        seqnBuilder.addDeclaration(decl)
+    }
 }
