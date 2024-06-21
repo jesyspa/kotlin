@@ -66,7 +66,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
                     fields.values.distinctBy { it.name.mangled }.map { it.toViper() },
             functions = SpecialFunctions.all,
             methods = SpecialMethods.all + methods.values.mapNotNull { it.viperMethod }.distinctBy { it.name.mangled },
-            predicates = classes.values.flatMap { listOf(it.predicate, it.uniquePredicate) }
+            predicates = classes.values.flatMap { listOf(it.sharedPredicate, it.uniquePredicate) }
         )
 
     fun registerForVerification(declaration: FirSimpleFunction) {

@@ -23,8 +23,6 @@ interface FieldEmbedding {
     val accessPolicy: AccessPolicy
     val isUnique: Boolean
         get() = false
-    val includeInUniquePredicate: Boolean
-        get() = false
 
     // If true, it is necessary to unfold the predicate of the receiver before accessing the field
     val unfoldToAccess: Boolean
@@ -48,8 +46,6 @@ interface FieldEmbedding {
             AccessPolicy.ALWAYS_INHALE_EXHALE -> FieldAccessTypeInvariantEmbedding(this, PermExp.FullPerm())
             AccessPolicy.ALWAYS_READABLE, AccessPolicy.ALWAYS_WRITEABLE -> null
         }
-
-    fun accessInvariantsForPredicate(): TypeInvariantEmbedding? = null
 }
 
 class UserFieldEmbedding(
@@ -60,18 +56,9 @@ class UserFieldEmbedding(
 ) : FieldEmbedding {
     override val viperType = Type.Ref
     override val accessPolicy: AccessPolicy = if (symbol.isVal) AccessPolicy.ALWAYS_READABLE else AccessPolicy.ALWAYS_INHALE_EXHALE
-    override val includeInUniquePredicate: Boolean
-        get() = isUnique || type.isPrimitive
     override val unfoldToAccess: Boolean
         get() = accessPolicy == AccessPolicy.ALWAYS_READABLE
     override val includeInShortDump: Boolean = true
-
-    override fun accessInvariantsForPredicate(): TypeInvariantEmbedding =
-        if (symbol.isVal) {
-            FieldAccessTypeInvariantEmbedding(this, PermExp.WildcardPerm())
-        } else {
-            FieldAccessTypeInvariantEmbedding(this, PermExp.FullPerm())
-        }
 }
 
 

@@ -31,6 +31,8 @@ predicate Unique$T_class_global$class_Foo(special$class$predicate$subject: Ref) 
   acc(special$class$predicate$subject.public$backing_field_x, write) &&
   acc(special$class$predicate$subject.public$backing_field_y, wildcard) &&
   acc(special$class$predicate$subject.public$backing_field_z, write) &&
+  acc(T_class_global$class_T(special$class$predicate$subject.public$backing_field_y), wildcard) &&
+  acc(T_class_global$class_T(special$class$predicate$subject.public$backing_field_z), wildcard) &&
   acc(Unique$T_class_global$class_T(special$class$predicate$subject.public$backing_field_y), write) &&
   acc(Unique$T_class_global$class_T(special$class$predicate$subject.public$backing_field_z), write) &&
   acc(Unique$T_class_global$class_S(special$class$predicate$subject), write) &&
