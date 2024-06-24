@@ -128,6 +128,12 @@ public class FirLightTreeFormVerPluginDiagnosticsTestGenerated extends AbstractF
     }
 
     @Test
+    @TestMetadata("generics.kt")
+    public void testGenerics() {
+      runTest("plugins/formal-verification/testData/diagnostics/good_contracts/generics.kt");
+    }
+
+    @Test
     @TestMetadata("inline_correctness.kt")
     public void testInline_correctness() {
       runTest("plugins/formal-verification/testData/diagnostics/good_contracts/inline_correctness.kt");

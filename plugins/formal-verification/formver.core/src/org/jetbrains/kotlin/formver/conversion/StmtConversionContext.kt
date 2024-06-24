@@ -165,7 +165,7 @@ fun StmtConversionContext.insertInlineFunctionCall(
     val methodCtxFactory = MethodContextFactory(
         calleeSignature,
         InlineParameterResolver(subs, returnTargetName, returnTarget),
-        parentCtx,
+        parent = parentCtx,
     )
     return withMethodCtx(methodCtxFactory) {
         Block(

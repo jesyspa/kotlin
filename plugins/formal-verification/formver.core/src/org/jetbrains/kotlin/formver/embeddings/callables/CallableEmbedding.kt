@@ -21,9 +21,4 @@ interface CallableEmbedding : CallableSignature {
 fun CallableEmbedding.insertCall(
     args: List<ExpEmbedding>,
     ctx: StmtConversionContext,
-): ExpEmbedding {
-    return args.zip(formalArgTypes)
-        .map { (arg, type) -> arg.withType(type) }
-        .let { insertCallImpl(it, ctx) }
-        .withType(returnType)
-}
+): ExpEmbedding = insertCallImpl(args, ctx)

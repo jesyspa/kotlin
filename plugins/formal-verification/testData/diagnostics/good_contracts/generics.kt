@@ -1,0 +1,51 @@
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.contract
+import org.jetbrains.kotlin.formver.plugin.NeverConvert
+
+@NeverConvert
+public inline fun <R> copiedRun(block: () -> R): R = block()
+
+@NeverConvert
+public inline fun intRun(block: () -> Int): Int = block()
+
+@NeverConvert
+public inline fun equalsThree(block: () -> Int): Boolean {
+    val result = block()
+    return result == 3
+}
+
+@NeverConvert
+public inline fun equalsThreeParametrized(block: (Int) -> Int): Boolean {
+    val result = block(1)
+    return result == 3
+}
+
+@NeverConvert
+public inline fun equalsThreeExtension(block: Int.() -> Int): Boolean {
+    val result = 1.block()
+    return result == 3
+}
+
+@OptIn(ExperimentalContracts::class)
+public fun <!VIPER_TEXT!>useRun<!>(): Boolean {
+    contract {
+        returns(true)
+    }
+    val one = 1
+    val two = 2
+    val three = 3
+    val genericResult = copiedRun { 1 } + copiedRun { 2 } == copiedRun { 3 }
+    val intResult = intRun { 1 } + intRun { 2 } == intRun { 3 }
+    val stdlibResult = run { 1 } + run { 2 } == run { 3 }
+    val capturedResult = run { one } + run { two } == run { three }
+    return intResult
+            && genericResult
+            && stdlibResult
+            && capturedResult
+            && equalsThree { 1 + 2 }
+            && !equalsThree { 4 }
+            && equalsThreeParametrized { it + 2 }
+            && !equalsThreeParametrized { arg -> arg }
+            && equalsThreeExtension { this + 2 }
+            && equalsThreeExtension { plus(2) }
+}
