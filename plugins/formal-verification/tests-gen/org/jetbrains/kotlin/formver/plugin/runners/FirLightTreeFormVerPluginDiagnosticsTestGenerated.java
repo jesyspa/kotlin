@@ -128,12 +128,6 @@ public class FirLightTreeFormVerPluginDiagnosticsTestGenerated extends AbstractF
     }
 
     @Test
-    @TestMetadata("generics.kt")
-    public void testGenerics() {
-      runTest("plugins/formal-verification/testData/diagnostics/good_contracts/generics.kt");
-    }
-
-    @Test
     @TestMetadata("inline_correctness.kt")
     public void testInline_correctness() {
       runTest("plugins/formal-verification/testData/diagnostics/good_contracts/inline_correctness.kt");
@@ -143,6 +137,12 @@ public class FirLightTreeFormVerPluginDiagnosticsTestGenerated extends AbstractF
     @TestMetadata("is_type_contract.kt")
     public void testIs_type_contract() {
       runTest("plugins/formal-verification/testData/diagnostics/good_contracts/is_type_contract.kt");
+    }
+
+    @Test
+    @TestMetadata("lambdas_receivers.kt")
+    public void testLambdas_receivers() {
+      runTest("plugins/formal-verification/testData/diagnostics/good_contracts/lambdas_receivers.kt");
     }
 
     @Test
