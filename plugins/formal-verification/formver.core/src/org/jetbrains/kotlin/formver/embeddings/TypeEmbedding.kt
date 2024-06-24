@@ -67,7 +67,6 @@ interface TypeEmbedding {
     fun accessInvariants(): List<TypeInvariantEmbedding> = emptyList()
 
     // Note: this function will replace accessInvariants when nested unfold will be implemented
-    // Note: for the moment, unique predicates are not used and so TYPE_PREDICATE can be the default value
     fun sharedPredicateAccessInvariant(): TypeInvariantEmbedding? = null
     fun uniquePredicateAccessInvariant(): TypeInvariantEmbedding? = null
 
