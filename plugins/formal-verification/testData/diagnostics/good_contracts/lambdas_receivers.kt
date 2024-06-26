@@ -26,6 +26,15 @@ public inline fun equalsThreeExtension(block: Int.() -> Int): Boolean {
     return result == 3
 }
 
+@NeverConvert
+public inline fun doubleEqualsThree(block: Int.() -> Int): Boolean {
+    val result = 1.block().block()
+    return result == 3
+}
+
+@NeverConvert
+public inline fun Int.doubleIntRun(block: Int.() -> Int): Int = block().block()
+
 @OptIn(ExperimentalContracts::class)
 public fun <!VIPER_TEXT!>useRun<!>(): Boolean {
     contract {
@@ -38,6 +47,7 @@ public fun <!VIPER_TEXT!>useRun<!>(): Boolean {
     val intResult = intRun { 1 } + intRun { 2 } == intRun { 3 }
     val stdlibResult = run { 1 } + run { 2 } == run { 3 }
     val capturedResult = run { one } + run { two } == run { three }
+    val doubleIntRunResult = 1.doubleIntRun { plus(1) } == 3
     return intResult
             && genericResult
             && stdlibResult
@@ -48,4 +58,6 @@ public fun <!VIPER_TEXT!>useRun<!>(): Boolean {
             && !equalsThreeParametrized { arg -> arg }
             && equalsThreeExtension { this + 2 }
             && equalsThreeExtension { plus(2) }
+            && doubleEqualsThree { plus(1) }
+            && doubleIntRunResult
 }
