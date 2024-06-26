@@ -240,32 +240,35 @@ data class ClassTypeEmbedding(val className: ScopedKotlinName, val isInterface: 
         _uniquePredicate = initUniquePredicate()
     }
 
-    private val subjectEmbedding = PlaceholderVariableEmbedding(ClassPredicateSubjectName, this)
-    private fun initSharedPredicate(): Predicate {
-        val filteredFields = fields.values
-            .filterIsInstance<UserFieldEmbedding>()
-            .filter { it.accessPolicy == AccessPolicy.ALWAYS_READABLE }
+    class ClassPredicateBuilder(private val type: ClassTypeEmbedding) {
+        private val subjectEmbedding = PlaceholderVariableEmbedding(ClassPredicateSubjectName, type)
+        private var fields = type.fields.values.filterIsInstance<UserFieldEmbedding>()
+        private val body = mutableListOf<ExpEmbedding>()
 
-        val accessFields = filteredFields.map { FieldAccessTypeInvariantEmbedding(it, PermExp.WildcardPerm()).fillHole(subjectEmbedding) }
+        fun build(name: MangledName, action: ClassPredicateBuilder.() -> Unit): Predicate {
+            action()
+            return Predicate(
+                name,
+                listOf(subjectEmbedding.toLocalVarDecl()),
+                body.toConjunction().pureToViper(toBuiltin = true)
+            )
+        }
 
-        // We need to pass in the field access since the predicates are simply the ones for the type.
-        val accessFieldPredicates = filteredFields
-            .mapNotNull { it.type.sharedPredicateAccessInvariant()?.fillHole(PrimitiveFieldAccess(subjectEmbedding, it)) }
+        /**
+         * Filters the user fields based on the provided condition.
+         * The actions performed after this will use these filtered fields.
+         */
+        fun filterFields(filter: (FieldEmbedding) -> Boolean) {
+            fields = type.fields.values.filterIsInstance<UserFieldEmbedding>().filter(filter)
+        }
 
-        val fieldsProvenInvariants = filteredFields
-            .flatMap { it.type.provenInvariants().fillHoles(PrimitiveFieldAccess(subjectEmbedding, it)) }
-
-        val accessSuperTypesPredicates = classSuperTypes
-            .map { PredicateAccessTypeInvariantEmbedding(it.name, PermExp.WildcardPerm()).fillHole(subjectEmbedding) }
-
-        val body = (accessFields + accessFieldPredicates + accessSuperTypesPredicates + fieldsProvenInvariants).toConjunction()
-        return Predicate(name, listOf(subjectEmbedding.toLocalVarDecl()), body.pureToViper(toBuiltin = true))
-    }
-
-    private fun initUniquePredicate(): Predicate {
-        val filteredFields = fields.values.filterIsInstance<UserFieldEmbedding>()
-
-        val accessFields = filteredFields.map {
+        /**
+         * Adds fields access assertions in the body of the predicate.
+         * The permission used for the access is the following:
+         * - wildcard if the field is a val
+         * - write if the field is a var
+         */
+        fun accessFields() = addAllToBody {
             if (it.symbol.isVal) {
                 FieldAccessTypeInvariantEmbedding(it, PermExp.WildcardPerm()).fillHole(subjectEmbedding)
             } else {
@@ -273,22 +276,59 @@ data class ClassTypeEmbedding(val className: ScopedKotlinName, val isInterface: 
             }
         }
 
-        val accessFieldSharedPredicates = filteredFields
-            .mapNotNull { it.type.sharedPredicateAccessInvariant()?.fillHole(PrimitiveFieldAccess(subjectEmbedding, it)) }
+        /**
+         * Adds access to the shared predicate of the fields in the body of the predicate
+         */
+        fun accessFieldsSharedPredicate() = addAllToBody {
+            it.type.sharedPredicateAccessInvariant()?.fillHole(PrimitiveFieldAccess(subjectEmbedding, it))
+        }
 
-        val accessFieldUniquePredicates = filteredFields
-            .filter { it.isUnique }
-            .mapNotNull { it.type.uniquePredicateAccessInvariant()?.fillHole(PrimitiveFieldAccess(subjectEmbedding, it)) }
+        /**
+         * Adds access to the unique predicate of the unique fields in the body of the predicate
+         */
+        fun accessFieldsUniquePredicate() = addAllToBody {
+            it.isUnique.let { condition ->
+                if (condition) it.type.uniquePredicateAccessInvariant()?.fillHole(PrimitiveFieldAccess(subjectEmbedding, it)) else null
+            }
+        }
 
-        val fieldsProvenInvariants = filteredFields
-            .flatMap { it.type.provenInvariants().fillHoles(PrimitiveFieldAccess(subjectEmbedding, it)) }
+        /**
+         * Adds access to super-types predicates in the body of the predicate
+         */
+        fun accessSuperTypesPredicates(perm: PermExp, name: ClassTypeEmbedding.() -> MangledName) = body.addAll(
+            type.classSuperTypes.map { PredicateAccessTypeInvariantEmbedding(it.name(), perm).fillHole(subjectEmbedding) }
+        )
 
-        val accessSuperTypesPredicates = classSuperTypes
-            .map { PredicateAccessTypeInvariantEmbedding(it.uniquePredicateName, PermExp.FullPerm()).fillHole(subjectEmbedding) }
+        /**
+         * Adds the proven invariants in the body of the predicate
+         */
+        fun fieldsProvenInvariants() = addAllToBodyFlat {
+            it.type.provenInvariants().fillHoles(PrimitiveFieldAccess(subjectEmbedding, it))
+        }
 
-        val body =
-            (accessFields + accessFieldSharedPredicates + accessFieldUniquePredicates + accessSuperTypesPredicates + fieldsProvenInvariants).toConjunction()
-        return Predicate(uniquePredicateName, listOf(subjectEmbedding.toLocalVarDecl()), body.pureToViper(toBuiltin = true))
+        private inline fun addAllToBody(transform: (UserFieldEmbedding) -> ExpEmbedding?) {
+            body.addAll(fields.mapNotNull(transform))
+        }
+
+        private inline fun addAllToBodyFlat(transform: (UserFieldEmbedding) -> List<ExpEmbedding>) {
+            body.addAll(fields.flatMap(transform))
+        }
+    }
+
+    private fun initSharedPredicate() = ClassPredicateBuilder(this).build(name) {
+        filterFields { it.accessPolicy == AccessPolicy.ALWAYS_READABLE }
+        accessFields()
+        accessFieldsSharedPredicate()
+        accessSuperTypesPredicates(PermExp.WildcardPerm()) { name }
+        fieldsProvenInvariants()
+    }
+
+    private fun initUniquePredicate(): Predicate = ClassPredicateBuilder(this).build(uniquePredicateName) {
+        accessFields()
+        accessFieldsSharedPredicate()
+        accessFieldsUniquePredicate()
+        accessSuperTypesPredicates(PermExp.FullPerm()) { uniquePredicateName }
+        fieldsProvenInvariants()
     }
 
     // TODO: incorporate generic parameters.
