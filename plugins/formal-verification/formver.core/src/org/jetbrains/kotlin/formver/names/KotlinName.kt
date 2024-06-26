@@ -27,7 +27,7 @@ abstract class PrefixedKotlinName(prefix: String, name: Name) : KotlinName {
 }
 
 abstract class PrefixedKotlinNameWithType(prefix: String, name: Name, type: TypeEmbedding) : KotlinName {
-    override val mangled: String = "${prefix}_${name.asStringStripSpecialMarkers()}${'$'}${type.name.mangled}"
+    override val mangled: String = "${prefix}_${name.asStringStripSpecialMarkers()}\$${type.name.mangled}"
 }
 
 data class FunctionKotlinName(val name: Name, val type: TypeEmbedding) : PrefixedKotlinNameWithType("fun", name, type)
@@ -57,6 +57,6 @@ data class ClassKotlinName(val name: FqName) : KotlinName {
 }
 
 data class ConstructorKotlinName(val type: TypeEmbedding) : KotlinName {
-    override val mangled: String = "constructor${'$'}${type.name.mangled}"
+    override val mangled: String = "constructor\$${type.name.mangled}"
 }
 
