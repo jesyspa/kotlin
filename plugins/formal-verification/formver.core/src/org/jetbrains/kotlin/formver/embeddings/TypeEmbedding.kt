@@ -8,11 +8,6 @@ package org.jetbrains.kotlin.formver.embeddings
 import org.jetbrains.kotlin.formver.domains.Injection
 import org.jetbrains.kotlin.formver.domains.RuntimeTypeDomain
 import org.jetbrains.kotlin.formver.embeddings.callables.CallableSignatureData
-import org.jetbrains.kotlin.formver.embeddings.expression.PlaceholderVariableEmbedding
-import org.jetbrains.kotlin.formver.embeddings.expression.PrimitiveFieldAccess
-import org.jetbrains.kotlin.formver.embeddings.expression.toConjunction
-import org.jetbrains.kotlin.formver.linearization.pureToViper
-import org.jetbrains.kotlin.formver.embeddings.expression.*
 import org.jetbrains.kotlin.formver.names.*
 import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.formver.viper.ast.Exp
