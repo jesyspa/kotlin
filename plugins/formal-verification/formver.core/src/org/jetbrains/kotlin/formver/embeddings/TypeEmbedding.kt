@@ -5,7 +5,6 @@
 
 package org.jetbrains.kotlin.formver.embeddings
 
-import org.jetbrains.kotlin.formver.conversion.AccessPolicy
 import org.jetbrains.kotlin.formver.domains.Injection
 import org.jetbrains.kotlin.formver.domains.RuntimeTypeDomain
 import org.jetbrains.kotlin.formver.embeddings.callables.CallableSignatureData
@@ -13,6 +12,7 @@ import org.jetbrains.kotlin.formver.embeddings.expression.PlaceholderVariableEmb
 import org.jetbrains.kotlin.formver.embeddings.expression.PrimitiveFieldAccess
 import org.jetbrains.kotlin.formver.embeddings.expression.toConjunction
 import org.jetbrains.kotlin.formver.linearization.pureToViper
+import org.jetbrains.kotlin.formver.embeddings.expression.*
 import org.jetbrains.kotlin.formver.names.*
 import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.formver.viper.ast.Exp
@@ -66,20 +66,9 @@ interface TypeEmbedding {
      */
     fun accessInvariants(): List<TypeInvariantEmbedding> = emptyList()
 
-    // Note: this function will replace accessInvariants when nested unfold will be implemented
+    // Note: these functions will replace accessInvariants when nested unfold will be implemented
     fun sharedPredicateAccessInvariant(): TypeInvariantEmbedding? = null
     fun uniquePredicateAccessInvariant(): TypeInvariantEmbedding? = null
-
-    /**
-     * A list of invariants that are already known to be true based on the Kotlin code being well-formed.
-     *
-     * We can provide these to Viper as assumptions rather than requiring them to be explicitly proven.
-     * An example of this is when other systems (e.g. the type checker) have already proven these.
-     *
-     * TODO: Can be included in the class predicate when unfolding works
-     */
-    fun provenInvariants(): List<TypeInvariantEmbedding> =
-        listOf(SubTypeInvariantEmbedding(this))
 
     /**
      * Invariants that do not depend on the heap, and so do not need to be repeated
@@ -147,8 +136,6 @@ data object AnyTypeEmbedding : TypeEmbedding {
     override val name = object : MangledName {
         override val mangled: String = "T_Any"
     }
-
-    override fun provenInvariants(): List<TypeInvariantEmbedding> = listOf(SubTypeInvariantEmbedding(this))
 }
 
 data object NullableAnyTypeEmbedding : TypeEmbedding by NullableTypeEmbedding(AnyTypeEmbedding)
@@ -236,99 +223,33 @@ data class ClassTypeEmbedding(val className: ScopedKotlinName, val isInterface: 
     fun initFields(newFields: Map<SimpleKotlinName, FieldEmbedding>) {
         check(_fields == null) { "Fields of $className are already initialised." }
         _fields = newFields
-        _sharedPredicate = initSharedPredicate()
-        _uniquePredicate = initUniquePredicate()
-    }
-
-    class ClassPredicateBuilder(private val type: ClassTypeEmbedding) {
-        private val subjectEmbedding = PlaceholderVariableEmbedding(ClassPredicateSubjectName, type)
-        private var fields = type.fields.values.filterIsInstance<UserFieldEmbedding>()
-        private val body = mutableListOf<ExpEmbedding>()
-
-        fun build(name: MangledName, action: ClassPredicateBuilder.() -> Unit): Predicate {
-            action()
-            return Predicate(
-                name,
-                listOf(subjectEmbedding.toLocalVarDecl()),
-                body.toConjunction().pureToViper(toBuiltin = true)
-            )
-        }
-
-        /**
-         * Filters the user fields based on the provided condition.
-         * The actions performed after this will use these filtered fields.
-         */
-        fun filterFields(filter: (FieldEmbedding) -> Boolean) {
-            fields = type.fields.values.filterIsInstance<UserFieldEmbedding>().filter(filter)
-        }
-
-        /**
-         * Adds fields access assertions in the body of the predicate.
-         * The permission used for the access is the following:
-         * - wildcard if the field is a val
-         * - write if the field is a var
-         */
-        fun accessFields() = addAllToBody {
-            if (it.symbol.isVal) {
-                FieldAccessTypeInvariantEmbedding(it, PermExp.WildcardPerm()).fillHole(subjectEmbedding)
-            } else {
-                FieldAccessTypeInvariantEmbedding(it, PermExp.FullPerm()).fillHole(subjectEmbedding)
+        _sharedPredicate = ClassPredicateBuilder.build(this, name) {
+            forEachField {
+                ifIsAlwaysReadable {
+                    access()
+                    onType {
+                        accessSharedPredicate()
+                        includeSubTypeInvariants()
+                    }
+                }
+            }
+            forEachSuperType {
+                accessSharedPredicate()
             }
         }
-
-        /**
-         * Adds access to the shared predicate of the fields in the body of the predicate
-         */
-        fun accessFieldsSharedPredicate() = addAllToBody {
-            it.type.sharedPredicateAccessInvariant()?.fillHole(PrimitiveFieldAccess(subjectEmbedding, it))
-        }
-
-        /**
-         * Adds access to the unique predicate of the unique fields in the body of the predicate
-         */
-        fun accessFieldsUniquePredicate() = addAllToBody {
-            it.isUnique.let { condition ->
-                if (condition) it.type.uniquePredicateAccessInvariant()?.fillHole(PrimitiveFieldAccess(subjectEmbedding, it)) else null
+        _uniquePredicate = ClassPredicateBuilder.build(this, uniquePredicateName) {
+            forEachField {
+                access()
+                onType {
+                    accessSharedPredicate()
+                    ifIsUnique { accessUniquePredicate() }
+                    includeSubTypeInvariants()
+                }
+            }
+            forEachSuperType {
+                accessUniquePredicate()
             }
         }
-
-        /**
-         * Adds access to super-types predicates in the body of the predicate
-         */
-        fun accessSuperTypesPredicates(perm: PermExp, name: ClassTypeEmbedding.() -> MangledName) = body.addAll(
-            type.classSuperTypes.map { PredicateAccessTypeInvariantEmbedding(it.name(), perm).fillHole(subjectEmbedding) }
-        )
-
-        /**
-         * Adds the proven invariants in the body of the predicate
-         */
-        fun fieldsProvenInvariants() = addAllToBodyFlat {
-            it.type.provenInvariants().fillHoles(PrimitiveFieldAccess(subjectEmbedding, it))
-        }
-
-        private inline fun addAllToBody(transform: (UserFieldEmbedding) -> ExpEmbedding?) {
-            body.addAll(fields.mapNotNull(transform))
-        }
-
-        private inline fun addAllToBodyFlat(transform: (UserFieldEmbedding) -> List<ExpEmbedding>) {
-            body.addAll(fields.flatMap(transform))
-        }
-    }
-
-    private fun initSharedPredicate() = ClassPredicateBuilder(this).build(name) {
-        filterFields { it.accessPolicy == AccessPolicy.ALWAYS_READABLE }
-        accessFields()
-        accessFieldsSharedPredicate()
-        accessSuperTypesPredicates(PermExp.WildcardPerm()) { name }
-        fieldsProvenInvariants()
-    }
-
-    private fun initUniquePredicate(): Predicate = ClassPredicateBuilder(this).build(uniquePredicateName) {
-        accessFields()
-        accessFieldsSharedPredicate()
-        accessFieldsUniquePredicate()
-        accessSuperTypesPredicates(PermExp.FullPerm()) { uniquePredicateName }
-        fieldsProvenInvariants()
     }
 
     // TODO: incorporate generic parameters.
@@ -405,4 +326,6 @@ fun TypeEmbedding.isInheritorOfCollectionTypeNamed(name: String): Boolean =
 
 val TypeEmbedding.isCollectionInheritor
     get() = isInheritorOfCollectionTypeNamed("Collection")
+
+fun TypeEmbedding.subTypeInvariant() = SubTypeInvariantEmbedding(this)
 
