@@ -220,29 +220,35 @@ data class ClassTypeEmbedding(val className: ScopedKotlinName, val isInterface: 
         _fields = newFields
         _sharedPredicate = ClassPredicateBuilder.build(this, name) {
             forEachField {
-                ifIsAlwaysReadable {
-                    access()
-                    onType {
-                        accessSharedPredicate()
+                if (isAlwaysReadable) {
+                    addAccessPermissions(PermExp.WildcardPerm())
+                    forType {
+                        addAccessToSharedPredicate()
                         includeSubTypeInvariants()
                     }
                 }
             }
             forEachSuperType {
-                accessSharedPredicate()
+                addAccessToSharedPredicate()
             }
         }
         _uniquePredicate = ClassPredicateBuilder.build(this, uniquePredicateName) {
             forEachField {
-                access()
-                onType {
-                    accessSharedPredicate()
-                    ifIsUnique { accessUniquePredicate() }
+                if (isAlwaysReadable) {
+                    addAccessPermissions(PermExp.WildcardPerm())
+                } else {
+                    addAccessPermissions(PermExp.FullPerm())
+                }
+                forType {
+                    addAccessToSharedPredicate()
+                    if (isUnique) {
+                        addAccessToUniquePredicate()
+                    }
                     includeSubTypeInvariants()
                 }
             }
             forEachSuperType {
-                accessUniquePredicate()
+                addAccessToUniquePredicate()
             }
         }
     }

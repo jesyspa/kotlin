@@ -49,39 +49,28 @@ class FieldAssertionsBuilder(private val subject: VariableEmbedding, private val
     private val assertions = mutableListOf<ExpEmbedding>()
     fun toAssertionsList() = assertions.toList()
 
-    fun ifIsAlwaysReadable(action: FieldAssertionsBuilder.() -> Unit) {
-        if (field.accessPolicy == AccessPolicy.ALWAYS_READABLE) {
-            action()
-        }
-    }
+    val isAlwaysReadable = field.accessPolicy == AccessPolicy.ALWAYS_READABLE
+    val isUnique = field.isUnique
 
-    fun ifIsUnique(action: FieldAssertionsBuilder.() -> Unit) {
-        if (field.isUnique) {
-            action()
-        }
-    }
-
-    fun onType(action: TypeInvariantsBuilder.() -> Unit) {
+    fun forType(action: TypeInvariantsBuilder.() -> Unit) {
         val builder = TypeInvariantsBuilder(field.type)
         builder.action()
         assertions.addAll(builder.toInvariantsList().fillHoles(PrimitiveFieldAccess(subject, field)))
     }
 
-    fun access() {
-        val perm = if (field.symbol.isVal) PermExp.WildcardPerm() else PermExp.FullPerm()
+    fun addAccessPermissions(perm: PermExp) =
         assertions.add(FieldAccessTypeInvariantEmbedding(field, perm).fillHole(subject))
-    }
 }
 
 class TypeInvariantsBuilder(private val type: TypeEmbedding) {
     private val invariants = mutableListOf<TypeInvariantEmbedding>()
     fun toInvariantsList() = invariants.toList()
 
-    fun accessSharedPredicate() = invariants.addIfNotNull(
+    fun addAccessToSharedPredicate() = invariants.addIfNotNull(
         type.sharedPredicateAccessInvariant()
     )
 
-    fun accessUniquePredicate() = invariants.addIfNotNull(
+    fun addAccessToUniquePredicate() = invariants.addIfNotNull(
         type.uniquePredicateAccessInvariant()
     )
 
