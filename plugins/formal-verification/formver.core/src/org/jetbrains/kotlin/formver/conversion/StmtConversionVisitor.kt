@@ -301,7 +301,7 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext>()
         return when (typeOperatorCall.operation) {
             FirOperation.IS -> Is(argument, conversionType)
             FirOperation.NOT_IS -> Not(Is(argument, conversionType))
-            FirOperation.AS -> argument.withNewTypeAccessAndProvenInvariants(conversionType)
+            FirOperation.AS -> Cast(argument, conversionType).withAccessAndProvenInvariants()
             FirOperation.SAFE_AS -> SafeCast(argument, conversionType).withAccessAndProvenInvariants()
             else -> handleUnimplementedElement("Can't embed type operator ${typeOperatorCall.operation}.", data)
         }
