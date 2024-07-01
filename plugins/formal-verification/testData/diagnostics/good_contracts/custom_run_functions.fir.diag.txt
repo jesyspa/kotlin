@@ -1,4 +1,4 @@
-/custom_run_functions.kt:(1073,1079): info: Generated Viper text for useRun:
+/custom_run_functions.kt:(1058,1064): info: Generated Viper text for useRun:
 method global$fun_useRun$fun_take$$return$T_Boolean() returns (ret$0: Ref)
   ensures dom$RuntimeType$isSubtype(dom$RuntimeType$typeOf(ret$0), dom$RuntimeType$boolType())
   ensures dom$RuntimeType$boolFromRef(ret$0) == true
@@ -316,7 +316,7 @@ method global$fun_useRun$fun_take$$return$T_Boolean() returns (ret$0: Ref)
   label label$ret$0
 }
 
-/custom_run_functions.kt:(2241,2256): info: Generated Viper text for complexScenario:
+/custom_run_functions.kt:(2226,2241): info: Generated Viper text for complexScenario:
 method global$fun_complexScenario$fun_take$T_Boolean$return$T_Boolean(local$arg: Ref)
   returns (ret$0: Ref)
   ensures dom$RuntimeType$isSubtype(dom$RuntimeType$typeOf(ret$0), dom$RuntimeType$boolType())
@@ -455,6 +455,53 @@ method global$fun_complexScenario$fun_take$T_Boolean$return$T_Boolean(local$arg:
     anonymous$11 := ret$10
     ret$0 := anonymous$11
   }
+  goto label$ret$0
+  label label$ret$0
+}
+
+/custom_run_functions.kt:(3305,3320): info: Generated Viper text for testCustomClass:
+field public$backing_field_member: Ref
+
+method class_CustomClass$constructor$fun_take$$return$T_class_global$class_CustomClass()
+  returns (ret: Ref)
+  ensures dom$RuntimeType$isSubtype(dom$RuntimeType$typeOf(ret), dom$RuntimeType$T_class_global$class_CustomClass())
+  ensures acc(T_class_global$class_CustomClass(ret), wildcard)
+
+
+method global$fun_testCustomClass$fun_take$$return$T_Boolean()
+  returns (ret$0: Ref)
+  ensures dom$RuntimeType$isSubtype(dom$RuntimeType$typeOf(ret$0), dom$RuntimeType$boolType())
+  ensures dom$RuntimeType$boolFromRef(ret$0) == true
+{
+  var local0$custom: Ref
+  var anonymous$0: Ref
+  var ret$1: Ref
+  var anonymous$1: Ref
+  var ret$2: Ref
+  var anonymous$2: Ref
+  var ret$3: Ref
+  var anonymous$3: Ref
+  var ret$4: Ref
+  local0$custom := class_CustomClass$constructor$fun_take$$return$T_class_global$class_CustomClass()
+  unfold acc(T_class_global$class_CustomClass(local0$custom), wildcard)
+  ret$2 := local0$custom.public$backing_field_member
+  goto label$ret$2
+  label label$ret$2
+  anonymous$1 := ret$2
+  ret$1 := anonymous$1
+  goto label$ret$1
+  label label$ret$1
+  anonymous$0 := ret$1
+  unfold acc(T_class_global$class_CustomClass(local0$custom), wildcard)
+  ret$4 := local0$custom.public$backing_field_member
+  goto label$ret$4
+  label label$ret$4
+  anonymous$3 := ret$4
+  ret$3 := anonymous$3
+  goto label$ret$3
+  label label$ret$3
+  anonymous$2 := ret$3
+  ret$0 := dom$RuntimeType$boolToRef(anonymous$0 == anonymous$2)
   goto label$ret$0
   label label$ret$0
 }

@@ -1,5 +1,3 @@
-// USE_STDLIB
-
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 import org.jetbrains.kotlin.formver.plugin.NeverConvert
@@ -102,4 +100,23 @@ public fun <!VIPER_TEXT!>complexScenario<!>(arg: Boolean): Boolean {
             }
         }
     }
+}
+
+class CustomClass {
+    val member: Int = 42
+
+    @NeverConvert
+    inline fun <T> memberRun(block: CustomClass.() -> T): T = block()
+}
+
+@NeverConvert
+inline fun <T> CustomClass.extensionRun(block: CustomClass.() -> T): T = block()
+
+@OptIn(ExperimentalContracts::class)
+fun <!VIPER_TEXT!>testCustomClass<!>(): Boolean {
+    contract {
+        returns(true)
+    }
+    val custom = CustomClass()
+    return custom.memberRun { member } == custom.extensionRun { member }
 }
