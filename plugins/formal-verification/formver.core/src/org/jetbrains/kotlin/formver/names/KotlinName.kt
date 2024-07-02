@@ -6,8 +6,6 @@
 package org.jetbrains.kotlin.formver.names
 
 import org.jetbrains.kotlin.formver.embeddings.TypeEmbedding
-import org.jetbrains.kotlin.formver.viper.MangledName
-import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 
 /**
@@ -16,18 +14,19 @@ import org.jetbrains.kotlin.name.Name
  * This is a little more general than the `Name` type in Kotlin: we also use this
  * to represent getters and setters, for example.
  */
-sealed interface KotlinName : MangledName
 
-data class SimpleKotlinName(val name: Name) : KotlinName {
-    override val mangled: String = name.asStringStripSpecialMarkers()
+data class SimpleKotlinName(val name: Name) : ResolvableImplMixin() {
+    override val primary = name.asChunkedName()
 }
 
-abstract class PrefixedKotlinName(prefix: String, name: Name) : KotlinName {
-    override val mangled: String = "${prefix}_${name.asStringStripSpecialMarkers()}"
+abstract class PrefixedKotlinName(prefix: String, name: Name) : ResolvableImplMixin() {
+    override val primary = ChunkedName(StringNameChunk(prefix), name.asChunk())
+    override val secondary = listOf(ChunkedName(name.asChunk()))
 }
 
-abstract class PrefixedKotlinNameWithType(prefix: String, name: Name, type: TypeEmbedding) : KotlinName {
-    override val mangled: String = "${prefix}_${name.asStringStripSpecialMarkers()}\$${type.name.mangled}"
+abstract class PrefixedKotlinNameWithType(prefix: String, name: Name, type: TypeEmbedding) : ResolvableImplMixin() {
+    override val primary = ChunkedName(StringNameChunk(prefix), name.asChunk(), ResolvableNameChunk(type.name))
+    override val secondary = listOf(name.asChunkedName(), ChunkedName(StringNameChunk(prefix), name.asChunk()))
 }
 
 data class FunctionKotlinName(val name: Name, val type: TypeEmbedding) : PrefixedKotlinNameWithType("fun", name, type)
@@ -38,7 +37,7 @@ data class FunctionKotlinName(val name: Name, val type: TypeEmbedding) : Prefixe
 data class PropertyKotlinName(val name: Name) : PrefixedKotlinName("property_property", name)
 data class BackingFieldKotlinName(val name: Name) : PrefixedKotlinName("backing_field", name)
 data class GetterKotlinName(val name: Name) : PrefixedKotlinName("property_getter", name)
-data class SetterKotlinName(val name: Name) : PrefixedKotlinName("property_setter", name)
+data class SetterKotlinName(val name: Name) :PrefixedKotlinName("property_setter", name)
 data class ExtensionSetterKotlinName(val name: Name, val type: TypeEmbedding) : PrefixedKotlinNameWithType(
     "ext_setter",
     name, type
@@ -50,13 +49,8 @@ data class ExtensionGetterKotlinName(val name: Name, val type: TypeEmbedding) : 
     name, type
 )
 
-data class ClassKotlinName(val name: FqName) : KotlinName {
-    override val mangled: String = "class_${name.asViperString()}"
-
-    constructor(classSegments: List<String>) : this(FqName.fromSegments(classSegments))
+data class ConstructorKotlinName(val type: TypeEmbedding) : ResolvableImplMixin() {
+    override val primary = ChunkedName(StringNameChunk("constructor"), ResolvableNameChunk(type.name))
+    override val secondary = listOf(ChunkedName("constructor"), ChunkedName(StringNameChunk("constructor"),
+                                                                            ResolvableNameChunk(type.name)))
 }
-
-data class ConstructorKotlinName(val type: TypeEmbedding) : KotlinName {
-    override val mangled: String = "constructor\$${type.name.mangled}"
-}
-

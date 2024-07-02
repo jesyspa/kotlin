@@ -5,53 +5,48 @@
 
 package org.jetbrains.kotlin.formver.names
 
-import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.name.FqName
 
-sealed interface NameScope : MangledName
+data class PackageNamespace(val packageName: FqName) : ResolvableNamespace, ResolvableImplMixin() {
+    override val phase: ResolutionPhase
+        get() = TODO("Not yet implemented")
 
-sealed interface PackagePrefixScope : NameScope {
-    val packageName: FqName
-    val suffix: String
-    override val mangled: String
-        get() = if (packageName.isRoot) {
-            suffix
-        } else {
-            "pkg\$${packageName.asViperString()}\$$suffix"
-        }
+    override val primary: ChunkedName =
+        if (packageName.isRoot) ChunkedName()
+        else ChunkedName("pkg") + packageName.asChunkedName()
+    override val secondary: List<ChunkedName> =
+        if (packageName.isRoot) listOf()
+        else listOf(packageName.asChunkedName())
 }
 
-data class GlobalScope(override val packageName: FqName) : PackagePrefixScope {
-    override val suffix = "global"
+data class ClassScope(val name: FqName) : ResolvableNamespace, ResolvableImplMixin() {
+    override val phase: ResolutionPhase
+        get() = TODO("Not yet implemented")
 
-    constructor(segments: List<String>) : this(FqName.fromSegments(segments))
+    override val primary: ChunkedName = ChunkedName("class") + name.asChunkedName()
+    override val secondary: List<ChunkedName> = listOf(name.asChunkedName())
 }
 
-sealed interface ClassScope : PackagePrefixScope {
-    val className: ClassKotlinName
+data class ClassPrivateScope(val name: FqName) : ResolvableNamespace, ResolvableImplMixin() {
+    override val phase: ResolutionPhase
+        get() = TODO("Not yet implemented")
+    override val optional: Boolean = true
+    override val primary: ChunkedName = ChunkedName("class") + name.asChunkedName()
+    override val secondary: List<ChunkedName> = listOf(name.asChunkedName())
 }
 
-data class DefaultClassScope(override val packageName: FqName, override val className: ClassKotlinName, ) : ClassScope {
-    override val suffix = className.mangled
+data object PublicMemberScope : ResolvableNamespace, ResolvableImplMixin() {
+    override val phase: ResolutionPhase = PackagePhase
+    override val optional: Boolean = true
+    override val primary: ChunkedName = ChunkedName("public")
 }
 
-/**
- * We do not want to mangle field names with class and package, hence introducing
- * this special `NameScope`. Note that it still needs package and class for other purposes.
- */
-data class PublicClassScope(override val packageName: FqName, override val className: ClassKotlinName) : ClassScope {
-    override val suffix = className.mangled + "_public"
-    override val mangled = "public"
+data object ParameterScope : ResolvableNamespace, ResolvableImplMixin() {
+    override val phase: ResolutionPhase = PackagePhase
+    override val primary: ChunkedName = ChunkedName("local")
 }
 
-data class PrivateClassScope(override val packageName: FqName, override val className: ClassKotlinName) : ClassScope {
-    override val suffix = className.mangled + "_private"
-}
-
-data object ParameterScope : NameScope {
-    override val mangled = "local"
-}
-
-data class LocalScope(val level: Int) : NameScope {
-    override val mangled = "local$level"
+data class LocalScope(val level: Int) : ResolvableNamespace, ResolvableImplMixin() {
+    override val phase: ResolutionPhase = PackagePhase
+    override val primary: ChunkedName = ChunkedName("local$level")
 }

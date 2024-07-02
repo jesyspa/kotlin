@@ -5,15 +5,21 @@
 
 package org.jetbrains.kotlin.formver.names
 
-import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.name.FqName
+import org.jetbrains.kotlin.name.Name
 
-/**
- * Name of a Kotlin entity in the original program in a specified scope and optionally distinguished by type.
- */
-data class ScopedKotlinName(val scope: NameScope, val name: KotlinName) : MangledName {
-    override val mangled: String
-        get() = listOf(scope.mangled, name.mangled).joinToString("$")
+data class NamespacedName(val namespace: ResolvableNamespace, val name: Resolvable) : ResolvableImplMixin() {
+    override val primary: ChunkedName
+        get() = namespace.resolved + name.resolved
+
+    override fun registerDependencies(resolver: NameResolver, phase: ResolutionPhase) {
+        resolver.registerInPhase(namespace, namespace.phase)
+        resolver.registerInPhase(name, InNamespacePhase(namespace))
+    }
 }
 
-fun FqName.asViperString() = asString().replace('.', '$')
+fun FqName.asChunkedName(): ChunkedName =
+    ChunkedName(this.pathSegments().map { StringNameChunk(it.asStringStripSpecialMarkers()) })
+
+fun Name.asChunk(): NameChunk = StringNameChunk(this.asStringStripSpecialMarkers())
+fun Name.asChunkedName(): ChunkedName = ChunkedName(asChunk())

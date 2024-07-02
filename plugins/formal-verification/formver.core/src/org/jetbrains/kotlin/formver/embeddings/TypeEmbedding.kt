@@ -39,7 +39,7 @@ interface TypeEmbedding {
      * It may at some point necessary to make a `TypeName` hierarchy of some sort to
      * represent these names, but we do it inline for now.
      */
-    val name: MangledName
+    val name: TypeName
 
     /**
      * Find an embedding of a backing field by this name amongst the ancestors of this type.
@@ -125,25 +125,19 @@ fun <R> TypeEmbedding.mapNotNullUniqueFields(action: (SimpleKotlinName, FieldEmb
 
 data object UnitTypeEmbedding : TypeEmbedding {
     override val runtimeType = RuntimeTypeDomain.unitType()
-    override val name = object : MangledName {
-        override val mangled: String = "T_Unit"
-    }
+    override val name = TypeName(SimpleTypeName("Unit"))
 }
 
 data object NothingTypeEmbedding : TypeEmbedding {
     override val runtimeType = RuntimeTypeDomain.nothingType()
-    override val name = object : MangledName {
-        override val mangled: String = "T_Nothing"
-    }
+    override val name = TypeName(SimpleTypeName("Nothing"))
 
     override fun pureInvariants(): List<TypeInvariantEmbedding> = listOf(FalseTypeInvariant)
 }
 
 data object AnyTypeEmbedding : TypeEmbedding {
     override val runtimeType = RuntimeTypeDomain.anyType()
-    override val name = object : MangledName {
-        override val mangled: String = "T_Any"
-    }
+    override val name = TypeName(SimpleTypeName("Any"))
 
     override fun provenInvariants(): List<TypeInvariantEmbedding> = listOf(SubTypeInvariantEmbedding(this))
 }
@@ -152,25 +146,19 @@ data object NullableAnyTypeEmbedding : TypeEmbedding by NullableTypeEmbedding(An
 
 data object IntTypeEmbedding : TypeEmbedding {
     override val runtimeType = RuntimeTypeDomain.intType()
-    override val name = object : MangledName {
-        override val mangled: String = "T_Int"
-    }
+    override val name = TypeName(SimpleTypeName("Int"))
 }
 
 
 data object BooleanTypeEmbedding : TypeEmbedding {
     override val runtimeType = RuntimeTypeDomain.boolType()
-    override val name = object : MangledName {
-        override val mangled: String = "T_Boolean"
-    }
+    override val name = TypeName(SimpleTypeName("Boolean"))
 }
 
 
 data class NullableTypeEmbedding(val elementType: TypeEmbedding) : TypeEmbedding {
     override val runtimeType = RuntimeTypeDomain.nullable(elementType.runtimeType)
-    override val name = object : MangledName {
-        override val mangled: String = "N" + elementType.name.mangled
-    }
+    override val name = elementType.name.copy(nullable = true)
 
     override fun accessInvariants(): List<TypeInvariantEmbedding> = elementType.accessInvariants().map { IfNonNullInvariant(it) }
 
@@ -207,17 +195,14 @@ abstract class UnspecifiedFunctionTypeEmbedding : TypeEmbedding {
  * type embedding as a workaround.
  */
 data object LegacyUnspecifiedFunctionTypeEmbedding : UnspecifiedFunctionTypeEmbedding() {
-    override val name: MangledName = SpecialName("legacy_function_object_type")
+    override val name = TypeName(SimpleTypeName("legacy_function_object_type"))
 }
 
 data class FunctionTypeEmbedding(val signature: CallableSignatureData) : UnspecifiedFunctionTypeEmbedding() {
-    override val name = object : MangledName {
-        override val mangled: String =
-            "fun_take\$${signature.formalArgTypes.joinToString("$") { it.name.mangled }}\$return\$${signature.returnType.name.mangled}"
-    }
+    override val name = TypeName(FunctionTypeName(signature.formalArgTypes.map { it.name }))
 }
 
-data class ClassTypeEmbedding(val className: ScopedKotlinName, val isInterface: Boolean) : TypeEmbedding {
+data class ClassTypeEmbedding(val className: Resolvable, val isInterface: Boolean) : TypeEmbedding {
     private var _superTypes: List<TypeEmbedding>? = null
     val superTypes: List<TypeEmbedding>
         get() = _superTypes ?: error("Super types of $className have not been initialised yet.")
@@ -268,7 +253,7 @@ data class ClassTypeEmbedding(val className: ScopedKotlinName, val isInterface: 
     }
 
     // TODO: incorporate generic parameters.
-    override val name = object : MangledName {
+    override val name = TypeName("T_class") object : MangledName {
         override val mangled: String = "T_class_${className.mangled}"
     }
 
