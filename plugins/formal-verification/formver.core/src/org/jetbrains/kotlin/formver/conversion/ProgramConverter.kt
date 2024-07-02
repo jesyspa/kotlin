@@ -25,6 +25,7 @@ import org.jetbrains.kotlin.formver.linearization.SharedLinearizationState
 import org.jetbrains.kotlin.formver.names.*
 import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.formver.viper.ast.Program
+import org.jetbrains.kotlin.utils.addIfNotNull
 import org.jetbrains.kotlin.utils.addToStdlib.ifTrue
 
 /**
@@ -238,26 +239,35 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
 
         return object : FullNamedFunctionSignature, NamedFunctionSignature by subSignature {
             // TODO (inhale vs require) Decide if `predicateAccessInvariant` should be required rather than inhaled in the beginning of the body.
-            override fun getPreconditions(returnVariable: VariableEmbedding) =
-                subSignature.formalArgs.flatMap { it.pureInvariants() } +
-                        subSignature.formalArgs.flatMap { it.accessInvariants() } +
-                        subSignature.formalArgs.filter { it.isUnique }
-                            .mapNotNull { it.type.uniquePredicateAccessInvariant()?.fillHole(it) } +
-                        subSignature.stdLibPreconditions()
+            override fun getPreconditions(returnVariable: VariableEmbedding) = buildList {
+                subSignature.formalArgs.forEach {
+                    addAll(it.pureInvariants())
+                    addAll(it.accessInvariants())
+                    if (it.isUnique) {
+                        addIfNotNull(it.type.uniquePredicateAccessInvariant()?.fillHole(it))
+                    }
+                }
+                addAll(subSignature.stdLibPreconditions())
+            }
 
-            override fun getPostconditions(returnVariable: VariableEmbedding) =
-                subSignature.formalArgs.flatMap { it.accessInvariants() } +
-                        subSignature.params.flatMap { it.dynamicInvariants() } +
-                        subSignature.formalArgs.filter { it.isUnique && it.isBorrowed }.mapNotNull {
-                            it.type.uniquePredicateAccessInvariant()?.fillHole(it)
-                        } +
-                        returnVariable.pureInvariants() +
-                        returnVariable.provenInvariants() +
-                        returnVariable.allAccessInvariants() +
-                        listOfNotNull(if (subSignature.returnsUnique) returnVariable.uniquePredicateAccessInvariant() else null) +
-                        contractVisitor.getPostconditions(ContractVisitorContext(returnVariable, symbol)) +
-                        subSignature.stdLibPostconditions(returnVariable) +
-                        listOfNotNull(primaryConstructorInvariants(returnVariable))
+            override fun getPostconditions(returnVariable: VariableEmbedding) = buildList {
+                subSignature.formalArgs.forEach {
+                    addAll(it.accessInvariants())
+                    if (it.isUnique && it.isBorrowed) {
+                        addIfNotNull(it.type.uniquePredicateAccessInvariant()?.fillHole(it))
+                    }
+                }
+                addAll(subSignature.params.flatMap { it.dynamicInvariants() })
+                addAll(returnVariable.pureInvariants())
+                addAll(returnVariable.provenInvariants())
+                addAll(returnVariable.allAccessInvariants())
+                if (subSignature.returnsUnique) {
+                    addIfNotNull(returnVariable.uniquePredicateAccessInvariant())
+                }
+                addAll(contractVisitor.getPostconditions(ContractVisitorContext(returnVariable, symbol)))
+                addAll(subSignature.stdLibPostconditions(returnVariable))
+                addIfNotNull(primaryConstructorInvariants(returnVariable))
+            }
 
             fun primaryConstructorInvariants(returnVariable: VariableEmbedding): ExpEmbedding? {
                 val invariants = params.mapNotNull { param ->
