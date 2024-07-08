@@ -130,11 +130,6 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext>()
         return propertyAccess.getValue(data)
     }
 
-    override fun visitSimpleFunction(simpleFunction: FirSimpleFunction, data: StmtConversionContext): ExpEmbedding {
-        data.embedFunctionSignature(simpleFunction.symbol)
-        return UnitLit
-    }
-
     override fun visitEqualityOperatorCall(
         equalityOperatorCall: FirEqualityOperatorCall,
         data: StmtConversionContext,
