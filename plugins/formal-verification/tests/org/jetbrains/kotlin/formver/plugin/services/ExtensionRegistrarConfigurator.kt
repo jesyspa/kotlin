@@ -13,12 +13,17 @@ import org.jetbrains.kotlin.formver.plugin.services.FormVerDirectives.ALWAYS_VAL
 import org.jetbrains.kotlin.formver.plugin.services.FormVerDirectives.FULL_VIPER_DUMP
 import org.jetbrains.kotlin.formver.plugin.services.FormVerDirectives.NEVER_VALIDATE
 import org.jetbrains.kotlin.formver.plugin.services.FormVerDirectives.RENDER_PREDICATES
+import org.jetbrains.kotlin.formver.plugin.services.FormVerDirectives.REPLACE_STDLIB_EXTENSIONS
 import org.jetbrains.kotlin.formver.plugin.services.FormVerDirectives.UNIQUE_CHECK_ONLY
 import org.jetbrains.kotlin.test.directives.model.DirectivesContainer
+import org.jetbrains.kotlin.test.directives.model.RegisteredDirectives
 import org.jetbrains.kotlin.test.directives.model.SimpleDirectivesContainer
+import org.jetbrains.kotlin.test.model.TestFile
 import org.jetbrains.kotlin.test.model.TestModule
+import org.jetbrains.kotlin.test.services.AdditionalSourceProvider
 import org.jetbrains.kotlin.test.services.EnvironmentConfigurator
 import org.jetbrains.kotlin.test.services.TestServices
+import java.io.File
 
 class ExtensionRegistrarConfigurator(testServices: TestServices) : EnvironmentConfigurator(testServices) {
     override val directiveContainers: List<DirectivesContainer>
@@ -77,4 +82,17 @@ object FormVerDirectives : SimpleDirectivesContainer() {
     val UNIQUE_CHECK_ONLY by directive(
         description = "Do uniqueness checking"
     )
+
+    val REPLACE_STDLIB_EXTENSIONS by directive(
+        description = "Use replacements for stdlib functions like run with accessible bodies"
+    )
+}
+
+class StdlibReplacementsProvider(testServices: TestServices, baseDir: String = ".") : AdditionalSourceProvider(testServices) {
+    private val libraryPath = "$baseDir/plugins/formal-verification/testData/stdlibReplacements.kt"
+
+    override fun produceAdditionalFiles(globalDirectives: RegisteredDirectives, module: TestModule) =
+        if (containsDirective(globalDirectives, module, REPLACE_STDLIB_EXTENSIONS))
+            listOf(File(libraryPath).toTestFile())
+        else emptyList()
 }
