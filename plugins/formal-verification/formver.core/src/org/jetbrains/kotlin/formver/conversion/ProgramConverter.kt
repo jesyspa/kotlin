@@ -150,11 +150,11 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
 
     override fun embedType(type: ConeKotlinType): TypeEmbedding = when {
         type is ConeErrorType -> error("Encountered an erroneous type: $type")
-        type is ConeTypeParameterType -> NullableTypeEmbedding(AnyTypeEmbedding)
-        type.isUnit -> UnitTypeEmbedding
-        type.isInt -> IntTypeEmbedding
-        type.isBoolean -> BooleanTypeEmbedding
-        type.isNothing -> NothingTypeEmbedding
+        type is ConeTypeParameterType -> buildType { nullable = true; any() }
+        type.isUnit -> buildType { unit() }
+        type.isInt -> buildType { int() }
+        type.isBoolean -> buildType { boolean() }
+        type.isNothing -> buildType { nothing() }
         type.isSomeFunctionType(session) -> {
             val receiverType: TypeEmbedding? = type.receiverType(session)?.let { embedType(it) }
             val paramTypes: List<TypeEmbedding> = type.valueParameterTypesWithoutReceivers(session).map(::embedType)
@@ -163,7 +163,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
             FunctionTypeEmbedding(signature)
         }
         type.isNullable -> NullableTypeEmbedding(embedType(type.withNullability(ConeNullability.NOT_NULL, session.typeContext)))
-        type.isAny -> AnyTypeEmbedding
+        type.isAny -> buildType { any() }
         type is ConeClassLikeType -> {
             val classLikeSymbol = type.toClassSymbol(session)
             if (classLikeSymbol is FirRegularClassSymbol) {
@@ -399,7 +399,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
                 throw NotImplementedError("The embedding for type $type is not yet implemented.")
             UnsupportedFeatureBehaviour.ASSUME_UNREACHABLE -> {
                 errorCollector.addMinorError("Requested type $type, for which we do not yet have an embedding.")
-                UnitTypeEmbedding
+                buildType { unit() }
             }
         }
 }

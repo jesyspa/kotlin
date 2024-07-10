@@ -46,7 +46,7 @@ object KotlinContractFunction : SpecialKotlinFunction {
     override val receiverType: TypeEmbedding? = null
     override val paramTypes: List<TypeEmbedding> =
         listOf(FunctionTypeEmbedding(CallableSignatureData(contractBuilderType, listOf(), UnitTypeEmbedding)))
-    override val returnType: TypeEmbedding = UnitTypeEmbedding
+    override val returnType: TypeEmbedding = buildType { unit() }
 
     override fun insertCallImpl(
         args: List<ExpEmbedding>,
@@ -58,9 +58,9 @@ abstract class KotlinIntSpecialFunction : SpecialKotlinFunction {
     override val packageName: List<String> = listOf("kotlin")
     override val className: String? = "Int"
 
-    override val receiverType: TypeEmbedding = IntTypeEmbedding
-    override val paramTypes: List<TypeEmbedding> = listOf(IntTypeEmbedding)
-    override val returnType: TypeEmbedding = IntTypeEmbedding
+    override val receiverType: TypeEmbedding = buildType { int() }
+    override val paramTypes: List<TypeEmbedding> = listOf(buildType { int() })
+    override val returnType: TypeEmbedding = buildType { int() }
 }
 
 object KotlinIntPlusFunctionImplementation : KotlinIntSpecialFunction() {
@@ -103,9 +103,9 @@ abstract class KotlinBooleanSpecialFunction : SpecialKotlinFunction {
     override val packageName: List<String> = listOf("kotlin")
     override val className: String? = "Boolean"
 
-    override val receiverType: TypeEmbedding = BooleanTypeEmbedding
+    override val receiverType: TypeEmbedding = buildType { boolean() }
     override val paramTypes: List<TypeEmbedding> = emptyList()
-    override val returnType: TypeEmbedding = BooleanTypeEmbedding
+    override val returnType: TypeEmbedding = buildType { boolean() }
 }
 
 object KotlinBooleanNotFunctionImplementation : KotlinBooleanSpecialFunction() {
@@ -129,8 +129,8 @@ object SpecialVerifyFunction : SpecialKotlinFunction {
     }
 
     override val receiverType: TypeEmbedding? = null
-    override val paramTypes: List<TypeEmbedding> = listOf(BooleanTypeEmbedding)
-    override val returnType: TypeEmbedding = UnitTypeEmbedding
+    override val paramTypes: List<TypeEmbedding> = listOf(buildType { boolean() })
+    override val returnType: TypeEmbedding = buildType { unit() }
 }
 
 object SpecialKotlinFunctions {
