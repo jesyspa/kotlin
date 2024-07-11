@@ -6,9 +6,14 @@
 package org.jetbrains.kotlin.formver.embeddings.callables
 
 import org.jetbrains.kotlin.formver.conversion.StmtConversionContext
-import org.jetbrains.kotlin.formver.embeddings.*
+import org.jetbrains.kotlin.formver.embeddings.FunctionTypeEmbedding
+import org.jetbrains.kotlin.formver.embeddings.TypeEmbedding
+import org.jetbrains.kotlin.formver.embeddings.buildType
 import org.jetbrains.kotlin.formver.embeddings.expression.*
-import org.jetbrains.kotlin.formver.names.*
+import org.jetbrains.kotlin.formver.names.ClassKotlinName
+import org.jetbrains.kotlin.formver.names.ScopedKotlinName
+import org.jetbrains.kotlin.formver.names.buildName
+import org.jetbrains.kotlin.formver.names.embedFunctionName
 import org.jetbrains.kotlin.formver.viper.ast.Method
 import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.FqName
@@ -42,10 +47,18 @@ object KotlinContractFunction : SpecialKotlinFunction {
         packageScope(packageName)
         ClassKotlinName(listOf("ContractBuilder"))
     }
-    private val contractBuilderType = ClassTypeEmbedding(contractBuilderTypeName)
     override val receiverType: TypeEmbedding? = null
     override val paramTypes: List<TypeEmbedding> =
-        listOf(FunctionTypeEmbedding(CallableSignatureData(contractBuilderType, listOf(), UnitTypeEmbedding)))
+        listOf(buildType {
+            function {
+                withReceiver {
+                    klass {
+                        withName(contractBuilderTypeName)
+                    }
+                }
+                withReturnType { unit() }
+            }
+        })
     override val returnType: TypeEmbedding = buildType { unit() }
 
     override fun insertCallImpl(

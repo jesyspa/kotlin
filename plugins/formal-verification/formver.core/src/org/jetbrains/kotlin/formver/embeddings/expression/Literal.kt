@@ -57,7 +57,7 @@ data class BooleanLit(val value: Boolean, override val sourceRole: SourceRole? =
 }
 
 data object NullLit : PureExpEmbedding {
-    override val type = buildType { nullable = true; nothing() }
+    override val type = buildType { isNullable = true; nothing() }
     override fun toViper(source: KtSourceElement?): Exp =
         RuntimeTypeDomain.nullValue(pos = source.asPosition)
 

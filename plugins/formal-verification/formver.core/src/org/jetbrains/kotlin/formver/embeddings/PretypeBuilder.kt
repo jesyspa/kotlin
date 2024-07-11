@@ -6,6 +6,7 @@
 package org.jetbrains.kotlin.formver.embeddings
 
 import org.jetbrains.kotlin.formver.embeddings.callables.CallableSignatureData
+import org.jetbrains.kotlin.formver.names.ScopedKotlinName
 
 /**
  * We use "pretype" to refer to types that do not contain information on nullability or
@@ -62,5 +63,19 @@ class FunctionPretypeBuilder : PretypeBuilder {
     override fun complete(): TypeEmbedding {
         require(returnType != null) { "Return type not set" }
         return FunctionTypeEmbedding(CallableSignatureData(receiverType, paramTypes, returnType!!))
+    }
+}
+
+class ClassPretypeBuilder : PretypeBuilder {
+    private var className: ScopedKotlinName? = null
+
+    fun withName(name: ScopedKotlinName) {
+        require(className == null) { "Class name already set" }
+        className = name
+    }
+
+    override fun complete(): TypeEmbedding {
+        require(className != null) { "Class name not set" }
+        return ClassTypeEmbedding(className!!)
     }
 }

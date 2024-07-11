@@ -119,7 +119,11 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
      */
     private fun embedClass(symbol: FirRegularClassSymbol): ClassTypeEmbedding {
         val className = symbol.classId.embedName()
-        val embedding = classes.getOrPut(className) { ClassTypeEmbedding(className) }
+        val embedding = classes.getOrPut(className) {
+            buildType {
+                klass { withName(className) }
+            } as ClassTypeEmbedding
+        }
         if (embedding.hasDetails) return embedding
 
         val newDetails = ClassEmbeddingDetails(embedding, symbol.classKind == ClassKind.INTERFACE)
@@ -150,7 +154,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
 
     override fun embedType(type: ConeKotlinType): TypeEmbedding = when {
         type is ConeErrorType -> error("Encountered an erroneous type: $type")
-        type is ConeTypeParameterType -> buildType { nullable = true; any() }
+        type is ConeTypeParameterType -> buildType { isNullable = true; any() }
         type.isUnit -> buildType { unit() }
         type.isInt -> buildType { int() }
         type.isBoolean -> buildType { boolean() }

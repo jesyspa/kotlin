@@ -13,7 +13,7 @@ package org.jetbrains.kotlin.formver.embeddings
  * state at any point, though a `TypeBuilder`, `PretypeBuilder` pair does.
  */
 class TypeBuilder {
-    var nullable = false
+    var isNullable = false
 
     fun complete(init: TypeBuilder.() -> PretypeBuilder): TypeEmbedding {
         return completeWithPretypeBuilder(init())
@@ -21,7 +21,7 @@ class TypeBuilder {
 
     private fun completeWithPretypeBuilder(subBuilder: PretypeBuilder): TypeEmbedding {
         val subResult = subBuilder.complete()
-        return if (nullable) NullableTypeEmbedding(subResult) else subResult
+        return if (isNullable) NullableTypeEmbedding(subResult) else subResult
     }
 
     fun unit() = UnitPretypeBuilder
@@ -30,10 +30,11 @@ class TypeBuilder {
     fun int() = IntPretypeBuilder
     fun boolean() = BooleanPretypeBuilder
     fun function(init: FunctionPretypeBuilder.() -> Unit) = FunctionPretypeBuilder().also { it.init() }
+    fun klass(init: ClassPretypeBuilder.() -> Unit) = ClassPretypeBuilder().also { it.init() }
 }
 
 fun TypeBuilder.nullableAny(): AnyPretypeBuilder {
-    nullable = true
+    isNullable = true
     return any()
 }
 
