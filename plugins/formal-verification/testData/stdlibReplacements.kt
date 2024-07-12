@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.formver.plugin.NeverConvert
+import org.jetbrains.kotlin.formver.plugin.verify
 
 @NeverConvert
 inline fun <T> run(block: () -> T): T = block()
@@ -23,3 +24,23 @@ inline fun <T> T.apply(block: T.() -> Unit): T = {
 
 @NeverConvert
 inline fun <T, R> with(receiver: T, block: T.() -> R): R = receiver.block()
+
+@NeverConvert
+inline fun repeat(times: Int, action: (Int) -> Unit) {
+    var counter: Int = 0
+    while (counter < times) {
+        action(counter)
+        counter = counter + 1
+    }
+}
+
+// `check`s are intended for runtime, we have our own `verify` to check static properties
+@NeverConvert
+inline fun check(value: Boolean) {
+}
+
+@NeverConvert
+inline fun check(value: Boolean, lazyMessage: () -> Any) {
+}
+
+

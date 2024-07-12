@@ -192,6 +192,12 @@ public class FirLightTreeFormVerPluginDiagnosticsTestGenerated extends AbstractF
     public void testSimple() {
       runTest("plugins/formal-verification/testData/diagnostics/good_contracts/simple.kt");
     }
+
+    @Test
+    @TestMetadata("stdlib_replacement_tests.kt")
+    public void testStdlib_replacement_tests() {
+      runTest("plugins/formal-verification/testData/diagnostics/good_contracts/stdlib_replacement_tests.kt");
+    }
   }
 
   @Nested
