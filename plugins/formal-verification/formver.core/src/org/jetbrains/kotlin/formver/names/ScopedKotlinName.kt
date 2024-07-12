@@ -11,9 +11,13 @@ import org.jetbrains.kotlin.name.FqName
 /**
  * Name of a Kotlin entity in the original program in a specified scope and optionally distinguished by type.
  */
-data class ScopedKotlinName(val scope: NameScope, val name: KotlinName) : KotlinName {
-    override val mangled: String
-        get() = listOf(scope.fullMangledName, name.mangled).joinToString("$")
+data class ScopedKotlinName(val scope: NameScope, val name: KotlinName) : MangledName {
+    override val mangledScope: String?
+        get() = scope.fullMangledName
+    override val mangledBaseName: String
+        get() = name.mangledBaseName
+    override val mangledType: String?
+        get() = name.mangledType
 }
 
-fun FqName.asViperString() = asString().replace('.', '$')
+fun FqName.asViperString() = asString().replace('.', '_')

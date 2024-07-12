@@ -11,8 +11,10 @@ import org.jetbrains.kotlin.formver.embeddings.callables.CallableSignatureData
 import org.jetbrains.kotlin.formver.names.NameMatcher
 import org.jetbrains.kotlin.formver.names.ScopedKotlinName
 import org.jetbrains.kotlin.formver.names.SimpleKotlinName
+import org.jetbrains.kotlin.formver.names.TypeName
 import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.formver.viper.ast.Exp
+import org.jetbrains.kotlin.formver.viper.mangled
 
 /**
  * Represents our representation of a Kotlin type.
@@ -63,48 +65,41 @@ interface TypeEmbedding : TypeInvariantHolder {
 
 data object UnitTypeEmbedding : TypeEmbedding {
     override val runtimeType = RuntimeTypeDomain.unitType()
-    override val name = object : MangledName {
-        override val mangled: String = "T_Unit"
-    }
+    override val name = TypeName("Unit")
 }
 
 data object NothingTypeEmbedding : TypeEmbedding {
     override val runtimeType = RuntimeTypeDomain.nothingType()
-    override val name = object : MangledName {
-        override val mangled: String = "T_Nothing"
-    }
+    override val name = TypeName("Nothing")
 
     override fun pureInvariants(): List<TypeInvariantEmbedding> = listOf(FalseTypeInvariant)
 }
 
 data object AnyTypeEmbedding : TypeEmbedding {
     override val runtimeType = RuntimeTypeDomain.anyType()
-    override val name = object : MangledName {
-        override val mangled: String = "T_Any"
-    }
+    override val name = TypeName("Any")
 }
 
 data object NullableAnyTypeEmbedding : TypeEmbedding by NullableTypeEmbedding(AnyTypeEmbedding)
 
 data object IntTypeEmbedding : TypeEmbedding {
     override val runtimeType = RuntimeTypeDomain.intType()
-    override val name = object : MangledName {
-        override val mangled: String = "T_Int"
-    }
+    override val name = TypeName("Int")
 }
 
 data object BooleanTypeEmbedding : TypeEmbedding {
     override val runtimeType = RuntimeTypeDomain.boolType()
-    override val name = object : MangledName {
-        override val mangled: String = "T_Boolean"
-    }
+    override val name = TypeName("Boolean")
 }
 
 
 data class NullableTypeEmbedding(val elementType: TypeEmbedding) : TypeEmbedding {
     override val runtimeType = RuntimeTypeDomain.nullable(elementType.runtimeType)
     override val name = object : MangledName {
-        override val mangled: String = "N" + elementType.name.mangled
+        override val mangledScope: String?
+            get() = elementType.name.mangledScope?.let { "N$it" }
+        override val mangledBaseName: String
+            get() = elementType.name.mangledBaseName
     }
 
     override fun accessInvariants(): List<TypeInvariantEmbedding> = elementType.accessInvariants().map { IfNonNullInvariant(it) }
@@ -126,8 +121,11 @@ data class NullableTypeEmbedding(val elementType: TypeEmbedding) : TypeEmbedding
 data class FunctionTypeEmbedding(val signature: CallableSignatureData) : TypeEmbedding {
     override val runtimeType = RuntimeTypeDomain.functionType()
     override val name = object : MangledName {
-        override val mangled: String =
-            "fun_take\$${signature.formalArgTypes.joinToString("$") { it.name.mangled }}\$return\$${signature.returnType.name.mangled}"
+        // TODO: this can cause some number of collisions; fix it if it becomes an issue.
+        override val mangledBaseName: String =
+            signature.formalArgTypes.joinToString("$") { it.name.mangled }
+        override val mangledType: String
+            get() = "TF"
     }
 }
 
@@ -145,9 +143,7 @@ data class ClassTypeEmbedding(val className: ScopedKotlinName) : TypeEmbedding {
         get() = _details != null
 
     // TODO: incorporate generic parameters.
-    override val name = object : MangledName {
-        override val mangled: String = "T_class_${className.mangled}"
-    }
+    override val name = TypeName("class_${className.mangled}")
 
     val runtimeTypeFunc = RuntimeTypeDomain.classTypeFunc(name)
     override val runtimeType: Exp = runtimeTypeFunc()

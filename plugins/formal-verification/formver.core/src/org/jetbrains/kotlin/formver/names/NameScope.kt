@@ -6,9 +6,9 @@
 package org.jetbrains.kotlin.formver.names
 
 import org.jetbrains.kotlin.formver.viper.MangledName
+import org.jetbrains.kotlin.formver.viper.mangled
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.utils.addToStdlib.ifFalse
-import org.jetbrains.kotlin.utils.addToStdlib.ifTrue
 
 sealed interface NameScope {
     val parent: NameScope?
@@ -57,7 +57,7 @@ data class PackageScope(val packageName: FqName) : NameScope {
 // This is really just package scope, here for backwards compatibility.
 data class GlobalScope(override val parent: NameScope) : NameScope {
     override val mangledScopeName: String
-        get() = "global"
+        get() = "g"
 }
 
 data class ClassScope(override val parent: NameScope, val className: ClassKotlinName) : NameScope {
@@ -84,10 +84,10 @@ data class PrivateScope(override val parent: NameScope) : NameScope {
 data object ParameterScope : NameScope {
     override val parent: NameScope? = null
     override val mangledScopeName: String
-        get() = "local"
+        get() = "p"
 }
 
 data class LocalScope(val level: Int) : NameScope {
     override val parent: NameScope? = null
-    override val mangledScopeName = "local$level"
+    override val mangledScopeName = "l$level"
 }

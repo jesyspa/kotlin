@@ -12,6 +12,7 @@ import org.jetbrains.kotlin.formver.names.classNameIfAny
 import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.formver.viper.ast.PermExp
 import org.jetbrains.kotlin.formver.viper.ast.Predicate
+import org.jetbrains.kotlin.formver.viper.mangled
 import org.jetbrains.kotlin.utils.addToStdlib.ifTrue
 
 class ClassEmbeddingDetails(val type: ClassTypeEmbedding, val isInterface: Boolean) : TypeInvariantHolder {
@@ -76,7 +77,10 @@ class ClassEmbeddingDetails(val type: ClassTypeEmbedding, val isInterface: Boole
     }
 
     private val uniquePredicateName = object : MangledName {
-        override val mangled: String = "Unique\$T_class_${type.className.mangled}"
+        override val mangledType: String
+            get() = "U"
+        override val mangledBaseName: String
+            get() = type.name.mangled
     }
 
     /**
