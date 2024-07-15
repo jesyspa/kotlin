@@ -38,7 +38,6 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
     ProgramConversionContext {
     private val methods: MutableMap<MangledName, FunctionEmbedding> = SpecialKotlinFunctions.byName.toMutableMap()
     private val classes: MutableMap<MangledName, ClassTypeEmbedding> = mutableMapOf()
-    private val classDetails: MutableMap<ClassTypeEmbedding, ClassEmbeddingDetails> = mutableMapOf()
     private val properties: MutableMap<MangledName, PropertyEmbedding> = mutableMapOf()
     private val fields: MutableMap<MangledName, FieldEmbedding> = mutableMapOf()
 
@@ -68,7 +67,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
                     fields.values.distinctBy { it.name.mangled }.map { it.toViper() },
             functions = SpecialFunctions.all,
             methods = SpecialMethods.all + methods.values.mapNotNull { it.viperMethod }.distinctBy { it.name.mangled },
-            predicates = classDetails.values.flatMap { listOf(it.sharedPredicate, it.uniquePredicate) }
+            predicates = classes.values.flatMap { listOf(it.details.sharedPredicate, it.details.uniquePredicate) }
         )
 
     fun registerForVerification(declaration: FirSimpleFunction) {
@@ -119,18 +118,10 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
      */
     private fun embedClass(symbol: FirRegularClassSymbol): ClassTypeEmbedding {
         val className = symbol.classId.embedName()
-        val embedding = classes.getOrPut(className) {
-            ClassTypeEmbedding(className, symbol.classKind == ClassKind.INTERFACE)
-        }
+        val embedding = classes.getOrPut(className) { ClassTypeEmbedding(className) }
         if (embedding.hasDetails) return embedding
 
-        classDetails[embedding]?.let {
-            embedding.initDetails(it)
-            return embedding
-        }
-
-        val newDetails = ClassEmbeddingDetails(embedding)
-        classDetails[embedding] = newDetails
+        val newDetails = ClassEmbeddingDetails(embedding, symbol.classKind == ClassKind.INTERFACE)
         embedding.initDetails(newDetails)
 
         // The full class embedding is necessary to process the signatures of the properties of the class, since

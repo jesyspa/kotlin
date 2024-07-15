@@ -131,7 +131,7 @@ data class FunctionTypeEmbedding(val signature: CallableSignatureData) : TypeEmb
     }
 }
 
-data class ClassTypeEmbedding(val className: ScopedKotlinName, val isInterface: Boolean) : TypeEmbedding {
+data class ClassTypeEmbedding(val className: ScopedKotlinName) : TypeEmbedding {
     private var _details: ClassEmbeddingDetails? = null
     val details: ClassEmbeddingDetails
         get() = _details ?: error("Details of $className have not been initialised yet.")
