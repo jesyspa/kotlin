@@ -34,6 +34,7 @@ class LambdaExp(
     override fun insertCallImpl(
         args: List<ExpEmbedding>,
         ctx: StmtConversionContext,
+        actualReturnType: TypeEmbedding
     ): ExpEmbedding {
         val inlineBody = function.body ?: throw IllegalArgumentException("Lambda $function has a null body.")
         val nonReceiverParamNames = function.valueParameters.map { it.name }
@@ -44,6 +45,7 @@ class LambdaExp(
             args,
             inlineBody,
             ctx.signature.sourceName,
+            actualReturnType,
             parentCtx,
         )
     }

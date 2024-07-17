@@ -6,6 +6,7 @@
 package org.jetbrains.kotlin.formver.embeddings.callables
 
 import org.jetbrains.kotlin.formver.conversion.StmtConversionContext
+import org.jetbrains.kotlin.formver.embeddings.TypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.expression.ExpEmbedding
 
 /**
@@ -14,10 +15,11 @@ import org.jetbrains.kotlin.formver.embeddings.expression.ExpEmbedding
  * Should be used exclusively through `insertCall` below.
  */
 interface CallableEmbedding : CallableSignature {
-    fun insertCallImpl(args: List<ExpEmbedding>, ctx: StmtConversionContext): ExpEmbedding
+    fun insertCallImpl(args: List<ExpEmbedding>, ctx: StmtConversionContext, actualReturnType: TypeEmbedding): ExpEmbedding
 }
 
 fun CallableEmbedding.insertCall(
     args: List<ExpEmbedding>,
     ctx: StmtConversionContext,
-): ExpEmbedding = insertCallImpl(args, ctx)
+    returnType: TypeEmbedding,
+): ExpEmbedding = insertCallImpl(args, ctx, returnType)

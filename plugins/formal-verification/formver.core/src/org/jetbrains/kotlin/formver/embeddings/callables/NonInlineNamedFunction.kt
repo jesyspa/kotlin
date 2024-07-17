@@ -10,6 +10,7 @@ import org.jetbrains.kotlin.formver.embeddings.TypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.expression.ExpEmbedding
 import org.jetbrains.kotlin.formver.embeddings.expression.MethodCall
 import org.jetbrains.kotlin.formver.embeddings.expression.PlaceholderVariableEmbedding
+import org.jetbrains.kotlin.formver.embeddings.expression.withNewTypeAccessAndProvenInvariants
 import org.jetbrains.kotlin.formver.names.PlaceholderReturnVariableName
 import org.jetbrains.kotlin.formver.viper.ast.Method
 
@@ -17,7 +18,8 @@ class NonInlineNamedFunction(val signature: FullNamedFunctionSignature) : RichCa
     override fun insertCallImpl(
         args: List<ExpEmbedding>,
         ctx: StmtConversionContext,
-    ): ExpEmbedding = MethodCall(signature, args)
+        actualReturnType: TypeEmbedding
+    ): ExpEmbedding = MethodCall(signature, args).withNewTypeAccessAndProvenInvariants(actualReturnType)
 
     override fun toViperMethodHeader(): Method =
         signature.toViperMethod(null, PlaceholderVariableEmbedding(PlaceholderReturnVariableName, signature.returnType))

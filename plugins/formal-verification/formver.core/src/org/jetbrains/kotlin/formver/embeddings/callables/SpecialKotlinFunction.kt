@@ -64,6 +64,7 @@ object KotlinContractFunction : SpecialKotlinFunction {
     override fun insertCallImpl(
         args: List<ExpEmbedding>,
         ctx: StmtConversionContext,
+        actualReturnType: TypeEmbedding
     ): ExpEmbedding = UnitLit
 }
 
@@ -74,6 +75,13 @@ abstract class KotlinIntSpecialFunction : SpecialKotlinFunction {
     override val receiverType: TypeEmbedding = buildType { int() }
     override val paramTypes: List<TypeEmbedding> = listOf(buildType { int() })
     override val returnType: TypeEmbedding = buildType { int() }
+
+    abstract fun insertCallImpl(args: List<ExpEmbedding>, ctx: StmtConversionContext): ExpEmbedding
+    override fun insertCallImpl(
+        args: List<ExpEmbedding>,
+        ctx: StmtConversionContext,
+        actualReturnType: TypeEmbedding
+    ): ExpEmbedding = insertCallImpl(args, ctx)
 }
 
 object KotlinIntPlusFunctionImplementation : KotlinIntSpecialFunction() {
@@ -126,6 +134,7 @@ object KotlinBooleanNotFunctionImplementation : KotlinBooleanSpecialFunction() {
     override fun insertCallImpl(
         args: List<ExpEmbedding>,
         ctx: StmtConversionContext,
+        actualReturnType: TypeEmbedding,
     ): ExpEmbedding =
         Not(args[0])
 }
@@ -137,7 +146,7 @@ object SpecialVerifyFunction : SpecialKotlinFunction {
     override val packageName: List<String> = listOf("org", "jetbrains", "kotlin", "formver", "plugin")
     override val name: String = "verify"
 
-    override fun insertCallImpl(args: List<ExpEmbedding>, ctx: StmtConversionContext): ExpEmbedding {
+    override fun insertCallImpl(args: List<ExpEmbedding>, ctx: StmtConversionContext, actualReturnType: TypeEmbedding): ExpEmbedding {
         return Assert(args[0])
     }
 

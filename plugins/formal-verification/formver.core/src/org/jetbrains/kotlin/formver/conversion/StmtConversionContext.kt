@@ -157,10 +157,11 @@ fun StmtConversionContext.insertInlineFunctionCall(
     args: List<ExpEmbedding>,
     body: FirBlock,
     returnTargetName: String?,
+    actualReturnType: TypeEmbedding,
     parentCtx: MethodConversionContext? = null,
 ): ExpEmbedding {
     // TODO: It seems like it may be possible to avoid creating a local here, but it is not clear how.
-    val returnTarget = returnTargetProducer.getFresh(calleeSignature.returnType)
+    val returnTarget = returnTargetProducer.getFresh(actualReturnType)
     val (declarations, callArgs) = getInlineFunctionCallArgs(args)
     val subs = paramNames.zip(callArgs).toMap()
     val methodCtxFactory = MethodContextFactory(
@@ -174,6 +175,9 @@ fun StmtConversionContext.insertInlineFunctionCall(
                 add(Declare(returnTarget.variable, null))
                 addAll(declarations)
                 add(FunctionExp(null, convert(body), returnTarget.label))
+                if (actualReturnType != calleeSignature.returnType) {
+                    add(InhaleAccessAndProven(returnTarget.variable))
+                }
                 add(returnTarget.variable)
             }
         )
