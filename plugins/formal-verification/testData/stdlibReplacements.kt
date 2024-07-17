@@ -1,5 +1,4 @@
 import org.jetbrains.kotlin.formver.plugin.NeverConvert
-import org.jetbrains.kotlin.formver.plugin.verify
 
 @NeverConvert
 inline fun <T> run(block: () -> T): T = block()
@@ -17,7 +16,7 @@ inline fun <T> T.also(block: (T) -> Unit): T {
 inline fun <T, R> T.let(block: (T) -> R): R = block(this)
 
 @NeverConvert
-inline fun <T> T.apply(block: T.() -> Unit): T = {
+inline fun <T> T.apply(block: T.() -> Unit): T {
     this.block()
     return this
 }
