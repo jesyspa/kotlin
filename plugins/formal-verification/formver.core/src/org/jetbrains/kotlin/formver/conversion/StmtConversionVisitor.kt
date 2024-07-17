@@ -20,6 +20,7 @@ import org.jetbrains.kotlin.formver.UnsupportedFeatureBehaviour
 import org.jetbrains.kotlin.formver.embeddings.TypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.buildType
 import org.jetbrains.kotlin.formver.embeddings.callables.FullNamedFunctionSignature
+import org.jetbrains.kotlin.formver.embeddings.callables.insertCall
 import org.jetbrains.kotlin.formver.embeddings.expression.*
 import org.jetbrains.kotlin.formver.functionCallArguments
 import org.jetbrains.kotlin.text
@@ -175,7 +176,11 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext>()
     override fun visitFunctionCall(functionCall: FirFunctionCall, data: StmtConversionContext): ExpEmbedding {
         val symbol = functionCall.toResolvedCallableSymbol()
         val callee = data.embedFunction(symbol as FirFunctionSymbol<*>)
-        return callee.insertCall(functionCall.functionCallArguments.map(data::convert), data)
+        return callee.insertCall(
+            functionCall.functionCallArguments.map(data::convert),
+            data,
+            data.embedType(functionCall.resolvedType),
+        )
     }
 
     override fun visitImplicitInvokeCall(
@@ -184,17 +189,17 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext>()
     ): ExpEmbedding {
         val receiver = implicitInvokeCall.dispatchReceiver as? FirPropertyAccessExpression
             ?: throw NotImplementedError("Implicit invoke calls only support a limited range of receivers at the moment.")
+        val returnType = data.embedType(implicitInvokeCall.resolvedType)
         val receiverSymbol = receiver.calleeReference.toResolvedSymbol<FirBasedSymbol<*>>()!!
         val args = implicitInvokeCall.argumentList.arguments.map(data::convert)
         return when (val exp = data.embedLocalSymbol(receiverSymbol).ignoringMetaNodes()) {
             is LambdaExp -> {
                 // The lambda is already the receiver, so we do not need to convert it.
                 // TODO: do this more uniformly: convert the receiver, see it is a lambda, use insertCall on it.
-                exp.insertCall(args, data)
+                exp.insertCall(args, data, returnType)
             }
             else -> {
-                val retType = data.embedType(implicitInvokeCall.toResolvedCallableSymbol()!!.resolvedReturnType)
-                InvokeFunctionObject(data.convert(receiver), args, retType)
+                InvokeFunctionObject(data.convert(receiver), args, returnType)
             }
         }
     }
