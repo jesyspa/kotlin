@@ -212,7 +212,7 @@ method f$g$call$TF$T$Int(p$x: Ref) returns (ret: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$unitType())
 
 
-method f$g$ignore$TF$T$class_c$pkg$java_lang$g$Exception(p$e: Ref)
+method f$g$ignore$TF$T$c$pkg$java_lang$g$Exception(p$e: Ref)
   returns (ret: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$unitType())
 
@@ -235,7 +235,7 @@ method f$g$useException$TF$() returns (ret$0: Ref)
   }
   goto lbl$try_exit$0
   label lbl$catch$0
-  anon$3 := f$g$ignore$TF$T$class_c$pkg$java_lang$g$Exception(l2$e)
+  anon$3 := f$g$ignore$TF$T$c$pkg$java_lang$g$Exception(l2$e)
   goto lbl$try_exit$0
   label lbl$try_exit$0
   label lbl$ret$0

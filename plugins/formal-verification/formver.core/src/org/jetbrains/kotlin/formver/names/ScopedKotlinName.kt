@@ -21,3 +21,9 @@ data class ScopedKotlinName(val scope: NameScope, val name: KotlinName) : Mangle
 }
 
 fun FqName.asViperString() = asString().replace('.', '_')
+
+fun ScopedKotlinName.asScope(): NameScope {
+    val className = name as? ClassKotlinName
+    require(className != null) { "Only classes can be used for scopes." }
+    return ClassScope(scope, className)
+}

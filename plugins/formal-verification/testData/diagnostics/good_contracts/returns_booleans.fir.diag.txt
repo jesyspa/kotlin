@@ -88,7 +88,7 @@ method f$g$call_fun_with_contracts$TF$T$Boolean(p$b: Ref)
 /returns_booleans.kt:(1467,1480): info: Generated Viper text for isNullOrEmpty:
 field sp$size: Ref
 
-method f$g$isNullOrEmpty$TF$class_c$pkg$kotlin_collections$g$Collection(p$collection: Ref)
+method f$g$isNullOrEmpty$TF$c$pkg$kotlin_collections$g$Collection(p$collection: Ref)
   returns (ret$0: Ref)
   requires p$collection != df$rt$nullValue() ==>
     acc(p$collection.sp$size, write)
@@ -102,18 +102,18 @@ method f$g$isNullOrEmpty$TF$class_c$pkg$kotlin_collections$g$Collection(p$collec
   ensures df$rt$boolFromRef(ret$0) == false ==>
     p$collection != df$rt$nullValue()
 {
-  inhale df$rt$isSubtype(df$rt$typeOf(p$collection), df$rt$nullable(df$rt$T$class_c$pkg$kotlin_collections$g$Collection()))
+  inhale df$rt$isSubtype(df$rt$typeOf(p$collection), df$rt$nullable(df$rt$T$c$pkg$kotlin_collections$g$Collection()))
   inhale p$collection != df$rt$nullValue() ==>
-    acc(T$class_c$pkg$kotlin_collections$g$Collection(p$collection), wildcard)
+    acc(p$pkg$kotlin_collections$g$c$Collection$shared(p$collection), wildcard)
   if (p$collection == df$rt$nullValue()) {
     ret$0 := df$rt$boolToRef(true)
   } else {
-    ret$0 := f$pkg$kotlin_collections$c$Collection$isEmpty$TF$T$class_c$pkg$kotlin_collections$g$Collection(p$collection)}
+    ret$0 := f$pkg$kotlin_collections$c$Collection$isEmpty$TF$T$c$pkg$kotlin_collections$g$Collection(p$collection)}
   goto lbl$ret$0
   label lbl$ret$0
 }
 
-method f$pkg$kotlin_collections$c$Collection$isEmpty$TF$T$class_c$pkg$kotlin_collections$g$Collection(this: Ref)
+method f$pkg$kotlin_collections$c$Collection$isEmpty$TF$T$c$pkg$kotlin_collections$g$Collection(this: Ref)
   returns (ret: Ref)
   requires acc(this.sp$size, write)
   requires df$rt$intFromRef(this.sp$size) >= 0

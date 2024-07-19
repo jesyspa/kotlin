@@ -69,4 +69,3 @@ data class TypeName(override val mangledBaseName: String) : MangledName {
     override val mangledType: String
         get() = "T"
 }
-

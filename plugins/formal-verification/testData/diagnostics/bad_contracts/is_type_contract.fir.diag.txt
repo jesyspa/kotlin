@@ -6,7 +6,7 @@ method f$g$unverifiableTypeCheck$TF$Int(p$x: Ref) returns (ret$0: Ref)
   ensures true ==> df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$unitType())
 {
   inhale df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$nullable(df$rt$intType()))
-  ret$0 := df$rt$boolToRef(df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$T$class_c$pkg$kotlin$g$String()))
+  ret$0 := df$rt$boolToRef(df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$T$c$pkg$kotlin$g$String()))
   goto lbl$ret$0
   label lbl$ret$0
 }

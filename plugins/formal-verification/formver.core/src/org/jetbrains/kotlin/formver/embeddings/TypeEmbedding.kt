@@ -8,10 +8,8 @@ package org.jetbrains.kotlin.formver.embeddings
 import org.jetbrains.kotlin.formver.domains.Injection
 import org.jetbrains.kotlin.formver.domains.RuntimeTypeDomain
 import org.jetbrains.kotlin.formver.embeddings.callables.CallableSignatureData
+import org.jetbrains.kotlin.formver.names.*
 import org.jetbrains.kotlin.formver.names.NameMatcher
-import org.jetbrains.kotlin.formver.names.ScopedKotlinName
-import org.jetbrains.kotlin.formver.names.SimpleKotlinName
-import org.jetbrains.kotlin.formver.names.TypeName
 import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.formver.viper.ast.Exp
 import org.jetbrains.kotlin.formver.viper.mangled
@@ -143,7 +141,7 @@ data class ClassTypeEmbedding(val className: ScopedKotlinName) : TypeEmbedding {
         get() = _details != null
 
     // TODO: incorporate generic parameters.
-    override val name = TypeName("class_${className.mangled}")
+    override val name = TypeName(className.mangled)
 
     val runtimeTypeFunc = RuntimeTypeDomain.classTypeFunc(name)
     override val runtimeType: Exp = runtimeTypeFunc()

@@ -13,7 +13,7 @@ domain d$rt  {
 
   unique function df$rt$functionType(): d$rt
 
-  unique function df$rt$T$class_c$g$Foo(): d$rt
+  unique function df$rt$T$c$g$Foo(): d$rt
 
   function df$rt$nullValue(): Ref
 
@@ -100,7 +100,7 @@ domain d$rt  {
   }
 
   axiom {
-    df$rt$isSubtype(df$rt$T$class_c$g$Foo(), df$rt$anyType())
+    df$rt$isSubtype(df$rt$T$c$g$Foo(), df$rt$anyType())
   }
 
   axiom rt$supertype_of_nothing {
@@ -269,21 +269,21 @@ function sp$timesInts(arg1: Ref, arg2: Ref): Ref
     df$rt$intFromRef(arg1) * df$rt$intFromRef(arg2)
 
 
-predicate T$class_c$g$Foo(this: Ref) {
+predicate p$g$c$Foo$shared(this: Ref) {
   acc(this.bf$public$x, wildcard) &&
   df$rt$isSubtype(df$rt$typeOf(this.bf$public$x), df$rt$intType())
 }
 
-predicate U$T$class_c$g$Foo(this: Ref) {
+predicate p$g$c$Foo$unique(this: Ref) {
   acc(this.bf$public$x, wildcard) &&
   df$rt$isSubtype(df$rt$typeOf(this.bf$public$x), df$rt$intType())
 }
 
 method con$c$Foo$T$Int(p$x: Ref) returns (ret: Ref)
-  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$T$class_c$g$Foo())
-  ensures acc(T$class_c$g$Foo(ret), wildcard)
-  ensures acc(U$T$class_c$g$Foo(ret), write)
-  ensures (unfolding acc(T$class_c$g$Foo(ret), wildcard) in
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$T$c$g$Foo())
+  ensures acc(p$g$c$Foo$shared(ret), wildcard)
+  ensures acc(p$g$c$Foo$unique(ret), write)
+  ensures (unfolding acc(p$g$c$Foo$shared(ret), wildcard) in
       df$rt$intFromRef(ret.bf$public$x) == df$rt$intFromRef(p$x))
 
 
@@ -299,6 +299,6 @@ method f$g$f$TF$() returns (ret$0: Ref)
 /full_viper_dump.kt:(172,173): info: Generated ExpEmbedding for f$g$f$TF$:
 Function(
     name = f$g$f$TF$,
-    { Var(ret$0) := Unit; Declare(Var(l0$foo), T$class_c$g$Foo, MethodCall(callee = con$c$Foo$T$Int, Int(0))) },
+    { Var(ret$0) := Unit; Declare(Var(l0$foo), T$c$g$Foo, MethodCall(callee = con$c$Foo$T$Int, Int(0))) },
     return = lbl$ret$0,
 )

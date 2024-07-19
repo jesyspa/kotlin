@@ -61,3 +61,9 @@ data class ConstructorKotlinName(val type: TypeEmbedding) : KotlinName {
         get() = type.name.mangledBaseName
 }
 
+// It's a bit of a hack to make this as KotlinName, it should really just be any old name, but right now our scoped
+// names are KotlinNames and changing that could be messy.
+data class PredicateKotlinName(override val mangledBaseName: String) : KotlinName {
+    override val mangledType: String
+        get() = "p"
+}

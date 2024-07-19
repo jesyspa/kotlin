@@ -40,14 +40,14 @@ method f$g$mayReturnNull$TF$Any(p$x: Ref) returns (ret$0: Ref)
 /cond_effects.kt:(478,513): warning: Cannot verify that if a non-null value is returned then x is Int.
 
 /cond_effects.kt:(723,741): info: Generated Viper text for isNullOrEmptyWrong:
-method f$g$isNullOrEmptyWrong$TF$class_c$pkg$kotlin$g$CharSequence(p$seq: Ref)
+method f$g$isNullOrEmptyWrong$TF$c$pkg$kotlin$g$CharSequence(p$seq: Ref)
   returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$boolType())
   ensures df$rt$boolFromRef(ret$0) == false ==> p$seq != df$rt$nullValue()
 {
-  inhale df$rt$isSubtype(df$rt$typeOf(p$seq), df$rt$nullable(df$rt$T$class_c$pkg$kotlin$g$CharSequence()))
+  inhale df$rt$isSubtype(df$rt$typeOf(p$seq), df$rt$nullable(df$rt$T$c$pkg$kotlin$g$CharSequence()))
   inhale p$seq != df$rt$nullValue() ==>
-    acc(T$class_c$pkg$kotlin$g$CharSequence(p$seq), wildcard)
+    acc(p$pkg$kotlin$g$c$CharSequence$shared(p$seq), wildcard)
   if (!(p$seq == df$rt$nullValue())) {
     var anon$0: Ref
     var anon$1: Ref
@@ -73,7 +73,7 @@ method f$g$recursiveContract$TF$T$Int$Any(p$n: Ref, p$x: Ref)
   returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$boolType())
   ensures df$rt$boolFromRef(ret$0) == true ==>
-    df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$T$class_c$pkg$kotlin$g$String())
+    df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$T$c$pkg$kotlin$g$String())
 {
   inhale df$rt$isSubtype(df$rt$typeOf(p$n), df$rt$intType())
   inhale df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$nullable(df$rt$anyType()))

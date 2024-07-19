@@ -2,8 +2,8 @@
 field bf$public$x: Ref
 
 method f$g$getFoo$TF$() returns (ret: Ref)
-  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$T$class_c$g$Foo())
-  ensures acc(T$class_c$g$Foo(ret), wildcard)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$T$c$g$Foo())
+  ensures acc(p$g$c$Foo$shared(ret), wildcard)
 
 
 method f$g$sideEffect$TF$() returns (ret: Ref)

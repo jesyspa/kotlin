@@ -4,10 +4,10 @@ field bf$public$length: Ref
 method f$g$isString$TF$Any(p$x: Ref) returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$boolType())
   ensures df$rt$boolFromRef(ret$0) == true ==>
-    df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$T$class_c$pkg$kotlin$g$String())
+    df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$T$c$pkg$kotlin$g$String())
 {
   inhale df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$nullable(df$rt$anyType()))
-  ret$0 := df$rt$boolToRef(df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$T$class_c$pkg$kotlin$g$String()))
+  ret$0 := df$rt$boolToRef(df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$T$c$pkg$kotlin$g$String()))
   goto lbl$ret$0
   label lbl$ret$0
 }
@@ -21,10 +21,10 @@ field bf$public$length: Ref
 method f$g$isString$TF$T$Any(p$obj: Ref) returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$boolType())
   ensures df$rt$boolFromRef(ret$0) == true ==>
-    df$rt$isSubtype(df$rt$typeOf(p$obj), df$rt$T$class_c$pkg$kotlin$g$String())
+    df$rt$isSubtype(df$rt$typeOf(p$obj), df$rt$T$c$pkg$kotlin$g$String())
 {
   inhale df$rt$isSubtype(df$rt$typeOf(p$obj), df$rt$anyType())
-  ret$0 := df$rt$boolToRef(df$rt$isSubtype(df$rt$typeOf(p$obj), df$rt$T$class_c$pkg$kotlin$g$String()))
+  ret$0 := df$rt$boolToRef(df$rt$isSubtype(df$rt$typeOf(p$obj), df$rt$T$c$pkg$kotlin$g$String()))
   goto lbl$ret$0
   label lbl$ret$0
 }
@@ -47,9 +47,9 @@ method f$g$subtypeTransitive$TF$T$Unit(p$x: Ref) returns (ret$0: Ref)
 field bf$public$bar: Ref
 
 method con$c$Foo$() returns (ret: Ref)
-  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$T$class_c$g$Foo())
-  ensures acc(T$class_c$g$Foo(ret), wildcard)
-  ensures acc(U$T$class_c$g$Foo(ret), write)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$T$c$g$Foo())
+  ensures acc(p$g$c$Foo$shared(ret), wildcard)
+  ensures acc(p$g$c$Foo$unique(ret), write)
 
 
 method f$g$constructorReturnType$TF$() returns (ret$0: Ref)
@@ -58,7 +58,7 @@ method f$g$constructorReturnType$TF$() returns (ret$0: Ref)
 {
   var anon$0: Ref
   anon$0 := con$c$Foo$()
-  ret$0 := df$rt$boolToRef(df$rt$isSubtype(df$rt$typeOf(anon$0), df$rt$T$class_c$g$Foo()))
+  ret$0 := df$rt$boolToRef(df$rt$isSubtype(df$rt$typeOf(anon$0), df$rt$T$c$g$Foo()))
   goto lbl$ret$0
   label lbl$ret$0
 }
@@ -66,14 +66,12 @@ method f$g$constructorReturnType$TF$() returns (ret$0: Ref)
 /is_type_contract.kt:(1016,1032): info: Generated Viper text for subtypeSuperType:
 field bf$public$bar: Ref
 
-method f$g$subtypeSuperType$TF$T$class_c$g$Bar(p$bar: Ref)
-  returns (ret$0: Ref)
+method f$g$subtypeSuperType$TF$T$c$g$Bar(p$bar: Ref) returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
-  ensures true ==>
-    df$rt$isSubtype(df$rt$typeOf(p$bar), df$rt$T$class_c$g$Foo())
+  ensures true ==> df$rt$isSubtype(df$rt$typeOf(p$bar), df$rt$T$c$g$Foo())
 {
-  inhale df$rt$isSubtype(df$rt$typeOf(p$bar), df$rt$T$class_c$g$Bar())
-  inhale acc(T$class_c$g$Bar(p$bar), wildcard)
+  inhale df$rt$isSubtype(df$rt$typeOf(p$bar), df$rt$T$c$g$Bar())
+  inhale acc(p$g$c$Bar$shared(p$bar), wildcard)
   ret$0 := df$rt$unitValue()
   label lbl$ret$0
 }
@@ -81,16 +79,16 @@ method f$g$subtypeSuperType$TF$T$class_c$g$Bar(p$bar: Ref)
 /is_type_contract.kt:(1149,1160): info: Generated Viper text for typeOfField:
 field bf$public$bar: Ref
 
-method f$g$typeOfField$TF$T$class_c$g$Foo(p$foo: Ref) returns (ret$0: Ref)
+method f$g$typeOfField$TF$T$c$g$Foo(p$foo: Ref) returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$boolType())
   ensures df$rt$boolFromRef(ret$0) == true
 {
   var anon$0: Ref
-  inhale df$rt$isSubtype(df$rt$typeOf(p$foo), df$rt$T$class_c$g$Foo())
-  inhale acc(T$class_c$g$Foo(p$foo), wildcard)
-  unfold acc(T$class_c$g$Foo(p$foo), wildcard)
+  inhale df$rt$isSubtype(df$rt$typeOf(p$foo), df$rt$T$c$g$Foo())
+  inhale acc(p$g$c$Foo$shared(p$foo), wildcard)
+  unfold acc(p$g$c$Foo$shared(p$foo), wildcard)
   anon$0 := p$foo.bf$public$bar
-  if (df$rt$isSubtype(df$rt$typeOf(anon$0), df$rt$T$class_c$g$Bar())) {
+  if (df$rt$isSubtype(df$rt$typeOf(anon$0), df$rt$T$c$g$Bar())) {
     ret$0 := df$rt$boolToRef(true)
     goto lbl$ret$0
   } else {

@@ -7,158 +7,155 @@ field bf$public$y: Ref
 
 field bf$public$z: Ref
 
-predicate T$class_c$g$Foo(this: Ref) {
+predicate p$g$c$Foo$shared(this: Ref) {
   acc(this.bf$public$w, wildcard) &&
   df$rt$isSubtype(df$rt$typeOf(this.bf$public$w), df$rt$intType()) &&
   acc(this.bf$public$y, wildcard) &&
-  acc(T$class_c$g$T(this.bf$public$y), wildcard) &&
-  df$rt$isSubtype(df$rt$typeOf(this.bf$public$y), df$rt$T$class_c$g$T()) &&
-  acc(T$class_c$g$S(this), wildcard)
+  acc(p$g$c$T$shared(this.bf$public$y), wildcard) &&
+  df$rt$isSubtype(df$rt$typeOf(this.bf$public$y), df$rt$T$c$g$T()) &&
+  acc(p$g$c$S$shared(this), wildcard)
 }
 
-predicate T$class_c$g$S(this: Ref) {
-  true
-}
-
-predicate T$class_c$g$T(this: Ref) {
-  true
-}
-
-predicate U$T$class_c$g$Foo(this: Ref) {
+predicate p$g$c$Foo$unique(this: Ref) {
   acc(this.bf$public$w, wildcard) &&
   df$rt$isSubtype(df$rt$typeOf(this.bf$public$w), df$rt$intType()) &&
   acc(this.bf$public$x, write) &&
   df$rt$isSubtype(df$rt$typeOf(this.bf$public$x), df$rt$intType()) &&
   acc(this.bf$public$y, wildcard) &&
-  acc(T$class_c$g$T(this.bf$public$y), wildcard) &&
-  acc(U$T$class_c$g$T(this.bf$public$y), write) &&
-  df$rt$isSubtype(df$rt$typeOf(this.bf$public$y), df$rt$T$class_c$g$T()) &&
+  acc(p$g$c$T$shared(this.bf$public$y), wildcard) &&
+  acc(p$g$c$T$unique(this.bf$public$y), write) &&
+  df$rt$isSubtype(df$rt$typeOf(this.bf$public$y), df$rt$T$c$g$T()) &&
   acc(this.bf$public$z, write) &&
-  acc(T$class_c$g$T(this.bf$public$z), wildcard) &&
-  acc(U$T$class_c$g$T(this.bf$public$z), write) &&
-  df$rt$isSubtype(df$rt$typeOf(this.bf$public$z), df$rt$T$class_c$g$T()) &&
-  acc(U$T$class_c$g$S(this), write)
+  acc(p$g$c$T$shared(this.bf$public$z), wildcard) &&
+  acc(p$g$c$T$unique(this.bf$public$z), write) &&
+  df$rt$isSubtype(df$rt$typeOf(this.bf$public$z), df$rt$T$c$g$T()) &&
+  acc(p$g$c$S$unique(this), write)
 }
 
-predicate U$T$class_c$g$S(this: Ref) {
+predicate p$g$c$S$shared(this: Ref) {
   true
 }
 
-predicate U$T$class_c$g$T(this: Ref) {
+predicate p$g$c$S$unique(this: Ref) {
   true
 }
 
-method f$g$unique_foo_arg$TF$T$class_c$g$Foo(p$foo: Ref)
-  returns (ret$0: Ref)
-  requires acc(U$T$class_c$g$Foo(p$foo), write)
+predicate p$g$c$T$shared(this: Ref) {
+  true
+}
+
+predicate p$g$c$T$unique(this: Ref) {
+  true
+}
+
+method f$g$unique_foo_arg$TF$T$c$g$Foo(p$foo: Ref) returns (ret$0: Ref)
+  requires acc(p$g$c$Foo$unique(p$foo), write)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 {
-  inhale df$rt$isSubtype(df$rt$typeOf(p$foo), df$rt$T$class_c$g$Foo())
-  inhale acc(T$class_c$g$Foo(p$foo), wildcard)
+  inhale df$rt$isSubtype(df$rt$typeOf(p$foo), df$rt$T$c$g$Foo())
+  inhale acc(p$g$c$Foo$shared(p$foo), wildcard)
   ret$0 := df$rt$unitValue()
   label lbl$ret$0
 }
 
 /unique_predicates.kt:(310,329): info: Generated Viper text for nullable_unique_arg:
-predicate T$class_c$g$T(this: Ref) {
+predicate p$g$c$T$shared(this: Ref) {
   true
 }
 
-predicate U$T$class_c$g$T(this: Ref) {
+predicate p$g$c$T$unique(this: Ref) {
   true
 }
 
-method f$g$nullable_unique_arg$TF$class_c$g$T(p$t: Ref)
-  returns (ret$0: Ref)
-  requires p$t != df$rt$nullValue() ==> acc(U$T$class_c$g$T(p$t), write)
+method f$g$nullable_unique_arg$TF$c$g$T(p$t: Ref) returns (ret$0: Ref)
+  requires p$t != df$rt$nullValue() ==> acc(p$g$c$T$unique(p$t), write)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 {
-  inhale df$rt$isSubtype(df$rt$typeOf(p$t), df$rt$nullable(df$rt$T$class_c$g$T()))
-  inhale p$t != df$rt$nullValue() ==> acc(T$class_c$g$T(p$t), wildcard)
+  inhale df$rt$isSubtype(df$rt$typeOf(p$t), df$rt$nullable(df$rt$T$c$g$T()))
+  inhale p$t != df$rt$nullValue() ==> acc(p$g$c$T$shared(p$t), wildcard)
   ret$0 := df$rt$unitValue()
   label lbl$ret$0
 }
 
 /unique_predicates.kt:(353,372): info: Generated Viper text for borrowed_unique_arg:
-predicate T$class_c$g$T(this: Ref) {
+predicate p$g$c$T$shared(this: Ref) {
   true
 }
 
-predicate U$T$class_c$g$T(this: Ref) {
+predicate p$g$c$T$unique(this: Ref) {
   true
 }
 
-method f$g$borrowed_unique_arg$TF$T$class_c$g$T(p$t: Ref)
-  returns (ret$0: Ref)
-  requires acc(U$T$class_c$g$T(p$t), write)
-  ensures acc(U$T$class_c$g$T(p$t), write)
+method f$g$borrowed_unique_arg$TF$T$c$g$T(p$t: Ref) returns (ret$0: Ref)
+  requires acc(p$g$c$T$unique(p$t), write)
+  ensures acc(p$g$c$T$unique(p$t), write)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 {
-  inhale df$rt$isSubtype(df$rt$typeOf(p$t), df$rt$T$class_c$g$T())
-  inhale acc(T$class_c$g$T(p$t), wildcard)
+  inhale df$rt$isSubtype(df$rt$typeOf(p$t), df$rt$T$c$g$T())
+  inhale acc(p$g$c$T$shared(p$t), wildcard)
   ret$0 := df$rt$unitValue()
   label lbl$ret$0
 }
 
 /unique_predicates.kt:(424,439): info: Generated Viper text for unique_receiver:
-predicate T$class_c$g$T(this: Ref) {
+predicate p$g$c$T$shared(this: Ref) {
   true
 }
 
-predicate U$T$class_c$g$T(this: Ref) {
+predicate p$g$c$T$unique(this: Ref) {
   true
 }
 
-method f$g$unique_receiver$TF$T$class_c$g$T(this: Ref) returns (ret$0: Ref)
-  requires acc(U$T$class_c$g$T(this), write)
+method f$g$unique_receiver$TF$T$c$g$T(this: Ref) returns (ret$0: Ref)
+  requires acc(p$g$c$T$unique(this), write)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 {
-  inhale df$rt$isSubtype(df$rt$typeOf(this), df$rt$T$class_c$g$T())
-  inhale acc(T$class_c$g$T(this), wildcard)
+  inhale df$rt$isSubtype(df$rt$typeOf(this), df$rt$T$c$g$T())
+  inhale acc(p$g$c$T$shared(this), wildcard)
   ret$0 := df$rt$unitValue()
   label lbl$ret$0
 }
 
 /unique_predicates.kt:(488,512): info: Generated Viper text for borrowed_unique_receiver:
-predicate T$class_c$g$T(this: Ref) {
+predicate p$g$c$T$shared(this: Ref) {
   true
 }
 
-predicate U$T$class_c$g$T(this: Ref) {
+predicate p$g$c$T$unique(this: Ref) {
   true
 }
 
-method f$g$borrowed_unique_receiver$TF$T$class_c$g$T(this: Ref)
+method f$g$borrowed_unique_receiver$TF$T$c$g$T(this: Ref)
   returns (ret$0: Ref)
-  requires acc(U$T$class_c$g$T(this), write)
-  ensures acc(U$T$class_c$g$T(this), write)
+  requires acc(p$g$c$T$unique(this), write)
+  ensures acc(p$g$c$T$unique(this), write)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 {
-  inhale df$rt$isSubtype(df$rt$typeOf(this), df$rt$T$class_c$g$T())
-  inhale acc(T$class_c$g$T(this), wildcard)
+  inhale df$rt$isSubtype(df$rt$typeOf(this), df$rt$T$c$g$T())
+  inhale acc(p$g$c$T$shared(this), wildcard)
   ret$0 := df$rt$unitValue()
   label lbl$ret$0
 }
 
 /unique_predicates.kt:(531,544): info: Generated Viper text for unique_result:
-predicate T$class_c$g$T(this: Ref) {
+predicate p$g$c$T$shared(this: Ref) {
   true
 }
 
-predicate U$T$class_c$g$T(this: Ref) {
+predicate p$g$c$T$unique(this: Ref) {
   true
 }
 
 method con$c$T$() returns (ret: Ref)
-  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$T$class_c$g$T())
-  ensures acc(T$class_c$g$T(ret), wildcard)
-  ensures acc(U$T$class_c$g$T(ret), write)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$T$c$g$T())
+  ensures acc(p$g$c$T$shared(ret), wildcard)
+  ensures acc(p$g$c$T$unique(ret), write)
 
 
 method f$g$unique_result$TF$() returns (ret$0: Ref)
-  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$T$class_c$g$T())
-  ensures acc(T$class_c$g$T(ret$0), wildcard)
-  ensures acc(U$T$class_c$g$T(ret$0), write)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$T$c$g$T())
+  ensures acc(p$g$c$T$shared(ret$0), wildcard)
+  ensures acc(p$g$c$T$unique(ret$0), write)
 {
   ret$0 := con$c$T$()
   goto lbl$ret$0
@@ -166,19 +163,19 @@ method f$g$unique_result$TF$() returns (ret$0: Ref)
 }
 
 /unique_predicates.kt:(579,601): info: Generated Viper text for unique_nullable_result:
-predicate T$class_c$g$T(this: Ref) {
+predicate p$g$c$T$shared(this: Ref) {
   true
 }
 
-predicate U$T$class_c$g$T(this: Ref) {
+predicate p$g$c$T$unique(this: Ref) {
   true
 }
 
 method f$g$unique_nullable_result$TF$() returns (ret$0: Ref)
-  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$nullable(df$rt$T$class_c$g$T()))
+  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$nullable(df$rt$T$c$g$T()))
   ensures ret$0 != df$rt$nullValue() ==>
-    acc(T$class_c$g$T(ret$0), wildcard)
-  ensures ret$0 != df$rt$nullValue() ==> acc(U$T$class_c$g$T(ret$0), write)
+    acc(p$g$c$T$shared(ret$0), wildcard)
+  ensures ret$0 != df$rt$nullValue() ==> acc(p$g$c$T$unique(ret$0), write)
 {
   ret$0 := df$rt$nullValue()
   goto lbl$ret$0

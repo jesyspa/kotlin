@@ -1,12 +1,12 @@
 /setters.kt:(103,127): info: Generated Viper text for testPrimitiveFieldSetter:
 field bf$public$a: Ref
 
-method f$g$testPrimitiveFieldSetter$TF$T$class_c$g$PrimitiveField(p$pf: Ref)
+method f$g$testPrimitiveFieldSetter$TF$T$c$g$PrimitiveField(p$pf: Ref)
   returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 {
-  inhale df$rt$isSubtype(df$rt$typeOf(p$pf), df$rt$T$class_c$g$PrimitiveField())
-  inhale acc(T$class_c$g$PrimitiveField(p$pf), wildcard)
+  inhale df$rt$isSubtype(df$rt$typeOf(p$pf), df$rt$T$c$g$PrimitiveField())
+  inhale acc(p$g$c$PrimitiveField$shared(p$pf), wildcard)
   ret$0 := df$rt$unitValue()
   inhale acc(p$pf.bf$public$a, write)
   p$pf.bf$public$a := df$rt$intToRef(0)
@@ -20,18 +20,18 @@ field bf$public$a: Ref
 field bf$public$pf: Ref
 
 method con$c$PrimitiveField$T$Int(p$a: Ref) returns (ret: Ref)
-  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$T$class_c$g$PrimitiveField())
-  ensures acc(T$class_c$g$PrimitiveField(ret), wildcard)
-  ensures acc(U$T$class_c$g$PrimitiveField(ret), write)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$T$c$g$PrimitiveField())
+  ensures acc(p$g$c$PrimitiveField$shared(ret), wildcard)
+  ensures acc(p$g$c$PrimitiveField$unique(ret), write)
 
 
-method f$g$testReferenceFieldSetter$TF$T$class_c$g$ReferenceField(p$rf: Ref)
+method f$g$testReferenceFieldSetter$TF$T$c$g$ReferenceField(p$rf: Ref)
   returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 {
   var anon$0: Ref
-  inhale df$rt$isSubtype(df$rt$typeOf(p$rf), df$rt$T$class_c$g$ReferenceField())
-  inhale acc(T$class_c$g$ReferenceField(p$rf), wildcard)
+  inhale df$rt$isSubtype(df$rt$typeOf(p$rf), df$rt$T$c$g$ReferenceField())
+  inhale acc(p$g$c$ReferenceField$shared(p$rf), wildcard)
   ret$0 := df$rt$unitValue()
   anon$0 := con$c$PrimitiveField$T$Int(df$rt$intToRef(0))
   inhale acc(p$rf.bf$public$pf, write)
@@ -41,13 +41,13 @@ method f$g$testReferenceFieldSetter$TF$T$class_c$g$ReferenceField(p$rf: Ref)
 }
 
 /setters.kt:(427,454): info: Generated Viper text for testPrimitivePropertySetter:
-method f$g$testPrimitivePropertySetter$TF$T$class_c$g$PrimitiveProperty(p$pp: Ref)
+method f$g$testPrimitivePropertySetter$TF$T$c$g$PrimitiveProperty(p$pp: Ref)
   returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 {
   var anon$0: Ref
-  inhale df$rt$isSubtype(df$rt$typeOf(p$pp), df$rt$T$class_c$g$PrimitiveProperty())
-  inhale acc(T$class_c$g$PrimitiveProperty(p$pp), wildcard)
+  inhale df$rt$isSubtype(df$rt$typeOf(p$pp), df$rt$T$c$g$PrimitiveProperty())
+  inhale acc(p$g$c$PrimitiveProperty$shared(p$pp), wildcard)
   ret$0 := df$rt$unitValue()
   anon$0 := ps$public$aProp(p$pp, df$rt$intToRef(0))
   label lbl$ret$0
@@ -61,19 +61,19 @@ method ps$public$aProp(this: Ref, value: Ref) returns (ret: Ref)
 
 /setters.kt:(504,531): info: Generated Viper text for testReferencePropertySetter:
 method con$c$PrimitiveProperty$() returns (ret: Ref)
-  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$T$class_c$g$PrimitiveProperty())
-  ensures acc(T$class_c$g$PrimitiveProperty(ret), wildcard)
-  ensures acc(U$T$class_c$g$PrimitiveProperty(ret), write)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$T$c$g$PrimitiveProperty())
+  ensures acc(p$g$c$PrimitiveProperty$shared(ret), wildcard)
+  ensures acc(p$g$c$PrimitiveProperty$unique(ret), write)
 
 
-method f$g$testReferencePropertySetter$TF$T$class_c$g$ReferenceProperty(p$rp: Ref)
+method f$g$testReferencePropertySetter$TF$T$c$g$ReferenceProperty(p$rp: Ref)
   returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 {
   var anon$0: Ref
   var anon$1: Ref
-  inhale df$rt$isSubtype(df$rt$typeOf(p$rp), df$rt$T$class_c$g$ReferenceProperty())
-  inhale acc(T$class_c$g$ReferenceProperty(p$rp), wildcard)
+  inhale df$rt$isSubtype(df$rt$typeOf(p$rp), df$rt$T$c$g$ReferenceProperty())
+  inhale acc(p$g$c$ReferenceProperty$shared(p$rp), wildcard)
   ret$0 := df$rt$unitValue()
   anon$1 := con$c$PrimitiveProperty$()
   anon$0 := ps$public$ppProp(p$rp, anon$1)

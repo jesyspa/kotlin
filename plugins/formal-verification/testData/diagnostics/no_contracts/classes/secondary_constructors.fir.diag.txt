@@ -2,15 +2,15 @@
 field bf$public$a: Ref
 
 method con$c$NoPrimaryConstructor$T$Boolean(p$b: Ref) returns (ret: Ref)
-  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$T$class_c$g$NoPrimaryConstructor())
-  ensures acc(T$class_c$g$NoPrimaryConstructor(ret), wildcard)
-  ensures acc(U$T$class_c$g$NoPrimaryConstructor(ret), write)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$T$c$g$NoPrimaryConstructor())
+  ensures acc(p$g$c$NoPrimaryConstructor$shared(ret), wildcard)
+  ensures acc(p$g$c$NoPrimaryConstructor$unique(ret), write)
 
 
 method con$c$NoPrimaryConstructor$T$Int(p$n: Ref) returns (ret: Ref)
-  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$T$class_c$g$NoPrimaryConstructor())
-  ensures acc(T$class_c$g$NoPrimaryConstructor(ret), wildcard)
-  ensures acc(U$T$class_c$g$NoPrimaryConstructor(ret), write)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$T$c$g$NoPrimaryConstructor())
+  ensures acc(p$g$c$NoPrimaryConstructor$shared(ret), wildcard)
+  ensures acc(p$g$c$NoPrimaryConstructor$unique(ret), write)
 
 
 method f$g$onlySecondConstructors$TF$() returns (ret$0: Ref)
@@ -28,16 +28,16 @@ method f$g$onlySecondConstructors$TF$() returns (ret$0: Ref)
 field bf$public$a: Ref
 
 method con$c$BothConstructors$T$Boolean(p$b: Ref) returns (ret: Ref)
-  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$T$class_c$g$BothConstructors())
-  ensures acc(T$class_c$g$BothConstructors(ret), wildcard)
-  ensures acc(U$T$class_c$g$BothConstructors(ret), write)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$T$c$g$BothConstructors())
+  ensures acc(p$g$c$BothConstructors$shared(ret), wildcard)
+  ensures acc(p$g$c$BothConstructors$unique(ret), write)
 
 
 method con$c$BothConstructors$T$Int(p$a: Ref) returns (ret: Ref)
-  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$T$class_c$g$BothConstructors())
-  ensures acc(T$class_c$g$BothConstructors(ret), wildcard)
-  ensures acc(U$T$class_c$g$BothConstructors(ret), write)
-  ensures (unfolding acc(T$class_c$g$BothConstructors(ret), wildcard) in
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$T$c$g$BothConstructors())
+  ensures acc(p$g$c$BothConstructors$shared(ret), wildcard)
+  ensures acc(p$g$c$BothConstructors$unique(ret), write)
+  ensures (unfolding acc(p$g$c$BothConstructors$shared(ret), wildcard) in
       df$rt$intFromRef(ret.bf$public$a) == df$rt$intFromRef(p$a))
 
 

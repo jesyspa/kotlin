@@ -447,9 +447,9 @@ method f$g$complexScenario$TF$T$Boolean(p$arg: Ref) returns (ret$0: Ref)
 field bf$public$member: Ref
 
 method con$c$CustomClass$() returns (ret: Ref)
-  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$T$class_c$g$CustomClass())
-  ensures acc(T$class_c$g$CustomClass(ret), wildcard)
-  ensures acc(U$T$class_c$g$CustomClass(ret), write)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$T$c$g$CustomClass())
+  ensures acc(p$g$c$CustomClass$shared(ret), wildcard)
+  ensures acc(p$g$c$CustomClass$unique(ret), write)
 
 
 method f$g$testCustomClass$TF$() returns (ret$0: Ref)
@@ -466,7 +466,7 @@ method f$g$testCustomClass$TF$() returns (ret$0: Ref)
   var anon$3: Ref
   var ret$4: Ref
   l0$custom := con$c$CustomClass$()
-  unfold acc(T$class_c$g$CustomClass(l0$custom), wildcard)
+  unfold acc(p$g$c$CustomClass$shared(l0$custom), wildcard)
   ret$2 := l0$custom.bf$public$member
   goto lbl$ret$2
   label lbl$ret$2
@@ -475,7 +475,7 @@ method f$g$testCustomClass$TF$() returns (ret$0: Ref)
   goto lbl$ret$1
   label lbl$ret$1
   anon$0 := ret$1
-  unfold acc(T$class_c$g$CustomClass(l0$custom), wildcard)
+  unfold acc(p$g$c$CustomClass$shared(l0$custom), wildcard)
   ret$4 := l0$custom.bf$public$member
   goto lbl$ret$4
   label lbl$ret$4

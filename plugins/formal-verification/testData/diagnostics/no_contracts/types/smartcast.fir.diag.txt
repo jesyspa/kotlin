@@ -12,13 +12,13 @@ method f$g$smartcastReturn$TF$Int(p$n: Ref) returns (ret$0: Ref)
 }
 
 /smartcast.kt:(88,106): info: Generated Viper text for isNullOrEmptyWrong:
-method f$g$isNullOrEmptyWrong$TF$class_c$pkg$kotlin$g$CharSequence(p$seq: Ref)
+method f$g$isNullOrEmptyWrong$TF$c$pkg$kotlin$g$CharSequence(p$seq: Ref)
   returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$boolType())
 {
-  inhale df$rt$isSubtype(df$rt$typeOf(p$seq), df$rt$nullable(df$rt$T$class_c$pkg$kotlin$g$CharSequence()))
+  inhale df$rt$isSubtype(df$rt$typeOf(p$seq), df$rt$nullable(df$rt$T$c$pkg$kotlin$g$CharSequence()))
   inhale p$seq != df$rt$nullValue() ==>
-    acc(T$class_c$pkg$kotlin$g$CharSequence(p$seq), wildcard)
+    acc(p$pkg$kotlin$g$c$CharSequence$shared(p$seq), wildcard)
   if (p$seq == df$rt$nullValue()) {
     var anon$0: Ref
     if (p$seq != df$rt$nullValue()) {

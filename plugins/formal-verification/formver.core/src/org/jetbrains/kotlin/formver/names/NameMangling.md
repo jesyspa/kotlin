@@ -35,6 +35,7 @@ For types:
 * `ps` for property setter
 * `eg` for extension getter
 * `es` for extension setter
+* `p` for predicate
 
 There are still holdover (longer) names.
 
