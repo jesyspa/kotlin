@@ -1,12 +1,12 @@
 /generics.kt:(52,65): info: Generated Viper text for genericMethod:
 field bf$public$t: Ref
 
-method f$c$Box$genericMethod$TF$T$c$g$Box$Any(this: Ref, p$x: Ref)
+method f$c$Box$genericMethod$TF$T$c$Box$Any(this: Ref, p$x: Ref)
   returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$nullable(df$rt$anyType()))
 {
-  inhale df$rt$isSubtype(df$rt$typeOf(this), df$rt$T$c$g$Box())
-  inhale acc(p$g$c$Box$shared(this), wildcard)
+  inhale df$rt$isSubtype(df$rt$typeOf(this), df$rt$T$c$Box())
+  inhale acc(p$c$Box$shared(this), wildcard)
   inhale df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$nullable(df$rt$anyType()))
   ret$0 := p$x
   goto lbl$ret$0
@@ -17,12 +17,12 @@ method f$c$Box$genericMethod$TF$T$c$g$Box$Any(this: Ref, p$x: Ref)
 field bf$public$t: Ref
 
 method con$c$Box$Any(p$t: Ref) returns (ret: Ref)
-  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$T$c$g$Box())
-  ensures acc(p$g$c$Box$shared(ret), wildcard)
-  ensures acc(p$g$c$Box$unique(ret), write)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$T$c$Box())
+  ensures acc(p$c$Box$shared(ret), wildcard)
+  ensures acc(p$c$Box$unique(ret), write)
 
 
-method f$g$createBox$TF$() returns (ret$0: Ref)
+method f$createBox$TF$() returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$intType())
 {
   var l0$boolBox: Ref
@@ -52,12 +52,12 @@ method f$g$createBox$TF$() returns (ret$0: Ref)
 field bf$public$t: Ref
 
 method con$c$Box$Any(p$t: Ref) returns (ret: Ref)
-  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$T$c$g$Box())
-  ensures acc(p$g$c$Box$shared(ret), wildcard)
-  ensures acc(p$g$c$Box$unique(ret), write)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$T$c$Box())
+  ensures acc(p$c$Box$shared(ret), wildcard)
+  ensures acc(p$c$Box$unique(ret), write)
 
 
-method f$g$setGenericField$TF$() returns (ret$0: Ref)
+method f$setGenericField$TF$() returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 {
   var l0$box: Ref
@@ -70,7 +70,7 @@ method f$g$setGenericField$TF$() returns (ret$0: Ref)
 }
 
 /generics.kt:(293,303): info: Generated Viper text for genericFun:
-method f$g$genericFun$TF$Any(p$t: Ref) returns (ret$0: Ref)
+method f$genericFun$TF$Any(p$t: Ref) returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$nullable(df$rt$anyType()))
 {
   inhale df$rt$isSubtype(df$rt$typeOf(p$t), df$rt$nullable(df$rt$anyType()))
@@ -80,32 +80,31 @@ method f$g$genericFun$TF$Any(p$t: Ref) returns (ret$0: Ref)
 }
 
 /generics.kt:(322,337): info: Generated Viper text for callGenericFunc:
-method f$g$callGenericFunc$TF$() returns (ret$0: Ref)
+method f$callGenericFunc$TF$() returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 {
   var l0$x: Ref
   var anon$0: Ref
   ret$0 := df$rt$unitValue()
-  anon$0 := f$g$genericFun$TF$Any(df$rt$intToRef(3))
+  anon$0 := f$genericFun$TF$Any(df$rt$intToRef(3))
   l0$x := anon$0
   label lbl$ret$0
 }
 
-method f$g$genericFun$TF$Any(p$t: Ref) returns (ret: Ref)
+method f$genericFun$TF$Any(p$t: Ref) returns (ret: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$nullable(df$rt$anyType()))
 
 
 /generics.kt:(375,395): info: Generated Viper text for genericAsIfCondition:
 field bf$public$t: Ref
 
-method f$g$genericAsIfCondition$TF$T$c$g$Box(p$box: Ref)
-  returns (ret$0: Ref)
+method f$genericAsIfCondition$TF$T$c$Box(p$box: Ref) returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$intType())
 {
   var anon$0: Ref
   var anon$1: Ref
-  inhale df$rt$isSubtype(df$rt$typeOf(p$box), df$rt$T$c$g$Box())
-  inhale acc(p$g$c$Box$shared(p$box), wildcard)
+  inhale df$rt$isSubtype(df$rt$typeOf(p$box), df$rt$T$c$Box())
+  inhale acc(p$c$Box$shared(p$box), wildcard)
   inhale acc(p$box.bf$public$t, write)
   anon$1 := p$box.bf$public$t
   exhale acc(p$box.bf$public$t, write)

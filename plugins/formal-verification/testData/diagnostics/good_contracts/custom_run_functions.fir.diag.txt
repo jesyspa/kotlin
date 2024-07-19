@@ -1,5 +1,5 @@
 /custom_run_functions.kt:(1058,1064): info: Generated Viper text for useRun:
-method f$g$useRun$TF$() returns (ret$0: Ref)
+method f$useRun$TF$() returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$boolType())
   ensures df$rt$boolFromRef(ret$0) == true
 {
@@ -306,7 +306,7 @@ method f$g$useRun$TF$() returns (ret$0: Ref)
 }
 
 /custom_run_functions.kt:(2226,2241): info: Generated Viper text for complexScenario:
-method f$g$complexScenario$TF$T$Boolean(p$arg: Ref) returns (ret$0: Ref)
+method f$complexScenario$TF$T$Boolean(p$arg: Ref) returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$boolType())
   ensures df$rt$boolFromRef(ret$0) == true ==> df$rt$boolFromRef(p$arg)
   ensures df$rt$boolFromRef(ret$0) == false ==> !df$rt$boolFromRef(p$arg)
@@ -447,12 +447,12 @@ method f$g$complexScenario$TF$T$Boolean(p$arg: Ref) returns (ret$0: Ref)
 field bf$public$member: Ref
 
 method con$c$CustomClass$() returns (ret: Ref)
-  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$T$c$g$CustomClass())
-  ensures acc(p$g$c$CustomClass$shared(ret), wildcard)
-  ensures acc(p$g$c$CustomClass$unique(ret), write)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$T$c$CustomClass())
+  ensures acc(p$c$CustomClass$shared(ret), wildcard)
+  ensures acc(p$c$CustomClass$unique(ret), write)
 
 
-method f$g$testCustomClass$TF$() returns (ret$0: Ref)
+method f$testCustomClass$TF$() returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$boolType())
   ensures df$rt$boolFromRef(ret$0) == true
 {
@@ -466,7 +466,7 @@ method f$g$testCustomClass$TF$() returns (ret$0: Ref)
   var anon$3: Ref
   var ret$4: Ref
   l0$custom := con$c$CustomClass$()
-  unfold acc(p$g$c$CustomClass$shared(l0$custom), wildcard)
+  unfold acc(p$c$CustomClass$shared(l0$custom), wildcard)
   ret$2 := l0$custom.bf$public$member
   goto lbl$ret$2
   label lbl$ret$2
@@ -475,7 +475,7 @@ method f$g$testCustomClass$TF$() returns (ret$0: Ref)
   goto lbl$ret$1
   label lbl$ret$1
   anon$0 := ret$1
-  unfold acc(p$g$c$CustomClass$shared(l0$custom), wildcard)
+  unfold acc(p$c$CustomClass$shared(l0$custom), wildcard)
   ret$4 := l0$custom.bf$public$member
   goto lbl$ret$4
   label lbl$ret$4

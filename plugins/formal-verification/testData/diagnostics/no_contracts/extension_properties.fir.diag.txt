@@ -1,8 +1,8 @@
 /extension_properties.kt:(114,137): info: Generated Viper text for extensionGetterProperty:
-method eg$g$intValProp$TF$T$Int(this: Ref) returns (ret: Ref)
+method eg$intValProp$TF$T$Int(this: Ref) returns (ret: Ref)
 
 
-method f$g$extensionGetterProperty$TF$() returns (ret$0: Ref)
+method f$extensionGetterProperty$TF$() returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 {
   var l0$a: Ref
@@ -12,51 +12,51 @@ method f$g$extensionGetterProperty$TF$() returns (ret$0: Ref)
   var anon$2: Ref
   var anon$3: Ref
   ret$0 := df$rt$unitValue()
-  anon$0 := eg$g$intValProp$TF$T$Int(df$rt$intToRef(0))
+  anon$0 := eg$intValProp$TF$T$Int(df$rt$intToRef(0))
   l0$a := anon$0
   inhale df$rt$isSubtype(df$rt$typeOf(l0$a), df$rt$intType())
-  anon$3 := eg$g$intValProp$TF$T$Int(df$rt$intToRef(1))
+  anon$3 := eg$intValProp$TF$T$Int(df$rt$intToRef(1))
   anon$2 := anon$3
   inhale df$rt$isSubtype(df$rt$typeOf(anon$2), df$rt$intType())
-  anon$1 := eg$g$intValProp$TF$T$Int(anon$2)
+  anon$1 := eg$intValProp$TF$T$Int(anon$2)
   l0$b := anon$1
   inhale df$rt$isSubtype(df$rt$typeOf(l0$b), df$rt$intType())
   label lbl$ret$0
 }
 
 /extension_properties.kt:(210,233): info: Generated Viper text for extensionSetterProperty:
-method eg$g$intVarProp$TF$T$Int(this: Ref) returns (ret: Ref)
+method eg$intVarProp$TF$T$Int(this: Ref) returns (ret: Ref)
 
 
-method es$g$intVarProp$TF$T$Int$T$Int(this: Ref, value: Ref)
+method es$intVarProp$TF$T$Int$T$Int(this: Ref, value: Ref)
   returns (ret: Ref)
 
 
-method f$g$extensionSetterProperty$TF$() returns (ret$0: Ref)
+method f$extensionSetterProperty$TF$() returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 {
   var anon$0: Ref
   ret$0 := df$rt$unitValue()
-  anon$0 := es$g$intVarProp$TF$T$Int$T$Int(df$rt$intToRef(42), df$rt$intToRef(0))
+  anon$0 := es$intVarProp$TF$T$Int$T$Int(df$rt$intToRef(42), df$rt$intToRef(0))
   label lbl$ret$0
 }
 
 /extension_properties.kt:(414,453): info: Generated Viper text for extensionGetterPropertyUserDefinedClass:
 field bf$public$x: Ref
 
-method eg$g$pfValProp$TF$T$c$g$PrimitiveField(this: Ref) returns (ret: Ref)
+method eg$pfValProp$TF$T$c$PrimitiveField(this: Ref) returns (ret: Ref)
 
 
-method f$g$extensionGetterPropertyUserDefinedClass$TF$T$c$g$PrimitiveField(p$pf: Ref)
+method f$extensionGetterPropertyUserDefinedClass$TF$T$c$PrimitiveField(p$pf: Ref)
   returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 {
   var l0$x: Ref
   var anon$0: Ref
-  inhale df$rt$isSubtype(df$rt$typeOf(p$pf), df$rt$T$c$g$PrimitiveField())
-  inhale acc(p$g$c$PrimitiveField$shared(p$pf), wildcard)
+  inhale df$rt$isSubtype(df$rt$typeOf(p$pf), df$rt$T$c$PrimitiveField())
+  inhale acc(p$c$PrimitiveField$shared(p$pf), wildcard)
   ret$0 := df$rt$unitValue()
-  anon$0 := eg$g$pfValProp$TF$T$c$g$PrimitiveField(p$pf)
+  anon$0 := eg$pfValProp$TF$T$c$PrimitiveField(p$pf)
   l0$x := anon$0
   inhale df$rt$isSubtype(df$rt$typeOf(l0$x), df$rt$intType())
   label lbl$ret$0
@@ -65,21 +65,21 @@ method f$g$extensionGetterPropertyUserDefinedClass$TF$T$c$g$PrimitiveField(p$pf:
 /extension_properties.kt:(508,547): info: Generated Viper text for extensionSetterPropertyUserDefinedClass:
 field bf$public$x: Ref
 
-method eg$g$pfVarProp$TF$T$c$g$PrimitiveField(this: Ref) returns (ret: Ref)
+method eg$pfVarProp$TF$T$c$PrimitiveField(this: Ref) returns (ret: Ref)
 
 
-method es$g$pfVarProp$TF$T$c$g$PrimitiveField$T$Int(this: Ref, value: Ref)
+method es$pfVarProp$TF$T$c$PrimitiveField$T$Int(this: Ref, value: Ref)
   returns (ret: Ref)
 
 
-method f$g$extensionSetterPropertyUserDefinedClass$TF$T$c$g$PrimitiveField(p$pf: Ref)
+method f$extensionSetterPropertyUserDefinedClass$TF$T$c$PrimitiveField(p$pf: Ref)
   returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 {
   var anon$0: Ref
-  inhale df$rt$isSubtype(df$rt$typeOf(p$pf), df$rt$T$c$g$PrimitiveField())
-  inhale acc(p$g$c$PrimitiveField$shared(p$pf), wildcard)
+  inhale df$rt$isSubtype(df$rt$typeOf(p$pf), df$rt$T$c$PrimitiveField())
+  inhale acc(p$c$PrimitiveField$shared(p$pf), wildcard)
   ret$0 := df$rt$unitValue()
-  anon$0 := es$g$pfVarProp$TF$T$c$g$PrimitiveField$T$Int(p$pf, df$rt$intToRef(42))
+  anon$0 := es$pfVarProp$TF$T$c$PrimitiveField$T$Int(p$pf, df$rt$intToRef(42))
   label lbl$ret$0
 }

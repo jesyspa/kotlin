@@ -1,5 +1,5 @@
 /viper_verify.kt:(125,137): info: Generated Viper text for verify_false:
-method f$g$verify_false$TF$() returns (ret$0: Ref)
+method f$verify_false$TF$() returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 {
   ret$0 := df$rt$unitValue()
@@ -10,7 +10,7 @@ method f$g$verify_false$TF$() returns (ret$0: Ref)
 /viper_verify.kt:(153,158): warning: Viper verification error: Assert might fail. Assertion false might not hold.
 
 /viper_verify.kt:(181,196): info: Generated Viper text for verify_compound:
-method f$g$verify_compound$TF$() returns (ret$0: Ref)
+method f$verify_compound$TF$() returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 {
   var anon$0: Ref

@@ -5,7 +5,6 @@
 
 package org.jetbrains.kotlin.formver.names
 
-import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.formver.viper.mangled
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.utils.addToStdlib.ifFalse
@@ -52,12 +51,6 @@ data class PackageScope(val packageName: FqName) : NameScope {
 
     override val mangledScopeName: String?
         get() = packageName.isRoot.ifFalse { "pkg\$${packageName.asViperString()}" }
-}
-
-// This is really just package scope, here for backwards compatibility.
-data class GlobalScope(override val parent: NameScope) : NameScope {
-    override val mangledScopeName: String
-        get() = "g"
 }
 
 data class ClassScope(override val parent: NameScope, val className: ClassKotlinName) : NameScope {

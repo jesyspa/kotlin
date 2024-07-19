@@ -1,7 +1,7 @@
 /list.kt:(77,88): info: Generated Viper text for declaration:
 field sp$size: Ref
 
-method f$g$declaration$TF$() returns (ret$0: Ref)
+method f$declaration$TF$() returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 {
   var l0$l1: Ref
@@ -14,7 +14,7 @@ method f$g$declaration$TF$() returns (ret$0: Ref)
 /list.kt:(187,201): info: Generated Viper text for initialization:
 field sp$size: Ref
 
-method f$g$initialization$TF$T$c$pkg$kotlin_collections$g$List(p$l: Ref)
+method f$initialization$TF$T$c$pkg$kotlin_collections$List(p$l: Ref)
   returns (ret$0: Ref)
   requires acc(p$l.sp$size, write)
   requires df$rt$intFromRef(p$l.sp$size) >= 0
@@ -24,26 +24,26 @@ method f$g$initialization$TF$T$c$pkg$kotlin_collections$g$List(p$l: Ref)
 {
   var l0$myList: Ref
   var l0$myEmptyList: Ref
-  inhale df$rt$isSubtype(df$rt$typeOf(p$l), df$rt$T$c$pkg$kotlin_collections$g$List())
-  inhale acc(p$pkg$kotlin_collections$g$c$List$shared(p$l), wildcard)
+  inhale df$rt$isSubtype(df$rt$typeOf(p$l), df$rt$T$c$pkg$kotlin_collections$List())
+  inhale acc(p$pkg$kotlin_collections$c$List$shared(p$l), wildcard)
   ret$0 := df$rt$unitValue()
   l0$myList := p$l
-  l0$myEmptyList := f$pkg$kotlin_collections$g$emptyList$TF$()
+  l0$myEmptyList := f$pkg$kotlin_collections$emptyList$TF$()
   label lbl$ret$0
 }
 
-method f$pkg$kotlin_collections$g$emptyList$TF$() returns (ret: Ref)
-  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$T$c$pkg$kotlin_collections$g$List())
+method f$pkg$kotlin_collections$emptyList$TF$() returns (ret: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$T$c$pkg$kotlin_collections$List())
   ensures acc(ret.sp$size, write)
   ensures df$rt$intFromRef(ret.sp$size) >= 0
-  ensures acc(p$pkg$kotlin_collections$g$c$List$shared(ret), wildcard)
+  ensures acc(p$pkg$kotlin_collections$c$List$shared(ret), wildcard)
   ensures df$rt$intFromRef(ret.sp$size) == 0
 
 
 /list.kt:(297,304): info: Generated Viper text for add_get:
 field sp$size: Ref
 
-method f$g$add_get$TF$T$c$pkg$kotlin_collections$g$MutableList(p$l: Ref)
+method f$add_get$TF$T$c$pkg$kotlin_collections$MutableList(p$l: Ref)
   returns (ret$0: Ref)
   requires acc(p$l.sp$size, write)
   requires df$rt$intFromRef(p$l.sp$size) >= 0
@@ -53,17 +53,17 @@ method f$g$add_get$TF$T$c$pkg$kotlin_collections$g$MutableList(p$l: Ref)
 {
   var anon$0: Ref
   var l0$n: Ref
-  inhale df$rt$isSubtype(df$rt$typeOf(p$l), df$rt$T$c$pkg$kotlin_collections$g$MutableList())
-  inhale acc(p$pkg$kotlin_collections$g$c$MutableList$shared(p$l), wildcard)
+  inhale df$rt$isSubtype(df$rt$typeOf(p$l), df$rt$T$c$pkg$kotlin_collections$MutableList())
+  inhale acc(p$pkg$kotlin_collections$c$MutableList$shared(p$l), wildcard)
   ret$0 := df$rt$unitValue()
-  anon$0 := f$pkg$kotlin_collections$c$MutableList$add$TF$T$c$pkg$kotlin_collections$g$MutableList$T$Int(p$l,
+  anon$0 := f$pkg$kotlin_collections$c$MutableList$add$TF$T$c$pkg$kotlin_collections$MutableList$T$Int(p$l,
     df$rt$intToRef(1))
-  l0$n := f$pkg$kotlin_collections$c$MutableList$get$TF$T$c$pkg$kotlin_collections$g$MutableList$T$Int(p$l,
+  l0$n := f$pkg$kotlin_collections$c$MutableList$get$TF$T$c$pkg$kotlin_collections$MutableList$T$Int(p$l,
     df$rt$intToRef(0))
   label lbl$ret$0
 }
 
-method f$pkg$kotlin_collections$c$MutableList$add$TF$T$c$pkg$kotlin_collections$g$MutableList$T$Int(this: Ref,
+method f$pkg$kotlin_collections$c$MutableList$add$TF$T$c$pkg$kotlin_collections$MutableList$T$Int(this: Ref,
   p$element: Ref)
   returns (ret: Ref)
   requires acc(this.sp$size, write)
@@ -75,7 +75,7 @@ method f$pkg$kotlin_collections$c$MutableList$add$TF$T$c$pkg$kotlin_collections$
     old(df$rt$intFromRef(this.sp$size)) + 1
 
 
-method f$pkg$kotlin_collections$c$MutableList$get$TF$T$c$pkg$kotlin_collections$g$MutableList$T$Int(this: Ref,
+method f$pkg$kotlin_collections$c$MutableList$get$TF$T$c$pkg$kotlin_collections$MutableList$T$Int(this: Ref,
   p$index: Ref)
   returns (ret: Ref)
   requires acc(this.sp$size, write)
@@ -92,7 +92,7 @@ method f$pkg$kotlin_collections$c$MutableList$get$TF$T$c$pkg$kotlin_collections$
 /list.kt:(379,391): info: Generated Viper text for last_or_null:
 field sp$size: Ref
 
-method f$g$last_or_null$TF$T$c$pkg$kotlin_collections$g$List(p$l: Ref)
+method f$last_or_null$TF$T$c$pkg$kotlin_collections$List(p$l: Ref)
   returns (ret$0: Ref)
   requires acc(p$l.sp$size, write)
   requires df$rt$intFromRef(p$l.sp$size) >= 0
@@ -101,13 +101,13 @@ method f$g$last_or_null$TF$T$c$pkg$kotlin_collections$g$List(p$l: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$nullable(df$rt$intType()))
 {
   var l0$size: Ref
-  inhale df$rt$isSubtype(df$rt$typeOf(p$l), df$rt$T$c$pkg$kotlin_collections$g$List())
-  inhale acc(p$pkg$kotlin_collections$g$c$List$shared(p$l), wildcard)
+  inhale df$rt$isSubtype(df$rt$typeOf(p$l), df$rt$T$c$pkg$kotlin_collections$List())
+  inhale acc(p$pkg$kotlin_collections$c$List$shared(p$l), wildcard)
   l0$size := p$l.sp$size
   inhale df$rt$isSubtype(df$rt$typeOf(l0$size), df$rt$intType())
   if (!(df$rt$intFromRef(l0$size) == 0)) {
     var anon$0: Ref
-    anon$0 := f$pkg$kotlin_collections$c$List$get$TF$T$c$pkg$kotlin_collections$g$List$T$Int(p$l,
+    anon$0 := f$pkg$kotlin_collections$c$List$get$TF$T$c$pkg$kotlin_collections$List$T$Int(p$l,
       sp$minusInts(l0$size, df$rt$intToRef(1)))
     ret$0 := anon$0
     goto lbl$ret$0
@@ -118,7 +118,7 @@ method f$g$last_or_null$TF$T$c$pkg$kotlin_collections$g$List(p$l: Ref)
   label lbl$ret$0
 }
 
-method f$pkg$kotlin_collections$c$List$get$TF$T$c$pkg$kotlin_collections$g$List$T$Int(this: Ref,
+method f$pkg$kotlin_collections$c$List$get$TF$T$c$pkg$kotlin_collections$List$T$Int(this: Ref,
   p$index: Ref)
   returns (ret: Ref)
   requires acc(this.sp$size, write)
@@ -135,7 +135,7 @@ method f$pkg$kotlin_collections$c$List$get$TF$T$c$pkg$kotlin_collections$g$List$
 /list.kt:(545,553): info: Generated Viper text for is_empty:
 field sp$size: Ref
 
-method f$g$is_empty$TF$T$c$pkg$kotlin_collections$g$List(p$l: Ref)
+method f$is_empty$TF$T$c$pkg$kotlin_collections$List(p$l: Ref)
   returns (ret$0: Ref)
   requires acc(p$l.sp$size, write)
   requires df$rt$intFromRef(p$l.sp$size) >= 0
@@ -144,11 +144,11 @@ method f$g$is_empty$TF$T$c$pkg$kotlin_collections$g$List(p$l: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$intType())
 {
   var anon$0: Ref
-  inhale df$rt$isSubtype(df$rt$typeOf(p$l), df$rt$T$c$pkg$kotlin_collections$g$List())
-  inhale acc(p$pkg$kotlin_collections$g$c$List$shared(p$l), wildcard)
-  anon$0 := f$pkg$kotlin_collections$c$List$isEmpty$TF$T$c$pkg$kotlin_collections$g$List(p$l)
+  inhale df$rt$isSubtype(df$rt$typeOf(p$l), df$rt$T$c$pkg$kotlin_collections$List())
+  inhale acc(p$pkg$kotlin_collections$c$List$shared(p$l), wildcard)
+  anon$0 := f$pkg$kotlin_collections$c$List$isEmpty$TF$T$c$pkg$kotlin_collections$List(p$l)
   if (!df$rt$boolFromRef(anon$0)) {
-    ret$0 := f$pkg$kotlin_collections$c$List$get$TF$T$c$pkg$kotlin_collections$g$List$T$Int(p$l,
+    ret$0 := f$pkg$kotlin_collections$c$List$get$TF$T$c$pkg$kotlin_collections$List$T$Int(p$l,
       df$rt$intToRef(0))
   } else {
     ret$0 := df$rt$intToRef(1)}
@@ -156,7 +156,7 @@ method f$g$is_empty$TF$T$c$pkg$kotlin_collections$g$List(p$l: Ref)
   label lbl$ret$0
 }
 
-method f$pkg$kotlin_collections$c$List$get$TF$T$c$pkg$kotlin_collections$g$List$T$Int(this: Ref,
+method f$pkg$kotlin_collections$c$List$get$TF$T$c$pkg$kotlin_collections$List$T$Int(this: Ref,
   p$index: Ref)
   returns (ret: Ref)
   requires acc(this.sp$size, write)
@@ -170,7 +170,7 @@ method f$pkg$kotlin_collections$c$List$get$TF$T$c$pkg$kotlin_collections$g$List$
     old(df$rt$intFromRef(this.sp$size))
 
 
-method f$pkg$kotlin_collections$c$List$isEmpty$TF$T$c$pkg$kotlin_collections$g$List(this: Ref)
+method f$pkg$kotlin_collections$c$List$isEmpty$TF$T$c$pkg$kotlin_collections$List(this: Ref)
   returns (ret: Ref)
   requires acc(this.sp$size, write)
   requires df$rt$intFromRef(this.sp$size) >= 0
@@ -186,7 +186,7 @@ method f$pkg$kotlin_collections$c$List$isEmpty$TF$T$c$pkg$kotlin_collections$g$L
 /list.kt:(670,683): info: Generated Viper text for nullable_list:
 field sp$size: Ref
 
-method f$g$nullable_list$TF$c$pkg$kotlin_collections$g$List(p$l: Ref)
+method f$nullable_list$TF$c$pkg$kotlin_collections$List(p$l: Ref)
   returns (ret$0: Ref)
   requires p$l != df$rt$nullValue() ==> acc(p$l.sp$size, write)
   requires p$l != df$rt$nullValue() ==> df$rt$intFromRef(p$l.sp$size) >= 0
@@ -195,13 +195,13 @@ method f$g$nullable_list$TF$c$pkg$kotlin_collections$g$List(p$l: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 {
   var anon$0: Ref
-  inhale df$rt$isSubtype(df$rt$typeOf(p$l), df$rt$nullable(df$rt$T$c$pkg$kotlin_collections$g$List()))
+  inhale df$rt$isSubtype(df$rt$typeOf(p$l), df$rt$nullable(df$rt$T$c$pkg$kotlin_collections$List()))
   inhale p$l != df$rt$nullValue() ==>
-    acc(p$pkg$kotlin_collections$g$c$List$shared(p$l), wildcard)
+    acc(p$pkg$kotlin_collections$c$List$shared(p$l), wildcard)
   ret$0 := df$rt$unitValue()
   if (!(p$l == df$rt$nullValue())) {
     var anon$1: Ref
-    anon$1 := f$pkg$kotlin_collections$c$List$isEmpty$TF$T$c$pkg$kotlin_collections$g$List(p$l)
+    anon$1 := f$pkg$kotlin_collections$c$List$isEmpty$TF$T$c$pkg$kotlin_collections$List(p$l)
     anon$0 := sp$notBool(anon$1)
   } else {
     anon$0 := df$rt$boolToRef(false)}
@@ -210,13 +210,13 @@ method f$g$nullable_list$TF$c$pkg$kotlin_collections$g$List(p$l: Ref)
     var anon$2: Ref
     anon$2 := p$l.sp$size
     inhale df$rt$isSubtype(df$rt$typeOf(anon$2), df$rt$intType())
-    l2$x := f$pkg$kotlin_collections$c$List$get$TF$T$c$pkg$kotlin_collections$g$List$T$Int(p$l,
+    l2$x := f$pkg$kotlin_collections$c$List$get$TF$T$c$pkg$kotlin_collections$List$T$Int(p$l,
       sp$minusInts(anon$2, df$rt$intToRef(1)))
   }
   label lbl$ret$0
 }
 
-method f$pkg$kotlin_collections$c$List$get$TF$T$c$pkg$kotlin_collections$g$List$T$Int(this: Ref,
+method f$pkg$kotlin_collections$c$List$get$TF$T$c$pkg$kotlin_collections$List$T$Int(this: Ref,
   p$index: Ref)
   returns (ret: Ref)
   requires acc(this.sp$size, write)
@@ -230,7 +230,7 @@ method f$pkg$kotlin_collections$c$List$get$TF$T$c$pkg$kotlin_collections$g$List$
     old(df$rt$intFromRef(this.sp$size))
 
 
-method f$pkg$kotlin_collections$c$List$isEmpty$TF$T$c$pkg$kotlin_collections$g$List(this: Ref)
+method f$pkg$kotlin_collections$c$List$isEmpty$TF$T$c$pkg$kotlin_collections$List(this: Ref)
   returns (ret: Ref)
   requires acc(this.sp$size, write)
   requires df$rt$intFromRef(this.sp$size) >= 0

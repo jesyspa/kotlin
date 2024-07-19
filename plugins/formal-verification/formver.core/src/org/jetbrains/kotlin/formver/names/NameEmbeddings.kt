@@ -25,10 +25,7 @@ fun ClassId.embedLocalName(): ClassKotlinName = ClassKotlinName(relativeClassNam
 
 fun ScopedKotlinNameBuilder.embedScope(id: CallableId) {
     packageScope(id.packageName)
-    when (val classId = id.classId) {
-        null -> globalScope()
-        else -> classScope(classId.embedLocalName())
-    }
+    id.classId?.let { classScope(it.embedLocalName()) }
 }
 
 fun ScopedKotlinNameBuilder.embedScope(id: ClassId) {
@@ -38,7 +35,6 @@ fun ScopedKotlinNameBuilder.embedScope(id: ClassId) {
 
 fun ClassId.embedName(): ScopedKotlinName = buildName {
     packageScope(packageFqName)
-    globalScope()
     embedLocalName()
 }
 

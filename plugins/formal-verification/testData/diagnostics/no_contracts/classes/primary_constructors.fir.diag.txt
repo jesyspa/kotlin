@@ -5,17 +5,17 @@ field bf$public$b: Ref
 
 method con$c$PrimitiveFields$T$Int$T$Int(p$a: Ref, p$b: Ref)
   returns (ret: Ref)
-  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$T$c$g$PrimitiveFields())
-  ensures acc(p$g$c$PrimitiveFields$shared(ret), wildcard)
-  ensures acc(p$g$c$PrimitiveFields$unique(ret), write)
-  ensures (unfolding acc(p$g$c$PrimitiveFields$shared(ret), wildcard) in
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$T$c$PrimitiveFields())
+  ensures acc(p$c$PrimitiveFields$shared(ret), wildcard)
+  ensures acc(p$c$PrimitiveFields$unique(ret), write)
+  ensures (unfolding acc(p$c$PrimitiveFields$shared(ret), wildcard) in
       df$rt$intFromRef(ret.bf$public$a) == df$rt$intFromRef(p$a) &&
       df$rt$intFromRef(ret.bf$public$b) == df$rt$intFromRef(p$b))
 
 
-method f$g$createPrimitiveFields$TF$() returns (ret$0: Ref)
-  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$T$c$g$PrimitiveFields())
-  ensures acc(p$g$c$PrimitiveFields$shared(ret$0), wildcard)
+method f$createPrimitiveFields$TF$() returns (ret$0: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$T$c$PrimitiveFields())
+  ensures acc(p$c$PrimitiveFields$shared(ret$0), wildcard)
 {
   ret$0 := con$c$PrimitiveFields$T$Int$T$Int(df$rt$intToRef(10), df$rt$intToRef(20))
   goto lbl$ret$0
@@ -25,19 +25,19 @@ method f$g$createPrimitiveFields$TF$() returns (ret$0: Ref)
 /primary_constructors.kt:(178,193): info: Generated Viper text for createRecursive:
 field bf$public$a: Ref
 
-method con$c$Recursive$c$g$Recursive(p$a: Ref) returns (ret: Ref)
-  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$T$c$g$Recursive())
-  ensures acc(p$g$c$Recursive$shared(ret), wildcard)
-  ensures acc(p$g$c$Recursive$unique(ret), write)
-  ensures (unfolding acc(p$g$c$Recursive$shared(ret), wildcard) in
+method con$c$Recursive$c$Recursive(p$a: Ref) returns (ret: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$T$c$Recursive())
+  ensures acc(p$c$Recursive$shared(ret), wildcard)
+  ensures acc(p$c$Recursive$unique(ret), write)
+  ensures (unfolding acc(p$c$Recursive$shared(ret), wildcard) in
       ret.bf$public$a == p$a)
 
 
-method f$g$createRecursive$TF$() returns (ret$0: Ref)
-  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$T$c$g$Recursive())
-  ensures acc(p$g$c$Recursive$shared(ret$0), wildcard)
+method f$createRecursive$TF$() returns (ret$0: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$T$c$Recursive())
+  ensures acc(p$c$Recursive$shared(ret$0), wildcard)
 {
-  ret$0 := con$c$Recursive$c$g$Recursive(df$rt$nullValue())
+  ret$0 := con$c$Recursive$c$Recursive(df$rt$nullValue())
   goto lbl$ret$0
   label lbl$ret$0
 }
@@ -48,16 +48,16 @@ field bf$public$a: Ref
 field bf$public$c: Ref
 
 method con$c$FieldInBody$T$Int(p$c: Ref) returns (ret: Ref)
-  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$T$c$g$FieldInBody())
-  ensures acc(p$g$c$FieldInBody$shared(ret), wildcard)
-  ensures acc(p$g$c$FieldInBody$unique(ret), write)
-  ensures (unfolding acc(p$g$c$FieldInBody$shared(ret), wildcard) in
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$T$c$FieldInBody())
+  ensures acc(p$c$FieldInBody$shared(ret), wildcard)
+  ensures acc(p$c$FieldInBody$unique(ret), write)
+  ensures (unfolding acc(p$c$FieldInBody$shared(ret), wildcard) in
       df$rt$intFromRef(ret.bf$public$c) == df$rt$intFromRef(p$c))
 
 
-method f$g$createFieldInBody$TF$() returns (ret$0: Ref)
-  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$T$c$g$FieldInBody())
-  ensures acc(p$g$c$FieldInBody$shared(ret$0), wildcard)
+method f$createFieldInBody$TF$() returns (ret$0: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$T$c$FieldInBody())
+  ensures acc(p$c$FieldInBody$shared(ret$0), wildcard)
 {
   ret$0 := con$c$FieldInBody$T$Int(df$rt$intToRef(10))
   goto lbl$ret$0

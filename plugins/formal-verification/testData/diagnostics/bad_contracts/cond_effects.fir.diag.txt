@@ -1,5 +1,5 @@
 /cond_effects.kt:(121,146): info: Generated Viper text for compoundConditionalEffect:
-method f$g$compoundConditionalEffect$TF$T$Boolean(p$b: Ref)
+method f$compoundConditionalEffect$TF$T$Boolean(p$b: Ref)
   returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
   ensures true ==> df$rt$boolFromRef(p$b) && false
@@ -12,7 +12,7 @@ method f$g$compoundConditionalEffect$TF$T$Boolean(p$b: Ref)
 /cond_effects.kt:(190,220): warning: Cannot verify that if the function returns then (b && false).
 
 /cond_effects.kt:(271,287): info: Generated Viper text for mayReturnNonNull:
-method f$g$mayReturnNonNull$TF$Any(p$x: Ref) returns (ret$0: Ref)
+method f$mayReturnNonNull$TF$Any(p$x: Ref) returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$nullable(df$rt$anyType()))
   ensures ret$0 == df$rt$nullValue() ==>
     df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$intType())
@@ -26,7 +26,7 @@ method f$g$mayReturnNonNull$TF$Any(p$x: Ref) returns (ret$0: Ref)
 /cond_effects.kt:(328,360): warning: Cannot verify that if a null value is returned then x is Int.
 
 /cond_effects.kt:(424,437): info: Generated Viper text for mayReturnNull:
-method f$g$mayReturnNull$TF$Any(p$x: Ref) returns (ret$0: Ref)
+method f$mayReturnNull$TF$Any(p$x: Ref) returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$nullable(df$rt$anyType()))
   ensures ret$0 != df$rt$nullValue() ==>
     df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$intType())
@@ -40,14 +40,14 @@ method f$g$mayReturnNull$TF$Any(p$x: Ref) returns (ret$0: Ref)
 /cond_effects.kt:(478,513): warning: Cannot verify that if a non-null value is returned then x is Int.
 
 /cond_effects.kt:(723,741): info: Generated Viper text for isNullOrEmptyWrong:
-method f$g$isNullOrEmptyWrong$TF$c$pkg$kotlin$g$CharSequence(p$seq: Ref)
+method f$isNullOrEmptyWrong$TF$c$pkg$kotlin$CharSequence(p$seq: Ref)
   returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$boolType())
   ensures df$rt$boolFromRef(ret$0) == false ==> p$seq != df$rt$nullValue()
 {
-  inhale df$rt$isSubtype(df$rt$typeOf(p$seq), df$rt$nullable(df$rt$T$c$pkg$kotlin$g$CharSequence()))
+  inhale df$rt$isSubtype(df$rt$typeOf(p$seq), df$rt$nullable(df$rt$T$c$pkg$kotlin$CharSequence()))
   inhale p$seq != df$rt$nullValue() ==>
-    acc(p$pkg$kotlin$g$c$CharSequence$shared(p$seq), wildcard)
+    acc(p$pkg$kotlin$c$CharSequence$shared(p$seq), wildcard)
   if (!(p$seq == df$rt$nullValue())) {
     var anon$0: Ref
     var anon$1: Ref
@@ -69,18 +69,18 @@ method pg$public$length(this: Ref) returns (ret: Ref)
 /cond_effects.kt:(925,942): info: Generated Viper text for recursiveContract:
 field bf$public$length: Ref
 
-method f$g$recursiveContract$TF$T$Int$Any(p$n: Ref, p$x: Ref)
+method f$recursiveContract$TF$T$Int$Any(p$n: Ref, p$x: Ref)
   returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$boolType())
   ensures df$rt$boolFromRef(ret$0) == true ==>
-    df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$T$c$pkg$kotlin$g$String())
+    df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$T$c$pkg$kotlin$String())
 {
   inhale df$rt$isSubtype(df$rt$typeOf(p$n), df$rt$intType())
   inhale df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$nullable(df$rt$anyType()))
   if (df$rt$intFromRef(p$n) == 0) {
     ret$0 := df$rt$boolToRef(df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$intType()))
   } else {
-    ret$0 := f$g$recursiveContract$TF$T$Int$Any(sp$minusInts(p$n, df$rt$intToRef(1)),
+    ret$0 := f$recursiveContract$TF$T$Int$Any(sp$minusInts(p$n, df$rt$intToRef(1)),
       p$x)}
   goto lbl$ret$0
   label lbl$ret$0

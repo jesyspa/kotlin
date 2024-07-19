@@ -1,11 +1,11 @@
 /multiple_interfaces.kt:(162,173): info: Generated Viper text for testDiamond:
 method con$c$D$() returns (ret: Ref)
-  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$T$c$g$D())
-  ensures acc(p$g$c$D$shared(ret), wildcard)
-  ensures acc(p$g$c$D$unique(ret), write)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$T$c$D())
+  ensures acc(p$c$D$shared(ret), wildcard)
+  ensures acc(p$c$D$unique(ret), write)
 
 
-method f$g$testDiamond$TF$() returns (ret$0: Ref)
+method f$testDiamond$TF$() returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$intType())
 {
   var anon$0: Ref
@@ -23,18 +23,18 @@ method pg$public$field(this: Ref) returns (ret: Ref)
 
 /multiple_interfaces.kt:(405,415): info: Generated Viper text for testVarVal:
 method con$c$G$() returns (ret: Ref)
-  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$T$c$g$G())
-  ensures acc(p$g$c$G$shared(ret), wildcard)
-  ensures acc(p$g$c$G$unique(ret), write)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$T$c$G())
+  ensures acc(p$c$G$shared(ret), wildcard)
+  ensures acc(p$c$G$unique(ret), write)
 
 
 method con$c$I$() returns (ret: Ref)
-  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$T$c$g$I())
-  ensures acc(p$g$c$I$shared(ret), wildcard)
-  ensures acc(p$g$c$I$unique(ret), write)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$T$c$I())
+  ensures acc(p$c$I$shared(ret), wildcard)
+  ensures acc(p$c$I$unique(ret), write)
 
 
-method f$g$testVarVal$TF$() returns (ret$0: Ref)
+method f$testVarVal$TF$() returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 {
   var l0$g: Ref

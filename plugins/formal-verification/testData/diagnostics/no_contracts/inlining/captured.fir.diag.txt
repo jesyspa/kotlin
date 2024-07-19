@@ -1,5 +1,5 @@
 /captured.kt:(155,165): info: Generated Viper text for captureArg:
-method f$g$captureArg$TF$TF$T$Int(p$g: Ref) returns (ret$0: Ref)
+method f$captureArg$TF$TF$T$Int(p$g: Ref) returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$intType())
 {
   var ret$1: Ref
@@ -23,7 +23,7 @@ method f$g$captureArg$TF$TF$T$Int(p$g: Ref) returns (ret$0: Ref)
 }
 
 /captured.kt:(225,235): info: Generated Viper text for captureVar:
-method f$g$captureVar$TF$() returns (ret$0: Ref)
+method f$captureVar$TF$() returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$intType())
 {
   var l0$x: Ref
@@ -44,7 +44,7 @@ method f$g$captureVar$TF$() returns (ret$0: Ref)
 }
 
 /captured.kt:(295,311): info: Generated Viper text for captureAndShadow:
-method f$g$captureAndShadow$TF$T$Int(p$x: Ref) returns (ret$0: Ref)
+method f$captureAndShadow$TF$T$Int(p$x: Ref) returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$intType())
 {
   var ret$1: Ref
@@ -68,7 +68,7 @@ method f$g$captureAndShadow$TF$T$Int(p$x: Ref) returns (ret$0: Ref)
 }
 
 /captured.kt:(513,528): info: Generated Viper text for captureVarClash:
-method f$g$captureVarClash$TF$T$Int(p$x: Ref) returns (ret$0: Ref)
+method f$captureVarClash$TF$T$Int(p$x: Ref) returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$intType())
 {
   var ret$1: Ref
@@ -92,7 +92,7 @@ method f$g$captureVarClash$TF$T$Int(p$x: Ref) returns (ret$0: Ref)
 }
 
 /captured.kt:(585,606): info: Generated Viper text for captureAndShadowClash:
-method f$g$captureAndShadowClash$TF$T$Int(p$x: Ref) returns (ret$0: Ref)
+method f$captureAndShadowClash$TF$T$Int(p$x: Ref) returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$intType())
 {
   var ret$1: Ref
@@ -120,7 +120,7 @@ method f$g$captureAndShadowClash$TF$T$Int(p$x: Ref) returns (ret$0: Ref)
 }
 
 /captured.kt:(715,736): info: Generated Viper text for nestedLambdaShadowing:
-method f$g$nestedLambdaShadowing$TF$T$Int(p$x: Ref) returns (ret$0: Ref)
+method f$nestedLambdaShadowing$TF$T$Int(p$x: Ref) returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$intType())
 {
   var ret$1: Ref
@@ -164,7 +164,7 @@ method f$g$nestedLambdaShadowing$TF$T$Int(p$x: Ref) returns (ret$0: Ref)
 }
 
 /captured.kt:(1008,1024): info: Generated Viper text for callDoubleInvoke:
-method f$g$callDoubleInvoke$TF$T$Int(p$x: Ref) returns (ret$0: Ref)
+method f$callDoubleInvoke$TF$T$Int(p$x: Ref) returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$intType())
 {
   var ret$1: Ref

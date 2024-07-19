@@ -3,17 +3,17 @@ field bf$public$y: Ref
 
 field bf$public$z: Ref
 
-method f$g$cascadeGet$TF$T$c$g$X(p$x: Ref) returns (ret$0: Ref)
-  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$T$c$g$Z())
-  ensures acc(p$g$c$Z$shared(ret$0), wildcard)
+method f$cascadeGet$TF$T$c$X(p$x: Ref) returns (ret$0: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$T$c$Z())
+  ensures acc(p$c$Z$shared(ret$0), wildcard)
   ensures true
 {
   var anon$0: Ref
-  inhale df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$T$c$g$X())
-  inhale acc(p$g$c$X$shared(p$x), wildcard)
-  unfold acc(p$g$c$X$shared(p$x), wildcard)
+  inhale df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$T$c$X())
+  inhale acc(p$c$X$shared(p$x), wildcard)
+  unfold acc(p$c$X$shared(p$x), wildcard)
   anon$0 := p$x.bf$public$y
-  unfold acc(p$g$c$Y$shared(anon$0), wildcard)
+  unfold acc(p$c$Y$shared(anon$0), wildcard)
   ret$0 := anon$0.bf$public$z
   goto lbl$ret$0
   label lbl$ret$0
@@ -24,16 +24,16 @@ field bf$public$y: Ref
 
 field bf$public$z: Ref
 
-method f$g$receiverNotNullProved$TF$c$g$X(p$x: Ref) returns (ret$0: Ref)
+method f$receiverNotNullProved$TF$c$X(p$x: Ref) returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$boolType())
   ensures df$rt$boolFromRef(ret$0) == true ==> p$x != df$rt$nullValue()
 {
   var anon$0: Ref
-  inhale df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$nullable(df$rt$T$c$g$X()))
-  inhale p$x != df$rt$nullValue() ==> acc(p$g$c$X$shared(p$x), wildcard)
+  inhale df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$nullable(df$rt$T$c$X()))
+  inhale p$x != df$rt$nullValue() ==> acc(p$c$X$shared(p$x), wildcard)
   if (p$x != df$rt$nullValue()) {
     var anon$1: Ref
-    unfold acc(p$g$c$X$shared(p$x), wildcard)
+    unfold acc(p$c$X$shared(p$x), wildcard)
     anon$1 := p$x.bf$public$y
     anon$0 := anon$1
   } else {
@@ -48,24 +48,22 @@ field bf$public$y: Ref
 
 field bf$public$z: Ref
 
-method f$g$cascadeNullableGet$TF$c$g$NullableX(p$x: Ref)
-  returns (ret$0: Ref)
-  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$nullable(df$rt$T$c$g$Z()))
-  ensures ret$0 != df$rt$nullValue() ==>
-    acc(p$g$c$Z$shared(ret$0), wildcard)
+method f$cascadeNullableGet$TF$c$NullableX(p$x: Ref) returns (ret$0: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$nullable(df$rt$T$c$Z()))
+  ensures ret$0 != df$rt$nullValue() ==> acc(p$c$Z$shared(ret$0), wildcard)
   ensures ret$0 != df$rt$nullValue() ==> p$x != df$rt$nullValue()
 {
   var anon$0: Ref
-  inhale df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$nullable(df$rt$T$c$g$NullableX()))
+  inhale df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$nullable(df$rt$T$c$NullableX()))
   inhale p$x != df$rt$nullValue() ==>
-    acc(p$g$c$NullableX$shared(p$x), wildcard)
+    acc(p$c$NullableX$shared(p$x), wildcard)
   if (p$x != df$rt$nullValue()) {
-    unfold acc(p$g$c$NullableX$shared(p$x), wildcard)
+    unfold acc(p$c$NullableX$shared(p$x), wildcard)
     anon$0 := p$x.bf$public$y
   } else {
     anon$0 := df$rt$nullValue()}
   if (anon$0 != df$rt$nullValue()) {
-    unfold acc(p$g$c$NullableY$shared(anon$0), wildcard)
+    unfold acc(p$c$NullableY$shared(anon$0), wildcard)
     ret$0 := anon$0.bf$public$z
   } else {
     ret$0 := df$rt$nullValue()}
@@ -78,23 +76,22 @@ field bf$public$y: Ref
 
 field bf$public$z: Ref
 
-method f$g$cascadeNullableSmartcastGet$TF$c$g$NullableX(p$x: Ref)
+method f$cascadeNullableSmartcastGet$TF$c$NullableX(p$x: Ref)
   returns (ret$0: Ref)
-  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$nullable(df$rt$T$c$g$Z()))
-  ensures ret$0 != df$rt$nullValue() ==>
-    acc(p$g$c$Z$shared(ret$0), wildcard)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$nullable(df$rt$T$c$Z()))
+  ensures ret$0 != df$rt$nullValue() ==> acc(p$c$Z$shared(ret$0), wildcard)
   ensures ret$0 != df$rt$nullValue() ==> p$x != df$rt$nullValue()
 {
-  inhale df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$nullable(df$rt$T$c$g$NullableX()))
+  inhale df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$nullable(df$rt$T$c$NullableX()))
   inhale p$x != df$rt$nullValue() ==>
-    acc(p$g$c$NullableX$shared(p$x), wildcard)
+    acc(p$c$NullableX$shared(p$x), wildcard)
   if (p$x == df$rt$nullValue()) {
     var anon$0: Ref
     anon$0 := df$rt$nullValue()
     ret$0 := anon$0
   } else {
     var anon$1: Ref
-    unfold acc(p$g$c$NullableX$shared(p$x), wildcard)
+    unfold acc(p$c$NullableX$shared(p$x), wildcard)
     anon$1 := p$x.bf$public$y
     if (anon$1 == df$rt$nullValue()) {
       var anon$2: Ref
@@ -102,9 +99,9 @@ method f$g$cascadeNullableSmartcastGet$TF$c$g$NullableX(p$x: Ref)
       ret$0 := anon$2
     } else {
       var anon$3: Ref
-      unfold acc(p$g$c$NullableX$shared(p$x), wildcard)
+      unfold acc(p$c$NullableX$shared(p$x), wildcard)
       anon$3 := p$x.bf$public$y
-      unfold acc(p$g$c$NullableY$shared(anon$3), wildcard)
+      unfold acc(p$c$NullableY$shared(anon$3), wildcard)
       ret$0 := anon$3.bf$public$z
     }
   }
@@ -116,12 +113,12 @@ method f$g$cascadeNullableSmartcastGet$TF$c$g$NullableX(p$x: Ref)
 field bf$public$x: Ref
 
 method con$c$Baz$() returns (ret: Ref)
-  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$T$c$g$Baz())
-  ensures acc(p$g$c$Baz$shared(ret), wildcard)
-  ensures acc(p$g$c$Baz$unique(ret), write)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$T$c$Baz())
+  ensures acc(p$c$Baz$shared(ret), wildcard)
+  ensures acc(p$c$Baz$unique(ret), write)
 
 
-method f$g$nullableReceiverNotNullSafeGet$TF$() returns (ret$0: Ref)
+method f$nullableReceiverNotNullSafeGet$TF$() returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$boolType())
   ensures df$rt$boolFromRef(ret$0) == false
 {
@@ -132,7 +129,7 @@ method f$g$nullableReceiverNotNullSafeGet$TF$() returns (ret$0: Ref)
   l0$f := anon$0
   if (l0$f != df$rt$nullValue()) {
     var anon$2: Ref
-    unfold acc(p$g$c$Baz$shared(l0$f), wildcard)
+    unfold acc(p$c$Baz$shared(l0$f), wildcard)
     anon$2 := l0$f.bf$public$x
     anon$1 := anon$2
   } else {
@@ -145,7 +142,7 @@ method f$g$nullableReceiverNotNullSafeGet$TF$() returns (ret$0: Ref)
 /backing_field_getters.kt:(1167,1194): info: Generated Viper text for nullableReceiverNullSafeGet:
 field bf$public$x: Ref
 
-method f$g$nullableReceiverNullSafeGet$TF$() returns (ret$0: Ref)
+method f$nullableReceiverNullSafeGet$TF$() returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$boolType())
   ensures df$rt$boolFromRef(ret$0) == true
 {
@@ -154,7 +151,7 @@ method f$g$nullableReceiverNullSafeGet$TF$() returns (ret$0: Ref)
   l0$f := df$rt$nullValue()
   if (l0$f != df$rt$nullValue()) {
     var anon$1: Ref
-    unfold acc(p$g$c$Baz$shared(l0$f), wildcard)
+    unfold acc(p$c$Baz$shared(l0$f), wildcard)
     anon$1 := l0$f.bf$public$x
     anon$0 := anon$1
   } else {
@@ -168,12 +165,12 @@ method f$g$nullableReceiverNullSafeGet$TF$() returns (ret$0: Ref)
 field bf$public$x: Ref
 
 method con$c$Baz$() returns (ret: Ref)
-  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$T$c$g$Baz())
-  ensures acc(p$g$c$Baz$shared(ret), wildcard)
-  ensures acc(p$g$c$Baz$unique(ret), write)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$T$c$Baz())
+  ensures acc(p$c$Baz$shared(ret), wildcard)
+  ensures acc(p$c$Baz$unique(ret), write)
 
 
-method f$g$nonNullableReceiverSafeGet$TF$() returns (ret$0: Ref)
+method f$nonNullableReceiverSafeGet$TF$() returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$boolType())
   ensures df$rt$boolFromRef(ret$0) == false
 {
@@ -182,7 +179,7 @@ method f$g$nonNullableReceiverSafeGet$TF$() returns (ret$0: Ref)
   l0$f := con$c$Baz$()
   if (l0$f != df$rt$nullValue()) {
     var anon$1: Ref
-    unfold acc(p$g$c$Baz$shared(l0$f), wildcard)
+    unfold acc(p$c$Baz$shared(l0$f), wildcard)
     anon$1 := l0$f.bf$public$x
     anon$0 := anon$1
   } else {
@@ -200,29 +197,29 @@ field bf$public$y: Ref
 field bf$public$z: Ref
 
 method con$c$ClassI$T$Int$T$Int(p$x: Ref, p$y: Ref) returns (ret: Ref)
-  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$T$c$g$ClassI())
-  ensures acc(p$g$c$ClassI$shared(ret), wildcard)
-  ensures acc(p$g$c$ClassI$unique(ret), write)
-  ensures (unfolding acc(p$g$c$ClassI$shared(ret), wildcard) in
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$T$c$ClassI())
+  ensures acc(p$c$ClassI$shared(ret), wildcard)
+  ensures acc(p$c$ClassI$unique(ret), write)
+  ensures (unfolding acc(p$c$ClassI$shared(ret), wildcard) in
       df$rt$intFromRef(ret.bf$public$x) == df$rt$intFromRef(p$x) &&
       df$rt$intFromRef(ret.bf$public$y) == df$rt$intFromRef(p$y))
 
 
-method con$c$ClassII$T$c$g$Z(p$z: Ref) returns (ret: Ref)
-  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$T$c$g$ClassII())
-  ensures acc(p$g$c$ClassII$shared(ret), wildcard)
-  ensures acc(p$g$c$ClassII$unique(ret), write)
-  ensures (unfolding acc(p$g$c$ClassII$shared(ret), wildcard) in
+method con$c$ClassII$T$c$Z(p$z: Ref) returns (ret: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$T$c$ClassII())
+  ensures acc(p$c$ClassII$shared(ret), wildcard)
+  ensures acc(p$c$ClassII$unique(ret), write)
+  ensures (unfolding acc(p$c$ClassII$shared(ret), wildcard) in
       ret.bf$public$z == p$z)
 
 
 method con$c$Z$() returns (ret: Ref)
-  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$T$c$g$Z())
-  ensures acc(p$g$c$Z$shared(ret), wildcard)
-  ensures acc(p$g$c$Z$unique(ret), write)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$T$c$Z())
+  ensures acc(p$c$Z$shared(ret), wildcard)
+  ensures acc(p$c$Z$unique(ret), write)
 
 
-method f$g$checkPrimary$TF$T$Int$T$Int(p$x: Ref, p$y: Ref)
+method f$checkPrimary$TF$T$Int$T$Int(p$x: Ref, p$y: Ref)
   returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$boolType())
   ensures df$rt$boolFromRef(ret$0) == false ==> false
@@ -239,9 +236,9 @@ method f$g$checkPrimary$TF$T$Int$T$Int(p$x: Ref, p$y: Ref)
   } else {
     var anon$1: Ref
     var anon$2: Ref
-    unfold acc(p$g$c$ClassI$shared(l0$classI), wildcard)
+    unfold acc(p$c$ClassI$shared(l0$classI), wildcard)
     anon$1 := l0$classI.bf$public$x
-    unfold acc(p$g$c$ClassI$shared(l0$classI), wildcard)
+    unfold acc(p$c$ClassI$shared(l0$classI), wildcard)
     anon$2 := l0$classI.bf$public$y
     anon$0 := df$rt$boolToRef(df$rt$intFromRef(anon$1) ==
       df$rt$intFromRef(anon$2))
@@ -249,8 +246,8 @@ method f$g$checkPrimary$TF$T$Int$T$Int(p$x: Ref, p$y: Ref)
   if (df$rt$boolFromRef(anon$0)) {
     var anon$3: Ref
     var anon$4: Ref
-    anon$4 := con$c$ClassII$T$c$g$Z(l0$z)
-    unfold acc(p$g$c$ClassII$shared(anon$4), wildcard)
+    anon$4 := con$c$ClassII$T$c$Z(l0$z)
+    unfold acc(p$c$ClassII$shared(anon$4), wildcard)
     anon$3 := anon$4.bf$public$z
     ret$0 := df$rt$boolToRef(anon$3 == l0$z)
   } else {
