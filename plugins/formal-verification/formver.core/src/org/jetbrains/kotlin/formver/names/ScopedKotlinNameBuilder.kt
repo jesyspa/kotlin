@@ -31,17 +31,17 @@ class ScopedKotlinNameBuilder {
     }
 
     fun classScope(className: ClassKotlinName) {
-        require (scope != null) { "Public class scope cannot be top-level" }
+        require (scope != null) { "Class scope cannot be top-level" }
         scope = ClassScope(scope!!, className)
     }
 
     fun publicScope() {
-        require(scope != null) { "Public class scope cannot be top-level" }
+        require(scope is ClassScope) { "Public scope must be in a class scope." }
         scope = PublicScope(scope!!)
     }
 
     fun privateScope() {
-        require(scope != null) { "Private class scope cannot be top-level" }
+        require(scope is ClassScope) { "Private scope must be in a class scope." }
         scope = PrivateScope(scope!!)
     }
 
@@ -58,6 +58,4 @@ class ScopedKotlinNameBuilder {
 
 // TODO: generalise this to work for all names.
 fun buildName(init: ScopedKotlinNameBuilder.() -> KotlinName): ScopedKotlinName =
-    ScopedKotlinNameBuilder().let {
-        it.complete(it.init())
-    }
+    ScopedKotlinNameBuilder().run { complete(init()) }

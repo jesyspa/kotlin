@@ -42,10 +42,10 @@ val NameScope.fullMangledName: String?
     }
 
 val NameScope.packageNameIfAny: FqName?
-    get() = allParentScopes.filterIsInstance<PackageScope>().firstOrNull()?.packageName
+    get() = allParentScopes.filterIsInstance<PackageScope>().lastOrNull()?.packageName
 
 val NameScope.classNameIfAny: ClassKotlinName?
-    get() = allParentScopes.filterIsInstance<ClassScope>().firstOrNull()?.className
+    get() = allParentScopes.filterIsInstance<ClassScope>().lastOrNull()?.className
 
 data class PackageScope(val packageName: FqName) : NameScope {
     override val parent = null
