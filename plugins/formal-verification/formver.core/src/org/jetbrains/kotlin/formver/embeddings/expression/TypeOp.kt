@@ -15,6 +15,7 @@ import org.jetbrains.kotlin.formver.linearization.LinearizationContext
 import org.jetbrains.kotlin.formver.linearization.pureToViper
 import org.jetbrains.kotlin.formver.viper.ast.Exp
 import org.jetbrains.kotlin.formver.viper.ast.Stmt
+import org.jetbrains.kotlin.utils.addIfNotNull
 
 data class Is(override val inner: ExpEmbedding, val comparisonType: TypeEmbedding, override val sourceRole: SourceRole? = null) :
     UnaryDirectResultExpEmbedding {
@@ -102,8 +103,8 @@ interface InhaleInvariants: ExpEmbedding, DefaultDebugTreeViewImplementation {
  * This may require storing the result in a variable, if it is not already a variable. The `simplified` property allows
  * unwrapping this type when this can be avoided.
  */
-abstract class InhaleInvariantsForExp(final override val exp: ExpEmbedding) : StoredResultExpEmbedding,
-    InhaleInvariants {
+private data class InhaleInvariantsForExp(override val exp: ExpEmbedding, override val invariants: List<TypeInvariantEmbedding>) :
+    StoredResultExpEmbedding, InhaleInvariants {
 
     override fun toViperStoringIn(result: VariableEmbedding, ctx: LinearizationContext) {
         exp.toViperStoringIn(result, ctx)
@@ -113,38 +114,54 @@ abstract class InhaleInvariantsForExp(final override val exp: ExpEmbedding) : St
     }
 }
 
-abstract class InhaleInvariantsForVariable(override val exp: ExpEmbedding, val underlyingVariable: VariableEmbedding) :
+private data class InhaleInvariantsForVariable(
+    override val exp: ExpEmbedding,
+    override val invariants: List<TypeInvariantEmbedding>,
+) :
     InhaleInvariants, OnlyToViperExpEmbedding {
+
     override fun toViper(ctx: LinearizationContext): Exp {
-        for (invariant in invariants.fillHoles(underlyingVariable)) {
+        val variable = exp.underlyingVariable ?: error("Use of InhaleInvariantsForVariable for non-variable")
+        for (invariant in invariants.fillHoles(variable)) {
             ctx.addStatement { Stmt.Inhale(invariant.pureToViper(toBuiltin = true, ctx.source), ctx.source.asPosition) }
         }
+
+        // thanks to the fact we return `exp` here we're not losing types in `ExpEmbedding`
         return exp.toViper(ctx)
     }
 }
 
-private fun ExpEmbedding.withInvariants(invariants: List<TypeInvariantEmbedding>): InhaleInvariants =
-    when (val variable = ignoringCastsAndMetaNodes() as? VariableEmbedding) {
-        is VariableEmbedding -> object : InhaleInvariantsForVariable(this, variable) {
-            override val invariants = invariants
-        }
-        null -> object : InhaleInvariantsForExp(this) {
-            override val invariants = invariants
-        }
-    }
+class InhaleInvariantsBuilder(val exp: ExpEmbedding) {
 
-fun ExpEmbedding.withInvariants(proven: Boolean = true, access: Boolean = true): InhaleInvariants {
-    val invariants = buildList {
-        if (access) {
-            addAll(type.accessInvariants())
+    val invariants = mutableListOf<TypeInvariantEmbedding>()
+
+    fun complete() = when (exp.underlyingVariable) {
+        null -> InhaleInvariantsForExp(exp, invariants)
+        else -> InhaleInvariantsForVariable(exp, invariants)
+    }.simplified
+
+    var proven: Boolean = false
+        set(value) {
+            if (!field && value) invariants.add(exp.type.subTypeInvariant())
+            field = value
         }
-        if (proven) {
-            add(type.subTypeInvariant())
+
+    var access: Boolean = false
+        set(value) {
+            if (!field && value) {
+                invariants.addAll(exp.type.accessInvariants())
+                invariants.addIfNotNull(exp.type.sharedPredicateAccessInvariant())
+            }
+            field = value
         }
-    }
-    return withInvariants(invariants)
 }
 
-fun ExpEmbedding.withNewTypeInvariants(newType: TypeEmbedding, proven: Boolean = true, access: Boolean = true) =
-    if (this.type == newType) this else withType(newType).withInvariants(proven, access)
+inline fun ExpEmbedding.withInvariants(block: InhaleInvariantsBuilder.() -> Unit): ExpEmbedding {
+    val builder = InhaleInvariantsBuilder(this)
+    builder.block()
+    return builder.complete()
+}
+
+inline fun ExpEmbedding.withNewTypeInvariants(newType: TypeEmbedding, block: InhaleInvariantsBuilder.() -> Unit) =
+    if (this.type == newType) this else withType(newType).withInvariants(block)
 

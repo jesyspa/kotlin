@@ -212,7 +212,10 @@ data class InvokeFunctionObject(val receiver: ExpEmbedding, val args: List<ExpEm
         receiver.toViperUnusedResult(ctx)
         for (arg in args) arg.toViperUnusedResult(ctx)
         // TODO: figure out which exactly invariants we want here
-        return variable.withInvariants().toViper(ctx)
+        return variable.withInvariants {
+            proven = true
+            access = true
+        }.toViper(ctx)
     }
 
     override val debugTreeView: TreeView
