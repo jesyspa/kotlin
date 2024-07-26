@@ -15,9 +15,7 @@ package org.jetbrains.kotlin.formver.embeddings
 class TypeBuilder {
     var isNullable = false
 
-    fun complete(init: TypeBuilder.() -> PretypeBuilder): TypeEmbedding {
-        return completeWithPretypeBuilder(init())
-    }
+    fun complete(init: TypeBuilder.() -> PretypeBuilder): TypeEmbedding = completeWithPretypeBuilder(init())
 
     private fun completeWithPretypeBuilder(subBuilder: PretypeBuilder): TypeEmbedding {
         val subResult = subBuilder.complete()
