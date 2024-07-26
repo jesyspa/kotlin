@@ -133,13 +133,15 @@ fun StmtConversionContext.embedPropertyAccess(accessExpression: FirPropertyAcces
 
 fun StmtConversionContext.getInlineFunctionCallArgs(
     args: List<ExpEmbedding>,
+    formalArgTypes: List<TypeEmbedding>,
 ): Pair<List<Declare>, List<ExpEmbedding>> {
     val declarations = mutableListOf<Declare>()
-    val storedArgs = args.map { arg ->
+    val storedArgs = args.zip(formalArgTypes).map { (arg, callType) ->
         when (arg.ignoringMetaNodes()) {
-            is VariableEmbedding, is LambdaExp -> arg
+            is LambdaExp -> arg
             else -> {
-                val paramVarDecl = declareAnonVar(arg.type, arg)
+                if (arg is VariableEmbedding && arg.type == callType) return@map arg
+                val paramVarDecl = declareAnonVar(callType, arg)
                 declarations.add(paramVarDecl)
                 paramVarDecl.variable
             }
@@ -158,7 +160,7 @@ fun StmtConversionContext.insertInlineFunctionCall(
 ): ExpEmbedding {
     // TODO: It seems like it may be possible to avoid creating a local here, but it is not clear how.
     val returnTarget = returnTargetProducer.getFresh(calleeSignature.type.returnType)
-    val (declarations, callArgs) = getInlineFunctionCallArgs(args)
+    val (declarations, callArgs) = getInlineFunctionCallArgs(args, calleeSignature.type.formalArgTypes)
     val subs = paramNames.zip(callArgs).toMap()
     val methodCtxFactory = MethodContextFactory(
         calleeSignature,
