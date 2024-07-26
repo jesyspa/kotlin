@@ -135,25 +135,21 @@ class InhaleInvariantsBuilder(val exp: ExpEmbedding) {
 
     val invariants = mutableListOf<TypeInvariantEmbedding>()
 
-    fun complete() = when (exp.underlyingVariable) {
-        null -> InhaleInvariantsForExp(exp, invariants)
-        else -> InhaleInvariantsForVariable(exp, invariants)
-    }.simplified
+    fun complete(): ExpEmbedding {
+        if (proven) invariants.add(exp.type.subTypeInvariant())
+        if (access) {
+            invariants.addAll(exp.type.accessInvariants())
+            invariants.addIfNotNull(exp.type.sharedPredicateAccessInvariant())
+        }
+        return when (exp.underlyingVariable) {
+            null -> InhaleInvariantsForExp(exp, invariants)
+            else -> InhaleInvariantsForVariable(exp, invariants)
+        }.simplified
+    }
 
     var proven: Boolean = false
-        set(value) {
-            if (!field && value) invariants.add(exp.type.subTypeInvariant())
-            field = value
-        }
 
     var access: Boolean = false
-        set(value) {
-            if (!field && value) {
-                invariants.addAll(exp.type.accessInvariants())
-                invariants.addIfNotNull(exp.type.sharedPredicateAccessInvariant())
-            }
-            field = value
-        }
 }
 
 inline fun ExpEmbedding.withInvariants(block: InhaleInvariantsBuilder.() -> Unit): ExpEmbedding {
