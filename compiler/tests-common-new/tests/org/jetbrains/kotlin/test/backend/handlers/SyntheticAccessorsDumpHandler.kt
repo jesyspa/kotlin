@@ -25,8 +25,6 @@ abstract class SyntheticAccessorsDumpHandler<A : ResultingArtifact.Binary<A>>(
 ) : BinaryArtifactHandler<A>(
     testServices,
     artifactKind,
-    failureDisablesNextSteps = false,
-    doNotRunIfThereWerePreviousFailures = false
 ) {
     override val directiveContainers: List<DirectivesContainer>
         get() = listOf(KlibBasedCompilerTestDirectives)
