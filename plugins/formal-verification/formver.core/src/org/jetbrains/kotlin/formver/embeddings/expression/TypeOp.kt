@@ -138,7 +138,7 @@ class InhaleInvariantsBuilder(val exp: ExpEmbedding) {
     val invariants = mutableListOf<TypeInvariantEmbedding>()
 
     fun complete(): ExpEmbedding {
-        if (proven) invariants.add(exp.type.subTypeInvariant())
+        if (proven) invariants.addIfNotNull(exp.type.subTypeInvariant())
         if (access) {
             invariants.addAll(exp.type.accessInvariants())
             invariants.addIfNotNull(exp.type.sharedPredicateAccessInvariant())

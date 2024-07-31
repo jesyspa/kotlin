@@ -12,6 +12,7 @@ import org.jetbrains.kotlin.formver.names.NameMatcher
 import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.formver.viper.ast.Exp
 import org.jetbrains.kotlin.formver.viper.mangled
+import org.jetbrains.kotlin.utils.addToStdlib.ifFalse
 
 /**
  * Represents our representation of a Kotlin type.
@@ -182,5 +183,6 @@ fun TypeEmbedding.isInheritorOfCollectionTypeNamed(name: String): Boolean =
 val TypeEmbedding.isCollectionInheritor
     get() = isInheritorOfCollectionTypeNamed("Collection")
 
-fun TypeEmbedding.subTypeInvariant() = SubTypeInvariantEmbedding(this)
-
+fun TypeEmbedding.subTypeInvariant(): SubTypeInvariantEmbedding? = equals(buildType { nullableAny() }).ifFalse {
+    SubTypeInvariantEmbedding(this)
+}

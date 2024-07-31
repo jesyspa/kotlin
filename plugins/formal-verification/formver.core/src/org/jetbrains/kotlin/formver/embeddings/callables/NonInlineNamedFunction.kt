@@ -18,6 +18,7 @@ class NonInlineNamedFunction(val signature: FullNamedFunctionSignature) : RichCa
         ctx: StmtConversionContext,
     ): ExpEmbedding = MethodCall(signature, args)
 
+
     override fun toViperMethodHeader(): Method =
         signature.toViperMethod(null, PlaceholderVariableEmbedding(PlaceholderReturnVariableName, signature.type.returnType))
 }
