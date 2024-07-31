@@ -1,0 +1,36 @@
+/viper_casts_while_inlining.kt:(144,149): info: Generated Viper text for idFun:
+method f$idFun$TF$Any(p$arg: Ref) returns (ret$0: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$nullable(df$rt$anyType()))
+{
+  inhale df$rt$isSubtype(df$rt$typeOf(p$arg), df$rt$nullable(df$rt$anyType()))
+  ret$0 := p$arg
+  goto lbl$ret$0
+  label lbl$ret$0
+}
+
+/viper_casts_while_inlining.kt:(310,430): error: An internal error has occurred.
+Details: null cannot be cast to non-null type org.jetbrains.kotlin.fir.symbols.impl.FirFunctionSymbol<*>
+... while converting ClassWithMember.runWithId {
+        member
+    }
+... while converting return ClassWithMember.runWithId {
+        member
+    }
+... while converting {
+    contract {
+        returns()
+    }
+
+    return ClassWithMember.runWithId {
+        member
+    }
+}
+Please report this at https://github.com/jesyspa/kotlin
+
+/viper_casts_while_inlining.kt:(333,341): error: This declaration needs opt-in. Its usage must be marked with '@kotlin.contracts.ExperimentalContracts' or '@OptIn(kotlin.contracts.ExperimentalContracts::class)'
+
+/viper_casts_while_inlining.kt:(352,359): error: This declaration needs opt-in. Its usage must be marked with '@kotlin.contracts.ExperimentalContracts' or '@OptIn(kotlin.contracts.ExperimentalContracts::class)'
+
+/viper_casts_while_inlining.kt:(396,405): error: Unresolved reference 'runWithId'.
+
+/viper_casts_while_inlining.kt:(416,422): error: Unresolved reference 'member'.

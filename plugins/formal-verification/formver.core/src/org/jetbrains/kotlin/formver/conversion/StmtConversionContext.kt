@@ -22,11 +22,9 @@ import org.jetbrains.kotlin.formver.embeddings.expression.*
 import org.jetbrains.kotlin.formver.isCustom
 import org.jetbrains.kotlin.formver.viper.ast.Label
 import org.jetbrains.kotlin.name.Name
-import org.jetbrains.kotlin.utils.addToStdlib.ifFalse
+import org.jetbrains.kotlin.utils.addIfNotNull
 import org.jetbrains.kotlin.utils.addToStdlib.ifTrue
 import org.jetbrains.kotlin.utils.filterIsInstanceAnd
-import kotlin.contracts.ExperimentalContracts
-import kotlin.contracts.contract
 
 /**
  * Interface for statement conversion.
@@ -134,20 +132,31 @@ fun StmtConversionContext.embedPropertyAccess(accessExpression: FirPropertyAcces
             error("Property access symbol $calleeSymbol has unsupported type.")
     }
 
+
+fun StmtConversionContext.argumentDeclaration(arg: ExpEmbedding, callType: TypeEmbedding): Pair<Declare?, ExpEmbedding> =
+    when (arg.ignoringMetaNodes()) {
+        is LambdaExp -> null to arg
+        else -> {
+            val argWithInvariants = arg.withNewTypeInvariants(callType) {
+                proven = true
+                access = true
+            }
+            if (argWithInvariants is VariableEmbedding) null to argWithInvariants
+            else declareAnonVar(callType, argWithInvariants).let {
+                it to it.variable
+            }
+        }
+    }
+
 fun StmtConversionContext.getInlineFunctionCallArgs(
     args: List<ExpEmbedding>,
     formalArgTypes: List<TypeEmbedding>,
 ): Pair<List<Declare>, List<ExpEmbedding>> {
     val declarations = mutableListOf<Declare>()
     val storedArgs = args.zip(formalArgTypes).map { (arg, callType) ->
-        when (arg.ignoringMetaNodes()) {
-            is LambdaExp -> arg
-            else -> {
-                if (arg is VariableEmbedding && arg.type == callType) return@map arg
-                val paramVarDecl = declareAnonVar(callType, arg)
-                declarations.add(paramVarDecl)
-                paramVarDecl.variable
-            }
+        argumentDeclaration(arg, callType).let { (declaration, usage) ->
+            declarations.addIfNotNull(declaration)
+            usage
         }
     }
     return Pair(declarations, storedArgs)
@@ -177,7 +186,10 @@ fun StmtConversionContext.insertInlineFunctionCall(
                 add(Declare(returnTarget.variable, null))
                 addAll(declarations)
                 add(FunctionExp(null, convert(body), returnTarget.label))
-                add(returnTarget.variable.withAccessAndProvenInvariants())
+                add(returnTarget.variable.withInvariants {
+                    proven = true
+                    access = true
+                })
             }
         )
     }

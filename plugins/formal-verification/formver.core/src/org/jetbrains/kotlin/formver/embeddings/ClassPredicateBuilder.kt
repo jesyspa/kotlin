@@ -77,7 +77,7 @@ class TypeInvariantsBuilder(private val type: TypeEmbedding) {
         type.uniquePredicateAccessInvariant()
     )
 
-    fun includeSubTypeInvariants() = invariants.add(
+    fun includeSubTypeInvariants() = invariants.addIfNotNull(
         type.subTypeInvariant()
     )
 }
