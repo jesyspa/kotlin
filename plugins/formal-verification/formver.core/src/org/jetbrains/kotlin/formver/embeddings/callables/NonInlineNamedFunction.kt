@@ -22,8 +22,11 @@ class NonInlineNamedFunction(val signature: FullNamedFunctionSignature) : RichCa
     override fun toViperMethodHeader(): Method =
         signature.toViperMethod(null, PlaceholderVariableEmbedding(PlaceholderReturnVariableName, signature.returnType))
 
-    override val receiverType: TypeEmbedding?
-        get() = signature.receiverType
+    override val dispatchReceiverType: TypeEmbedding?
+        get() = signature.dispatchReceiverType
+
+    override val extensionReceiverType: TypeEmbedding?
+        get() = signature.extensionReceiverType
 
     override val paramTypes: List<TypeEmbedding>
         get() = signature.paramTypes

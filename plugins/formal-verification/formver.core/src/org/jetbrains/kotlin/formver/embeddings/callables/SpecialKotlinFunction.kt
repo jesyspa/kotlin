@@ -47,11 +47,12 @@ object KotlinContractFunction : SpecialKotlinFunction {
         packageScope(packageName)
         ClassKotlinName(listOf("ContractBuilder"))
     }
-    override val receiverType: TypeEmbedding? = null
+    override val dispatchReceiverType = null
+    override val extensionReceiverType = null
     override val paramTypes: List<TypeEmbedding> =
         listOf(buildType {
             function {
-                withReceiver {
+                withDispatchReceiver {
                     klass {
                         withName(contractBuilderTypeName)
                     }
@@ -71,7 +72,8 @@ abstract class KotlinIntSpecialFunction : SpecialKotlinFunction {
     override val packageName: List<String> = listOf("kotlin")
     override val className: String? = "Int"
 
-    override val receiverType: TypeEmbedding = buildType { int() }
+    override val dispatchReceiverType: TypeEmbedding = buildType { int() }
+    override val extensionReceiverType = null
     override val paramTypes: List<TypeEmbedding> = listOf(buildType { int() })
     override val returnType: TypeEmbedding = buildType { int() }
 }
@@ -116,7 +118,8 @@ abstract class KotlinBooleanSpecialFunction : SpecialKotlinFunction {
     override val packageName: List<String> = listOf("kotlin")
     override val className: String? = "Boolean"
 
-    override val receiverType: TypeEmbedding = buildType { boolean() }
+    override val dispatchReceiverType: TypeEmbedding = buildType { boolean() }
+    override val extensionReceiverType = null
     override val paramTypes: List<TypeEmbedding> = emptyList()
     override val returnType: TypeEmbedding = buildType { boolean() }
 }
@@ -141,7 +144,8 @@ object SpecialVerifyFunction : SpecialKotlinFunction {
         return Assert(args[0])
     }
 
-    override val receiverType: TypeEmbedding? = null
+    override val dispatchReceiverType = null
+    override val extensionReceiverType = null
     override val paramTypes: List<TypeEmbedding> = listOf(buildType { boolean() })
     override val returnType: TypeEmbedding = buildType { unit() }
 }

@@ -35,7 +35,7 @@ class RootParameterResolver(
     override val defaultResolvedReturnTarget: ReturnTarget,
 ) : ParameterResolver {
     private val parameters = signature.params.associateBy { it.name }
-    private val receiver = signature.receiver
+    private val receiver = signature.dispatchReceiver
     override fun tryResolveParameter(name: Name): ExpEmbedding? = parameters[name.embedParameterName()]
     override fun tryResolveReceiver() = receiver
 }

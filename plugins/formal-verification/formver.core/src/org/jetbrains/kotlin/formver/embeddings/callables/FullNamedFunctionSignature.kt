@@ -49,8 +49,9 @@ abstract class PropertyAccessorFunctionSignature(
 ) : FullNamedFunctionSignature {
     override fun getPreconditions(returnVariable: VariableEmbedding) = emptyList<ExpEmbedding>()
     override fun getPostconditions(returnVariable: VariableEmbedding) = emptyList<ExpEmbedding>()
-    override val receiver: VariableEmbedding
+    override val dispatchReceiver: VariableEmbedding
         get() = PlaceholderVariableEmbedding(ThisReceiverName, buildType { nullableAny() })
+    override val extensionReceiver = null
     override val declarationSource: KtSourceElement? = symbol.source
 }
 

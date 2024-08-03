@@ -158,7 +158,8 @@ class ContractDescriptionConversionVisitor(
             parameterIndex,
             { TODO("old code: data.functionContractOwner.receiverParameter!!.calleeSymbol") }) { data.functionContractOwner.valueParameterSymbols[it] }
 
-    private fun embeddedVarByIndex(ix: Int): VariableEmbedding = resolveByIndex(ix, { signature.receiver!! }) { signature.params[it] }
+    private fun embeddedVarByIndex(ix: Int): VariableEmbedding =
+        resolveByIndex(ix, { signature.dispatchReceiver!! }) { signature.params[it] }
 
     private fun VariableEmbedding.nullCmp(isNegated: Boolean, sourceRole: SourceRole?): ExpEmbedding =
         if (isNegated) NeCmp(this, NullLit, sourceRole)

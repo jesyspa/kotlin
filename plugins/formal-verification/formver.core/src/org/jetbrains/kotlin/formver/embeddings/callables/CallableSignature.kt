@@ -12,7 +12,8 @@ import org.jetbrains.kotlin.formver.embeddings.TypeEmbedding
  */
 
 interface CallableSignature {
-    val receiverType: TypeEmbedding?
+    val dispatchReceiverType: TypeEmbedding?
+    val extensionReceiverType: TypeEmbedding?
     val paramTypes: List<TypeEmbedding>
     val returnType: TypeEmbedding
     val returnsUnique: Boolean
@@ -25,17 +26,18 @@ interface CallableSignature {
      * `Foo.(Int) -> Int --> (Foo, Int) -> Int`
      */
     val formalArgTypes: List<TypeEmbedding>
-        get() = listOfNotNull(receiverType) + paramTypes
+        get() = listOfNotNull(dispatchReceiverType, extensionReceiverType) + paramTypes
 }
 
 /**
  * An instance of `CallableSignature` that is guaranteed to be `data`.
  */
 data class CallableSignatureData(
-    override val receiverType: TypeEmbedding?,
+    override val dispatchReceiverType: TypeEmbedding?,
+    override val extensionReceiverType: TypeEmbedding?,
     override val paramTypes: List<TypeEmbedding>,
     override val returnType: TypeEmbedding,
 ) : CallableSignature
 
 val CallableSignature.asData: CallableSignatureData
-    get() = CallableSignatureData(receiverType, paramTypes, returnType)
+    get() = CallableSignatureData(dispatchReceiverType, extensionReceiverType, paramTypes, returnType)

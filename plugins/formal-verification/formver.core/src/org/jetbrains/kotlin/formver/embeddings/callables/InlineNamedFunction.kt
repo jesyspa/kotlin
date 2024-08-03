@@ -22,14 +22,17 @@ class InlineNamedFunction(
         args: List<ExpEmbedding>,
         ctx: StmtConversionContext,
     ): ExpEmbedding {
-        val paramNames = listOfNotNull(receiver?.let { SpecialNames.THIS }) + symbol.valueParameterSymbols.map { it.name }
+        val paramNames = listOfNotNull(dispatchReceiver?.let { SpecialNames.THIS }) + symbol.valueParameterSymbols.map { it.name }
         return ctx.insertInlineFunctionCall(signature, paramNames, args, firBody, signature.sourceName)
     }
 
     override fun toViperMethodHeader(): Nothing? = null
 
-    override val receiverType: TypeEmbedding?
-        get() = signature.receiverType
+    override val dispatchReceiverType: TypeEmbedding?
+        get() = signature.dispatchReceiverType
+
+    override val extensionReceiverType: TypeEmbedding?
+        get() = signature.extensionReceiverType
 
     override val paramTypes: List<TypeEmbedding>
         get() = signature.paramTypes

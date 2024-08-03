@@ -165,7 +165,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
             val receiverType: TypeEmbedding? = type.receiverType(session)?.let { embedType(it) }
             val paramTypes: List<TypeEmbedding> = type.valueParameterTypesWithoutReceivers(session).map(::embedType)
             val returnType: TypeEmbedding = embedType(type.returnType(session))
-            val signature = CallableSignatureData(receiverType, paramTypes, returnType)
+            val signature = CallableSignatureData(receiverType, null, paramTypes, returnType)
             FunctionTypeEmbedding(signature)
         }
         type.isNullable -> NullableTypeEmbedding(embedType(type.withNullability(ConeNullability.NOT_NULL, session.typeContext)))
@@ -217,13 +217,20 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
 
     override fun embedFunctionSignature(symbol: FirFunctionSymbol<*>): FunctionSignature {
         val retType = embedType(symbol.resolvedReturnTypeRef.coneType)
-        val receiverType = symbol.receiverType
+        val dispatchReceiverType = symbol.receiverType
         val isReceiverUnique = symbol.receiverParameter?.isUnique(session) ?: false
         val isReceiverBorrowed = symbol.receiverParameter?.isBorrowed(session) ?: false
         return object : FunctionSignature {
             // TODO: figure out whether we want a symbol here and how to get it.
-            override val receiver =
-                receiverType?.let { PlaceholderVariableEmbedding(ThisReceiverName, embedType(it), isReceiverUnique, isReceiverBorrowed) }
+            override val dispatchReceiver = dispatchReceiverType?.let {
+                PlaceholderVariableEmbedding(
+                    ThisReceiverName,
+                    embedType(it),
+                    isReceiverUnique,
+                    isReceiverBorrowed,
+                )
+            }
+            override val extensionReceiver = null
             override val params = symbol.valueParameterSymbols.map {
                 FirVariableEmbedding(it.embedName(), embedType(it.resolvedReturnType), it, it.isUnique(session), it.isBorrowed(session))
             }

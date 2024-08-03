@@ -10,17 +10,21 @@ import org.jetbrains.kotlin.formver.embeddings.expression.FirVariableEmbedding
 import org.jetbrains.kotlin.formver.embeddings.expression.VariableEmbedding
 
 interface FunctionSignature : CallableSignature {
-    val receiver: VariableEmbedding?
+    val dispatchReceiver: VariableEmbedding?
+    val extensionReceiver: VariableEmbedding?
+
     val params: List<FirVariableEmbedding>
 
     val sourceName: String?
         get() = null
 
     val formalArgs: List<VariableEmbedding>
-        get() = listOfNotNull(receiver) + params
+        get() = listOfNotNull(dispatchReceiver, extensionReceiver) + params
 
-    override val receiverType: TypeEmbedding?
-        get() = receiver?.type
+    override val dispatchReceiverType: TypeEmbedding?
+        get() = dispatchReceiver?.type
+    override val extensionReceiverType: TypeEmbedding?
+        get() = extensionReceiver?.type
     override val paramTypes: List<TypeEmbedding>
         get() = params.map { it.type }
 }
