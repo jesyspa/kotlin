@@ -3,11 +3,9 @@ field bf$t: Ref
 
 method f$c$Box$genericMethod$TF$T$c$Box$Any(this: Ref, p$x: Ref)
   returns (ret$0: Ref)
-  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$nullable(df$rt$anyType()))
 {
   inhale df$rt$isSubtype(df$rt$typeOf(this), df$rt$T$c$Box())
   inhale acc(p$c$Box$shared(this), wildcard)
-  inhale df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$nullable(df$rt$anyType()))
   ret$0 := p$x
   goto lbl$ret$0
   label lbl$ret$0
@@ -34,14 +32,12 @@ method f$createBox$TF$() returns (ret$0: Ref)
   inhale acc(l0$boolBox.bf$t, write)
   anon$0 := l0$boolBox.bf$t
   exhale acc(l0$boolBox.bf$t, write)
-  inhale df$rt$isSubtype(df$rt$typeOf(anon$0), df$rt$nullable(df$rt$anyType()))
   l0$b := anon$0
   inhale df$rt$isSubtype(df$rt$typeOf(l0$b), df$rt$boolType())
   l0$intBox := con$c$Box$Any(df$rt$intToRef(2))
   inhale acc(l0$intBox.bf$t, write)
   anon$1 := l0$intBox.bf$t
   exhale acc(l0$intBox.bf$t, write)
-  inhale df$rt$isSubtype(df$rt$typeOf(anon$1), df$rt$nullable(df$rt$anyType()))
   ret$0 := anon$1
   inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$intType())
   goto lbl$ret$0
@@ -71,9 +67,7 @@ method f$setGenericField$TF$() returns (ret$0: Ref)
 
 /generics.kt:(293,303): info: Generated Viper text for genericFun:
 method f$genericFun$TF$Any(p$t: Ref) returns (ret$0: Ref)
-  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$nullable(df$rt$anyType()))
 {
-  inhale df$rt$isSubtype(df$rt$typeOf(p$t), df$rt$nullable(df$rt$anyType()))
   ret$0 := p$t
   goto lbl$ret$0
   label lbl$ret$0
@@ -88,11 +82,11 @@ method f$callGenericFunc$TF$() returns (ret$0: Ref)
   ret$0 := df$rt$unitValue()
   anon$0 := f$genericFun$TF$Any(df$rt$intToRef(3))
   l0$x := anon$0
+  inhale df$rt$isSubtype(df$rt$typeOf(l0$x), df$rt$intType())
   label lbl$ret$0
 }
 
 method f$genericFun$TF$Any(p$t: Ref) returns (ret: Ref)
-  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$nullable(df$rt$anyType()))
 
 
 /generics.kt:(375,395): info: Generated Viper text for genericAsIfCondition:
@@ -108,7 +102,6 @@ method f$genericAsIfCondition$TF$T$c$Box(p$box: Ref) returns (ret$0: Ref)
   inhale acc(p$box.bf$t, write)
   anon$1 := p$box.bf$t
   exhale acc(p$box.bf$t, write)
-  inhale df$rt$isSubtype(df$rt$typeOf(anon$1), df$rt$nullable(df$rt$anyType()))
   anon$0 := anon$1
   inhale df$rt$isSubtype(df$rt$typeOf(anon$0), df$rt$boolType())
   if (df$rt$boolFromRef(anon$0)) {

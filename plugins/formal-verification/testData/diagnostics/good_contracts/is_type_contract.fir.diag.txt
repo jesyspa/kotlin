@@ -6,7 +6,6 @@ method f$isString$TF$Any(p$x: Ref) returns (ret$0: Ref)
   ensures df$rt$boolFromRef(ret$0) == true ==>
     df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$T$c$pkg$kotlin$String())
 {
-  inhale df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$nullable(df$rt$anyType()))
   ret$0 := df$rt$boolToRef(df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$T$c$pkg$kotlin$String()))
   goto lbl$ret$0
   label lbl$ret$0
