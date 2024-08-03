@@ -106,7 +106,8 @@ data class NullableTypeEmbedding(val elementType: TypeEmbedding) : TypeEmbedding
 }
 
 data class FunctionTypeEmbedding(
-    val receiverType: TypeEmbedding?,
+    val dispatchReceiverType: TypeEmbedding?,
+    val extensionReceiverType: TypeEmbedding?,
     val paramTypes: List<TypeEmbedding>,
     val returnType: TypeEmbedding,
     val returnsUnique: Boolean,
@@ -127,7 +128,7 @@ data class FunctionTypeEmbedding(
      * `Foo.(Int) -> Int --> (Foo, Int) -> Int`
      */
     val formalArgTypes: List<TypeEmbedding>
-        get() = listOfNotNull(receiverType) + paramTypes
+        get() = listOfNotNull(dispatchReceiverType, extensionReceiverType) + paramTypes
 }
 
 data class ClassTypeEmbedding(val className: ScopedKotlinName) : TypeEmbedding {

@@ -21,7 +21,7 @@ class InlineNamedFunction(
         args: List<ExpEmbedding>,
         ctx: StmtConversionContext,
     ): ExpEmbedding {
-        val paramNames = listOfNotNull(receiver?.let { SpecialNames.THIS }) + symbol.valueParameterSymbols.map { it.name }
+        val paramNames = listOfNotNull(dispatchReceiver?.let { SpecialNames.THIS }) + symbol.valueParameterSymbols.map { it.name }
         return ctx.insertInlineFunctionCall(signature, paramNames, args, firBody, signature.sourceName)
     }
 

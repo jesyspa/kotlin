@@ -159,7 +159,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
     // Note: keep in mind that this function is necessary to resolve the name of the function!
     override fun embedType(symbol: FirFunctionSymbol<*>): FunctionTypeEmbedding = buildFunctionType {
         symbol.receiverType?.let {
-            withReceiver { embedTypeWithBuilder(it) }
+            withDispatchReceiver { embedTypeWithBuilder(it) }
         }
         symbol.valueParameterSymbols.forEach { param ->
             withParam {
@@ -202,15 +202,22 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
     }
 
     override fun embedFunctionSignature(symbol: FirFunctionSymbol<*>): FunctionSignature {
-        val receiverType = symbol.receiverType
+        val dispatchReceiverType = symbol.receiverType
         val isReceiverUnique = symbol.receiverParameter?.isUnique(session) ?: false
         val isReceiverBorrowed = symbol.receiverParameter?.isBorrowed(session) ?: false
         return object : FunctionSignature {
             override val type: FunctionTypeEmbedding = embedType(symbol)
 
             // TODO: figure out whether we want a symbol here and how to get it.
-            override val receiver =
-                receiverType?.let { PlaceholderVariableEmbedding(ThisReceiverName, embedType(it), isReceiverUnique, isReceiverBorrowed) }
+            override val dispatchReceiver = dispatchReceiverType?.let {
+                PlaceholderVariableEmbedding(
+                    ThisReceiverName,
+                    embedType(it),
+                    isReceiverUnique,
+                    isReceiverBorrowed,
+                )
+            }
+            override val extensionReceiver = null
             override val params = symbol.valueParameterSymbols.map {
                 FirVariableEmbedding(it.embedName(), embedType(it.resolvedReturnType), it, it.isUnique(session), it.isBorrowed(session))
             }
@@ -391,7 +398,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         type.isBoolean -> boolean()
         type.isNothing -> nothing()
         type.isSomeFunctionType(session) -> function {
-            type.receiverType(session)?.let { withReceiver { embedTypeWithBuilder(it) } }
+            type.receiverType(session)?.let { withDispatchReceiver { embedTypeWithBuilder(it) } }
             type.valueParameterTypesWithoutReceivers(session).forEach { param ->
                 withParam { embedTypeWithBuilder(param) }
             }
