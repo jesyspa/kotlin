@@ -21,10 +21,9 @@ class InlineNamedFunction(
     override fun insertCallImpl(
         args: List<ExpEmbedding>,
         ctx: StmtConversionContext,
-        actualReturnType: TypeEmbedding,
     ): ExpEmbedding {
         val paramNames = listOfNotNull(receiver?.let { SpecialNames.THIS }) + symbol.valueParameterSymbols.map { it.name }
-        return ctx.insertInlineFunctionCall(signature, paramNames, args, firBody, signature.sourceName, actualReturnType)
+        return ctx.insertInlineFunctionCall(signature, paramNames, args, firBody, signature.sourceName)
     }
 
     override fun toViperMethodHeader(): Nothing? = null
