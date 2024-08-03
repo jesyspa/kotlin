@@ -22,7 +22,6 @@ method f$notIsNullable$TF$Int(p$x: Ref) returns (ret$0: Ref)
 method f$smartCast$TF$Any(p$x: Ref) returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$intType())
 {
-  inhale df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$nullable(df$rt$anyType()))
   if (df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$intType())) {
     ret$0 := p$x
     goto lbl$ret$0
