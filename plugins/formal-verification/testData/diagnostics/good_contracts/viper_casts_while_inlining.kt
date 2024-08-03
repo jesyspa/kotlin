@@ -7,16 +7,41 @@ fun <T> <!VIPER_TEXT!>idFun<!>(arg: T): T = arg
 @NeverConvert
 public inline fun <T, R> T.runWithId(block: T.() -> R): R = idFun(this).block()
 
-class ClassWithMember {
-    val member = 42
-}
+@NeverConvert
+public inline fun <T, R> T.copiedRun(block: T.() -> R): R = block()
+
+
+
+class ClassWithMember(val member: Int)
 
 @OptIn(ExperimentalContracts::class)
-fun <!VIPER_TEXT!>checkMemberAccess<!>(): Int {
+fun <!VIPER_TEXT!>checkMemberAccess<!>(): Boolean {
     contract {
-        returns()
+        returns(true)
     }
-    return ClassWithMember().runWithId {
+
+    val obj = ClassWithMember(42)
+    obj.runWithId {
         member
+    }
+    obj.copiedRun {
+        return obj.member == 42
+    }
+}
+
+class Box<T>(val wrapped: T)
+
+@OptIn(ExperimentalContracts::class)
+fun <T> <!VIPER_TEXT!>checkGenericMemberAccess<!>(box: Box<T>): Boolean {
+    contract {
+        returns(true)
+    }
+
+    box.runWithId {
+        wrapped
+    }
+
+    Box(box.wrapped).copiedRun {
+        return wrapped == box.wrapped
     }
 }
