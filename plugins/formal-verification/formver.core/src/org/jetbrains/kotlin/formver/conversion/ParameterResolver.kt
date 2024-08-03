@@ -7,9 +7,9 @@ package org.jetbrains.kotlin.formver.conversion
 
 import org.jetbrains.kotlin.formver.embeddings.callables.FunctionSignature
 import org.jetbrains.kotlin.formver.embeddings.expression.ExpEmbedding
+import org.jetbrains.kotlin.formver.names.ExtraSpecialNames
 import org.jetbrains.kotlin.formver.names.embedParameterName
 import org.jetbrains.kotlin.name.Name
-import org.jetbrains.kotlin.name.SpecialNames
 import org.jetbrains.kotlin.utils.addToStdlib.ifTrue
 
 /**
@@ -30,14 +30,13 @@ fun ParameterResolver.resolveNamedReturnTarget(returnPointName: String): ReturnT
 
 class RootParameterResolver(
     val ctx: ProgramConversionContext,
-    signature: FunctionSignature,
+    private val signature: FunctionSignature,
     override val sourceName: String?,
     override val defaultResolvedReturnTarget: ReturnTarget,
 ) : ParameterResolver {
     private val parameters = signature.params.associateBy { it.name }
-    private val receiver = signature.dispatchReceiver
     override fun tryResolveParameter(name: Name): ExpEmbedding? = parameters[name.embedParameterName()]
-    override fun tryResolveReceiver() = receiver
+    override fun tryResolveReceiver() = signature.run { dispatchReceiver ?: extensionReceiver }
 }
 
 class InlineParameterResolver(
@@ -46,5 +45,5 @@ class InlineParameterResolver(
     override val defaultResolvedReturnTarget: ReturnTarget,
 ) : ParameterResolver {
     override fun tryResolveParameter(name: Name): ExpEmbedding? = substitutions[name]
-    override fun tryResolveReceiver(): ExpEmbedding? = substitutions[SpecialNames.THIS]
+    override fun tryResolveReceiver(): ExpEmbedding? = substitutions[ExtraSpecialNames.D_THIS] ?: substitutions[ExtraSpecialNames.E_THIS]
 }

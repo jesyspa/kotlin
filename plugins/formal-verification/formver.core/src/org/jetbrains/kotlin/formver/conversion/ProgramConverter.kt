@@ -203,21 +203,31 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
 
     override fun embedFunctionSignature(symbol: FirFunctionSymbol<*>): FunctionSignature {
         val dispatchReceiverType = symbol.receiverType
-        val isReceiverUnique = symbol.receiverParameter?.isUnique(session) ?: false
-        val isReceiverBorrowed = symbol.receiverParameter?.isBorrowed(session) ?: false
+        val extensionReceiverType = symbol.extensionReceiverType
+        val isExtensionReceiverUnique = symbol.receiverParameter?.isUnique(session) ?: false
+        val isExtensionReceiverBorrowed = symbol.receiverParameter?.isBorrowed(session) ?: false
         return object : FunctionSignature {
             override val type: FunctionTypeEmbedding = embedType(symbol)
 
             // TODO: figure out whether we want a symbol here and how to get it.
             override val dispatchReceiver = dispatchReceiverType?.let {
                 PlaceholderVariableEmbedding(
-                    ThisReceiverName,
+                    DispatchReceiverName,
                     embedType(it),
-                    isReceiverUnique,
-                    isReceiverBorrowed,
+                    isUnique = false,
+                    isBorrowed = false,
                 )
             }
-            override val extensionReceiver = null
+
+            override val extensionReceiver = extensionReceiverType?.let {
+                PlaceholderVariableEmbedding(
+                    ExtensionReceiverName,
+                    embedType(it),
+                    isExtensionReceiverUnique,
+                    isExtensionReceiverBorrowed,
+                )
+            }
+
             override val params = symbol.valueParameterSymbols.map {
                 FirVariableEmbedding(it.embedName(), embedType(it.resolvedReturnType), it, it.isUnique(session), it.isBorrowed(session))
             }
@@ -284,14 +294,17 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         }
     }
 
-    private val FirFunctionSymbol<*>.receiverType: ConeKotlinType?
-        get() {
-            val symbol = when (this) {
-                is FirPropertyAccessorSymbol -> propertySymbol
-                else -> this
-            }
-            return symbol.dispatchReceiverType ?: symbol.resolvedReceiverTypeRef?.coneType
+    private val FirFunctionSymbol<*>.containingPropertyOrSelf
+        get() = when (this) {
+            is FirPropertyAccessorSymbol -> propertySymbol
+            else -> this
         }
+
+    private val FirFunctionSymbol<*>.receiverType: ConeKotlinType?
+        get() = containingPropertyOrSelf.dispatchReceiverType
+
+    private val FirFunctionSymbol<*>.extensionReceiverType: ConeKotlinType?
+        get() = containingPropertyOrSelf.resolvedReceiverTypeRef?.coneType
 
     /**
      * Construct and register the field embedding for this property's backing field, if any exists.

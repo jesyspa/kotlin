@@ -10,7 +10,7 @@ import org.jetbrains.kotlin.fir.symbols.impl.FirFunctionSymbol
 import org.jetbrains.kotlin.formver.conversion.StmtConversionContext
 import org.jetbrains.kotlin.formver.conversion.insertInlineFunctionCall
 import org.jetbrains.kotlin.formver.embeddings.expression.ExpEmbedding
-import org.jetbrains.kotlin.name.SpecialNames
+import org.jetbrains.kotlin.formver.names.ExtraSpecialNames
 
 class InlineNamedFunction(
     val signature: FullNamedFunctionSignature,
@@ -21,7 +21,13 @@ class InlineNamedFunction(
         args: List<ExpEmbedding>,
         ctx: StmtConversionContext,
     ): ExpEmbedding {
-        val paramNames = listOfNotNull(dispatchReceiver?.let { SpecialNames.THIS }) + symbol.valueParameterSymbols.map { it.name }
+        val paramNames = buildList {
+            if (dispatchReceiverType != null)
+                add(ExtraSpecialNames.D_THIS)
+            if (extensionReceiverType != null)
+                add(ExtraSpecialNames.E_THIS)
+            addAll(symbol.valueParameterSymbols.map { it.name })
+        }
         return ctx.insertInlineFunctionCall(signature, paramNames, args, firBody, signature.sourceName)
     }
 
