@@ -107,6 +107,7 @@ method f$tryCatchWithInline$TF$() returns (ret$0: Ref)
   anon$1 := f$call$TF$T$Int(df$rt$intToRef(0))
   anon$2 := f$call$TF$T$Int(df$rt$intToRef(1))
   label lbl$ret$1
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$1), df$rt$unitType())
   if (df$rt$boolFromRef(anon$3)) {
     goto lbl$catch$0
   }
