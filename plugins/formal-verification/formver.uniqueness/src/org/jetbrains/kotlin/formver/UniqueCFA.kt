@@ -66,7 +66,7 @@ class UniqueCFA(private val data: UniqueCheckerContext) : FirControlFlowChecker(
                         it.symbol,
                         setOf(this.context.resolveUniqueAnnotation(it))
                     )
-                }.toMap()
+                }
             return dataForNode.transformValues { it.putAll(valueParameters) }
         }
 
