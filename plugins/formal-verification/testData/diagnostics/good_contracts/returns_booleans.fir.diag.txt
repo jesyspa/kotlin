@@ -113,14 +113,16 @@ method f$isNullOrEmpty$TF$c$pkg$kotlin_collections$Collection(p$collection: Ref)
   label lbl$ret$0
 }
 
-method f$pkg$kotlin_collections$c$Collection$isEmpty$TF$T$c$pkg$kotlin_collections$Collection(this: Ref)
+method f$pkg$kotlin_collections$c$Collection$isEmpty$TF$T$c$pkg$kotlin_collections$Collection(this$dispatch: Ref)
   returns (ret: Ref)
-  requires acc(this.sp$size, write)
-  requires df$rt$intFromRef(this.sp$size) >= 0
-  ensures acc(this.sp$size, write)
-  ensures df$rt$intFromRef(this.sp$size) >= 0
+  requires acc(this$dispatch.sp$size, write)
+  requires df$rt$intFromRef(this$dispatch.sp$size) >= 0
+  ensures acc(this$dispatch.sp$size, write)
+  ensures df$rt$intFromRef(this$dispatch.sp$size) >= 0
   ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$boolType())
-  ensures df$rt$intFromRef(this.sp$size) ==
-    old(df$rt$intFromRef(this.sp$size))
-  ensures df$rt$boolFromRef(ret) ==> df$rt$intFromRef(this.sp$size) == 0
-  ensures !df$rt$boolFromRef(ret) ==> df$rt$intFromRef(this.sp$size) > 0
+  ensures df$rt$intFromRef(this$dispatch.sp$size) ==
+    old(df$rt$intFromRef(this$dispatch.sp$size))
+  ensures df$rt$boolFromRef(ret) ==>
+    df$rt$intFromRef(this$dispatch.sp$size) == 0
+  ensures !df$rt$boolFromRef(ret) ==>
+    df$rt$intFromRef(this$dispatch.sp$size) > 0
