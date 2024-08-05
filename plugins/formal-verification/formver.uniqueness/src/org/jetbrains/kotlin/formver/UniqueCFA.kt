@@ -38,16 +38,6 @@ class UniqueCFA(private val data: UniqueCheckerContext) : FirControlFlowChecker(
             return a
         }
 
-        override fun visitEdge(
-            from: CFGNode<*>,
-            to: CFGNode<*>,
-            metadata: Edge,
-            data: PathAwareControlFlowInfo<FirVariableSymbol<FirVariable>, Set<UniqueLevel>>,
-        ): PathAwareControlFlowInfo<FirVariableSymbol<FirVariable>, Set<UniqueLevel>> {
-            val dataForEdge = super.visitEdge(from, to, metadata, data)
-            return dataForEdge
-        }
-
         override fun visitNode(
             node: CFGNode<*>,
             data: PathAwareControlFlowInfo<FirVariableSymbol<FirVariable>, Set<UniqueLevel>>,
