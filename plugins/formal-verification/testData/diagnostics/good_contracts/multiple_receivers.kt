@@ -11,6 +11,11 @@ class ClassWithExtension(val delta: Int) {
         val withLabels = this@ClassWithExtension.delta + this@applyDelta
         verify(withoutLabels == withLabels)
     }
+
+    @NeverConvert
+    @Suppress("NOTHING_TO_INLINE")
+    inline fun Int.applyInlineDelta() = this + delta
+
     fun <!VIPER_TEXT!>returnDelta<!>() = delta
 }
 
@@ -25,6 +30,7 @@ fun <!VIPER_TEXT!>checkClassWithExtension<!>() {
         42.applyDelta()
         returnDelta()
         extensionReturnDelta()
+        verify(42.applyInlineDelta() == 84)
     }
 }
 
