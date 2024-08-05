@@ -22,13 +22,13 @@ method f$testProperties$TF$T$c$Foo(p$foo: Ref) returns (ret$0: Ref)
   label lbl$ret$0
 }
 
-method pg$public$valProp(this: Ref) returns (ret: Ref)
+method pg$public$valProp(this$dispatch: Ref) returns (ret: Ref)
 
 
-method pg$public$varProp(this: Ref) returns (ret: Ref)
+method pg$public$varProp(this$dispatch: Ref) returns (ret: Ref)
 
 
-method ps$public$varProp(this: Ref, value: Ref) returns (ret: Ref)
+method ps$public$varProp(this$dispatch: Ref, value: Ref) returns (ret: Ref)
 
 
 /interface.kt:(348,358): info: Generated Viper text for createImpl:
@@ -54,4 +54,4 @@ method f$createImpl$TF$() returns (ret$0: Ref)
   label lbl$ret$0
 }
 
-method pg$public$number(this: Ref) returns (ret: Ref)
+method pg$public$number(this$dispatch: Ref) returns (ret: Ref)

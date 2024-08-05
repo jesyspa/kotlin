@@ -15,6 +15,7 @@ import org.jetbrains.kotlin.fir.expressions.impl.FirElseIfTrueCondition
 import org.jetbrains.kotlin.fir.references.FirThisReference
 import org.jetbrains.kotlin.fir.references.toResolvedSymbol
 import org.jetbrains.kotlin.fir.symbols.FirBasedSymbol
+import org.jetbrains.kotlin.fir.symbols.impl.FirClassSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirFunctionSymbol
 import org.jetbrains.kotlin.fir.types.coneType
 import org.jetbrains.kotlin.fir.types.resolvedType
@@ -285,7 +286,12 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext>()
         thisReceiverExpression: FirThisReceiverExpression,
         data: StmtConversionContext,
     ): ExpEmbedding {
-        return data.resolveReceiver()
+        val isExtensionReceiver = when (thisReceiverExpression.calleeReference.boundSymbol) {
+            is FirClassSymbol<*> -> false
+            is FirFunctionSymbol<*> -> true
+            else -> error("Unsupported receiver expression type.")
+        }
+        return data.resolveReceiver(isExtensionReceiver)
             ?: throw IllegalArgumentException("Can't resolve the 'this' receiver since the function does not have one.")
     }
 

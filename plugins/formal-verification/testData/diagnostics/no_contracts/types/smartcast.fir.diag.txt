@@ -37,4 +37,4 @@ method f$isNullOrEmptyWrong$TF$c$pkg$kotlin$CharSequence(p$seq: Ref)
   label lbl$ret$0
 }
 
-method pg$public$length(this: Ref) returns (ret: Ref)
+method pg$public$length(this$dispatch: Ref) returns (ret: Ref)

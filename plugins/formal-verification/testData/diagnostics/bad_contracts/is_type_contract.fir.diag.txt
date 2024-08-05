@@ -11,7 +11,7 @@ method f$unverifiableTypeCheck$TF$Int(p$x: Ref) returns (ret$0: Ref)
   label lbl$ret$0
 }
 
-method pg$public$length(this: Ref) returns (ret: Ref)
+method pg$public$length(this$dispatch: Ref) returns (ret: Ref)
 
 
 /is_type_contract.kt:(216,245): warning: Cannot verify that if the function returns then x is Unit.

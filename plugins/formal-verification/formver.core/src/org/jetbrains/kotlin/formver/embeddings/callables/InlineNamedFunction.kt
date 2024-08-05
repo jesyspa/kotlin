@@ -11,7 +11,7 @@ import org.jetbrains.kotlin.formver.conversion.StmtConversionContext
 import org.jetbrains.kotlin.formver.conversion.insertInlineFunctionCall
 import org.jetbrains.kotlin.formver.embeddings.TypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.expression.ExpEmbedding
-import org.jetbrains.kotlin.name.SpecialNames
+import org.jetbrains.kotlin.formver.names.ExtraSpecialNames
 
 class InlineNamedFunction(
     val signature: FullNamedFunctionSignature,
@@ -22,14 +22,23 @@ class InlineNamedFunction(
         args: List<ExpEmbedding>,
         ctx: StmtConversionContext,
     ): ExpEmbedding {
-        val paramNames = listOfNotNull(receiver?.let { SpecialNames.THIS }) + symbol.valueParameterSymbols.map { it.name }
+        val paramNames = buildList {
+            if (dispatchReceiverType != null)
+                add(ExtraSpecialNames.D_THIS)
+            if (extensionReceiverType != null)
+                add(ExtraSpecialNames.E_THIS)
+            addAll(symbol.valueParameterSymbols.map { it.name })
+        }
         return ctx.insertInlineFunctionCall(signature, paramNames, args, firBody, signature.sourceName)
     }
 
     override fun toViperMethodHeader(): Nothing? = null
 
-    override val receiverType: TypeEmbedding?
-        get() = signature.receiverType
+    override val dispatchReceiverType: TypeEmbedding?
+        get() = signature.dispatchReceiverType
+
+    override val extensionReceiverType: TypeEmbedding?
+        get() = signature.extensionReceiverType
 
     override val paramTypes: List<TypeEmbedding>
         get() = signature.paramTypes

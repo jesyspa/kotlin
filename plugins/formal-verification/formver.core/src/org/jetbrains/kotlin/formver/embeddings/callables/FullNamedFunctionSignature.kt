@@ -17,7 +17,7 @@ import org.jetbrains.kotlin.formver.embeddings.expression.VariableEmbedding
 import org.jetbrains.kotlin.formver.embeddings.nullableAny
 import org.jetbrains.kotlin.formver.linearization.pureToViper
 import org.jetbrains.kotlin.formver.names.SetterValueName
-import org.jetbrains.kotlin.formver.names.ThisReceiverName
+import org.jetbrains.kotlin.formver.names.DispatchReceiverName
 import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.formver.viper.ast.Stmt
 import org.jetbrains.kotlin.formver.viper.ast.UserMethod
@@ -49,8 +49,9 @@ abstract class PropertyAccessorFunctionSignature(
 ) : FullNamedFunctionSignature {
     override fun getPreconditions(returnVariable: VariableEmbedding) = emptyList<ExpEmbedding>()
     override fun getPostconditions(returnVariable: VariableEmbedding) = emptyList<ExpEmbedding>()
-    override val receiver: VariableEmbedding
-        get() = PlaceholderVariableEmbedding(ThisReceiverName, buildType { nullableAny() })
+    override val dispatchReceiver: VariableEmbedding
+        get() = PlaceholderVariableEmbedding(DispatchReceiverName, buildType { nullableAny() })
+    override val extensionReceiver = null
     override val declarationSource: KtSourceElement? = symbol.source
 }
 
