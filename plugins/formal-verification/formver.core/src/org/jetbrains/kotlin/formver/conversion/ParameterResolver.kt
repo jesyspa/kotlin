@@ -19,7 +19,7 @@ import org.jetbrains.kotlin.utils.addToStdlib.ifTrue
  */
 interface ParameterResolver {
     fun tryResolveParameter(name: Name): ExpEmbedding?
-    fun tryResolveReceiver(): ExpEmbedding?
+    fun tryResolveReceiver(isExtension: Boolean): ExpEmbedding?
 
     val sourceName: String?
     val defaultResolvedReturnTarget: ReturnTarget
@@ -36,7 +36,9 @@ class RootParameterResolver(
 ) : ParameterResolver {
     private val parameters = signature.params.associateBy { it.name }
     override fun tryResolveParameter(name: Name): ExpEmbedding? = parameters[name.embedParameterName()]
-    override fun tryResolveReceiver() = signature.run { dispatchReceiver ?: extensionReceiver }
+    override fun tryResolveReceiver(isExtension: Boolean) =
+        if (isExtension) signature.run { extensionReceiver }
+        else signature.run { dispatchReceiver }
 }
 
 class InlineParameterResolver(
@@ -45,5 +47,7 @@ class InlineParameterResolver(
     override val defaultResolvedReturnTarget: ReturnTarget,
 ) : ParameterResolver {
     override fun tryResolveParameter(name: Name): ExpEmbedding? = substitutions[name]
-    override fun tryResolveReceiver(): ExpEmbedding? = substitutions[ExtraSpecialNames.D_THIS] ?: substitutions[ExtraSpecialNames.E_THIS]
+    override fun tryResolveReceiver(isExtension: Boolean): ExpEmbedding? =
+        if (isExtension) substitutions[ExtraSpecialNames.E_THIS]
+        else substitutions[ExtraSpecialNames.D_THIS]
 }
