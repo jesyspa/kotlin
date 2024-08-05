@@ -25,5 +25,17 @@ interface UniqueCheckerContext {
     val session: FirSession
     val uniqueStack: ArrayDeque<ArrayDeque<PathUnique>>
 
+    /**
+     * Resolve the annotation for borrow and uniqueness
+     */
     fun resolveUniqueAnnotation(declaration: FirDeclaration): UniqueLevel
+
+    /**
+     * Pushes the alias or unique level of the last expression onto the top of last stack.
+     *
+     * @param pathUnique the unique path to be added to the stack
+     */
+    fun pushExprPathUnique(pathUnique: PathUnique)
+
+    fun getTopExprPathUnique(): PathUnique?
 }

@@ -31,4 +31,10 @@ class UniqueCheckerData(
         }
         return UniqueLevel.Shared
     }
+
+    override fun pushExprPathUnique(pathUnique: PathUnique) {
+        this.uniqueStack.last().add(pathUnique)
+    }
+
+    override fun getTopExprPathUnique(): PathUnique? = this.uniqueStack.last().lastOrNull()
 }

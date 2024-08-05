@@ -79,11 +79,8 @@ class UniqueCFA(private val data: UniqueCheckerContext) : FirControlFlowChecker(
             if (node.fir.initializer == null) {
                 return dataForNode.transformValues { it.put(lSymbol, setOf(UniqueLevel.Shared)) }
             }
-            val rhsUnique = when (val last = context.uniqueStack.last().last()) {
-                is Level -> last.level
-                is Path -> dataForNode[NormalPath]?.get(last.symbol) ?: setOf(UniqueLevel.Shared)
-            }
-            return dataForNode.transformValues { it.put(lSymbol, rhsUnique) }
+            val rhsUniqueLevel = data.getUniqueLevel(context.getTopExprPathUnique())
+            return dataForNode.transformValues { it.put(lSymbol, rhsUniqueLevel) }
         }
 
         override fun visitVariableAssignmentNode(
@@ -92,11 +89,8 @@ class UniqueCFA(private val data: UniqueCheckerContext) : FirControlFlowChecker(
         ): PathAwareControlFlowInfo<FirVariableSymbol<FirVariable>, Set<UniqueLevel>> {
             val dataForNode = visitNode(node, data)
             val lSymbol = node.fir.lValue.toResolvedCallableSymbol(context.session)
-            val rhsUnique = when (val last = context.uniqueStack.last().last()) {
-                is Level -> last.level
-                is Path -> dataForNode[NormalPath]?.get(last.symbol) ?: setOf(UniqueLevel.Shared)
-            }
-            return dataForNode.transformValues { it.put(lSymbol as FirVariableSymbol, rhsUnique) }
+            val rhsUniqueLevel = data.getUniqueLevel(context.getTopExprPathUnique())
+            return dataForNode.transformValues { it.put(lSymbol as FirVariableSymbol, rhsUniqueLevel) }
         }
 
         @OptIn(SymbolInternals::class)
@@ -114,10 +108,7 @@ class UniqueCFA(private val data: UniqueCheckerContext) : FirControlFlowChecker(
             // FIXME: might not get annotation in this way
             params.zip(argumentAliasOrUnique).forEach { (param, varUnique) ->
                 val argUniqueLevel = this.context.resolveUniqueAnnotation(param)
-                val passedUnique: Set<UniqueLevel> = when (varUnique) {
-                    is Path -> data[NormalPath]?.get(varUnique.symbol) ?: setOf(UniqueLevel.Shared)
-                    is Level -> varUnique.level
-                }
+                val passedUnique: Set<UniqueLevel> = data.getUniqueLevel(varUnique)
                 // TODO: more general comparison
                 if (argUniqueLevel == UniqueLevel.Unique && passedUnique.any { it != UniqueLevel.Unique }) {
                     throw IllegalArgumentException("uniqueness level not match ${param.source.text}")
@@ -148,10 +139,23 @@ class UniqueCFA(private val data: UniqueCheckerContext) : FirControlFlowChecker(
             } else {
                 uniqueLevel.add(this.context.resolveUniqueAnnotation(symbol.fir))
             }
-            context.uniqueStack.last().add(Level(uniqueLevel))
+            context.pushExprPathUnique(Level(uniqueLevel))
 
             // Function call does not change context
             return data
+        }
+
+        fun PathAwareControlFlowInfo<FirVariableSymbol<FirVariable>, Set<UniqueLevel>>.getUniqueLevel(pathUnique: PathUnique?): Set<UniqueLevel> =
+            when (pathUnique) {
+                is Path -> this.getPathUniqueOrShared(pathUnique.symbol)
+                is Level -> pathUnique.level
+                else -> setOf(UniqueLevel.Shared)
+            }
+
+        fun PathAwareControlFlowInfo<FirVariableSymbol<FirVariable>, Set<UniqueLevel>>.getPathUniqueOrShared(
+            symbol: FirVariableSymbol<FirVariable>,
+        ): Set<UniqueLevel> {
+            return this[NormalPath]?.get(symbol) ?: setOf(UniqueLevel.Shared)
         }
     }
 }
