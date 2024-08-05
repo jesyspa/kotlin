@@ -161,6 +161,9 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         symbol.receiverType?.let {
             withDispatchReceiver { embedTypeWithBuilder(it) }
         }
+        symbol.extensionReceiverType?.let {
+            withExtensionReceiver { embedTypeWithBuilder(it) }
+        }
         symbol.valueParameterSymbols.forEach { param ->
             withParam {
                 embedTypeWithBuilder(param.resolvedReturnType)

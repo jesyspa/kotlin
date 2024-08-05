@@ -9,7 +9,8 @@ import org.jetbrains.kotlin.formver.embeddings.FunctionTypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.expression.PlaceholderVariableEmbedding
 import org.jetbrains.kotlin.formver.embeddings.expression.VariableEmbedding
 import org.jetbrains.kotlin.formver.names.AnonymousName
-import org.jetbrains.kotlin.formver.names.ThisReceiverName
+import org.jetbrains.kotlin.formver.names.DispatchReceiverName
+import org.jetbrains.kotlin.formver.names.ExtensionReceiverName
 
 interface FunctionSignature {
     val type: FunctionTypeEmbedding
@@ -27,10 +28,10 @@ interface FunctionSignature {
 
 abstract class GenericFunctionSignatureMixin : FunctionSignature {
     override val dispatchReceiver: VariableEmbedding?
-        get() = type.dispatchReceiverType?.let { PlaceholderVariableEmbedding(ThisReceiverName, it) }
+        get() = type.dispatchReceiverType?.let { PlaceholderVariableEmbedding(DispatchReceiverName, it) }
 
     override val extensionReceiver: VariableEmbedding?
-        get() = type.extensionReceiverType?.let { PlaceholderVariableEmbedding(ThisReceiverName, it)}
+        get() = type.extensionReceiverType?.let { PlaceholderVariableEmbedding(ExtensionReceiverName, it)}
 
     override val params: List<VariableEmbedding>
         get() = type.paramTypes.mapIndexed { ix, type -> PlaceholderVariableEmbedding(AnonymousName(ix), type) }

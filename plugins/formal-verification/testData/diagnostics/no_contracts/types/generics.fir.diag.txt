@@ -1,12 +1,12 @@
 /generics.kt:(52,65): info: Generated Viper text for genericMethod:
 field bf$t: Ref
 
-method f$c$Box$genericMethod$TF$T$c$Box$Any(this: Ref, p$x: Ref)
+method f$c$Box$genericMethod$TF$T$c$Box$Any(this$dispatch: Ref, p$x: Ref)
   returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$nullable(df$rt$anyType()))
 {
-  inhale df$rt$isSubtype(df$rt$typeOf(this), df$rt$T$c$Box())
-  inhale acc(p$c$Box$shared(this), wildcard)
+  inhale df$rt$isSubtype(df$rt$typeOf(this$dispatch), df$rt$T$c$Box())
+  inhale acc(p$c$Box$shared(this$dispatch), wildcard)
   inhale df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$nullable(df$rt$anyType()))
   ret$0 := p$x
   goto lbl$ret$0
