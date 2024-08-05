@@ -1,10 +1,16 @@
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 import org.jetbrains.kotlin.formver.plugin.AlwaysVerify
+import org.jetbrains.kotlin.formver.plugin.verify
 import org.jetbrains.kotlin.formver.plugin.NeverConvert
 
 class ClassWithExtension(val delta: Int) {
-    fun Int.<!VIPER_TEXT!>applyDelta<!>() = this + delta
+    @AlwaysVerify
+    fun Int.<!VIPER_TEXT!>applyDelta<!>() {
+        val withoutLabels = this + delta
+        val withLabels = this@ClassWithExtension.delta + this@applyDelta
+        verify(withoutLabels == withLabels)
+    }
     fun <!VIPER_TEXT!>returnDelta<!>() = delta
 }
 
