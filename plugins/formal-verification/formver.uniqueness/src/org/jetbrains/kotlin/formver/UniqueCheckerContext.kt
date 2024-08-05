@@ -11,7 +11,11 @@ import org.jetbrains.kotlin.fir.declarations.FirVariable
 import org.jetbrains.kotlin.fir.symbols.impl.FirVariableSymbol
 import org.jetbrains.kotlin.name.ClassId
 
-// TODO: find a better name for it
+/**
+ * An enum for either a variable or a unique level
+ * [Path] denotes a possible variable, while [Level] is for a unique level
+ * This type is used for the stack for control-flow visitor
+ */
 sealed class PathUnique
 data class Path(val symbol: FirVariableSymbol<FirVariable>) : PathUnique()
 data class Level(val level: Set<UniqueLevel>) : PathUnique()
