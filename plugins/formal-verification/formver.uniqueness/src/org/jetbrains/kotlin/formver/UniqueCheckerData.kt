@@ -12,23 +12,32 @@ import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 
-class UniqueChecker(
+class UniqueCheckerData(
     override val session: FirSession,
     override val config: PluginConfiguration,
     override val errorCollector: ErrorCollector,
-) :
-    UniqueCheckerContext {
+    override val uniqueStack: ArrayDeque<ArrayDeque<PathUnique>> = ArrayDeque(),
+) : UniqueCheckerContext {
 
     private fun getAnnotationId(name: String): ClassId =
         ClassId(FqName.fromSegments(listOf("org", "jetbrains", "kotlin", "formver", "plugin")), Name.identifier(name))
 
     private val uniqueId: ClassId
         get() = getAnnotationId("Unique")
+    private val sharedId: ClassId
+        get() = getAnnotationId("Shared")
+    private val borrowedId: ClassId
+        get() = getAnnotationId("Borrowed")
 
     override fun resolveUniqueAnnotation(declaration: FirDeclaration): UniqueLevel {
-        if (declaration.hasAnnotation(uniqueId, session)) {
-            return UniqueLevel.Unique
-        }
-        return UniqueLevel.Shared
+        return if (declaration.hasAnnotation(borrowedId, session) && declaration.hasAnnotation(sharedId, session)) {
+            UniqueLevel.BorrowedShared
+        } else if (declaration.hasAnnotation(borrowedId, session) && declaration.hasAnnotation(uniqueId, session)) {
+            UniqueLevel.BorrowedUnique
+        } else if (declaration.hasAnnotation(sharedId, session)) {
+            UniqueLevel.Shared
+        } else if (declaration.hasAnnotation(uniqueId, session)) {
+            UniqueLevel.Unique
+        } else UniqueLevel.Shared
     }
 }
