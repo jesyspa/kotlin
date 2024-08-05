@@ -24,7 +24,6 @@ interface UniqueCheckerContext {
     val config: PluginConfiguration
     val errorCollector: ErrorCollector
     val session: FirSession
-    val uniqueId: ClassId
     val uniqueStack: ArrayDeque<ArrayDeque<PathUnique>>
 
     fun resolveUniqueAnnotation(declaration: FirDeclaration): UniqueLevel

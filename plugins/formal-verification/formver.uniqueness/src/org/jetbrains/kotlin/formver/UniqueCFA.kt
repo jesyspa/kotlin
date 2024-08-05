@@ -65,11 +65,7 @@ class UniqueCFA(private val data: UniqueCheckerContext) : FirControlFlowChecker(
                 declaration.valueParameters.associate {
                     Pair<FirVariableSymbol<FirVariable>, Set<UniqueLevel>>(
                         it.symbol,
-                        if (it.hasAnnotation(this.context.uniqueId, this.context.session)) {
-                            setOf(UniqueLevel.Unique)
-                        } else {
-                            setOf(UniqueLevel.Shared)
-                        }
+                        setOf(this.context.resolveUniqueAnnotation(it))
                     )
                 }.toMap()
             return dataForNode.transformValues { it.putAll(valueParameters) }
@@ -118,13 +114,13 @@ class UniqueCFA(private val data: UniqueCheckerContext) : FirControlFlowChecker(
             }
             // FIXME: might not get annotation in this way
             params.zip(argumentAliasOrUnique).forEach { (param, varUnique) ->
-                val argShouldUnique = param.hasAnnotation(context.uniqueId, context.session)
+                val argUniqueLevel = this.context.resolveUniqueAnnotation(param)
                 val passedUnique: Set<UniqueLevel> = when (varUnique) {
                     is Path -> data[NormalPath]?.get(varUnique.symbol) ?: setOf(UniqueLevel.Shared)
                     is Level -> varUnique.level
                 }
                 // TODO: more general comparison
-                if (argShouldUnique && passedUnique.any { it != UniqueLevel.Unique }) {
+                if (argUniqueLevel == UniqueLevel.Unique && passedUnique.any { it != UniqueLevel.Unique }) {
                     throw IllegalArgumentException("uniqueness level not match ${param.source.text}")
                 }
             }
@@ -141,16 +137,17 @@ class UniqueCFA(private val data: UniqueCheckerContext) : FirControlFlowChecker(
             return dataForNode
         }
 
+        @OptIn(SymbolInternals::class)
         override fun visitFunctionCallExitNode(
             node: FunctionCallExitNode,
             data: PathAwareControlFlowInfo<FirVariableSymbol<FirVariable>, Set<UniqueLevel>>,
         ): PathAwareControlFlowInfo<FirVariableSymbol<FirVariable>, Set<UniqueLevel>> {
             val uniqueLevel = mutableSetOf<UniqueLevel>()
-            // FIXME: might not be able to get the annotation for function declaration in this way
-            if (node.fir.hasAnnotation(this.context.uniqueId, this.context.session)) {
-                uniqueLevel.add(UniqueLevel.Unique)
-            } else {
+            val symbol = node.fir.calleeReference.symbol
+            if (symbol == null) {
                 uniqueLevel.add(UniqueLevel.Shared)
+            } else {
+                uniqueLevel.add(this.context.resolveUniqueAnnotation(symbol.fir))
             }
             context.uniqueStack.last().add(Level(uniqueLevel))
 
