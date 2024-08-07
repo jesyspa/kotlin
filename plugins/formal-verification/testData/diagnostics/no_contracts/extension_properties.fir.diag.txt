@@ -28,7 +28,7 @@ method f$extensionGetterProperty$TF$() returns (ret$0: Ref)
 method eg$intVarProp$TF$T$Int(this: Ref) returns (ret: Ref)
 
 
-method es$intVarProp$TF$T$Int$T$Int(this: Ref, value: Ref)
+method es$intVarProp$TF$T$Int$T$Int(this: Ref, anon$0: Ref)
   returns (ret: Ref)
 
 
@@ -68,7 +68,7 @@ field bf$x: Ref
 method eg$pfVarProp$TF$T$c$PrimitiveField(this: Ref) returns (ret: Ref)
 
 
-method es$pfVarProp$TF$T$c$PrimitiveField$T$Int(this: Ref, value: Ref)
+method es$pfVarProp$TF$T$c$PrimitiveField$T$Int(this: Ref, anon$0: Ref)
   returns (ret: Ref)
 
 
