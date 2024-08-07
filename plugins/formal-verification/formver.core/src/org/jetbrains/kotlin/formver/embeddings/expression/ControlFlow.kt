@@ -183,7 +183,7 @@ data class UnfoldingClassPredicateEmbedding(val predicated: VariableEmbedding, o
 
 // Note: this is always a *real* Viper method call.
 data class MethodCall(val method: NamedFunctionSignature, val args: List<ExpEmbedding>) : StoredResultExpEmbedding {
-    override val type: TypeEmbedding = method.returnType
+    override val type: TypeEmbedding = method.type.returnType
 
     override fun toViperStoringIn(result: VariableEmbedding, ctx: LinearizationContext) {
         ctx.addStatement {

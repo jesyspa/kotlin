@@ -10,10 +10,8 @@ import org.jetbrains.kotlin.formver.conversion.MethodConversionContext
 import org.jetbrains.kotlin.formver.conversion.StmtConversionContext
 import org.jetbrains.kotlin.formver.conversion.insertInlineFunctionCall
 import org.jetbrains.kotlin.formver.embeddings.FunctionTypeEmbedding
-import org.jetbrains.kotlin.formver.embeddings.TypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.callables.CallableEmbedding
 import org.jetbrains.kotlin.formver.embeddings.callables.FunctionSignature
-import org.jetbrains.kotlin.formver.embeddings.callables.asData
 import org.jetbrains.kotlin.formver.embeddings.expression.debug.PlaintextLeaf
 import org.jetbrains.kotlin.formver.embeddings.expression.debug.TreeView
 import org.jetbrains.kotlin.formver.linearization.LinearizationContext
@@ -25,13 +23,13 @@ class LambdaExp(
     private val parentCtx: MethodConversionContext,
 ) : CallableEmbedding, StoredResultExpEmbedding,
     FunctionSignature by signature {
-    override val type: TypeEmbedding = FunctionTypeEmbedding(signature.asData)
+    override val type: FunctionTypeEmbedding = signature.type
 
     override fun toViperStoringIn(result: VariableEmbedding, ctx: LinearizationContext) {
         TODO("create new function object with counter, duplicable (requires toViper restructuring)")
     }
 
-    override fun insertCallImpl(
+    override fun insertCall(
         args: List<ExpEmbedding>,
         ctx: StmtConversionContext,
     ): ExpEmbedding {

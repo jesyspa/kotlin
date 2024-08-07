@@ -12,6 +12,7 @@ import org.jetbrains.kotlin.formver.viper.ast.*
 
 interface NamedFunctionSignature : FunctionSignature {
     val name: MangledName
+    // TODO: Clean this up; if we want a source name, we should be storing a symbol.
     override val sourceName: String?
         get() = when (val signatureName = name) {
             is FunctionKotlinName -> signatureName.name.asString()

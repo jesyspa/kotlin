@@ -5,7 +5,6 @@
 
 package org.jetbrains.kotlin.formver.embeddings
 
-import org.jetbrains.kotlin.formver.embeddings.callables.CallableSignatureData
 import org.jetbrains.kotlin.formver.names.ScopedKotlinName
 
 /**
@@ -62,7 +61,7 @@ class FunctionPretypeBuilder : PretypeBuilder {
 
     override fun complete(): TypeEmbedding {
         require(returnType != null) { "Return type not set" }
-        return FunctionTypeEmbedding(CallableSignatureData(receiverType, paramTypes, returnType!!))
+        return FunctionTypeEmbedding(receiverType, paramTypes, returnType!!, returnsUnique = false)
     }
 }
 

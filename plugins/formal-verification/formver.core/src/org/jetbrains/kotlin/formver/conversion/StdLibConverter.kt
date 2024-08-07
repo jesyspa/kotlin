@@ -23,7 +23,7 @@ sealed interface StdLibReceiverInterface {
 sealed interface PresentInterface : StdLibReceiverInterface {
     val interfaceName: String
     override fun match(function: NamedFunctionSignature): Boolean =
-        function.receiverType?.isInheritorOfCollectionTypeNamed(interfaceName) ?: false
+        function.type.receiverType?.isInheritorOfCollectionTypeNamed(interfaceName) ?: false
 }
 
 data object CollectionInterface : PresentInterface {
