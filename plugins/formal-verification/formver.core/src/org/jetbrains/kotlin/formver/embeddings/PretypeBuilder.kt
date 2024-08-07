@@ -44,6 +44,7 @@ class FunctionPretypeBuilder : PretypeBuilder {
     private val paramTypes = mutableListOf<TypeEmbedding>()
     private var receiverType: TypeEmbedding? = null
     private var returnType: TypeEmbedding? = null
+    var returnsUnique: Boolean = false
 
     fun withParam(paramInit: TypeBuilder.() -> PretypeBuilder) {
         paramTypes.add(buildType { paramInit() })
@@ -61,7 +62,7 @@ class FunctionPretypeBuilder : PretypeBuilder {
 
     override fun complete(): TypeEmbedding {
         require(returnType != null) { "Return type not set" }
-        return FunctionTypeEmbedding(receiverType, paramTypes, returnType!!, returnsUnique = false)
+        return FunctionTypeEmbedding(receiverType, paramTypes, returnType!!, returnsUnique)
     }
 }
 
@@ -77,4 +78,9 @@ class ClassPretypeBuilder : PretypeBuilder {
         require(className != null) { "Class name not set" }
         return ClassTypeEmbedding(className!!)
     }
+}
+
+// TODO: ensure we can build the types with the builders, without hacks like this.
+class ExistingPretypeBuilder(val embedding: TypeEmbedding) : PretypeBuilder {
+    override fun complete(): TypeEmbedding = embedding
 }

@@ -154,40 +154,21 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         return embedding
     }
 
-    override fun embedType(type: ConeKotlinType): TypeEmbedding = when {
-        type is ConeErrorType -> error("Encountered an erroneous type: $type")
-        type is ConeTypeParameterType -> buildType { isNullable = true; any() }
-        type.isUnit -> buildType { unit() }
-        type.isInt -> buildType { int() }
-        type.isBoolean -> buildType { boolean() }
-        type.isNothing -> buildType { nothing() }
-        type.isSomeFunctionType(session) -> {
-            val receiverType: TypeEmbedding? = type.receiverType(session)?.let { embedType(it) }
-            val paramTypes: List<TypeEmbedding> = type.valueParameterTypesWithoutReceivers(session).map(::embedType)
-            val returnType: TypeEmbedding = embedType(type.returnType(session))
-            FunctionTypeEmbedding(receiverType, paramTypes, returnType, returnsUnique = false)
-        }
-        type.isNullable -> NullableTypeEmbedding(embedType(type.withNullability(ConeNullability.NOT_NULL, session.typeContext)))
-        type.isAny -> buildType { any() }
-        type is ConeClassLikeType -> {
-            val classLikeSymbol = type.toClassSymbol(session)
-            if (classLikeSymbol is FirRegularClassSymbol) {
-                embedClass(classLikeSymbol)
-            } else {
-                unimplementedTypeEmbedding(type)
-            }
-        }
-        else -> unimplementedTypeEmbedding(type)
-    }
+    override fun embedType(type: ConeKotlinType): TypeEmbedding = buildType { embedTypeWithBuilder(type) }
 
     // Note: keep in mind that this function is necessary to resolve the name of the function!
-    override fun embedType(symbol: FirFunctionSymbol<*>): FunctionTypeEmbedding =
-        FunctionTypeEmbedding(
-            receiverType = symbol.receiverType?.let(::embedType),
-            paramTypes = symbol.valueParameterSymbols.map { embedType(it.resolvedReturnType) },
-            returnType = embedType(symbol.resolvedReturnTypeRef.coneType),
-            returnsUnique = symbol.isUnique(session) || symbol is FirConstructorSymbol,
-        )
+    override fun embedType(symbol: FirFunctionSymbol<*>): FunctionTypeEmbedding = buildFunctionType {
+        symbol.receiverType?.let {
+            withReceiver { embedTypeWithBuilder(it) }
+        }
+        symbol.valueParameterSymbols.forEach { param ->
+            withParam {
+                embedTypeWithBuilder(param.resolvedReturnType)
+            }
+        }
+        withReturnType { embedTypeWithBuilder(symbol.resolvedReturnType) }
+        returnsUnique = symbol.isUnique(session) || symbol is FirConstructorSymbol
+    }
 
     override fun embedProperty(symbol: FirPropertySymbol): PropertyEmbedding = if (symbol.isExtension) {
         embedCustomProperty(symbol)
@@ -404,13 +385,45 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         return FunctionBodyEmbedding(seqnBuilder.block, returnTarget, bodyExp)
     }
 
-    private fun unimplementedTypeEmbedding(type: ConeKotlinType): TypeEmbedding =
+    private fun TypeBuilder.embedTypeWithBuilder(type: ConeKotlinType): PretypeBuilder = when {
+        type is ConeErrorType -> error("Encountered an erroneous type: $type")
+        type is ConeTypeParameterType -> {
+            isNullable = true; any()
+        }
+        type.isUnit -> unit()
+        type.isInt -> int()
+        type.isBoolean -> boolean()
+        type.isNothing -> nothing()
+        type.isSomeFunctionType(session) -> function {
+            type.receiverType(session)?.let { withReceiver { embedTypeWithBuilder(it) } }
+            type.valueParameterTypesWithoutReceivers(session).forEach { param ->
+                withParam { embedTypeWithBuilder(param) }
+            }
+            withReturnType { embedTypeWithBuilder(type.returnType(session)) }
+        }
+        type.isNullable -> {
+            isNullable = true
+            embedTypeWithBuilder(type.withNullability(ConeNullability.NOT_NULL, session.typeContext))
+        }
+        type.isAny -> any()
+        type is ConeClassLikeType -> {
+            val classLikeSymbol = type.toClassSymbol(session)
+            if (classLikeSymbol is FirRegularClassSymbol) {
+                existing(embedClass(classLikeSymbol))
+            } else {
+                unimplementedTypeEmbedding(type)
+            }
+        }
+        else -> unimplementedTypeEmbedding(type)
+    }
+
+    private fun TypeBuilder.unimplementedTypeEmbedding(type: ConeKotlinType): PretypeBuilder =
         when (config.behaviour) {
             UnsupportedFeatureBehaviour.THROW_EXCEPTION ->
                 throw NotImplementedError("The embedding for type $type is not yet implemented.")
             UnsupportedFeatureBehaviour.ASSUME_UNREACHABLE -> {
                 errorCollector.addMinorError("Requested type $type, for which we do not yet have an embedding.")
-                buildType { unit() }
+                unit()
             }
         }
 }
