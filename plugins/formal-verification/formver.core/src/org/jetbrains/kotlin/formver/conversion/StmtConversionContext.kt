@@ -22,11 +22,8 @@ import org.jetbrains.kotlin.formver.embeddings.expression.*
 import org.jetbrains.kotlin.formver.isCustom
 import org.jetbrains.kotlin.formver.viper.ast.Label
 import org.jetbrains.kotlin.name.Name
-import org.jetbrains.kotlin.utils.addToStdlib.ifFalse
 import org.jetbrains.kotlin.utils.addToStdlib.ifTrue
 import org.jetbrains.kotlin.utils.filterIsInstanceAnd
-import kotlin.contracts.ExperimentalContracts
-import kotlin.contracts.contract
 
 /**
  * Interface for statement conversion.
@@ -160,7 +157,7 @@ fun StmtConversionContext.insertInlineFunctionCall(
     parentCtx: MethodConversionContext? = null,
 ): ExpEmbedding {
     // TODO: It seems like it may be possible to avoid creating a local here, but it is not clear how.
-    val returnTarget = returnTargetProducer.getFresh(calleeSignature.returnType)
+    val returnTarget = returnTargetProducer.getFresh(calleeSignature.type.returnType)
     val (declarations, callArgs) = getInlineFunctionCallArgs(args)
     val subs = paramNames.zip(callArgs).toMap()
     val methodCtxFactory = MethodContextFactory(

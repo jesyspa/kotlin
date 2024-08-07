@@ -5,22 +5,28 @@
 
 package org.jetbrains.kotlin.formver.embeddings.callables
 
-import org.jetbrains.kotlin.formver.embeddings.TypeEmbedding
-import org.jetbrains.kotlin.formver.embeddings.expression.FirVariableEmbedding
+import org.jetbrains.kotlin.formver.embeddings.FunctionTypeEmbedding
+import org.jetbrains.kotlin.formver.embeddings.expression.PlaceholderVariableEmbedding
 import org.jetbrains.kotlin.formver.embeddings.expression.VariableEmbedding
+import org.jetbrains.kotlin.formver.names.AnonymousName
+import org.jetbrains.kotlin.formver.names.ThisReceiverName
 
-interface FunctionSignature : CallableSignature {
+interface FunctionSignature {
+    val type: FunctionTypeEmbedding
     val receiver: VariableEmbedding?
-    val params: List<FirVariableEmbedding>
+    val params: List<VariableEmbedding>
 
     val sourceName: String?
         get() = null
 
     val formalArgs: List<VariableEmbedding>
         get() = listOfNotNull(receiver) + params
+}
 
-    override val receiverType: TypeEmbedding?
-        get() = receiver?.type
-    override val paramTypes: List<TypeEmbedding>
-        get() = params.map { it.type }
+abstract class GenericFunctionSignatureMixin : FunctionSignature {
+    override val receiver: VariableEmbedding?
+        get() = type.receiverType?.let { PlaceholderVariableEmbedding(ThisReceiverName, it) }
+
+    override val params: List<VariableEmbedding>
+        get() = type.paramTypes.mapIndexed { ix, type -> PlaceholderVariableEmbedding(AnonymousName(ix), type) }
 }

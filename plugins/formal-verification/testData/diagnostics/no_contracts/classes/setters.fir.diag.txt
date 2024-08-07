@@ -56,7 +56,7 @@ method f$testPrimitivePropertySetter$TF$T$c$PrimitiveProperty(p$pp: Ref)
 method pg$public$aProp(this: Ref) returns (ret: Ref)
 
 
-method ps$public$aProp(this: Ref, value: Ref) returns (ret: Ref)
+method ps$public$aProp(this: Ref, anon$0: Ref) returns (ret: Ref)
 
 
 /setters.kt:(504,531): info: Generated Viper text for testReferencePropertySetter:
@@ -86,7 +86,8 @@ method pg$public$aProp(this: Ref) returns (ret: Ref)
 method pg$public$ppProp(this: Ref) returns (ret: Ref)
 
 
-method ps$public$aProp(this: Ref, value: Ref) returns (ret: Ref)
+method ps$public$aProp(this: Ref, anon$0: Ref) returns (ret: Ref)
 
 
-method ps$public$ppProp(this: Ref, value: Ref) returns (ret: Ref)
+method ps$public$ppProp(this: Ref, anon$0: Ref) returns (ret: Ref)
+

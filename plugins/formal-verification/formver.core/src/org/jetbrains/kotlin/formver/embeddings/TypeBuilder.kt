@@ -38,3 +38,6 @@ fun TypeBuilder.nullableAny(): AnyPretypeBuilder {
 
 fun buildType(init: TypeBuilder.() -> PretypeBuilder): TypeEmbedding = TypeBuilder().complete(init)
 
+fun buildFunctionType(init: FunctionPretypeBuilder.() -> Unit): FunctionTypeEmbedding =
+    buildType { function { init() } } as FunctionTypeEmbedding
+
