@@ -15,7 +15,7 @@ method f$c$A$getBooleanField$TF$T$c$A(this: Ref) returns (ret$0: Ref)
 method pg$c$A$private$field(this: Ref) returns (ret: Ref)
 
 
-method ps$c$A$private$field(this: Ref, value: Ref) returns (ret: Ref)
+method ps$c$A$private$field(this: Ref, anon$0: Ref) returns (ret: Ref)
 
 
 /private_properties.kt:(289,303): info: Generated Viper text for getStringField:
@@ -41,7 +41,7 @@ method pg$c$A$private$field(this: Ref) returns (ret: Ref)
 method pg$public$length(this: Ref) returns (ret: Ref)
 
 
-method ps$c$A$private$field(this: Ref, value: Ref) returns (ret: Ref)
+method ps$c$A$private$field(this: Ref, anon$0: Ref) returns (ret: Ref)
 
 
 /private_properties.kt:(471,484): info: Generated Viper text for extractPublic:
@@ -93,4 +93,5 @@ method pg$c$A$private$field(this: Ref) returns (ret: Ref)
 method pg$public$length(this: Ref) returns (ret: Ref)
 
 
-method ps$c$A$private$field(this: Ref, value: Ref) returns (ret: Ref)
+method ps$c$A$private$field(this: Ref, anon$0: Ref) returns (ret: Ref)
+

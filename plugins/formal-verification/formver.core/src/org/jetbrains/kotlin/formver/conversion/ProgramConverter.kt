@@ -165,8 +165,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
             val receiverType: TypeEmbedding? = type.receiverType(session)?.let { embedType(it) }
             val paramTypes: List<TypeEmbedding> = type.valueParameterTypesWithoutReceivers(session).map(::embedType)
             val returnType: TypeEmbedding = embedType(type.returnType(session))
-            val signature = CallableSignatureData(receiverType, paramTypes, returnType)
-            FunctionTypeEmbedding(signature)
+            FunctionTypeEmbedding(receiverType, paramTypes, returnType, returnsUnique = false)
         }
         type.isNullable -> NullableTypeEmbedding(embedType(type.withNullability(ConeNullability.NOT_NULL, session.typeContext)))
         type.isAny -> buildType { any() }
@@ -182,7 +181,13 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
     }
 
     // Note: keep in mind that this function is necessary to resolve the name of the function!
-    override fun embedType(symbol: FirFunctionSymbol<*>): TypeEmbedding = FunctionTypeEmbedding(embedFunctionSignature(symbol).asData)
+    override fun embedType(symbol: FirFunctionSymbol<*>): FunctionTypeEmbedding =
+        FunctionTypeEmbedding(
+            receiverType = symbol.receiverType?.let(::embedType),
+            paramTypes = symbol.valueParameterSymbols.map { embedType(it.resolvedReturnType) },
+            returnType = embedType(symbol.resolvedReturnTypeRef.coneType),
+            returnsUnique = symbol.isUnique(session) || symbol is FirConstructorSymbol,
+        )
 
     override fun embedProperty(symbol: FirPropertySymbol): PropertyEmbedding = if (symbol.isExtension) {
         embedCustomProperty(symbol)
@@ -216,19 +221,18 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
     }
 
     override fun embedFunctionSignature(symbol: FirFunctionSymbol<*>): FunctionSignature {
-        val retType = embedType(symbol.resolvedReturnTypeRef.coneType)
         val receiverType = symbol.receiverType
         val isReceiverUnique = symbol.receiverParameter?.isUnique(session) ?: false
         val isReceiverBorrowed = symbol.receiverParameter?.isBorrowed(session) ?: false
         return object : FunctionSignature {
+            override val type: FunctionTypeEmbedding = embedType(symbol)
+
             // TODO: figure out whether we want a symbol here and how to get it.
             override val receiver =
                 receiverType?.let { PlaceholderVariableEmbedding(ThisReceiverName, embedType(it), isReceiverUnique, isReceiverBorrowed) }
             override val params = symbol.valueParameterSymbols.map {
                 FirVariableEmbedding(it.embedName(), embedType(it.resolvedReturnType), it, it.isUnique(session), it.isBorrowed(session))
             }
-            override val returnType = retType
-            override val returnsUnique = symbol.isUnique(session) || symbol is FirConstructorSymbol
         }
     }
 
@@ -267,7 +271,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
                 addAll(returnVariable.pureInvariants())
                 addAll(returnVariable.provenInvariants())
                 addAll(returnVariable.allAccessInvariants())
-                if (subSignature.returnsUnique) {
+                if (subSignature.type.returnsUnique) {
                     addIfNotNull(returnVariable.uniquePredicateAccessInvariant())
                 }
                 addAll(contractVisitor.getPostconditions(ContractVisitorContext(returnVariable, symbol)))
@@ -277,6 +281,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
 
             fun primaryConstructorInvariants(returnVariable: VariableEmbedding): ExpEmbedding? {
                 val invariants = params.mapNotNull { param ->
+                    require(param is FirVariableEmbedding) { "Constructor parameters must be represented by FirVariableEmbeddings" }
                     constructorParamSymbolsToFields[param.symbol]?.let { field ->
                         (field.accessPolicy == AccessPolicy.ALWAYS_READABLE).ifTrue {
                             EqCmp(PrimitiveFieldAccess(returnVariable, field), param)
@@ -375,7 +380,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
 
     private fun convertMethodWithBody(declaration: FirSimpleFunction, signature: FullNamedFunctionSignature): FunctionBodyEmbedding? {
         val firBody = declaration.body ?: return null
-        val returnTarget = returnTargetProducer.getFresh(signature.returnType)
+        val returnTarget = returnTargetProducer.getFresh(signature.type.returnType)
         val methodCtx =
             MethodConverter(
                 this,
@@ -390,7 +395,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         // However, for Unit we don't assign the result to any value.
         // One of the simplest solutions is to do is directly in the beginning of the body.
         val unitExtendedBody: ExpEmbedding =
-            if (signature.returnType != UnitTypeEmbedding) body
+            if (signature.type.returnType != UnitTypeEmbedding) body
             else Block(Assign(stmtCtx.defaultResolvedReturnTarget.variable, UnitLit), body)
         val bodyExp = FunctionExp(signature, unitExtendedBody, returnTarget.label)
         val seqnBuilder = SeqnBuilder(declaration.source)

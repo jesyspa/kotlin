@@ -43,11 +43,6 @@ data object ThisReceiverName : MangledName {
         get() = "this"
 }
 
-data object SetterValueName : MangledName {
-    override val mangledBaseName: String
-        get() = "value"
-}
-
 data class SpecialName(override val mangledBaseName: String) : MangledName {
     override val mangledType: String
         get() = "sp"

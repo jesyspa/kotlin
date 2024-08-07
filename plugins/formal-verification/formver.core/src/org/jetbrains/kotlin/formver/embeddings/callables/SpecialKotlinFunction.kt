@@ -7,8 +7,7 @@ package org.jetbrains.kotlin.formver.embeddings.callables
 
 import org.jetbrains.kotlin.formver.conversion.StmtConversionContext
 import org.jetbrains.kotlin.formver.embeddings.FunctionTypeEmbedding
-import org.jetbrains.kotlin.formver.embeddings.TypeEmbedding
-import org.jetbrains.kotlin.formver.embeddings.buildType
+import org.jetbrains.kotlin.formver.embeddings.buildFunctionType
 import org.jetbrains.kotlin.formver.embeddings.expression.*
 import org.jetbrains.kotlin.formver.names.ClassKotlinName
 import org.jetbrains.kotlin.formver.names.ScopedKotlinName
@@ -37,7 +36,7 @@ interface SpecialKotlinFunction : FunctionEmbedding {
 val SpecialKotlinFunction.callableId: CallableId
     get() = CallableId(FqName.fromSegments(packageName), className?.let { FqName(it) }, Name.identifier(name))
 
-fun SpecialKotlinFunction.embedName(): ScopedKotlinName = callableId.embedFunctionName(FunctionTypeEmbedding(asData))
+fun SpecialKotlinFunction.embedName(): ScopedKotlinName = callableId.embedFunctionName(type)
 
 object KotlinContractFunction : SpecialKotlinFunction {
     override val packageName: List<String> = listOf("kotlin", "contracts")
@@ -47,9 +46,8 @@ object KotlinContractFunction : SpecialKotlinFunction {
         packageScope(packageName)
         ClassKotlinName(listOf("ContractBuilder"))
     }
-    override val receiverType: TypeEmbedding? = null
-    override val paramTypes: List<TypeEmbedding> =
-        listOf(buildType {
+    override val type: FunctionTypeEmbedding = buildFunctionType {
+        withParam {
             function {
                 withReceiver {
                     klass {
@@ -58,10 +56,11 @@ object KotlinContractFunction : SpecialKotlinFunction {
                 }
                 withReturnType { unit() }
             }
-        })
-    override val returnType: TypeEmbedding = buildType { unit() }
+        }
+        withReturnType { unit() }
+    }
 
-    override fun insertCallImpl(
+    override fun insertCall(
         args: List<ExpEmbedding>,
         ctx: StmtConversionContext,
     ): ExpEmbedding = UnitLit
@@ -71,14 +70,16 @@ abstract class KotlinIntSpecialFunction : SpecialKotlinFunction {
     override val packageName: List<String> = listOf("kotlin")
     override val className: String? = "Int"
 
-    override val receiverType: TypeEmbedding = buildType { int() }
-    override val paramTypes: List<TypeEmbedding> = listOf(buildType { int() })
-    override val returnType: TypeEmbedding = buildType { int() }
+    override val type: FunctionTypeEmbedding = buildFunctionType {
+        withReceiver { int() }
+        withParam { int() }
+        withReturnType { int() }
+    }
 }
 
 object KotlinIntPlusFunctionImplementation : KotlinIntSpecialFunction() {
     override val name: String = "plus"
-    override fun insertCallImpl(
+    override fun insertCall(
         args: List<ExpEmbedding>,
         ctx: StmtConversionContext,
     ): ExpEmbedding =
@@ -87,7 +88,7 @@ object KotlinIntPlusFunctionImplementation : KotlinIntSpecialFunction() {
 
 object KotlinIntMinusFunctionImplementation : KotlinIntSpecialFunction() {
     override val name: String = "minus"
-    override fun insertCallImpl(
+    override fun insertCall(
         args: List<ExpEmbedding>,
         ctx: StmtConversionContext,
     ): ExpEmbedding =
@@ -96,7 +97,7 @@ object KotlinIntMinusFunctionImplementation : KotlinIntSpecialFunction() {
 
 object KotlinIntTimesFunctionImplementation : KotlinIntSpecialFunction() {
     override val name: String = "times"
-    override fun insertCallImpl(
+    override fun insertCall(
         args: List<ExpEmbedding>,
         ctx: StmtConversionContext,
     ): ExpEmbedding =
@@ -105,7 +106,7 @@ object KotlinIntTimesFunctionImplementation : KotlinIntSpecialFunction() {
 
 object KotlinIntDivFunctionImplementation : KotlinIntSpecialFunction() {
     override val name: String = "div"
-    override fun insertCallImpl(
+    override fun insertCall(
         args: List<ExpEmbedding>,
         ctx: StmtConversionContext,
         // TODO: implement this properly, we don't want to evaluate args[1] twice.
@@ -116,14 +117,15 @@ abstract class KotlinBooleanSpecialFunction : SpecialKotlinFunction {
     override val packageName: List<String> = listOf("kotlin")
     override val className: String? = "Boolean"
 
-    override val receiverType: TypeEmbedding = buildType { boolean() }
-    override val paramTypes: List<TypeEmbedding> = emptyList()
-    override val returnType: TypeEmbedding = buildType { boolean() }
+    override val type: FunctionTypeEmbedding = buildFunctionType {
+        withReceiver { boolean() }
+        withReturnType { boolean() }
+    }
 }
 
 object KotlinBooleanNotFunctionImplementation : KotlinBooleanSpecialFunction() {
     override val name: String = "not"
-    override fun insertCallImpl(
+    override fun insertCall(
         args: List<ExpEmbedding>,
         ctx: StmtConversionContext,
     ): ExpEmbedding =
@@ -137,13 +139,14 @@ object SpecialVerifyFunction : SpecialKotlinFunction {
     override val packageName: List<String> = listOf("org", "jetbrains", "kotlin", "formver", "plugin")
     override val name: String = "verify"
 
-    override fun insertCallImpl(args: List<ExpEmbedding>, ctx: StmtConversionContext): ExpEmbedding {
+    override fun insertCall(args: List<ExpEmbedding>, ctx: StmtConversionContext): ExpEmbedding {
         return Assert(args[0])
     }
 
-    override val receiverType: TypeEmbedding? = null
-    override val paramTypes: List<TypeEmbedding> = listOf(buildType { boolean() })
-    override val returnType: TypeEmbedding = buildType { unit() }
+    override val type: FunctionTypeEmbedding = buildFunctionType {
+        withParam { boolean() }
+        withReturnType { unit() }
+    }
 }
 
 object SpecialKotlinFunctions {

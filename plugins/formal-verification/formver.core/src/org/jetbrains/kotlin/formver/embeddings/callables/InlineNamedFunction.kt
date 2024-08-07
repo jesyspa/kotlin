@@ -9,7 +9,6 @@ import org.jetbrains.kotlin.fir.expressions.FirBlock
 import org.jetbrains.kotlin.fir.symbols.impl.FirFunctionSymbol
 import org.jetbrains.kotlin.formver.conversion.StmtConversionContext
 import org.jetbrains.kotlin.formver.conversion.insertInlineFunctionCall
-import org.jetbrains.kotlin.formver.embeddings.TypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.expression.ExpEmbedding
 import org.jetbrains.kotlin.name.SpecialNames
 
@@ -18,7 +17,7 @@ class InlineNamedFunction(
     val symbol: FirFunctionSymbol<*>,
     val firBody: FirBlock,
 ) : RichCallableEmbedding, FullNamedFunctionSignature by signature {
-    override fun insertCallImpl(
+    override fun insertCall(
         args: List<ExpEmbedding>,
         ctx: StmtConversionContext,
     ): ExpEmbedding {
@@ -27,10 +26,4 @@ class InlineNamedFunction(
     }
 
     override fun toViperMethodHeader(): Nothing? = null
-
-    override val receiverType: TypeEmbedding?
-        get() = signature.receiverType
-
-    override val paramTypes: List<TypeEmbedding>
-        get() = signature.paramTypes
 }
