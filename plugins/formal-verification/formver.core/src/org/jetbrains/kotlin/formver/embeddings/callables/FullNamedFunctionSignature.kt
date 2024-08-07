@@ -6,15 +6,10 @@
 package org.jetbrains.kotlin.formver.embeddings.callables
 
 import org.jetbrains.kotlin.KtSourceElement
-import org.jetbrains.kotlin.fir.symbols.impl.FirPropertySymbol
 import org.jetbrains.kotlin.formver.asPosition
-import org.jetbrains.kotlin.formver.embeddings.FunctionTypeEmbedding
-import org.jetbrains.kotlin.formver.embeddings.buildFunctionType
 import org.jetbrains.kotlin.formver.embeddings.expression.ExpEmbedding
 import org.jetbrains.kotlin.formver.embeddings.expression.VariableEmbedding
-import org.jetbrains.kotlin.formver.embeddings.nullableAny
 import org.jetbrains.kotlin.formver.linearization.pureToViper
-import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.formver.viper.ast.Stmt
 import org.jetbrains.kotlin.formver.viper.ast.UserMethod
 
@@ -31,40 +26,6 @@ interface FullNamedFunctionSignature : NamedFunctionSignature {
 
     val declarationSource: KtSourceElement?
 }
-
-/**
- * We generate very reduced methods for getters and setters.
- * They don't have bodies or any invariants.
- * Since after the call to getter, invariants for the result will be inhaled based on the difference
- * between the returned `TypeEmbedding` and expected, we return the broadest possible type here.
- * Types of the arguments don't matter at all, but intuitively they must be `NullableAnyTypeEmbedding` as well.
- */
-abstract class PropertyAccessorFunctionSignature(
-    override val name: MangledName,
-    symbol: FirPropertySymbol,
-) : FullNamedFunctionSignature, GenericFunctionSignatureMixin() {
-    override fun getPreconditions(returnVariable: VariableEmbedding) = emptyList<ExpEmbedding>()
-    override fun getPostconditions(returnVariable: VariableEmbedding) = emptyList<ExpEmbedding>()
-    override val declarationSource: KtSourceElement? = symbol.source
-}
-
-class GetterFunctionSignature(name: MangledName, symbol: FirPropertySymbol) :
-    PropertyAccessorFunctionSignature(name, symbol) {
-    override val type: FunctionTypeEmbedding = buildFunctionType {
-        withReceiver { nullableAny() }
-        withReturnType { nullableAny() }
-    }
-}
-
-class SetterFunctionSignature(name: MangledName, symbol: FirPropertySymbol) :
-    PropertyAccessorFunctionSignature(name, symbol) {
-    override val type: FunctionTypeEmbedding = buildFunctionType {
-        withReceiver { nullableAny() }
-        withParam { nullableAny() }
-        withReturnType { unit() }
-    }
-}
-
 
 fun FullNamedFunctionSignature.toViperMethod(
     body: Stmt.Seqn?,

@@ -89,26 +89,6 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         return new
     }
 
-    private fun embedGetterFunction(symbol: FirPropertySymbol): FunctionEmbedding {
-        val name = symbol.embedGetterName(this)
-        return methods.getOrPut(name) {
-            val signature = GetterFunctionSignature(name, symbol)
-            UserFunctionEmbedding(
-                NonInlineNamedFunction(signature)
-            )
-        }
-    }
-
-    private fun embedSetterFunction(symbol: FirPropertySymbol): FunctionEmbedding {
-        val name = symbol.embedSetterName(this)
-        return methods.getOrPut(name) {
-            val signature = SetterFunctionSignature(name, symbol)
-            UserFunctionEmbedding(
-                NonInlineNamedFunction(signature)
-            )
-        }
-    }
-
     override fun embedFunction(symbol: FirFunctionSymbol<*>): FunctionEmbedding =
         methods.getOrPut(symbol.embedName(this)) {
             val signature = embedFullSignature(symbol)
@@ -332,19 +312,19 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         PropertyEmbedding(embedGetter(symbol, backingField),
                           symbol.isVar.ifTrue { embedSetter(symbol, backingField) })
 
+    private fun embedCustomGetter(symbol: FirPropertySymbol): CustomGetter =
+        CustomGetter(symbol.getterSymbol?.let(::embedFunction) ?: synthesizeGetter(symbol))
+
     private fun embedGetter(symbol: FirPropertySymbol, backingField: FieldEmbedding?): GetterEmbedding =
-        if (backingField != null) {
-            BackingFieldGetter(backingField)
-        } else {
-            CustomGetter(embedGetterFunction(symbol))
-        }
+        if (backingField != null) BackingFieldGetter(backingField)
+        else embedCustomGetter(symbol)
+
+    private fun embedCustomSetter(symbol: FirPropertySymbol): CustomSetter =
+        CustomSetter(symbol.setterSymbol?.let(::embedFunction) ?: synthesizeSetter(symbol))
 
     private fun embedSetter(symbol: FirPropertySymbol, backingField: FieldEmbedding?): SetterEmbedding =
-        if (backingField != null) {
-            BackingFieldSetter(backingField)
-        } else {
-            CustomSetter(embedSetterFunction(symbol))
-        }
+        if (backingField != null) BackingFieldSetter(backingField)
+        else embedCustomSetter(symbol)
 
     @OptIn(SymbolInternals::class)
     private fun processCallable(symbol: FirFunctionSymbol<*>, signature: FullNamedFunctionSignature): RichCallableEmbedding {
@@ -417,7 +397,35 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         else -> unimplementedTypeEmbedding(type)
     }
 
-    private fun TypeBuilder.unimplementedTypeEmbedding(type: ConeKotlinType): PretypeBuilder =
+    private fun synthesizeGetter(symbol: FirPropertySymbol): FunctionEmbedding {
+        // Doing this synthetically is really painful :(  We want to get some common logic factored out.
+        val signature = object : FullNamedFunctionSignature {
+            override fun getPreconditions(returnVariable: VariableEmbedding): List<ExpEmbedding> = buildList {  }
+
+            override fun getPostconditions(returnVariable: VariableEmbedding): List<ExpEmbedding> = buildList {  }
+
+            override val declarationSource: KtSourceElement?
+                get() = symbol.source
+            override val name: MangledName
+                get() = symbol.embedGetterName(this@ProgramConverter)
+            override val receiver: VariableEmbedding?
+                get() = symbol.receiverParameter?.typeRef?
+            override val params: List<FirVariableEmbedding>
+                get() = TODO("Not yet implemented")
+            override val returnType: TypeEmbedding
+                get() = TODO("Not yet implemented")
+
+        }
+        val function = UserFunctionEmbedding(NonInlineNamedFunction(signature))
+        methods.put(signature.name, function)
+        return function
+    }
+
+    private fun synthesizeSetter(symbol: FirPropertySymbol): FunctionEmbedding {
+        TODO()
+    }
+
+    private fun TypeBuilder.unimplementedTypeEmbedding(type: ConeKotlinType): PretypeBuilder {
         when (config.behaviour) {
             UnsupportedFeatureBehaviour.THROW_EXCEPTION ->
                 throw NotImplementedError("The embedding for type $type is not yet implemented.")

@@ -19,22 +19,25 @@ method f$createB$TF$() returns (ret$0: Ref)
   var l0$fieldB: Ref
   var l0$b: Ref
   var l0$fieldOverride: Ref
-  var anon$0: Ref
   var l0$fieldNotOverride: Ref
   ret$0 := df$rt$unitValue()
   l0$fieldB := con$c$FieldB$()
   l0$b := con$c$B$T$c$FieldB(l0$fieldB)
-  anon$0 := pg$public$fieldOverride(l0$b)
-  l0$fieldOverride := anon$0
-  inhale df$rt$isSubtype(df$rt$typeOf(l0$fieldOverride), df$rt$T$c$FieldB())
-  inhale acc(p$c$FieldB$shared(l0$fieldOverride), wildcard)
+  l0$fieldOverride := pg$c$B$public$fieldOverride(l0$b)
   unfold acc(p$c$B$shared(l0$b), wildcard)
   unfold acc(p$c$A$shared(l0$b), wildcard)
   l0$fieldNotOverride := l0$b.bf$fieldNotOverride
   label lbl$ret$0
 }
 
-method pg$public$fieldOverride(this: Ref) returns (ret: Ref)
+method pg$c$A$public$fieldOverride(this: Ref) returns (ret: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$T$c$FieldA())
+  ensures acc(p$c$FieldA$shared(ret), wildcard)
+
+
+method pg$c$B$public$fieldOverride(this: Ref) returns (ret: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$T$c$FieldB())
+  ensures acc(p$c$FieldB$shared(ret), wildcard)
 
 
 /inheritance_fields.kt:(699,715): info: Generated Viper text for createBFsAndNoBF:
@@ -65,28 +68,27 @@ method f$createBFsAndNoBF$TF$() returns (ret$0: Ref)
 {
   var l0$fbf: Ref
   var l0$fbfx: Ref
-  var anon$0: Ref
   var l0$nbf: Ref
   var l0$nbfx: Ref
-  var anon$1: Ref
   var l0$sbf: Ref
   var l0$sbfx: Ref
   ret$0 := df$rt$unitValue()
   l0$fbf := con$c$FirstBackingFieldClass$()
-  anon$0 := pg$public$x(l0$fbf)
-  l0$fbfx := anon$0
-  inhale df$rt$isSubtype(df$rt$typeOf(l0$fbfx), df$rt$intType())
+  l0$fbfx := pg$c$FirstBackingFieldClass$public$x(l0$fbf)
   l0$nbf := con$c$NoBackingFieldClass$()
-  anon$1 := pg$public$x(l0$nbf)
-  l0$nbfx := anon$1
-  inhale df$rt$isSubtype(df$rt$typeOf(l0$nbfx), df$rt$intType())
+  l0$nbfx := pg$c$NoBackingFieldClass$public$x(l0$nbf)
   l0$sbf := con$c$SecondBackingFieldClass$T$Int(df$rt$intToRef(10))
   unfold acc(p$c$SecondBackingFieldClass$shared(l0$sbf), wildcard)
   l0$sbfx := l0$sbf.bf$x
   label lbl$ret$0
 }
 
-method pg$public$x(this: Ref) returns (ret: Ref)
+method pg$c$FirstBackingFieldClass$public$x(this: Ref) returns (ret: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$intType())
+
+
+method pg$c$NoBackingFieldClass$public$x(this: Ref) returns (ret: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$intType())
 
 
 /inheritance_fields.kt:(1038,1045): info: Generated Viper text for createY:

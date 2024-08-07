@@ -256,4 +256,7 @@ method f$checkPrimary$TF$T$Int$T$Int(p$x: Ref, p$y: Ref)
   label lbl$ret$0
 }
 
-method pg$public$z(this: Ref) returns (ret: Ref)
+method pg$c$ClassI$public$z(this: Ref) returns (ret: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$T$c$Z())
+  ensures acc(p$c$Z$shared(ret), wildcard)
+

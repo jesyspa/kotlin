@@ -8,6 +8,9 @@ package org.jetbrains.kotlin.formver.embeddings.callables
 import org.jetbrains.kotlin.formver.embeddings.FunctionBodyEmbedding
 import org.jetbrains.kotlin.formver.viper.ast.Method
 
+/**
+ * This interface is very similar to `Rich
+ */
 interface FunctionEmbedding : CallableEmbedding {
     val viperMethod: Method?
 }

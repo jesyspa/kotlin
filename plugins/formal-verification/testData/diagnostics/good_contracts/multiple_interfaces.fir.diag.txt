@@ -8,13 +8,14 @@ method f$take1$TF$T$c$InterfaceWithImplementation1(p$obj: Ref)
   inhale df$rt$isSubtype(df$rt$typeOf(p$obj), df$rt$T$c$InterfaceWithImplementation1())
   inhale acc(p$c$InterfaceWithImplementation1$shared(p$obj), wildcard)
   ret$0 := df$rt$unitValue()
-  anon$1 := pg$public$field(p$obj)
+  anon$1 := pg$c$InterfaceWithImplementation1$public$field(p$obj)
   anon$0 := anon$1
   inhale df$rt$isSubtype(df$rt$typeOf(anon$0), df$rt$intType())
   label lbl$ret$0
 }
 
-method pg$public$field(this: Ref) returns (ret: Ref)
+method pg$c$InterfaceWithImplementation1$public$field(this: Ref)
+  returns (ret: Ref)
 
 
 /multiple_interfaces.kt:(890,895): info: Generated Viper text for take2:
@@ -27,13 +28,14 @@ method f$take2$TF$T$c$InterfaceWithoutImplementation2(p$obj: Ref)
   inhale df$rt$isSubtype(df$rt$typeOf(p$obj), df$rt$T$c$InterfaceWithoutImplementation2())
   inhale acc(p$c$InterfaceWithoutImplementation2$shared(p$obj), wildcard)
   ret$0 := df$rt$unitValue()
-  anon$1 := pg$public$field(p$obj)
+  anon$1 := pg$c$InterfaceWithoutImplementation2$public$field(p$obj)
   anon$0 := anon$1
   inhale df$rt$isSubtype(df$rt$typeOf(anon$0), df$rt$intType())
   label lbl$ret$0
 }
 
-method pg$public$field(this: Ref) returns (ret: Ref)
+method pg$c$InterfaceWithoutImplementation2$public$field(this: Ref)
+  returns (ret: Ref)
 
 
 /multiple_interfaces.kt:(957,962): info: Generated Viper text for take3:
@@ -59,13 +61,14 @@ method f$take4$TF$T$c$AbstractWithOpenImplementation4(p$obj: Ref)
   inhale df$rt$isSubtype(df$rt$typeOf(p$obj), df$rt$T$c$AbstractWithOpenImplementation4())
   inhale acc(p$c$AbstractWithOpenImplementation4$shared(p$obj), wildcard)
   ret$0 := df$rt$unitValue()
-  anon$1 := pg$public$field(p$obj)
+  anon$1 := pg$c$AbstractWithOpenImplementation4$public$field(p$obj)
   anon$0 := anon$1
   inhale df$rt$isSubtype(df$rt$typeOf(anon$0), df$rt$intType())
   label lbl$ret$0
 }
 
-method pg$public$field(this: Ref) returns (ret: Ref)
+method pg$c$AbstractWithOpenImplementation4$public$field(this: Ref)
+  returns (ret: Ref)
 
 
 /multiple_interfaces.kt:(1728,1739): info: Generated Viper text for createImpls:
@@ -160,7 +163,7 @@ method f$createImpls$TF$() returns (ret$0: Ref)
   l0$start3 := sp$minusInts(sp$plusInts(anon$6, df$rt$intToRef(1)), df$rt$intToRef(1))
   anon$7 := f$take3$TF$T$c$AbstractWithFinalImplementation3(l0$impl3)
   l0$impl24 := con$c$Impl24$()
-  anon$9 := pg$public$field(l0$impl24)
+  anon$9 := pg$c$Impl24$public$field(l0$impl24)
   anon$8 := anon$9
   inhale df$rt$isSubtype(df$rt$typeOf(anon$8), df$rt$intType())
   l0$start24 := sp$minusInts(sp$plusInts(anon$8, df$rt$intToRef(1)), df$rt$intToRef(1))
@@ -173,7 +176,7 @@ method f$createImpls$TF$() returns (ret$0: Ref)
   anon$13 := f$take1$TF$T$c$InterfaceWithImplementation1(l0$impl14)
   anon$14 := f$take4$TF$T$c$AbstractWithOpenImplementation4(l0$impl14)
   l0$impl6 := f$create6$TF$()
-  anon$16 := pg$public$field(l0$impl6)
+  anon$16 := pg$c$InheritingInterfaceWithoutImplementation6$public$field(l0$impl6)
   anon$15 := anon$16
   inhale df$rt$isSubtype(df$rt$typeOf(anon$15), df$rt$intType())
   l0$start6 := sp$minusInts(sp$plusInts(anon$15, df$rt$intToRef(1)), df$rt$intToRef(1))
@@ -213,4 +216,24 @@ method f$take4$TF$T$c$AbstractWithOpenImplementation4(p$obj: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$unitType())
 
 
-method pg$public$field(this: Ref) returns (ret: Ref)
+method pg$c$AbstractWithOpenImplementation4$public$field(this: Ref)
+  returns (ret: Ref)
+
+
+method pg$c$AnyInterfaceWithoutImplementation5$public$field(this: Ref)
+  returns (ret: Ref)
+
+
+method pg$c$Impl24$public$field(this: Ref) returns (ret: Ref)
+
+
+method pg$c$InheritingInterfaceWithoutImplementation6$public$field(this: Ref)
+  returns (ret: Ref)
+
+
+method pg$c$InterfaceWithImplementation1$public$field(this: Ref)
+  returns (ret: Ref)
+
+
+method pg$c$InterfaceWithoutImplementation2$public$field(this: Ref)
+  returns (ret: Ref)

@@ -6,29 +6,26 @@ method f$testProperties$TF$T$c$Foo(p$foo: Ref) returns (ret$0: Ref)
   var l0$x: Ref
   var anon$1: Ref
   var anon$2: Ref
-  var anon$3: Ref
-  var anon$4: Ref
   inhale df$rt$isSubtype(df$rt$typeOf(p$foo), df$rt$T$c$Foo())
   inhale acc(p$c$Foo$shared(p$foo), wildcard)
   ret$0 := df$rt$unitValue()
-  anon$0 := ps$public$varProp(p$foo, df$rt$intToRef(0))
-  anon$2 := pg$public$varProp(p$foo)
-  anon$1 := anon$2
-  inhale df$rt$isSubtype(df$rt$typeOf(anon$1), df$rt$intType())
-  anon$4 := pg$public$valProp(p$foo)
-  anon$3 := anon$4
-  inhale df$rt$isSubtype(df$rt$typeOf(anon$3), df$rt$intType())
-  l0$x := sp$plusInts(anon$1, anon$3)
+  anon$0 := ps$c$Foo$public$varProp(p$foo, df$rt$intToRef(0))
+  anon$1 := pg$c$Foo$public$varProp(p$foo)
+  anon$2 := pg$c$Foo$public$valProp(p$foo)
+  l0$x := sp$plusInts(anon$1, anon$2)
   label lbl$ret$0
 }
 
-method pg$public$valProp(this: Ref) returns (ret: Ref)
+method pg$c$Foo$public$valProp(this: Ref) returns (ret: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$intType())
 
 
-method pg$public$varProp(this: Ref) returns (ret: Ref)
+method pg$c$Foo$public$varProp(this: Ref) returns (ret: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$intType())
 
 
-method ps$public$varProp(this: Ref, anon$0: Ref) returns (ret: Ref)
+method ps$c$Foo$public$varProp(this: Ref, p$value: Ref) returns (ret: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$unitType())
 
 
 /interface.kt:(348,358): info: Generated Viper text for createImpl:
@@ -54,4 +51,10 @@ method f$createImpl$TF$() returns (ret$0: Ref)
   label lbl$ret$0
 }
 
-method pg$public$number(this: Ref) returns (ret: Ref)
+method pg$c$First$public$number(this: Ref) returns (ret: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$intType())
+
+
+method pg$c$Second$public$number(this: Ref) returns (ret: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$intType())
+

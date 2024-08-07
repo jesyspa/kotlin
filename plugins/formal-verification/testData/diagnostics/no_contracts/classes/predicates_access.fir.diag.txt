@@ -68,7 +68,8 @@ method f$accessSuperTypeProperty$TF$T$c$C(p$c: Ref) returns (ret$0: Ref)
   label lbl$ret$0
 }
 
-method pg$public$d(this: Ref) returns (ret: Ref)
+method pg$c$D$public$d(this: Ref) returns (ret: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$intType())
 
 
 /predicates_access.kt:(306,318): info: Generated Viper text for accessNested:
@@ -142,7 +143,8 @@ method f$accessNested$TF$T$c$C(p$c: Ref) returns (ret$0: Ref)
   label lbl$ret$0
 }
 
-method pg$public$d(this: Ref) returns (ret: Ref)
+method pg$c$D$public$d(this: Ref) returns (ret: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$intType())
 
 
 /predicates_access.kt:(354,368): info: Generated Viper text for accessNullable:

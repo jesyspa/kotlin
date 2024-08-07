@@ -16,11 +16,8 @@ method f$extractInt$TF$T$c$Base$T$Boolean(p$base: Ref, p$returnNull: Ref)
   } else {
     var anon$1: Ref
     if (df$rt$isSubtype(df$rt$typeOf(p$base), df$rt$T$c$OpenClassOpenFieldVarDerived())) {
-      var anon$2: Ref
       inhale acc(p$c$OpenClassOpenFieldVarDerived$shared(p$base), wildcard)
-      anon$2 := pg$public$field(p$base)
-      anon$1 := anon$2
-      inhale df$rt$isSubtype(df$rt$typeOf(anon$1), df$rt$intType())
+      anon$1 := pg$c$OpenClassOpenFieldVarDerived$public$field(p$base)
     } elseif (df$rt$isSubtype(df$rt$typeOf(p$base), df$rt$T$c$FinalClassOpenFieldVarDerived())) {
       inhale acc(p$c$FinalClassOpenFieldVarDerived$shared(p$base), wildcard)
       inhale acc(p$base.bf$field, write)
@@ -45,8 +42,20 @@ method f$extractInt$TF$T$c$Base$T$Boolean(p$base: Ref, p$returnNull: Ref)
   label lbl$ret$0
 }
 
-method pg$public$field(this: Ref) returns (ret: Ref)
+method pg$c$Base$public$field(this: Ref) returns (ret: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$nullable(df$rt$intType()))
 
 
+<<<<<<< HEAD
 method ps$public$field(this: Ref, anon$0: Ref) returns (ret: Ref)
+=======
+method pg$c$OpenClassOpenFieldVarDerived$public$field(this: Ref)
+  returns (ret: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$intType())
+
+
+method ps$c$OpenClassOpenFieldVarDerived$public$field(this: Ref, p$value: Ref)
+  returns (ret: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$unitType())
+>>>>>>> 6ff70b67646 (WIP: remove special case of public; stuck on handing FakeOverride properties)
 

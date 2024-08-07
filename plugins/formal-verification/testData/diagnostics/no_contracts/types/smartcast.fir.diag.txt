@@ -23,10 +23,7 @@ method f$isNullOrEmptyWrong$TF$c$pkg$kotlin$CharSequence(p$seq: Ref)
     var anon$0: Ref
     if (p$seq != df$rt$nullValue()) {
       var anon$1: Ref
-      var anon$2: Ref
-      anon$2 := pg$public$length(p$seq)
-      anon$1 := anon$2
-      inhale df$rt$isSubtype(df$rt$typeOf(anon$1), df$rt$intType())
+      anon$1 := pg$pkg$kotlin$c$CharSequence$public$length(p$seq)
       anon$0 := anon$1
     } else {
       anon$0 := df$rt$nullValue()}
@@ -37,4 +34,7 @@ method f$isNullOrEmptyWrong$TF$c$pkg$kotlin$CharSequence(p$seq: Ref)
   label lbl$ret$0
 }
 
-method pg$public$length(this: Ref) returns (ret: Ref)
+method pg$pkg$kotlin$c$CharSequence$public$length(this: Ref)
+  returns (ret: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$intType())
+

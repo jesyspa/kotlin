@@ -11,14 +11,20 @@ method f$testDiamond$TF$() returns (ret$0: Ref)
   var anon$0: Ref
   var anon$1: Ref
   anon$1 := con$c$D$()
-  anon$0 := pg$public$field(anon$1)
+  anon$0 := pg$c$D$public$field(anon$1)
   ret$0 := anon$0
   inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$intType())
   goto lbl$ret$0
   label lbl$ret$0
 }
 
-method pg$public$field(this: Ref) returns (ret: Ref)
+method pg$c$A$public$field(this: Ref) returns (ret: Ref)
+
+
+method pg$c$C$public$field(this: Ref) returns (ret: Ref)
+
+
+method pg$c$D$public$field(this: Ref) returns (ret: Ref)
 
 
 /multiple_interfaces.kt:(405,415): info: Generated Viper text for testVarVal:
@@ -47,20 +53,40 @@ method f$testVarVal$TF$() returns (ret$0: Ref)
   var anon$5: Ref
   ret$0 := df$rt$unitValue()
   l0$g := con$c$G$()
-  anon$1 := pg$public$field(l0$g)
+  anon$1 := pg$c$G$public$field(l0$g)
   anon$0 := anon$1
   inhale df$rt$isSubtype(df$rt$typeOf(anon$0), df$rt$intType())
-  anon$2 := ps$public$field(l0$g, df$rt$intToRef(1))
+  anon$2 := ps$c$G$public$field(l0$g, df$rt$intToRef(1))
   l0$i := con$c$I$()
-  anon$4 := pg$public$field(l0$i)
+  anon$4 := pg$c$I$public$field(l0$i)
   anon$3 := anon$4
   inhale df$rt$isSubtype(df$rt$typeOf(anon$3), df$rt$intType())
-  anon$5 := ps$public$field(l0$i, df$rt$intToRef(1))
+  anon$5 := ps$c$I$public$field(l0$i, df$rt$intToRef(1))
   label lbl$ret$0
 }
 
-method pg$public$field(this: Ref) returns (ret: Ref)
+method pg$c$E$public$field(this: Ref) returns (ret: Ref)
 
 
-method ps$public$field(this: Ref, anon$0: Ref) returns (ret: Ref)
+method pg$c$F$public$field(this: Ref) returns (ret: Ref)
 
+
+method pg$c$G$public$field(this: Ref) returns (ret: Ref)
+
+
+method pg$c$H$public$field(this: Ref) returns (ret: Ref)
+
+
+method pg$c$I$public$field(this: Ref) returns (ret: Ref)
+
+
+method ps$c$F$public$field(this: Ref, value: Ref) returns (ret: Ref)
+
+
+method ps$c$G$public$field(this: Ref, value: Ref) returns (ret: Ref)
+
+
+method ps$c$H$public$field(this: Ref, value: Ref) returns (ret: Ref)
+
+
+method ps$c$I$public$field(this: Ref, value: Ref) returns (ret: Ref)

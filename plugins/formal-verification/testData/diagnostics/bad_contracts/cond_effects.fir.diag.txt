@@ -50,10 +50,7 @@ method f$isNullOrEmptyWrong$TF$c$pkg$kotlin$CharSequence(p$seq: Ref)
     acc(p$pkg$kotlin$c$CharSequence$shared(p$seq), wildcard)
   if (!(p$seq == df$rt$nullValue())) {
     var anon$0: Ref
-    var anon$1: Ref
-    anon$1 := pg$public$length(p$seq)
-    anon$0 := anon$1
-    inhale df$rt$isSubtype(df$rt$typeOf(anon$0), df$rt$intType())
+    anon$0 := pg$pkg$kotlin$c$CharSequence$public$length(p$seq)
     ret$0 := sp$notBool(df$rt$boolToRef(df$rt$intFromRef(anon$0) == 0))
   } else {
     ret$0 := df$rt$boolToRef(false)}
@@ -61,7 +58,9 @@ method f$isNullOrEmptyWrong$TF$c$pkg$kotlin$CharSequence(p$seq: Ref)
   label lbl$ret$0
 }
 
-method pg$public$length(this: Ref) returns (ret: Ref)
+method pg$pkg$kotlin$c$CharSequence$public$length(this: Ref)
+  returns (ret: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$intType())
 
 
 /cond_effects.kt:(796,832): warning: Cannot verify that if a false value is returned then seq != null.
@@ -86,7 +85,9 @@ method f$recursiveContract$TF$T$Int$Any(p$n: Ref, p$x: Ref)
   label lbl$ret$0
 }
 
-method pg$public$length(this: Ref) returns (ret: Ref)
+method pg$pkg$kotlin$c$CharSequence$public$length(this: Ref)
+  returns (ret: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$intType())
 
 
 /cond_effects.kt:(994,1029): warning: Cannot verify that if a true value is returned then x is String.
