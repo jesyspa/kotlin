@@ -156,7 +156,7 @@ data class UnfoldingClassPredicateEmbedding(val predicated: VariableEmbedding, o
     UnaryDirectResultExpEmbedding {
     override val type: TypeEmbedding = inner.type
     private fun toViperImpl(ctx: LinearizationContext, action: ExpEmbedding.() -> Exp): Exp {
-        val predicatedType = predicated.type
+        val predicatedType = predicated.type.pretype
         check(predicatedType is ClassTypeEmbedding) {
             "Built-in types do not have predicates."
         }
@@ -183,7 +183,7 @@ data class UnfoldingClassPredicateEmbedding(val predicated: VariableEmbedding, o
 
 // Note: this is always a *real* Viper method call.
 data class MethodCall(val method: NamedFunctionSignature, val args: List<ExpEmbedding>) : StoredResultExpEmbedding {
-    override val type: TypeEmbedding = method.type.returnType
+    override val type: TypeEmbedding = method.callableType.returnType
 
     override fun toViperStoringIn(result: VariableEmbedding, ctx: LinearizationContext) {
         ctx.addStatement {

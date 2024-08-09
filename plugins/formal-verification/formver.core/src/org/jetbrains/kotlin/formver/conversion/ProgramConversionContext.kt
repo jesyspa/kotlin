@@ -12,6 +12,7 @@ import org.jetbrains.kotlin.fir.types.ConeKotlinType
 import org.jetbrains.kotlin.fir.types.resolvedType
 import org.jetbrains.kotlin.formver.ErrorCollector
 import org.jetbrains.kotlin.formver.PluginConfiguration
+import org.jetbrains.kotlin.formver.embeddings.FunctionTypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.PropertyEmbedding
 import org.jetbrains.kotlin.formver.embeddings.TypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.callables.FunctionEmbedding
@@ -36,7 +37,7 @@ interface ProgramConversionContext {
     fun embedFunction(symbol: FirFunctionSymbol<*>): FunctionEmbedding
     fun embedFunctionSignature(symbol: FirFunctionSymbol<*>): FunctionSignature
     fun embedType(type: ConeKotlinType): TypeEmbedding
-    fun embedType(symbol: FirFunctionSymbol<*>): TypeEmbedding
+    fun embedFunctionPretype(symbol: FirFunctionSymbol<*>): FunctionTypeEmbedding
     fun embedType(exp: FirExpression): TypeEmbedding = embedType(exp.resolvedType)
     fun embedProperty(symbol: FirPropertySymbol): PropertyEmbedding
 }

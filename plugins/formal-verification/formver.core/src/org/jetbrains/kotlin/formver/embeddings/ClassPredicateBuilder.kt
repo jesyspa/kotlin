@@ -15,7 +15,7 @@ import org.jetbrains.kotlin.formver.viper.ast.Predicate
 import org.jetbrains.kotlin.utils.addIfNotNull
 
 internal class ClassPredicateBuilder private constructor(private val details: ClassEmbeddingDetails) {
-    private val subject = PlaceholderVariableEmbedding(ThisReceiverName, details.type)
+    private val subject = PlaceholderVariableEmbedding(ThisReceiverName, details.type.asTypeEmbedding())
     private val body = mutableListOf<ExpEmbedding>()
 
     companion object {
@@ -42,7 +42,7 @@ internal class ClassPredicateBuilder private constructor(private val details: Cl
 
     fun forEachSuperType(action: TypeInvariantsBuilder.() -> Unit) =
         details.superTypes.forEach { type ->
-            val builder = TypeInvariantsBuilder(type)
+            val builder = TypeInvariantsBuilder(type.asTypeEmbedding())
             builder.action()
             body.addAll(builder.toInvariantsList().fillHoles(subject))
         }
@@ -78,6 +78,6 @@ class TypeInvariantsBuilder(private val type: TypeEmbedding) {
     )
 
     fun includeSubTypeInvariants() = invariants.add(
-        type.subTypeInvariant()
+        SubTypeInvariantEmbedding(type)
     )
 }

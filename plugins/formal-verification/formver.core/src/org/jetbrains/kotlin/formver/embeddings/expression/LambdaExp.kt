@@ -9,7 +9,8 @@ import org.jetbrains.kotlin.fir.declarations.FirAnonymousFunction
 import org.jetbrains.kotlin.formver.conversion.MethodConversionContext
 import org.jetbrains.kotlin.formver.conversion.StmtConversionContext
 import org.jetbrains.kotlin.formver.conversion.insertInlineFunctionCall
-import org.jetbrains.kotlin.formver.embeddings.FunctionTypeEmbedding
+import org.jetbrains.kotlin.formver.embeddings.TypeEmbedding
+import org.jetbrains.kotlin.formver.embeddings.asTypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.callables.CallableEmbedding
 import org.jetbrains.kotlin.formver.embeddings.callables.FunctionSignature
 import org.jetbrains.kotlin.formver.embeddings.expression.debug.PlaintextLeaf
@@ -23,7 +24,8 @@ class LambdaExp(
     private val parentCtx: MethodConversionContext,
 ) : CallableEmbedding, StoredResultExpEmbedding,
     FunctionSignature by signature {
-    override val type: FunctionTypeEmbedding = signature.type
+    override val type: TypeEmbedding
+        get() = callableType.asTypeEmbedding()
 
     override fun toViperStoringIn(result: VariableEmbedding, ctx: LinearizationContext) {
         TODO("create new function object with counter, duplicable (requires toViper restructuring)")

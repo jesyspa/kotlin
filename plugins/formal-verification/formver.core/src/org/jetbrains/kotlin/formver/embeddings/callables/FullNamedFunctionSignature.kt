@@ -9,7 +9,7 @@ import org.jetbrains.kotlin.KtSourceElement
 import org.jetbrains.kotlin.fir.symbols.impl.FirPropertySymbol
 import org.jetbrains.kotlin.formver.asPosition
 import org.jetbrains.kotlin.formver.embeddings.FunctionTypeEmbedding
-import org.jetbrains.kotlin.formver.embeddings.buildFunctionType
+import org.jetbrains.kotlin.formver.embeddings.buildFunctionPretype
 import org.jetbrains.kotlin.formver.embeddings.expression.ExpEmbedding
 import org.jetbrains.kotlin.formver.embeddings.expression.VariableEmbedding
 import org.jetbrains.kotlin.formver.embeddings.nullableAny
@@ -50,7 +50,7 @@ abstract class PropertyAccessorFunctionSignature(
 
 class GetterFunctionSignature(name: MangledName, symbol: FirPropertySymbol) :
     PropertyAccessorFunctionSignature(name, symbol) {
-    override val type: FunctionTypeEmbedding = buildFunctionType {
+    override val callableType: FunctionTypeEmbedding = buildFunctionPretype {
         withReceiver { nullableAny() }
         withReturnType { nullableAny() }
     }
@@ -58,13 +58,12 @@ class GetterFunctionSignature(name: MangledName, symbol: FirPropertySymbol) :
 
 class SetterFunctionSignature(name: MangledName, symbol: FirPropertySymbol) :
     PropertyAccessorFunctionSignature(name, symbol) {
-    override val type: FunctionTypeEmbedding = buildFunctionType {
+    override val callableType: FunctionTypeEmbedding = buildFunctionPretype {
         withReceiver { nullableAny() }
         withParam { nullableAny() }
         withReturnType { unit() }
     }
 }
-
 
 fun FullNamedFunctionSignature.toViperMethod(
     body: Stmt.Seqn?,

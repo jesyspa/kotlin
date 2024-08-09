@@ -12,7 +12,7 @@ import org.jetbrains.kotlin.formver.names.AnonymousName
 import org.jetbrains.kotlin.formver.names.ThisReceiverName
 
 interface FunctionSignature {
-    val type: FunctionTypeEmbedding
+    val callableType: FunctionTypeEmbedding
     val receiver: VariableEmbedding?
     val params: List<VariableEmbedding>
 
@@ -25,8 +25,8 @@ interface FunctionSignature {
 
 abstract class GenericFunctionSignatureMixin : FunctionSignature {
     override val receiver: VariableEmbedding?
-        get() = type.receiverType?.let { PlaceholderVariableEmbedding(ThisReceiverName, it) }
+        get() = callableType.receiverType?.let { PlaceholderVariableEmbedding(ThisReceiverName, it) }
 
     override val params: List<VariableEmbedding>
-        get() = type.paramTypes.mapIndexed { ix, type -> PlaceholderVariableEmbedding(AnonymousName(ix), type) }
+        get() = callableType.paramTypes.mapIndexed { ix, type -> PlaceholderVariableEmbedding(AnonymousName(ix), type) }
 }

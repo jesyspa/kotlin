@@ -23,4 +23,6 @@ interface TypeInvariantHolder {
      * once they have been established once.
      */
     fun pureInvariants(): List<TypeInvariantEmbedding> = emptyList()
+
+    fun subTypeInvariant(): TypeInvariantEmbedding
 }

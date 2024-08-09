@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.formver.embeddings
 
+import org.jetbrains.kotlin.formver.embeddings.types.PretypeEmbedding
 import org.jetbrains.kotlin.formver.names.ScopedKotlinName
 
 /**
@@ -17,27 +18,27 @@ interface PretypeBuilder {
      *
      * We allow this deferral so that the build can be done in any order.
      */
-    fun complete(): TypeEmbedding
+    fun complete(): PretypeEmbedding
 }
 
 object UnitPretypeBuilder : PretypeBuilder {
-    override fun complete(): TypeEmbedding = UnitTypeEmbedding
+    override fun complete() = UnitTypeEmbedding
 }
 
 object NothingPretypeBuilder : PretypeBuilder {
-    override fun complete(): TypeEmbedding = NothingTypeEmbedding
+    override fun complete() = NothingTypeEmbedding
 }
 
 object AnyPretypeBuilder : PretypeBuilder {
-    override fun complete(): TypeEmbedding = AnyTypeEmbedding
+    override fun complete() = AnyTypeEmbedding
 }
 
 object IntPretypeBuilder : PretypeBuilder {
-    override fun complete(): TypeEmbedding = IntTypeEmbedding
+    override fun complete() = IntTypeEmbedding
 }
 
 object BooleanPretypeBuilder : PretypeBuilder {
-    override fun complete(): TypeEmbedding = BooleanTypeEmbedding
+    override fun complete() = BooleanTypeEmbedding
 }
 
 class FunctionPretypeBuilder : PretypeBuilder {
@@ -60,11 +61,14 @@ class FunctionPretypeBuilder : PretypeBuilder {
         returnType = buildType { returnTypeInit() }
     }
 
-    override fun complete(): TypeEmbedding {
+    override fun complete(): FunctionTypeEmbedding {
         require(returnType != null) { "Return type not set" }
         return FunctionTypeEmbedding(receiverType, paramTypes, returnType!!, returnsUnique)
     }
 }
+
+fun buildFunctionPretype(init: FunctionPretypeBuilder.() -> Unit): FunctionTypeEmbedding =
+    FunctionPretypeBuilder().apply(init).complete()
 
 class ClassPretypeBuilder : PretypeBuilder {
     private var className: ScopedKotlinName? = null
@@ -74,13 +78,16 @@ class ClassPretypeBuilder : PretypeBuilder {
         className = name
     }
 
-    override fun complete(): TypeEmbedding {
+    override fun complete(): ClassTypeEmbedding {
         require(className != null) { "Class name not set" }
         return ClassTypeEmbedding(className!!)
     }
 }
 
+fun buildClassPretype(init: ClassPretypeBuilder.() -> Unit): ClassTypeEmbedding =
+    ClassPretypeBuilder().apply(init).complete()
+
 // TODO: ensure we can build the types with the builders, without hacks like this.
-class ExistingPretypeBuilder(val embedding: TypeEmbedding) : PretypeBuilder {
-    override fun complete(): TypeEmbedding = embedding
+class ExistingPretypeBuilder(val embedding: PretypeEmbedding) : PretypeBuilder {
+    override fun complete() = embedding
 }

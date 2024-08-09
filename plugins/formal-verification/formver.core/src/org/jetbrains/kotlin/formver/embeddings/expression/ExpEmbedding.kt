@@ -19,7 +19,7 @@ import org.jetbrains.kotlin.formver.viper.ast.PermExp
 import org.jetbrains.kotlin.formver.viper.ast.Stmt
 import org.jetbrains.kotlin.formver.viper.mangled
 
-sealed interface ExpEmbedding {
+sealed interface ExpEmbedding : DebugPrintable {
     val type: TypeEmbedding
 
     /**
@@ -74,8 +74,6 @@ sealed interface ExpEmbedding {
     // TODO: Come up with a better way to solve the problem these `ignoring` functions solve...
     // Probably either virtual functions or a visitor.
     fun ignoringCastsAndMetaNodes(): ExpEmbedding = this
-
-    val debugTreeView: TreeView
 }
 
 sealed class ToViperBuiltinMisuseError(msg: String) : RuntimeException(msg)
@@ -90,7 +88,7 @@ class ToViperBuiltinOnlyError(exp: ExpEmbedding) :
 sealed interface DefaultToBuiltinExpEmbedding : ExpEmbedding {
     override fun toViperBuiltinType(ctx: LinearizationContext): Exp {
         val exp = toViper(ctx)
-        val injection = type.injectionOr { return exp }
+        val injection = type.pretype.injectionOr { return exp }
         // optimisation here is widely used, in such `ExpEmbedding`s like `Is`
         // (which is very common when inhaling)
         return if (exp is Exp.DomainFuncApp && exp.function == injection.toRef)

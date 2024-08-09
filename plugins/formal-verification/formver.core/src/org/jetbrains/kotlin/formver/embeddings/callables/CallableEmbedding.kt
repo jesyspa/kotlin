@@ -13,6 +13,6 @@ import org.jetbrains.kotlin.formver.embeddings.expression.ExpEmbedding
  * Kotlin entity that can be called.
  */
 interface CallableEmbedding {
-    val type: FunctionTypeEmbedding
+    val callableType: FunctionTypeEmbedding
     fun insertCall(args: List<ExpEmbedding>, ctx: StmtConversionContext): ExpEmbedding
 }

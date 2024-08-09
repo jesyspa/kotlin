@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2023 JetBrains s.r.o. and Kotlin Programming Language contributors.
+ * Copyright 2010-2024 JetBrains s.r.o. and Kotlin Programming Language contributors.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
@@ -7,8 +7,11 @@ package org.jetbrains.kotlin.formver.embeddings
 
 import org.jetbrains.kotlin.formver.domains.Injection
 import org.jetbrains.kotlin.formver.domains.RuntimeTypeDomain
+import org.jetbrains.kotlin.formver.embeddings.expression.debug.PlaintextLeaf
+import org.jetbrains.kotlin.formver.embeddings.expression.debug.TreeView
+import org.jetbrains.kotlin.formver.embeddings.types.PretypeEmbedding
+import org.jetbrains.kotlin.formver.embeddings.types.RuntimeTypeHolder
 import org.jetbrains.kotlin.formver.names.*
-import org.jetbrains.kotlin.formver.names.NameMatcher
 import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.formver.viper.ast.Exp
 import org.jetbrains.kotlin.formver.viper.mangled
@@ -20,14 +23,7 @@ import org.jetbrains.kotlin.formver.viper.mangled
  *
  * All type embeddings must be `data` classes or objects!
  */
-interface TypeEmbedding : TypeInvariantHolder {
-    /**
-     * A Viper expression with the runtime representation of the type.
-     *
-     * The Viper values are defined in RuntimeTypeDomain and are used for casting, subtyping and the `is` operator.
-     */
-    val runtimeType: Exp
-
+data class TypeEmbedding(val pretype: PretypeEmbedding, val flags: TypeEmbeddingFlags) : RuntimeTypeHolder, TypeInvariantHolder {
     /**
      * Name representing the type, used for distinguishing overloads.
      *
@@ -35,50 +31,70 @@ interface TypeEmbedding : TypeInvariantHolder {
      * represent these names, but we do it inline for now.
      */
     val name: MangledName
+        get() = TypeName(pretype, flags.nullable)
 
     /**
      * Get a nullable version of this type embedding.
      *
      * Note that nullability doesn't stack, hence nullable types must return themselves.
      */
-    fun getNullable(): NullableTypeEmbedding = NullableTypeEmbedding(this)
+    fun getNullable(): TypeEmbedding = copy(flags = flags.copy(nullable = true))
 
     /**
      * Drop nullability, if it is present.
      */
-    fun getNonNullable(): TypeEmbedding = this
+    fun getNonNullable(): TypeEmbedding = copy(flags = flags.copy(nullable = false))
 
     val isNullable: Boolean
-        get() = false
+        get() = flags.nullable
+
+    override val runtimeType: Exp = flags.adjustRuntimeType(pretype.runtimeType)
+
+    override fun accessInvariants(): List<TypeInvariantEmbedding> = flags.adjustManyInvariants(pretype.accessInvariants())
+    override fun pureInvariants(): List<TypeInvariantEmbedding> = flags.adjustManyInvariants(pretype.pureInvariants())
+
+    override fun sharedPredicateAccessInvariant(): TypeInvariantEmbedding? =
+        flags.adjustOptionalInvariant(pretype.sharedPredicateAccessInvariant())
+
+    override fun uniquePredicateAccessInvariant(): TypeInvariantEmbedding? =
+        flags.adjustOptionalInvariant(pretype.uniquePredicateAccessInvariant())
+
+    override fun subTypeInvariant(): TypeInvariantEmbedding =
+        flags.adjustInvariant(pretype.subTypeInvariant())
+
+    override val debugTreeView: TreeView
+        get() = PlaintextLeaf(name.mangled)
 }
 
-data object UnitTypeEmbedding : TypeEmbedding {
+data object UnitTypeEmbedding : PretypeEmbedding {
     override val runtimeType = RuntimeTypeDomain.unitType()
-    override val name = TypeName("Unit")
+    override val name = PretypeName("Unit")
 }
 
-data object NothingTypeEmbedding : TypeEmbedding {
+data object NothingTypeEmbedding : PretypeEmbedding {
     override val runtimeType = RuntimeTypeDomain.nothingType()
-    override val name = TypeName("Nothing")
+    override val name = PretypeName("Nothing")
 
     override fun pureInvariants(): List<TypeInvariantEmbedding> = listOf(FalseTypeInvariant)
 }
 
-data object AnyTypeEmbedding : TypeEmbedding {
+data object AnyTypeEmbedding : PretypeEmbedding {
     override val runtimeType = RuntimeTypeDomain.anyType()
-    override val name = TypeName("Any")
+    override val name = PretypeName("Any")
 }
 
-data object IntTypeEmbedding : TypeEmbedding {
+data object IntTypeEmbedding : PretypeEmbedding {
     override val runtimeType = RuntimeTypeDomain.intType()
-    override val name = TypeName("Int")
+    override val name = PretypeName("Int")
 }
 
-data object BooleanTypeEmbedding : TypeEmbedding {
+data object BooleanTypeEmbedding : PretypeEmbedding {
     override val runtimeType = RuntimeTypeDomain.boolType()
-    override val name = TypeName("Boolean")
+    override val name = PretypeName("Boolean")
 }
 
+/*
+// this is here to make merges easier; remove before PR
 data class NullableTypeEmbedding(val elementType: TypeEmbedding) : TypeEmbedding {
     override val runtimeType = RuntimeTypeDomain.nullable(elementType.runtimeType)
     override val name = object : MangledName {
@@ -103,21 +119,16 @@ data class NullableTypeEmbedding(val elementType: TypeEmbedding) : TypeEmbedding
 
     override val isNullable = true
 }
+ */
 
 data class FunctionTypeEmbedding(
     val receiverType: TypeEmbedding?,
     val paramTypes: List<TypeEmbedding>,
     val returnType: TypeEmbedding,
     val returnsUnique: Boolean,
-) : TypeEmbedding {
+) : PretypeEmbedding {
     override val runtimeType = RuntimeTypeDomain.functionType()
-    override val name = object : MangledName {
-        // TODO: this can cause some number of collisions; fix it if it becomes an issue.
-        override val mangledBaseName: String =
-            formalArgTypes.joinToString("$") { it.name.mangled }
-        override val mangledType: String
-            get() = "TF"
-    }
+    override val name = PretypeName(formalArgTypes.joinToString("$") { it.name.mangled })
 
     /**
      * The flattened structure of the callable parameters: in case the callable has a receiver
@@ -129,10 +140,11 @@ data class FunctionTypeEmbedding(
         get() = listOfNotNull(receiverType) + paramTypes
 }
 
-data class ClassTypeEmbedding(val className: ScopedKotlinName) : TypeEmbedding {
+// TODO: incorporate generic parameters.
+data class ClassTypeEmbedding(override val name: ScopedKotlinName) : PretypeEmbedding {
     private var _details: ClassEmbeddingDetails? = null
     val details: ClassEmbeddingDetails
-        get() = _details ?: error("Details of $className have not been initialised yet.")
+        get() = _details ?: error("Details of $name have not been initialised yet.")
 
     fun initDetails(details: ClassEmbeddingDetails) {
         require(_details == null) { "Class details already initialized" }
@@ -142,8 +154,7 @@ data class ClassTypeEmbedding(val className: ScopedKotlinName) : TypeEmbedding {
     val hasDetails: Boolean
         get() = _details != null
 
-    // TODO: incorporate generic parameters.
-    override val name = TypeName(className.mangled)
+    // override val name = className
 
     val runtimeTypeFunc = RuntimeTypeDomain.classTypeFunc(name)
     override val runtimeType: Exp = runtimeTypeFunc()
@@ -156,16 +167,33 @@ data class ClassTypeEmbedding(val className: ScopedKotlinName) : TypeEmbedding {
     override fun uniquePredicateAccessInvariant() = details.uniquePredicateAccessInvariant()
 }
 
+data class TypeEmbeddingFlags(val nullable: Boolean) {
+    fun adjustRuntimeType(runtimeType: Exp): Exp =
+        if (nullable) RuntimeTypeDomain.nullable(runtimeType)
+        else runtimeType
 
-inline fun TypeEmbedding.injectionOr(default: () -> Injection): Injection = when (this) {
+    fun adjustInvariant(invariant: TypeInvariantEmbedding): TypeInvariantEmbedding =
+        if (nullable) IfNonNullInvariant(invariant)
+        else invariant
+
+    fun adjustManyInvariants(invariants: List<TypeInvariantEmbedding>): List<TypeInvariantEmbedding> =
+        invariants.map { adjustInvariant(it) }
+
+    fun adjustOptionalInvariant(invariant: TypeInvariantEmbedding?): TypeInvariantEmbedding? =
+        invariant?.let { adjustInvariant(it) }
+}
+
+fun PretypeEmbedding.asTypeEmbedding() = TypeEmbedding(this, TypeEmbeddingFlags(false))
+
+inline fun PretypeEmbedding.injectionOr(default: () -> Injection): Injection = when (this) {
     IntTypeEmbedding -> RuntimeTypeDomain.intInjection
     BooleanTypeEmbedding -> RuntimeTypeDomain.boolInjection
     else -> default()
 }
 
-private fun TypeEmbedding.isCollectionTypeNamed(name: String): Boolean =
-    if (this !is ClassTypeEmbedding) false
-    else NameMatcher.matchGlobalScope(this.className) {
+private fun PretypeEmbedding.isCollectionTypeNamed(name: String): Boolean {
+    val classEmbedding = this as? ClassTypeEmbedding ?: return false
+    NameMatcher.matchGlobalScope(classEmbedding.name) {
         ifInCollectionsPkg {
             ifClassName(name) {
                 return true
@@ -173,14 +201,14 @@ private fun TypeEmbedding.isCollectionTypeNamed(name: String): Boolean =
         }
         return false
     }
+}
 
-fun TypeEmbedding.isInheritorOfCollectionTypeNamed(name: String): Boolean =
-    if (this !is ClassTypeEmbedding) false else isCollectionTypeNamed(name) || details.superTypes.any {
+fun PretypeEmbedding.isInheritorOfCollectionTypeNamed(name: String): Boolean {
+    val classEmbedding = this as? ClassTypeEmbedding ?: return false
+    return isCollectionTypeNamed(name) || classEmbedding.details.superTypes.any {
         it.isInheritorOfCollectionTypeNamed(name)
     }
+}
 
-val TypeEmbedding.isCollectionInheritor
+val PretypeEmbedding.isCollectionInheritor
     get() = isInheritorOfCollectionTypeNamed("Collection")
-
-fun TypeEmbedding.subTypeInvariant() = SubTypeInvariantEmbedding(this)
-
