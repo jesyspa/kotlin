@@ -183,6 +183,4 @@ fun TypeEmbedding.isInheritorOfCollectionTypeNamed(name: String): Boolean =
 val TypeEmbedding.isCollectionInheritor
     get() = isInheritorOfCollectionTypeNamed("Collection")
 
-fun TypeEmbedding.subTypeInvariant(): SubTypeInvariantEmbedding? = equals(buildType { nullableAny() }).ifFalse {
-    SubTypeInvariantEmbedding(this)
-}
+fun TypeEmbedding.subTypeInvariant() = SubTypeInvariantEmbedding(this)
