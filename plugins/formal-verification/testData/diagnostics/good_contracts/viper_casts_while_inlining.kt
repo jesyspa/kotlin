@@ -12,6 +12,9 @@ public inline fun <T, R> T.runWithId(block: T.() -> R): R = idFun(this).block()
 @NeverConvert
 public inline fun <T, R> T.copiedRun(block: T.() -> R): R = block()
 
+@NeverConvert
+public inline fun <T> copiedRun(block: () -> T): T = block()
+
 class ClassWithMember(val member: Int)
 
 @OptIn(ExperimentalContracts::class)
@@ -77,5 +80,12 @@ fun <!VIPER_TEXT!>checkEvaluatedOnce<!>(i: Int, mm: ManyMembers) {
     (i + (if (mm.b) 1 else -1)).copiedRun {
         verify(this == this)
     }
+}
+
+@AlwaysVerify
+fun <!VIPER_TEXT!>useRuns<!>(x: Int): Unit {
+    verify(copiedRun { x + 1 } == 1 + x)
+    verify(x.copiedRun { plus(1) } == 1 + x)
+    (x + 1).copiedRun { verify(this == 1 + x) }
 }
 
