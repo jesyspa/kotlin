@@ -21,9 +21,9 @@ method f$c$Foo$callMemberFun$TF$T$c$Foo(this: Ref) returns (ret$0: Ref)
   var anon$0: Ref
   inhale df$rt$isSubtype(df$rt$typeOf(this), df$rt$T$c$Foo())
   inhale acc(p$c$Foo$shared(this), wildcard)
-  ret$0 := df$rt$unitValue()
   anon$0 := f$c$Foo$memberFun$TF$T$c$Foo(this)
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
 method f$c$Foo$memberFun$TF$T$c$Foo(this: Ref) returns (ret: Ref)
@@ -46,9 +46,9 @@ method f$c$Foo$siblingCall$TF$T$c$Foo$T$c$Foo(this: Ref, p$other: Ref)
   inhale acc(p$c$Foo$shared(this), wildcard)
   inhale df$rt$isSubtype(df$rt$typeOf(p$other), df$rt$T$c$Foo())
   inhale acc(p$c$Foo$shared(p$other), wildcard)
-  ret$0 := df$rt$unitValue()
   anon$0 := f$c$Foo$memberFun$TF$T$c$Foo(p$other)
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
 /member_functions.kt:(220,238): info: Generated Viper text for outerMemberFunCall:
@@ -64,7 +64,7 @@ method f$outerMemberFunCall$TF$T$c$Foo(p$f: Ref) returns (ret$0: Ref)
   var anon$0: Ref
   inhale df$rt$isSubtype(df$rt$typeOf(p$f), df$rt$T$c$Foo())
   inhale acc(p$c$Foo$shared(p$f), wildcard)
-  ret$0 := df$rt$unitValue()
   anon$0 := f$c$Foo$memberFun$TF$T$c$Foo(p$f)
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }

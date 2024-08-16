@@ -4,7 +4,6 @@ method f$shadowLocal$TF$() returns (ret$0: Ref)
 {
   var l0$foo: Ref
   var l0$x: Ref
-  ret$0 := df$rt$unitValue()
   l0$x := df$rt$intToRef(0)
   if (df$rt$intFromRef(l0$x) == 0) {
     var l2$x: Ref
@@ -19,6 +18,7 @@ method f$shadowLocal$TF$() returns (ret$0: Ref)
   }
   l0$foo := l0$x
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
 /shadowing.kt:(232,243): info: Generated Viper text for shadowParam:
@@ -28,11 +28,11 @@ method f$shadowParam$TF$T$Int(p$x: Ref) returns (ret$0: Ref)
   var l0$foo: Ref
   var l0$x: Ref
   inhale df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$intType())
-  ret$0 := df$rt$unitValue()
   l0$foo := p$x
   l0$x := df$rt$intToRef(0)
   l0$foo := l0$x
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
 /shadowing.kt:(322,334): info: Generated Viper text for shadowNested:
@@ -42,7 +42,6 @@ method f$shadowNested$TF$T$Int(p$x: Ref) returns (ret$0: Ref)
   var l0$foo: Ref
   var l0$x: Ref
   inhale df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$intType())
-  ret$0 := df$rt$unitValue()
   l0$foo := p$x
   l0$x := df$rt$intToRef(0)
   l0$foo := l0$x
@@ -68,4 +67,5 @@ method f$shadowNested$TF$T$Int(p$x: Ref) returns (ret$0: Ref)
   }
   l0$foo := l0$x
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }

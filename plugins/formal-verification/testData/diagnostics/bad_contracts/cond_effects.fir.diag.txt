@@ -5,17 +5,19 @@ method f$compoundConditionalEffect$TF$T$Boolean(p$b: Ref)
   ensures true ==> df$rt$boolFromRef(p$b) && false
 {
   inhale df$rt$isSubtype(df$rt$typeOf(p$b), df$rt$boolType())
-  ret$0 := df$rt$unitValue()
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
 /cond_effects.kt:(190,220): warning: Cannot verify that if the function returns then (b && false).
 
 /cond_effects.kt:(271,287): info: Generated Viper text for mayReturnNonNull:
 method f$mayReturnNonNull$TF$Any(p$x: Ref) returns (ret$0: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$nullable(df$rt$anyType()))
   ensures ret$0 == df$rt$nullValue() ==>
     df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$intType())
 {
+  inhale df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$nullable(df$rt$anyType()))
   ret$0 := p$x
   goto lbl$ret$0
   label lbl$ret$0
@@ -25,9 +27,11 @@ method f$mayReturnNonNull$TF$Any(p$x: Ref) returns (ret$0: Ref)
 
 /cond_effects.kt:(424,437): info: Generated Viper text for mayReturnNull:
 method f$mayReturnNull$TF$Any(p$x: Ref) returns (ret$0: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$nullable(df$rt$anyType()))
   ensures ret$0 != df$rt$nullValue() ==>
     df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$intType())
 {
+  inhale df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$nullable(df$rt$anyType()))
   ret$0 := p$x
   goto lbl$ret$0
   label lbl$ret$0
@@ -72,6 +76,7 @@ method f$recursiveContract$TF$T$Int$Any(p$n: Ref, p$x: Ref)
     df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$T$c$pkg$kotlin$String())
 {
   inhale df$rt$isSubtype(df$rt$typeOf(p$n), df$rt$intType())
+  inhale df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$nullable(df$rt$anyType()))
   if (df$rt$intFromRef(p$n) == 0) {
     ret$0 := df$rt$boolToRef(df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$intType()))
   } else {

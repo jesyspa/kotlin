@@ -21,7 +21,6 @@ method f$createB$TF$() returns (ret$0: Ref)
   var l0$fieldOverride: Ref
   var anon$0: Ref
   var l0$fieldNotOverride: Ref
-  ret$0 := df$rt$unitValue()
   l0$fieldB := con$c$FieldB$()
   l0$b := con$c$B$T$c$FieldB(l0$fieldB)
   anon$0 := pg$public$fieldOverride(l0$b)
@@ -32,6 +31,7 @@ method f$createB$TF$() returns (ret$0: Ref)
   unfold acc(p$c$A$shared(l0$b), wildcard)
   l0$fieldNotOverride := l0$b.bf$fieldNotOverride
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
 method pg$public$fieldOverride(this: Ref) returns (ret: Ref)
@@ -71,7 +71,6 @@ method f$createBFsAndNoBF$TF$() returns (ret$0: Ref)
   var anon$1: Ref
   var l0$sbf: Ref
   var l0$sbfx: Ref
-  ret$0 := df$rt$unitValue()
   l0$fbf := con$c$FirstBackingFieldClass$()
   anon$0 := pg$public$x(l0$fbf)
   l0$fbfx := anon$0
@@ -84,6 +83,7 @@ method f$createBFsAndNoBF$TF$() returns (ret$0: Ref)
   unfold acc(p$c$SecondBackingFieldClass$shared(l0$sbf), wildcard)
   l0$sbfx := l0$sbf.bf$x
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
 method pg$public$x(this: Ref) returns (ret: Ref)
@@ -103,10 +103,10 @@ method f$createY$TF$() returns (ret$0: Ref)
 {
   var l0$y: Ref
   var l0$ya: Ref
-  ret$0 := df$rt$unitValue()
   l0$y := con$c$Y$T$Int(df$rt$intToRef(10))
   unfold acc(p$c$Y$shared(l0$y), wildcard)
   unfold acc(p$c$X$shared(l0$y), wildcard)
   l0$ya := l0$y.bf$a
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }

@@ -4,9 +4,9 @@ method f$addition$TF$T$Int(p$x: Ref) returns (ret$0: Ref)
 {
   var l0$y: Ref
   inhale df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$intType())
-  ret$0 := df$rt$unitValue()
   l0$y := sp$plusInts(p$x, p$x)
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
 /arithmetic.kt:(66,77): info: Generated Viper text for subtraction:
@@ -15,9 +15,9 @@ method f$subtraction$TF$T$Int(p$x: Ref) returns (ret$0: Ref)
 {
   var l0$y: Ref
   inhale df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$intType())
-  ret$0 := df$rt$unitValue()
   l0$y := sp$minusInts(p$x, p$x)
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
 /arithmetic.kt:(112,126): info: Generated Viper text for multiplication:
@@ -26,9 +26,9 @@ method f$multiplication$TF$T$Int(p$x: Ref) returns (ret$0: Ref)
 {
   var l0$y: Ref
   inhale df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$intType())
-  ret$0 := df$rt$unitValue()
   l0$y := sp$timesInts(p$x, p$x)
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
 /arithmetic.kt:(161,169): info: Generated Viper text for division:
@@ -37,8 +37,8 @@ method f$division$TF$T$Int(p$x: Ref) returns (ret$0: Ref)
 {
   var l0$y: Ref
   inhale df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$intType())
-  ret$0 := df$rt$unitValue()
   inhale df$rt$intFromRef(p$x) != 0
   l0$y := sp$divInts(p$x, p$x)
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
