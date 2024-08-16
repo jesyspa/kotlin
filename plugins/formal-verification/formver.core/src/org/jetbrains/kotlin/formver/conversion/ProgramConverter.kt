@@ -377,7 +377,10 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         // One of the simplest solutions is to do is directly in the beginning of the body.
         val unitExtendedBody: ExpEmbedding =
             if (signature.type.returnType != UnitTypeEmbedding) body
-            else Block(Assign(stmtCtx.defaultResolvedReturnTarget.variable, UnitLit), body)
+            else blockOf(
+                Assign(stmtCtx.defaultResolvedReturnTarget.variable, UnitLit),
+                body,
+            )
         val bodyExp = FunctionExp(signature, unitExtendedBody, returnTarget.label)
         val seqnBuilder = SeqnBuilder(declaration.source)
         val linearizer = Linearizer(SharedLinearizationState(anonVarProducer), seqnBuilder, declaration.source)
