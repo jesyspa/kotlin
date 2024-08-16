@@ -23,11 +23,20 @@ import org.jetbrains.kotlin.formver.viper.ast.Label
 import org.jetbrains.kotlin.formver.viper.ast.PermExp
 import org.jetbrains.kotlin.formver.viper.ast.Stmt
 
-// TODO: make a nice BlockBuilder interface.
-data class Block(val exps: List<ExpEmbedding>) : OptionalResultExpEmbedding {
-    constructor (vararg exps: ExpEmbedding) : this(exps.toList())
+private data class BlockImpl(override val exps: List<ExpEmbedding>) : Block
 
-    override val type: TypeEmbedding = exps.lastOrNull()?.type ?: buildType { unit() }
+fun blockOf(vararg exps: ExpEmbedding): Block = BlockImpl(exps.toList())
+
+fun List<ExpEmbedding>.toBlock(): Block = BlockImpl(this)
+
+fun Block(actions: MutableList<ExpEmbedding>.() -> Unit): Block = BlockImpl(buildList {
+    actions()
+})
+
+sealed interface Block : OptionalResultExpEmbedding {
+    val exps: List<ExpEmbedding>
+    override val type: TypeEmbedding
+        get() = exps.lastOrNull()?.type ?: buildType { unit() }
 
     override fun toViperMaybeStoringIn(result: VariableEmbedding?, ctx: LinearizationContext) {
         if (exps.isEmpty()) return
@@ -41,6 +50,7 @@ data class Block(val exps: List<ExpEmbedding>) : OptionalResultExpEmbedding {
     override val debugTreeView: TreeView
         get() = BlockNode(exps.map { it.debugTreeView })
 }
+
 
 data class If(val condition: ExpEmbedding, val thenBranch: ExpEmbedding, val elseBranch: ExpEmbedding, override val type: TypeEmbedding) :
     OptionalResultExpEmbedding, DefaultDebugTreeViewImplementation {
