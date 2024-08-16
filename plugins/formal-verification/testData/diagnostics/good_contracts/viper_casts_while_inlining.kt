@@ -2,6 +2,7 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 import org.jetbrains.kotlin.formver.plugin.NeverConvert
 import org.jetbrains.kotlin.formver.plugin.AlwaysVerify
+import org.jetbrains.kotlin.formver.plugin.verify
 
 fun <T> <!VIPER_TEXT!>idFun<!>(arg: T): T = arg
 
@@ -55,19 +56,26 @@ fun <!VIPER_TEXT!>checkArgumentIsCopied<!>(x: ClassWithVar) {
     }
 }
 
-class ManyMembers(val i: Int, val b: Boolean, val c: ClassWithVar)
+class ManyMembers(val i: Int, var b: Boolean, val c: ClassWithVar)
 
 @AlwaysVerify
 fun <!VIPER_TEXT!>accessManyMembers<!>(m: ManyMembers) {
     m.copiedRun {
-        i * i
+        idFun(i)
         idFun(b)
         c
     }
     m.runWithId {
-        i * i
+        idFun(i)
         idFun(b)
         c
+    }
+}
+
+@AlwaysVerify
+fun <!VIPER_TEXT!>checkEvaluatedOnce<!>(i: Int, mm: ManyMembers) {
+    (i + (if (mm.b) 1 else -1)).copiedRun {
+        verify(this == this)
     }
 }
 
