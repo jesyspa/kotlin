@@ -52,11 +52,14 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext>()
         // returnTarget is null when it is the implicit return of a lambda
         val returnTargetName = returnExpression.target.labelName
         val target = data.resolveReturnTarget(returnTargetName)
-        return Block(Assign(target.variable, expr), Goto(target.label))
+        return blockOf(
+            Assign(target.variable, expr),
+            Goto(target.label)
+        )
     }
 
     override fun visitBlock(block: FirBlock, data: StmtConversionContext): ExpEmbedding =
-        Block(block.statements.map(data::convert))
+        block.statements.map(data::convert).toBlock()
 
     override fun visitLiteralExpression(
         constExpression: FirLiteralExpression,
@@ -114,7 +117,7 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext>()
             val body = withWhenSubject(subj?.variable) {
                 convertWhenBranches(whenExpression.branches.iterator(), type, this)
             }
-            subj?.let { Block(it, body) } ?: body
+            subj?.let { blockOf(it, body) } ?: body
         }
 
     override fun visitPropertyAccessExpression(
@@ -318,7 +321,15 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext>()
             withNewScope {
                 val jumps = catchData.blocks.map { catchBlock -> NonDeterministically(Goto(catchBlock.entryLabel)) }
                 val body = convert(tryExpression.tryBlock)
-                GotoChainNode(null, Block(jumps + listOf(body) + jumps), catchData.exitLabel)
+                GotoChainNode(
+                    null,
+                    Block {
+                        addAll(jumps)
+                        add(body)
+                        addAll(jumps)
+                    },
+                    catchData.exitLabel
+                )
             }
         }
         val catches = catchData.blocks.map { catchBlock ->
@@ -328,7 +339,7 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext>()
                 val paramDecl = declareLocalProperty(parameter.symbol, null)
                 GotoChainNode(
                     catchBlock.entryLabel,
-                    Block(
+                    blockOf(
                         paramDecl,
                         convert(catchBlock.firCatch.block)
                     ),
@@ -336,7 +347,11 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext>()
                 )
             }
         }
-        return Block(listOf(tryBody) + catches + LabelExp(catchData.exitLabel))
+        return Block {
+            add(tryBody)
+            addAll(catches)
+            add(LabelExp(catchData.exitLabel))
+        }
     }
 
     override fun visitElvisExpression(
