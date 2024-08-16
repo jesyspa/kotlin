@@ -166,14 +166,12 @@ fun StmtConversionContext.insertInlineFunctionCall(
         parent = parentCtx,
     )
     return withMethodCtx(methodCtxFactory) {
-        Block(
-            buildList {
-                add(Declare(returnTarget.variable, null))
-                addAll(declarations)
-                add(FunctionExp(null, convert(body), returnTarget.label))
-                add(returnTarget.variable)
-            }
-        )
+        Block {
+            add(Declare(returnTarget.variable, null))
+            addAll(declarations)
+            add(FunctionExp(null, convert(body), returnTarget.label))
+            add(returnTarget.variable)
+        }
     }
 }
 
