@@ -141,7 +141,11 @@ fun StmtConversionContext.argumentDeclaration(arg: ExpEmbedding, callType: TypeE
                 proven = true
                 access = true
             }
-            if (argWithInvariants is VariableEmbedding) null to argWithInvariants
+            // If `argWithInvariants` is `Cast(...(Cast(someVariable))...)` it is fine to use it
+            // since in Viper it will always be translated to `someVariable`.
+            // On other hand, `TypeEmbedding` and invariants in Viper are guaranteed
+            // via previous line.
+            if (argWithInvariants.underlyingVariable != null) null to argWithInvariants
             else declareAnonVar(callType, argWithInvariants).let {
                 it to it.variable
             }
