@@ -33,7 +33,7 @@ fun Block(actions: MutableList<ExpEmbedding>.() -> Unit): Block = BlockImpl(buil
     actions()
 })
 
-interface Block : OptionalResultExpEmbedding {
+sealed interface Block : OptionalResultExpEmbedding {
     val exps: List<ExpEmbedding>
     override val type: TypeEmbedding
         get() = exps.lastOrNull()?.type ?: buildType { unit() }
