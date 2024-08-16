@@ -110,7 +110,10 @@ object KotlinIntDivFunctionImplementation : KotlinIntSpecialFunction() {
         args: List<ExpEmbedding>,
         ctx: StmtConversionContext,
         // TODO: implement this properly, we don't want to evaluate args[1] twice.
-    ): ExpEmbedding = Block(InhaleDirect(NeCmp(args[1], IntLit(0))), Div(args[0], args[1]))
+    ): ExpEmbedding = blockOf(
+        InhaleDirect(NeCmp(args[1], IntLit(0))),
+        Div(args[0], args[1]),
+    )
 }
 
 abstract class KotlinBooleanSpecialFunction : SpecialKotlinFunction {
