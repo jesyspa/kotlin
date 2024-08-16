@@ -10,10 +10,12 @@ import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.declarations.FirProperty
 import org.jetbrains.kotlin.fir.expressions.*
 import org.jetbrains.kotlin.fir.expressions.impl.FirElseIfTrueCondition
+import org.jetbrains.kotlin.fir.expressions.impl.FirUnitExpression
 import org.jetbrains.kotlin.fir.references.toResolvedSymbol
 import org.jetbrains.kotlin.fir.symbols.FirBasedSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirFunctionSymbol
 import org.jetbrains.kotlin.fir.types.coneType
+import org.jetbrains.kotlin.fir.types.isUnit
 import org.jetbrains.kotlin.fir.types.resolvedType
 import org.jetbrains.kotlin.fir.visitors.FirVisitor
 import org.jetbrains.kotlin.formver.UnsupportedFeatureBehaviour
@@ -49,7 +51,10 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext>()
         returnExpression: FirReturnExpression,
         data: StmtConversionContext,
     ): ExpEmbedding {
-        val expr = data.convert(returnExpression.result)
+        val expr = when (returnExpression.result) {
+            is FirUnitExpression -> UnitLit
+            else -> data.convert(returnExpression.result)
+        }
         // returnTarget is null when it is the implicit return of a lambda
         val returnTargetName = returnExpression.target.labelName
         val target = data.resolveReturnTarget(returnTargetName)
@@ -59,18 +64,25 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext>()
         )
     }
 
+    override fun visitResolvedQualifier(resolvedQualifier: FirResolvedQualifier, data: StmtConversionContext): ExpEmbedding {
+        check(resolvedQualifier.resolvedType.isUnit) {
+            "Only `Unit` is supported among resolved qualifiers currently."
+        }
+        return UnitLit
+    }
+
     override fun visitBlock(block: FirBlock, data: StmtConversionContext): ExpEmbedding =
         block.statements.map(data::convert).toBlock()
 
     override fun visitLiteralExpression(
-        constExpression: FirLiteralExpression,
+        literalExpression: FirLiteralExpression,
         data: StmtConversionContext,
     ): ExpEmbedding =
-        when (constExpression.kind) {
-            ConstantValueKind.Int -> IntLit((constExpression.value as Long).toInt())
-            ConstantValueKind.Boolean -> BooleanLit(constExpression.value as Boolean)
+        when (literalExpression.kind) {
+            ConstantValueKind.Int -> IntLit((literalExpression.value as Long).toInt())
+            ConstantValueKind.Boolean -> BooleanLit(literalExpression.value as Boolean)
             ConstantValueKind.Null -> NullLit
-            else -> handleUnimplementedElement("Constant Expression of type ${constExpression.kind} is not yet implemented.", data)
+            else -> handleUnimplementedElement("Constant Expression of type ${literalExpression.kind} is not yet implemented.", data)
         }
 
     override fun visitIntegerLiteralOperatorCall(
