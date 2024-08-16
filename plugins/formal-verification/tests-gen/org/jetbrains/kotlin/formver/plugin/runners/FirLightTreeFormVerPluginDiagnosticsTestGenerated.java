@@ -194,6 +194,12 @@ public class FirLightTreeFormVerPluginDiagnosticsTestGenerated extends AbstractF
     }
 
     @Test
+    @TestMetadata("unit_return_type.kt")
+    public void testUnit_return_type() {
+      runTest("plugins/formal-verification/testData/diagnostics/good_contracts/unit_return_type.kt");
+    }
+
+    @Test
     @TestMetadata("viper_casts_while_inlining.kt")
     public void testViper_casts_while_inlining() {
       runTest("plugins/formal-verification/testData/diagnostics/good_contracts/viper_casts_while_inlining.kt");
