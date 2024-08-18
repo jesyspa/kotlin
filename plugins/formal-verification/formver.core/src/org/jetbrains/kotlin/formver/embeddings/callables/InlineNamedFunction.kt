@@ -23,9 +23,9 @@ class InlineNamedFunction(
     ): ExpEmbedding {
         val paramNames = buildList {
             if (type.dispatchReceiverType != null)
-                add(ExtraSpecialNames.D_THIS)
+                add(ExtraSpecialNames.DISPATCH_THIS)
             if (type.extensionReceiverType != null)
-                add(ExtraSpecialNames.E_THIS)
+                add(ExtraSpecialNames.EXTENSION_THIS)
             addAll(symbol.valueParameterSymbols.map { it.name })
         }
         return ctx.insertInlineFunctionCall(signature, paramNames, args, firBody, signature.sourceName)

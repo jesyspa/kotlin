@@ -36,7 +36,7 @@ class LambdaExp(
         val inlineBody = function.body ?: throw IllegalArgumentException("Lambda $function has a null body.")
         val nonReceiverParamNames = function.valueParameters.map { it.name }
         //TODO: can lambdas have dispatch receiver?
-        val receiverParamNames = if (function.receiverParameter != null) listOf(ExtraSpecialNames.E_THIS) else emptyList()
+        val receiverParamNames = if (function.receiverParameter != null) listOf(ExtraSpecialNames.EXTENSION_THIS) else emptyList()
         return ctx.insertInlineFunctionCall(
             signature,
             receiverParamNames + nonReceiverParamNames,

@@ -7,10 +7,15 @@ package org.jetbrains.kotlin.formver.names
 
 import org.jetbrains.kotlin.name.Name
 
+/*
+ * Those are actual `Name`s from Kotlin.
+ * The structure of the object is the same as in `SpecialNames`.
+ * They never end up in Viper output and are meant for internal use.
+ */
 object ExtraSpecialNames {
     @JvmField
-    val E_THIS = Name.special("<E_THIS>")
+    val EXTENSION_THIS = Name.special("<E_THIS>")
 
     @JvmField
-    val D_THIS = Name.special("<D_THIS>")
+    val DISPATCH_THIS = Name.special("<D_THIS>")
 }

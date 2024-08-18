@@ -37,8 +37,8 @@ class RootParameterResolver(
     private val parameters = signature.params.associateBy { it.name }
     override fun tryResolveParameter(name: Name): ExpEmbedding? = parameters[name.embedParameterName()]
     override fun tryResolveReceiver(isExtension: Boolean) =
-        if (isExtension) signature.run { extensionReceiver }
-        else signature.run { dispatchReceiver }
+        if (isExtension) signature.extensionReceiver
+        else signature.dispatchReceiver
 }
 
 class InlineParameterResolver(
@@ -48,6 +48,6 @@ class InlineParameterResolver(
 ) : ParameterResolver {
     override fun tryResolveParameter(name: Name): ExpEmbedding? = substitutions[name]
     override fun tryResolveReceiver(isExtension: Boolean): ExpEmbedding? =
-        if (isExtension) substitutions[ExtraSpecialNames.E_THIS]
-        else substitutions[ExtraSpecialNames.D_THIS]
+        if (isExtension) substitutions[ExtraSpecialNames.EXTENSION_THIS]
+        else substitutions[ExtraSpecialNames.DISPATCH_THIS]
 }

@@ -301,6 +301,10 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext>()
         thisReceiverExpression: FirThisReceiverExpression,
         data: StmtConversionContext,
     ): ExpEmbedding {
+        // `thisReceiverExpression` has a bound symbol which can be used for lookup
+        // for extensions `this`es the bound symbol is the function they originate from
+        // for member functions the bound symbol is a class they're defined in
+        // TODO: conduct more thorough lookup based on the name of this symbol as well
         val isExtensionReceiver = when (thisReceiverExpression.calleeReference.boundSymbol) {
             is FirClassSymbol<*> -> false
             is FirFunctionSymbol<*> -> true
