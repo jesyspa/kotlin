@@ -84,9 +84,11 @@ data class NullableTypeEmbedding(val elementType: TypeEmbedding) : TypeEmbedding
     override val runtimeType = RuntimeTypeDomain.nullable(elementType.runtimeType)
     override val name = object : MangledName {
         override val mangledScope: String?
-            get() = elementType.name.mangledScope?.let { "N$it" }
+            get() = elementType.name.mangledScope
+        override val mangledType: String?
+            get() = elementType.name.mangledType
         override val mangledBaseName: String
-            get() = elementType.name.mangledBaseName
+            get() = elementType.name.mangledBaseName.let { "N\$$it" }
     }
 
     override fun accessInvariants(): List<TypeInvariantEmbedding> = elementType.accessInvariants().map { IfNonNullInvariant(it) }
