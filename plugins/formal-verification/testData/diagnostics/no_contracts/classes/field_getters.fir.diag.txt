@@ -11,7 +11,6 @@ method f$testPrimitiveFieldGetter$TF$T$c$PrimitiveFields(p$pf: Ref)
   var l0$b: Ref
   inhale df$rt$isSubtype(df$rt$typeOf(p$pf), df$rt$T$c$PrimitiveFields())
   inhale acc(p$c$PrimitiveFields$shared(p$pf), wildcard)
-  ret$0 := df$rt$unitValue()
   unfold acc(p$c$PrimitiveFields$shared(p$pf), wildcard)
   l0$a := p$pf.bf$a
   inhale acc(p$pf.bf$b, write)
@@ -19,6 +18,7 @@ method f$testPrimitiveFieldGetter$TF$T$c$PrimitiveFields(p$pf: Ref)
   exhale acc(p$pf.bf$b, write)
   inhale df$rt$isSubtype(df$rt$typeOf(l0$b), df$rt$intType())
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
 /field_getters.kt:(230,254): info: Generated Viper text for testReferenceFieldGetter:
@@ -42,7 +42,6 @@ method f$testReferenceFieldGetter$TF$T$c$ReferenceFields(p$rf: Ref)
   var l0$gb: Ref
   inhale df$rt$isSubtype(df$rt$typeOf(p$rf), df$rt$T$c$ReferenceFields())
   inhale acc(p$c$ReferenceFields$shared(p$rf), wildcard)
-  ret$0 := df$rt$unitValue()
   unfold acc(p$c$ReferenceFields$shared(p$rf), wildcard)
   l0$f := p$rf.bf$f
   inhale acc(p$rf.bf$g, write)
@@ -63,6 +62,7 @@ method f$testReferenceFieldGetter$TF$T$c$ReferenceFields(p$rf: Ref)
   exhale acc(l0$g.bf$b, write)
   inhale df$rt$isSubtype(df$rt$typeOf(l0$gb), df$rt$intType())
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
 /field_getters.kt:(387,411): info: Generated Viper text for testCascadingFieldGetter:
@@ -88,7 +88,6 @@ method f$testCascadingFieldGetter$TF$T$c$ReferenceFields(p$rf: Ref)
   var anon$3: Ref
   inhale df$rt$isSubtype(df$rt$typeOf(p$rf), df$rt$T$c$ReferenceFields())
   inhale acc(p$c$ReferenceFields$shared(p$rf), wildcard)
-  ret$0 := df$rt$unitValue()
   unfold acc(p$c$ReferenceFields$shared(p$rf), wildcard)
   anon$0 := p$rf.bf$f
   unfold acc(p$c$PrimitiveFields$shared(anon$0), wildcard)
@@ -116,4 +115,5 @@ method f$testCascadingFieldGetter$TF$T$c$ReferenceFields(p$rf: Ref)
   exhale acc(anon$3.bf$b, write)
   inhale df$rt$isSubtype(df$rt$typeOf(l0$gb), df$rt$intType())
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }

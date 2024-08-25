@@ -7,143 +7,171 @@ method f$useRun$TF$() returns (ret$0: Ref)
   var l0$two: Ref
   var l0$three: Ref
   var l0$genericResult: Ref
-  var anon$9: Ref
-  var ret$1: Ref
   var anon$10: Ref
-  var ret$2: Ref
   var anon$11: Ref
-  var ret$3: Ref
+  var ret$1: Ref
   var anon$12: Ref
-  var ret$4: Ref
+  var ret$2: Ref
   var anon$13: Ref
-  var ret$5: Ref
   var anon$14: Ref
+  var ret$3: Ref
+  var anon$15: Ref
+  var ret$4: Ref
+  var anon$16: Ref
+  var anon$17: Ref
+  var ret$5: Ref
+  var anon$18: Ref
   var ret$6: Ref
   var l0$capturedResult: Ref
-  var anon$15: Ref
-  var ret$7: Ref
-  var anon$16: Ref
-  var ret$8: Ref
-  var anon$17: Ref
-  var ret$9: Ref
-  var anon$18: Ref
-  var ret$10: Ref
   var anon$19: Ref
-  var ret$11: Ref
   var anon$20: Ref
+  var ret$7: Ref
+  var anon$21: Ref
+  var ret$8: Ref
+  var anon$22: Ref
+  var anon$23: Ref
+  var ret$9: Ref
+  var anon$24: Ref
+  var ret$10: Ref
+  var anon$25: Ref
+  var anon$26: Ref
+  var ret$11: Ref
+  var anon$27: Ref
   var ret$12: Ref
   var l0$intResult: Ref
-  var anon$21: Ref
+  var anon$28: Ref
   var ret$13: Ref
   var ret$14: Ref
-  var anon$22: Ref
+  var anon$29: Ref
   var ret$15: Ref
   var ret$16: Ref
-  var anon$23: Ref
+  var anon$30: Ref
   var ret$17: Ref
   var ret$18: Ref
   var l0$doubleIntRunResult: Ref
-  var anon$24: Ref
+  var anon$31: Ref
   var ret$19: Ref
   var anon$0: Ref
   var ret$21: Ref
   var anon$1: Ref
   var ret$20: Ref
   var l0$genericReceiverResult: Ref
-  var anon$25: Ref
-  var ret$22: Ref
-  var anon$2: Ref
-  var anon$26: Ref
-  var ret$23: Ref
-  var anon$27: Ref
-  var anon$28: Ref
-  var anon$29: Ref
-  var anon$30: Ref
-  var anon$31: Ref
   var anon$32: Ref
   var anon$33: Ref
+  var ret$22: Ref
+  var anon$2: Ref
   var anon$34: Ref
+  var ret$23: Ref
+  var anon$3: Ref
   var anon$35: Ref
   var anon$36: Ref
+  var anon$37: Ref
+  var anon$38: Ref
+  var anon$39: Ref
+  var anon$40: Ref
+  var anon$41: Ref
+  var anon$42: Ref
+  var anon$43: Ref
+  var anon$44: Ref
   l0$one := df$rt$intToRef(1)
   l0$two := df$rt$intToRef(2)
   l0$three := df$rt$intToRef(3)
   ret$2 := df$rt$intToRef(1)
   goto lbl$ret$2
   label lbl$ret$2
-  anon$10 := ret$2
-  ret$1 := anon$10
+  anon$12 := ret$2
+  ret$1 := anon$12
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$1), df$rt$nullable(df$rt$anyType()))
   goto lbl$ret$1
   label lbl$ret$1
-  anon$9 := ret$1
+  anon$11 := ret$1
+  anon$10 := anon$11
+  inhale df$rt$isSubtype(df$rt$typeOf(anon$10), df$rt$intType())
   ret$4 := df$rt$intToRef(2)
   goto lbl$ret$4
   label lbl$ret$4
-  anon$12 := ret$4
-  ret$3 := anon$12
+  anon$15 := ret$4
+  ret$3 := anon$15
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$3), df$rt$nullable(df$rt$anyType()))
   goto lbl$ret$3
   label lbl$ret$3
-  anon$11 := ret$3
+  anon$14 := ret$3
+  anon$13 := anon$14
+  inhale df$rt$isSubtype(df$rt$typeOf(anon$13), df$rt$intType())
   ret$6 := df$rt$intToRef(3)
   goto lbl$ret$6
   label lbl$ret$6
-  anon$14 := ret$6
-  ret$5 := anon$14
+  anon$18 := ret$6
+  ret$5 := anon$18
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$5), df$rt$nullable(df$rt$anyType()))
   goto lbl$ret$5
   label lbl$ret$5
-  anon$13 := ret$5
-  l0$genericResult := df$rt$boolToRef(sp$plusInts(anon$9, anon$11) ==
-    anon$13)
+  anon$17 := ret$5
+  anon$16 := anon$17
+  inhale df$rt$isSubtype(df$rt$typeOf(anon$16), df$rt$intType())
+  l0$genericResult := df$rt$boolToRef(df$rt$intFromRef(anon$10) +
+    df$rt$intFromRef(anon$13) ==
+    df$rt$intFromRef(anon$16))
   ret$8 := df$rt$intToRef(1)
   goto lbl$ret$8
   label lbl$ret$8
-  anon$16 := ret$8
-  ret$7 := anon$16
+  anon$21 := ret$8
+  ret$7 := anon$21
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$7), df$rt$nullable(df$rt$anyType()))
   goto lbl$ret$7
   label lbl$ret$7
-  anon$15 := ret$7
+  anon$20 := ret$7
+  anon$19 := anon$20
+  inhale df$rt$isSubtype(df$rt$typeOf(anon$19), df$rt$intType())
   ret$10 := df$rt$intToRef(2)
   goto lbl$ret$10
   label lbl$ret$10
-  anon$18 := ret$10
-  ret$9 := anon$18
+  anon$24 := ret$10
+  ret$9 := anon$24
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$9), df$rt$nullable(df$rt$anyType()))
   goto lbl$ret$9
   label lbl$ret$9
-  anon$17 := ret$9
+  anon$23 := ret$9
+  anon$22 := anon$23
+  inhale df$rt$isSubtype(df$rt$typeOf(anon$22), df$rt$intType())
   ret$12 := df$rt$intToRef(3)
   goto lbl$ret$12
   label lbl$ret$12
-  anon$20 := ret$12
-  ret$11 := anon$20
+  anon$27 := ret$12
+  ret$11 := anon$27
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$11), df$rt$nullable(df$rt$anyType()))
   goto lbl$ret$11
   label lbl$ret$11
-  anon$19 := ret$11
-  l0$capturedResult := df$rt$boolToRef(sp$plusInts(anon$15, anon$17) ==
-    anon$19)
+  anon$26 := ret$11
+  anon$25 := anon$26
+  inhale df$rt$isSubtype(df$rt$typeOf(anon$25), df$rt$intType())
+  l0$capturedResult := df$rt$boolToRef(df$rt$intFromRef(anon$19) +
+    df$rt$intFromRef(anon$22) ==
+    df$rt$intFromRef(anon$25))
   ret$14 := df$rt$intToRef(1)
   goto lbl$ret$14
   label lbl$ret$14
   ret$13 := ret$14
   goto lbl$ret$13
   label lbl$ret$13
-  anon$21 := ret$13
+  anon$28 := ret$13
   ret$16 := df$rt$intToRef(2)
   goto lbl$ret$16
   label lbl$ret$16
   ret$15 := ret$16
   goto lbl$ret$15
   label lbl$ret$15
-  anon$22 := ret$15
+  anon$29 := ret$15
   ret$18 := df$rt$intToRef(3)
   goto lbl$ret$18
   label lbl$ret$18
   ret$17 := ret$18
   goto lbl$ret$17
   label lbl$ret$17
-  anon$23 := ret$17
-  l0$intResult := df$rt$boolToRef(df$rt$intFromRef(anon$21) +
-    df$rt$intFromRef(anon$22) ==
-    df$rt$intFromRef(anon$23))
+  anon$30 := ret$17
+  l0$intResult := df$rt$boolToRef(df$rt$intFromRef(anon$28) +
+    df$rt$intFromRef(anon$29) ==
+    df$rt$intFromRef(anon$30))
   anon$0 := df$rt$intToRef(1)
   ret$20 := sp$plusInts(anon$0, df$rt$intToRef(1))
   goto lbl$ret$20
@@ -155,27 +183,34 @@ method f$useRun$TF$() returns (ret$0: Ref)
   ret$19 := ret$21
   goto lbl$ret$19
   label lbl$ret$19
-  anon$24 := ret$19
-  l0$doubleIntRunResult := df$rt$boolToRef(df$rt$intFromRef(anon$24) == 3)
+  anon$31 := ret$19
+  l0$doubleIntRunResult := df$rt$boolToRef(df$rt$intFromRef(anon$31) == 3)
   anon$2 := df$rt$intToRef(1)
-  ret$23 := sp$plusInts(anon$2, df$rt$intToRef(2))
+  inhale df$rt$isSubtype(df$rt$typeOf(anon$2), df$rt$nullable(df$rt$anyType()))
+  inhale df$rt$isSubtype(df$rt$typeOf(anon$2), df$rt$intType())
+  anon$3 := anon$2
+  ret$23 := sp$plusInts(anon$3, df$rt$intToRef(2))
   goto lbl$ret$23
   label lbl$ret$23
-  anon$26 := ret$23
-  ret$22 := anon$26
+  anon$34 := ret$23
+  ret$22 := anon$34
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$22), df$rt$nullable(df$rt$anyType()))
   goto lbl$ret$22
   label lbl$ret$22
-  anon$25 := ret$22
-  l0$genericReceiverResult := df$rt$boolToRef(anon$25 == df$rt$intToRef(3))
+  anon$33 := ret$22
+  anon$32 := anon$33
+  inhale df$rt$isSubtype(df$rt$typeOf(anon$32), df$rt$intType())
+  l0$genericReceiverResult := df$rt$boolToRef(df$rt$intFromRef(anon$32) ==
+    3)
   if (df$rt$boolFromRef(l0$intResult)) {
-    anon$36 := l0$genericResult
+    anon$44 := l0$genericResult
   } else {
-    anon$36 := df$rt$boolToRef(false)}
-  if (df$rt$boolFromRef(anon$36)) {
-    anon$35 := l0$capturedResult
+    anon$44 := df$rt$boolToRef(false)}
+  if (df$rt$boolFromRef(anon$44)) {
+    anon$43 := l0$capturedResult
   } else {
-    anon$35 := df$rt$boolToRef(false)}
-  if (df$rt$boolFromRef(anon$35)) {
+    anon$43 := df$rt$boolToRef(false)}
+  if (df$rt$boolFromRef(anon$43)) {
     var ret$24: Ref
     var l24$result: Ref
     var ret$25: Ref
@@ -186,11 +221,11 @@ method f$useRun$TF$() returns (ret$0: Ref)
     ret$24 := df$rt$boolToRef(df$rt$intFromRef(l24$result) == 3)
     goto lbl$ret$24
     label lbl$ret$24
-    anon$34 := ret$24
+    anon$42 := ret$24
   } else {
-    anon$34 := df$rt$boolToRef(false)}
-  if (df$rt$boolFromRef(anon$34)) {
-    var anon$37: Ref
+    anon$42 := df$rt$boolToRef(false)}
+  if (df$rt$boolFromRef(anon$42)) {
+    var anon$45: Ref
     var ret$26: Ref
     var l26$result: Ref
     var ret$27: Ref
@@ -201,103 +236,103 @@ method f$useRun$TF$() returns (ret$0: Ref)
     ret$26 := df$rt$boolToRef(df$rt$intFromRef(l26$result) == 3)
     goto lbl$ret$26
     label lbl$ret$26
-    anon$37 := ret$26
-    anon$33 := sp$notBool(anon$37)
+    anon$45 := ret$26
+    anon$41 := sp$notBool(anon$45)
   } else {
-    anon$33 := df$rt$boolToRef(false)}
-  if (df$rt$boolFromRef(anon$33)) {
+    anon$41 := df$rt$boolToRef(false)}
+  if (df$rt$boolFromRef(anon$41)) {
     var ret$28: Ref
     var l28$result: Ref
     var ret$29: Ref
-    var anon$3: Ref
-    anon$3 := df$rt$intToRef(1)
-    ret$29 := sp$plusInts(anon$3, df$rt$intToRef(2))
+    var anon$4: Ref
+    anon$4 := df$rt$intToRef(1)
+    ret$29 := sp$plusInts(anon$4, df$rt$intToRef(2))
     goto lbl$ret$29
     label lbl$ret$29
     l28$result := ret$29
     ret$28 := df$rt$boolToRef(df$rt$intFromRef(l28$result) == 3)
     goto lbl$ret$28
     label lbl$ret$28
-    anon$32 := ret$28
+    anon$40 := ret$28
   } else {
-    anon$32 := df$rt$boolToRef(false)}
-  if (df$rt$boolFromRef(anon$32)) {
-    var anon$38: Ref
+    anon$40 := df$rt$boolToRef(false)}
+  if (df$rt$boolFromRef(anon$40)) {
+    var anon$46: Ref
     var ret$30: Ref
     var l30$result: Ref
     var ret$31: Ref
-    var anon$4: Ref
-    anon$4 := df$rt$intToRef(1)
-    ret$31 := anon$4
+    var anon$5: Ref
+    anon$5 := df$rt$intToRef(1)
+    ret$31 := anon$5
     goto lbl$ret$31
     label lbl$ret$31
     l30$result := ret$31
     ret$30 := df$rt$boolToRef(df$rt$intFromRef(l30$result) == 3)
     goto lbl$ret$30
     label lbl$ret$30
-    anon$38 := ret$30
-    anon$31 := sp$notBool(anon$38)
+    anon$46 := ret$30
+    anon$39 := sp$notBool(anon$46)
   } else {
-    anon$31 := df$rt$boolToRef(false)}
-  if (df$rt$boolFromRef(anon$31)) {
+    anon$39 := df$rt$boolToRef(false)}
+  if (df$rt$boolFromRef(anon$39)) {
     var ret$32: Ref
     var l32$result: Ref
     var ret$33: Ref
-    var anon$5: Ref
-    anon$5 := df$rt$intToRef(1)
-    ret$33 := sp$plusInts(anon$5, df$rt$intToRef(2))
+    var anon$6: Ref
+    anon$6 := df$rt$intToRef(1)
+    ret$33 := sp$plusInts(anon$6, df$rt$intToRef(2))
     goto lbl$ret$33
     label lbl$ret$33
     l32$result := ret$33
     ret$32 := df$rt$boolToRef(df$rt$intFromRef(l32$result) == 3)
     goto lbl$ret$32
     label lbl$ret$32
-    anon$30 := ret$32
+    anon$38 := ret$32
   } else {
-    anon$30 := df$rt$boolToRef(false)}
-  if (df$rt$boolFromRef(anon$30)) {
+    anon$38 := df$rt$boolToRef(false)}
+  if (df$rt$boolFromRef(anon$38)) {
     var ret$34: Ref
     var l34$result: Ref
     var ret$35: Ref
-    var anon$6: Ref
-    anon$6 := df$rt$intToRef(1)
-    ret$35 := sp$plusInts(anon$6, df$rt$intToRef(2))
+    var anon$7: Ref
+    anon$7 := df$rt$intToRef(1)
+    ret$35 := sp$plusInts(anon$7, df$rt$intToRef(2))
     goto lbl$ret$35
     label lbl$ret$35
     l34$result := ret$35
     ret$34 := df$rt$boolToRef(df$rt$intFromRef(l34$result) == 3)
     goto lbl$ret$34
     label lbl$ret$34
-    anon$29 := ret$34
+    anon$37 := ret$34
   } else {
-    anon$29 := df$rt$boolToRef(false)}
-  if (df$rt$boolFromRef(anon$29)) {
+    anon$37 := df$rt$boolToRef(false)}
+  if (df$rt$boolFromRef(anon$37)) {
     var ret$36: Ref
     var l36$result: Ref
     var ret$38: Ref
-    var anon$8: Ref
+    var anon$9: Ref
     var ret$37: Ref
-    var anon$7: Ref
-    anon$7 := df$rt$intToRef(1)
-    ret$37 := sp$plusInts(anon$7, df$rt$intToRef(1))
+    var anon$8: Ref
+    anon$8 := df$rt$intToRef(1)
+    ret$37 := sp$plusInts(anon$8, df$rt$intToRef(1))
     goto lbl$ret$37
     label lbl$ret$37
-    anon$8 := ret$37
-    ret$38 := sp$plusInts(anon$8, df$rt$intToRef(1))
+    anon$9 := ret$37
+    ret$38 := sp$plusInts(anon$9, df$rt$intToRef(1))
     goto lbl$ret$38
     label lbl$ret$38
     l36$result := ret$38
     ret$36 := df$rt$boolToRef(df$rt$intFromRef(l36$result) == 3)
     goto lbl$ret$36
     label lbl$ret$36
-    anon$28 := ret$36
+    anon$36 := ret$36
   } else {
-    anon$28 := df$rt$boolToRef(false)}
-  if (df$rt$boolFromRef(anon$28)) {
-    anon$27 := l0$doubleIntRunResult
+    anon$36 := df$rt$boolToRef(false)}
+  if (df$rt$boolFromRef(anon$36)) {
+    anon$35 := l0$doubleIntRunResult
   } else {
-    anon$27 := df$rt$boolToRef(false)}
-  if (df$rt$boolFromRef(anon$27)) {
+    anon$35 := df$rt$boolToRef(false)}
+  if (df$rt$boolFromRef(anon$35)) {
     ret$0 := l0$genericReceiverResult
   } else {
     ret$0 := df$rt$boolToRef(false)}
@@ -311,31 +346,38 @@ method f$complexScenario$TF$T$Boolean(p$arg: Ref) returns (ret$0: Ref)
   ensures df$rt$boolFromRef(ret$0) == true ==> df$rt$boolFromRef(p$arg)
   ensures df$rt$boolFromRef(ret$0) == false ==> !df$rt$boolFromRef(p$arg)
 {
-  var anon$5: Ref
+  var anon$11: Ref
+  var anon$12: Ref
   var ret$1: Ref
   inhale df$rt$isSubtype(df$rt$typeOf(p$arg), df$rt$boolType())
   if (df$rt$boolFromRef(p$arg)) {
-    var anon$6: Ref
+    var anon$13: Ref
     var ret$2: Ref
-    var anon$7: Ref
+    var anon$14: Ref
     var ret$3: Ref
     var l5$result: Ref
     var ret$4: Ref
     var anon$0: Ref
-    var anon$8: Ref
+    var anon$15: Ref
     var ret$5: Ref
-    var anon$9: Ref
+    var anon$1: Ref
+    var anon$16: Ref
     var ret$6: Ref
+    var anon$2: Ref
     var ret$7: Ref
     var ret$9: Ref
-    var anon$1: Ref
+    var anon$3: Ref
     var ret$8: Ref
     anon$0 := df$rt$intToRef(1)
-    ret$8 := sp$plusInts(anon$0, df$rt$intToRef(1))
+    inhale df$rt$isSubtype(df$rt$typeOf(anon$0), df$rt$nullable(df$rt$anyType()))
+    anon$1 := anon$0
+    inhale df$rt$isSubtype(df$rt$typeOf(anon$1), df$rt$intType())
+    anon$2 := anon$1
+    ret$8 := sp$plusInts(anon$2, df$rt$intToRef(1))
     goto lbl$ret$8
     label lbl$ret$8
-    anon$1 := ret$8
-    ret$9 := sp$plusInts(anon$1, df$rt$intToRef(1))
+    anon$3 := ret$8
+    ret$9 := sp$plusInts(anon$3, df$rt$intToRef(1))
     goto lbl$ret$9
     label lbl$ret$9
     ret$7 := ret$9
@@ -344,85 +386,110 @@ method f$complexScenario$TF$T$Boolean(p$arg: Ref) returns (ret$0: Ref)
     ret$6 := ret$7
     goto lbl$ret$6
     label lbl$ret$6
-    anon$9 := ret$6
-    ret$5 := anon$9
+    anon$16 := ret$6
+    ret$5 := anon$16
+    inhale df$rt$isSubtype(df$rt$typeOf(ret$5), df$rt$nullable(df$rt$anyType()))
     goto lbl$ret$5
     label lbl$ret$5
-    anon$8 := ret$5
-    ret$4 := anon$8
+    anon$15 := ret$5
+    ret$4 := anon$15
+    inhale df$rt$isSubtype(df$rt$typeOf(ret$4), df$rt$intType())
     goto lbl$ret$4
     label lbl$ret$4
     l5$result := ret$4
     ret$3 := df$rt$boolToRef(df$rt$intFromRef(l5$result) == 3)
     goto lbl$ret$3
     label lbl$ret$3
-    anon$7 := ret$3
-    ret$2 := anon$7
+    anon$14 := ret$3
+    ret$2 := anon$14
     goto lbl$ret$2
     label lbl$ret$2
-    anon$6 := ret$2
-    ret$1 := anon$6
+    anon$13 := ret$2
+    ret$1 := anon$13
+    inhale df$rt$isSubtype(df$rt$typeOf(ret$1), df$rt$nullable(df$rt$anyType()))
   } else {
-    var anon$10: Ref
-    anon$10 := df$rt$nullValue()
-    ret$1 := anon$10
+    var anon$17: Ref
+    anon$17 := df$rt$nullValue()
+    ret$1 := anon$17
   }
   goto lbl$ret$1
   label lbl$ret$1
-  anon$5 := ret$1
-  if (anon$5 != df$rt$nullValue()) {
-    ret$0 := anon$5
+  anon$12 := ret$1
+  anon$11 := anon$12
+  inhale df$rt$isSubtype(df$rt$typeOf(anon$11), df$rt$nullable(df$rt$boolType()))
+  if (anon$11 != df$rt$nullValue()) {
+    ret$0 := anon$11
   } else {
-    var anon$11: Ref
+    var anon$18: Ref
     var ret$10: Ref
-    var anon$12: Ref
+    var anon$19: Ref
     var ret$11: Ref
     var ret$12: Ref
     var l15$result: Ref
     var ret$13: Ref
-    var anon$2: Ref
-    var anon$13: Ref
-    var ret$14: Ref
-    var anon$14: Ref
-    var ret$15: Ref
-    var anon$15: Ref
-    var ret$16: Ref
-    var anon$3: Ref
-    var anon$16: Ref
-    var ret$17: Ref
-    var anon$17: Ref
-    var ret$18: Ref
     var anon$4: Ref
-    var anon$18: Ref
+    var anon$20: Ref
+    var ret$14: Ref
+    var anon$5: Ref
+    var anon$21: Ref
+    var ret$15: Ref
+    var anon$6: Ref
+    var anon$22: Ref
+    var ret$16: Ref
+    var anon$7: Ref
+    var anon$23: Ref
+    var ret$17: Ref
+    var anon$8: Ref
+    var anon$24: Ref
+    var ret$18: Ref
+    var anon$9: Ref
+    var anon$25: Ref
     var ret$19: Ref
-    anon$2 := df$rt$intToRef(1)
-    anon$3 := sp$plusInts(anon$2, df$rt$intToRef(1))
-    anon$4 := sp$plusInts(anon$3, df$rt$intToRef(1))
-    ret$19 := sp$plusInts(anon$4, df$rt$intToRef(1))
+    var anon$10: Ref
+    anon$4 := df$rt$intToRef(1)
+    inhale df$rt$isSubtype(df$rt$typeOf(anon$4), df$rt$nullable(df$rt$anyType()))
+    anon$5 := anon$4
+    inhale df$rt$isSubtype(df$rt$typeOf(anon$5), df$rt$intType())
+    anon$6 := anon$5
+    anon$7 := sp$plusInts(anon$6, df$rt$intToRef(1))
+    inhale df$rt$isSubtype(df$rt$typeOf(anon$7), df$rt$nullable(df$rt$anyType()))
+    inhale df$rt$isSubtype(df$rt$typeOf(anon$7), df$rt$intType())
+    anon$8 := anon$7
+    anon$9 := sp$plusInts(anon$8, df$rt$intToRef(1))
+    inhale df$rt$isSubtype(df$rt$typeOf(anon$9), df$rt$nullable(df$rt$anyType()))
+    inhale df$rt$isSubtype(df$rt$typeOf(anon$9), df$rt$intType())
+    anon$10 := anon$9
+    ret$19 := sp$plusInts(anon$10, df$rt$intToRef(1))
     goto lbl$ret$19
     label lbl$ret$19
-    anon$18 := ret$19
-    ret$18 := anon$18
+    anon$25 := ret$19
+    ret$18 := anon$25
+    inhale df$rt$isSubtype(df$rt$typeOf(ret$18), df$rt$nullable(df$rt$anyType()))
     goto lbl$ret$18
     label lbl$ret$18
-    anon$17 := ret$18
-    ret$17 := anon$17
+    anon$24 := ret$18
+    ret$17 := anon$24
+    inhale df$rt$isSubtype(df$rt$typeOf(ret$17), df$rt$intType())
     goto lbl$ret$17
     label lbl$ret$17
-    anon$16 := ret$17
-    ret$16 := anon$16
+    anon$23 := ret$17
+    ret$16 := anon$23
+    inhale df$rt$isSubtype(df$rt$typeOf(ret$16), df$rt$nullable(df$rt$anyType()))
     goto lbl$ret$16
     label lbl$ret$16
-    anon$15 := ret$16
-    ret$15 := anon$15
+    anon$22 := ret$16
+    ret$15 := anon$22
+    inhale df$rt$isSubtype(df$rt$typeOf(ret$15), df$rt$intType())
     goto lbl$ret$15
     label lbl$ret$15
-    anon$14 := ret$15
-    ret$14 := anon$14
+    anon$21 := ret$15
+    ret$14 := anon$21
+    inhale df$rt$isSubtype(df$rt$typeOf(ret$14), df$rt$nullable(df$rt$anyType()))
     goto lbl$ret$14
     label lbl$ret$14
-    anon$13 := ret$14
-    ret$13 := anon$13
+    anon$20 := ret$14
+    ret$13 := anon$20
+    inhale df$rt$isSubtype(df$rt$typeOf(ret$13), df$rt$intType())
     goto lbl$ret$13
     label lbl$ret$13
     l15$result := ret$13
@@ -432,12 +499,14 @@ method f$complexScenario$TF$T$Boolean(p$arg: Ref) returns (ret$0: Ref)
     ret$11 := ret$12
     goto lbl$ret$11
     label lbl$ret$11
-    anon$12 := ret$11
-    ret$10 := anon$12
+    anon$19 := ret$11
+    ret$10 := anon$19
+    inhale df$rt$isSubtype(df$rt$typeOf(ret$10), df$rt$nullable(df$rt$anyType()))
     goto lbl$ret$10
     label lbl$ret$10
-    anon$11 := ret$10
-    ret$0 := anon$11
+    anon$18 := ret$10
+    ret$0 := anon$18
+    inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$boolType())
   }
   goto lbl$ret$0
   label lbl$ret$0
@@ -458,33 +527,42 @@ method f$testCustomClass$TF$() returns (ret$0: Ref)
 {
   var l0$custom: Ref
   var anon$0: Ref
-  var ret$1: Ref
   var anon$1: Ref
-  var ret$2: Ref
+  var ret$1: Ref
   var anon$2: Ref
-  var ret$3: Ref
+  var ret$2: Ref
   var anon$3: Ref
+  var anon$4: Ref
+  var ret$3: Ref
+  var anon$5: Ref
   var ret$4: Ref
   l0$custom := con$c$CustomClass$()
   unfold acc(p$c$CustomClass$shared(l0$custom), wildcard)
   ret$2 := l0$custom.bf$member
   goto lbl$ret$2
   label lbl$ret$2
-  anon$1 := ret$2
-  ret$1 := anon$1
+  anon$2 := ret$2
+  ret$1 := anon$2
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$1), df$rt$nullable(df$rt$anyType()))
   goto lbl$ret$1
   label lbl$ret$1
-  anon$0 := ret$1
+  anon$1 := ret$1
+  anon$0 := anon$1
+  inhale df$rt$isSubtype(df$rt$typeOf(anon$0), df$rt$intType())
   unfold acc(p$c$CustomClass$shared(l0$custom), wildcard)
   ret$4 := l0$custom.bf$member
   goto lbl$ret$4
   label lbl$ret$4
-  anon$3 := ret$4
-  ret$3 := anon$3
+  anon$5 := ret$4
+  ret$3 := anon$5
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$3), df$rt$nullable(df$rt$anyType()))
   goto lbl$ret$3
   label lbl$ret$3
-  anon$2 := ret$3
-  ret$0 := df$rt$boolToRef(anon$0 == anon$2)
+  anon$4 := ret$3
+  anon$3 := anon$4
+  inhale df$rt$isSubtype(df$rt$typeOf(anon$3), df$rt$intType())
+  ret$0 := df$rt$boolToRef(df$rt$intFromRef(anon$0) ==
+    df$rt$intFromRef(anon$3))
   goto lbl$ret$0
   label lbl$ret$0
 }

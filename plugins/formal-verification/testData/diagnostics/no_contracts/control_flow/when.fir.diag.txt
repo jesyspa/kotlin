@@ -180,7 +180,6 @@ method f$whenSubjectValNested$TF$() returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 {
   var l1$x: Ref
-  ret$0 := df$rt$unitValue()
   l1$x := df$rt$intToRef(1)
   if (df$rt$intFromRef(l1$x) == 0) {
   } else {
@@ -203,6 +202,7 @@ method f$whenSubjectValNested$TF$() returns (ret$0: Ref)
     }
   }
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
 /when.kt:(1674,1697): info: Generated Viper text for whenSubjectVarShadowing:
@@ -211,8 +211,8 @@ method f$whenSubjectVarShadowing$TF$() returns (ret$0: Ref)
 {
   var l0$x: Ref
   var l1$x: Ref
-  ret$0 := df$rt$unitValue()
   l0$x := df$rt$intToRef(0)
   l1$x := df$rt$intToRef(1)
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
