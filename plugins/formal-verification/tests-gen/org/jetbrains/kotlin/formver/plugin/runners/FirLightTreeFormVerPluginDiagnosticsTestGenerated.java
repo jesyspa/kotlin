@@ -210,6 +210,12 @@ public class FirLightTreeFormVerPluginDiagnosticsTestGenerated extends AbstractF
     public void testViper_casts_while_inlining() {
       runTest("plugins/formal-verification/testData/diagnostics/good_contracts/viper_casts_while_inlining.kt");
     }
+
+    @Test
+    @TestMetadata("stdlib_replacement_tests.kt")
+    public void testStdlib_replacement_tests() {
+      runTest("plugins/formal-verification/testData/diagnostics/good_contracts/stdlib_replacement_tests.kt");
+    }
   }
 
   @Nested

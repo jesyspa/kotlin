@@ -7,6 +7,7 @@ package org.jetbrains.kotlin.formver.plugin.runners
 
 import org.jetbrains.kotlin.formver.plugin.services.ExtensionRegistrarConfigurator
 import org.jetbrains.kotlin.formver.plugin.services.PluginAnnotationsProvider
+import org.jetbrains.kotlin.formver.plugin.services.StdlibReplacementsProvider
 import org.jetbrains.kotlin.test.builders.TestConfigurationBuilder
 import org.jetbrains.kotlin.test.directives.DiagnosticsDirectives.RENDER_DIAGNOSTICS_FULL_TEXT
 import org.jetbrains.kotlin.test.directives.FirDiagnosticsDirectives.ENABLE_PLUGIN_PHASES
@@ -27,6 +28,8 @@ fun TestConfigurationBuilder.commonFirWithPluginFrontendConfiguration() {
         +ENABLE_PLUGIN_PHASES
         +RENDER_DIAGNOSTICS_FULL_TEXT
     }
+
+    useAdditionalSourceProviders(::StdlibReplacementsProvider)
 
     useConfigurators(
         ::PluginAnnotationsProvider,
