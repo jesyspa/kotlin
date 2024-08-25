@@ -162,7 +162,7 @@ predicate p$c$A$unique(this$dispatch: Ref) {
   df$rt$isSubtype(df$rt$typeOf(this$dispatch.bf$a), df$rt$intType())
 }
 
-method f$accessNullable$TF$c$A(p$x: Ref) returns (ret$0: Ref)
+method f$accessNullable$TF$N$c$A(p$x: Ref) returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 {
   var l0$n: Ref

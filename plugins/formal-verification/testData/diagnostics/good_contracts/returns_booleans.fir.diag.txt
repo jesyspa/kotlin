@@ -88,7 +88,7 @@ method f$call_fun_with_contracts$TF$T$Boolean(p$b: Ref)
 /returns_booleans.kt:(1467,1480): info: Generated Viper text for isNullOrEmpty:
 field sp$size: Ref
 
-method f$isNullOrEmpty$TF$c$pkg$kotlin_collections$Collection(p$collection: Ref)
+method f$isNullOrEmpty$TF$N$c$pkg$kotlin_collections$Collection(p$collection: Ref)
   returns (ret$0: Ref)
   requires p$collection != df$rt$nullValue() ==>
     acc(p$collection.sp$size, write)

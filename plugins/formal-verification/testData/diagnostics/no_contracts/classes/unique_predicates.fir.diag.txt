@@ -67,7 +67,7 @@ predicate p$c$T$unique(this$dispatch: Ref) {
   true
 }
 
-method f$nullable_unique_arg$TF$c$T(p$t: Ref) returns (ret$0: Ref)
+method f$nullable_unique_arg$TF$N$c$T(p$t: Ref) returns (ret$0: Ref)
   requires p$t != df$rt$nullValue() ==> acc(p$c$T$unique(p$t), write)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 {
