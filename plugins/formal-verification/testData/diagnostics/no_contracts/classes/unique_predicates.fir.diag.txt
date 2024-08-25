@@ -54,8 +54,8 @@ method f$unique_foo_arg$TF$T$c$Foo(p$foo: Ref) returns (ret$0: Ref)
 {
   inhale df$rt$isSubtype(df$rt$typeOf(p$foo), df$rt$T$c$Foo())
   inhale acc(p$c$Foo$shared(p$foo), wildcard)
-  ret$0 := df$rt$unitValue()
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
 /unique_predicates.kt:(310,329): info: Generated Viper text for nullable_unique_arg:
@@ -73,8 +73,8 @@ method f$nullable_unique_arg$TF$c$T(p$t: Ref) returns (ret$0: Ref)
 {
   inhale df$rt$isSubtype(df$rt$typeOf(p$t), df$rt$nullable(df$rt$T$c$T()))
   inhale p$t != df$rt$nullValue() ==> acc(p$c$T$shared(p$t), wildcard)
-  ret$0 := df$rt$unitValue()
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
 /unique_predicates.kt:(353,372): info: Generated Viper text for borrowed_unique_arg:
@@ -93,8 +93,8 @@ method f$borrowed_unique_arg$TF$T$c$T(p$t: Ref) returns (ret$0: Ref)
 {
   inhale df$rt$isSubtype(df$rt$typeOf(p$t), df$rt$T$c$T())
   inhale acc(p$c$T$shared(p$t), wildcard)
-  ret$0 := df$rt$unitValue()
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
 /unique_predicates.kt:(424,439): info: Generated Viper text for unique_receiver:
@@ -112,8 +112,8 @@ method f$unique_receiver$TF$T$c$T(this: Ref) returns (ret$0: Ref)
 {
   inhale df$rt$isSubtype(df$rt$typeOf(this), df$rt$T$c$T())
   inhale acc(p$c$T$shared(this), wildcard)
-  ret$0 := df$rt$unitValue()
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
 /unique_predicates.kt:(488,512): info: Generated Viper text for borrowed_unique_receiver:
@@ -132,8 +132,8 @@ method f$borrowed_unique_receiver$TF$T$c$T(this: Ref) returns (ret$0: Ref)
 {
   inhale df$rt$isSubtype(df$rt$typeOf(this), df$rt$T$c$T())
   inhale acc(p$c$T$shared(this), wildcard)
-  ret$0 := df$rt$unitValue()
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
 /unique_predicates.kt:(531,544): info: Generated Viper text for unique_result:

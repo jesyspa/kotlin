@@ -10,16 +10,19 @@ import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.declarations.FirProperty
 import org.jetbrains.kotlin.fir.expressions.*
 import org.jetbrains.kotlin.fir.expressions.impl.FirElseIfTrueCondition
+import org.jetbrains.kotlin.fir.expressions.impl.FirUnitExpression
 import org.jetbrains.kotlin.fir.references.toResolvedSymbol
 import org.jetbrains.kotlin.fir.symbols.FirBasedSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirFunctionSymbol
 import org.jetbrains.kotlin.fir.types.coneType
+import org.jetbrains.kotlin.fir.types.isUnit
 import org.jetbrains.kotlin.fir.types.resolvedType
 import org.jetbrains.kotlin.fir.visitors.FirVisitor
 import org.jetbrains.kotlin.formver.UnsupportedFeatureBehaviour
 import org.jetbrains.kotlin.formver.embeddings.TypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.buildType
 import org.jetbrains.kotlin.formver.embeddings.callables.FullNamedFunctionSignature
+import org.jetbrains.kotlin.formver.embeddings.callables.insertCall
 import org.jetbrains.kotlin.formver.embeddings.expression.*
 import org.jetbrains.kotlin.formver.functionCallArguments
 import org.jetbrains.kotlin.text
@@ -48,7 +51,10 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext>()
         returnExpression: FirReturnExpression,
         data: StmtConversionContext,
     ): ExpEmbedding {
-        val expr = data.convert(returnExpression.result)
+        val expr = when (returnExpression.result) {
+            is FirUnitExpression -> UnitLit
+            else -> data.convert(returnExpression.result)
+        }
         // returnTarget is null when it is the implicit return of a lambda
         val returnTargetName = returnExpression.target.labelName
         val target = data.resolveReturnTarget(returnTargetName)
@@ -58,18 +64,25 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext>()
         )
     }
 
+    override fun visitResolvedQualifier(resolvedQualifier: FirResolvedQualifier, data: StmtConversionContext): ExpEmbedding {
+        check(resolvedQualifier.resolvedType.isUnit) {
+            "Only `Unit` is supported among resolved qualifiers currently."
+        }
+        return UnitLit
+    }
+
     override fun visitBlock(block: FirBlock, data: StmtConversionContext): ExpEmbedding =
         block.statements.map(data::convert).toBlock()
 
     override fun visitLiteralExpression(
-        constExpression: FirLiteralExpression,
+        literalExpression: FirLiteralExpression,
         data: StmtConversionContext,
     ): ExpEmbedding =
-        when (constExpression.kind) {
-            ConstantValueKind.Int -> IntLit((constExpression.value as Long).toInt())
-            ConstantValueKind.Boolean -> BooleanLit(constExpression.value as Boolean)
+        when (literalExpression.kind) {
+            ConstantValueKind.Int -> IntLit((literalExpression.value as Long).toInt())
+            ConstantValueKind.Boolean -> BooleanLit(literalExpression.value as Boolean)
             ConstantValueKind.Null -> NullLit
-            else -> handleUnimplementedElement("Constant Expression of type ${constExpression.kind} is not yet implemented.", data)
+            else -> handleUnimplementedElement("Constant Expression of type ${literalExpression.kind} is not yet implemented.", data)
         }
 
     override fun visitIntegerLiteralOperatorCall(
@@ -175,7 +188,11 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext>()
     override fun visitFunctionCall(functionCall: FirFunctionCall, data: StmtConversionContext): ExpEmbedding {
         val symbol = functionCall.toResolvedCallableSymbol()
         val callee = data.embedFunction(symbol as FirFunctionSymbol<*>)
-        return callee.insertCall(functionCall.functionCallArguments.map(data::convert), data)
+        return callee.insertCall(
+            functionCall.functionCallArguments.map(data::convert),
+            data,
+            data.embedType(functionCall.resolvedType),
+        )
     }
 
     override fun visitImplicitInvokeCall(
@@ -184,17 +201,17 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext>()
     ): ExpEmbedding {
         val receiver = implicitInvokeCall.dispatchReceiver as? FirPropertyAccessExpression
             ?: throw NotImplementedError("Implicit invoke calls only support a limited range of receivers at the moment.")
+        val returnType = data.embedType(implicitInvokeCall.resolvedType)
         val receiverSymbol = receiver.calleeReference.toResolvedSymbol<FirBasedSymbol<*>>()!!
         val args = implicitInvokeCall.argumentList.arguments.map(data::convert)
         return when (val exp = data.embedLocalSymbol(receiverSymbol).ignoringMetaNodes()) {
             is LambdaExp -> {
                 // The lambda is already the receiver, so we do not need to convert it.
                 // TODO: do this more uniformly: convert the receiver, see it is a lambda, use insertCall on it.
-                exp.insertCall(args, data)
+                exp.insertCall(args, data, returnType)
             }
             else -> {
-                val retType = data.embedType(implicitInvokeCall.toResolvedCallableSymbol()!!.resolvedReturnType)
-                InvokeFunctionObject(data.convert(receiver), args, retType)
+                InvokeFunctionObject(data.convert(receiver), args, returnType)
             }
         }
     }

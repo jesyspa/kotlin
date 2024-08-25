@@ -10,7 +10,6 @@ method f$testProperties$TF$T$c$Foo(p$foo: Ref) returns (ret$0: Ref)
   var anon$4: Ref
   inhale df$rt$isSubtype(df$rt$typeOf(p$foo), df$rt$T$c$Foo())
   inhale acc(p$c$Foo$shared(p$foo), wildcard)
-  ret$0 := df$rt$unitValue()
   anon$0 := ps$public$varProp(p$foo, df$rt$intToRef(0))
   anon$2 := pg$public$varProp(p$foo)
   anon$1 := anon$2
@@ -20,6 +19,7 @@ method f$testProperties$TF$T$c$Foo(p$foo: Ref) returns (ret$0: Ref)
   inhale df$rt$isSubtype(df$rt$typeOf(anon$3), df$rt$intType())
   l0$x := sp$plusInts(anon$1, anon$3)
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
 method pg$public$valProp(this: Ref) returns (ret: Ref)
@@ -47,11 +47,11 @@ method f$createImpl$TF$() returns (ret$0: Ref)
 {
   var l0$impl: Ref
   var l0$implField: Ref
-  ret$0 := df$rt$unitValue()
   l0$impl := con$c$Impl$T$Int(df$rt$intToRef(-1))
   unfold acc(p$c$Impl$shared(l0$impl), wildcard)
   l0$implField := l0$impl.bf$number
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
 method pg$public$number(this: Ref) returns (ret: Ref)

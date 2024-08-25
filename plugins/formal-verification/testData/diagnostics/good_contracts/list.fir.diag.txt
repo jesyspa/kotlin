@@ -7,8 +7,8 @@ method f$declaration$TF$() returns (ret$0: Ref)
   var l0$l1: Ref
   var l0$l2: Ref
   var l0$l3: Ref
-  ret$0 := df$rt$unitValue()
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
 /list.kt:(187,201): info: Generated Viper text for initialization:
@@ -26,10 +26,10 @@ method f$initialization$TF$T$c$pkg$kotlin_collections$List(p$l: Ref)
   var l0$myEmptyList: Ref
   inhale df$rt$isSubtype(df$rt$typeOf(p$l), df$rt$T$c$pkg$kotlin_collections$List())
   inhale acc(p$pkg$kotlin_collections$c$List$shared(p$l), wildcard)
-  ret$0 := df$rt$unitValue()
   l0$myList := p$l
   l0$myEmptyList := f$pkg$kotlin_collections$emptyList$TF$()
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
 method f$pkg$kotlin_collections$emptyList$TF$() returns (ret: Ref)
@@ -55,12 +55,12 @@ method f$add_get$TF$T$c$pkg$kotlin_collections$MutableList(p$l: Ref)
   var l0$n: Ref
   inhale df$rt$isSubtype(df$rt$typeOf(p$l), df$rt$T$c$pkg$kotlin_collections$MutableList())
   inhale acc(p$pkg$kotlin_collections$c$MutableList$shared(p$l), wildcard)
-  ret$0 := df$rt$unitValue()
   anon$0 := f$pkg$kotlin_collections$c$MutableList$add$TF$T$c$pkg$kotlin_collections$MutableList$T$Int(p$l,
     df$rt$intToRef(1))
   l0$n := f$pkg$kotlin_collections$c$MutableList$get$TF$T$c$pkg$kotlin_collections$MutableList$T$Int(p$l,
     df$rt$intToRef(0))
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
 method f$pkg$kotlin_collections$c$MutableList$add$TF$T$c$pkg$kotlin_collections$MutableList$T$Int(this: Ref,
@@ -198,7 +198,6 @@ method f$nullable_list$TF$c$pkg$kotlin_collections$List(p$l: Ref)
   inhale df$rt$isSubtype(df$rt$typeOf(p$l), df$rt$nullable(df$rt$T$c$pkg$kotlin_collections$List()))
   inhale p$l != df$rt$nullValue() ==>
     acc(p$pkg$kotlin_collections$c$List$shared(p$l), wildcard)
-  ret$0 := df$rt$unitValue()
   if (!(p$l == df$rt$nullValue())) {
     var anon$1: Ref
     anon$1 := f$pkg$kotlin_collections$c$List$isEmpty$TF$T$c$pkg$kotlin_collections$List(p$l)
@@ -214,6 +213,7 @@ method f$nullable_list$TF$c$pkg$kotlin_collections$List(p$l: Ref)
       sp$minusInts(anon$2, df$rt$intToRef(1)))
   }
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
 method f$pkg$kotlin_collections$c$List$get$TF$T$c$pkg$kotlin_collections$List$T$Int(this: Ref,

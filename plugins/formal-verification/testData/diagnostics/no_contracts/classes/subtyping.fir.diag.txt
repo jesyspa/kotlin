@@ -27,10 +27,10 @@ method f$assignmentSubtyping$TF$() returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 {
   var l0$x: Ref
-  ret$0 := df$rt$unitValue()
   l0$x := df$rt$boolToRef(false)
   l0$x := df$rt$boolToRef(true)
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
 /subtyping.kt:(358,384): info: Generated Viper text for functionParameterSubtyping:
@@ -38,9 +38,9 @@ method f$functionParameterSubtyping$TF$() returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 {
   var anon$0: Ref
-  ret$0 := df$rt$unitValue()
   anon$0 := f$nullableParameter$TF$Boolean(df$rt$boolToRef(false))
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
 method f$nullableParameter$TF$Boolean(p$b: Ref) returns (ret: Ref)

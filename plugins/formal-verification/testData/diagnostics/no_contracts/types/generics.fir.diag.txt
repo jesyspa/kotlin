@@ -61,12 +61,12 @@ method f$setGenericField$TF$() returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 {
   var l0$box: Ref
-  ret$0 := df$rt$unitValue()
   l0$box := con$c$Box$Any(df$rt$intToRef(3))
   inhale acc(l0$box.bf$t, write)
   l0$box.bf$t := df$rt$intToRef(5)
   exhale acc(l0$box.bf$t, write)
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
 /generics.kt:(293,303): info: Generated Viper text for genericFun:
@@ -85,10 +85,11 @@ method f$callGenericFunc$TF$() returns (ret$0: Ref)
 {
   var l0$x: Ref
   var anon$0: Ref
-  ret$0 := df$rt$unitValue()
   anon$0 := f$genericFun$TF$Any(df$rt$intToRef(3))
   l0$x := anon$0
+  inhale df$rt$isSubtype(df$rt$typeOf(l0$x), df$rt$intType())
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
 method f$genericFun$TF$Any(p$t: Ref) returns (ret: Ref)

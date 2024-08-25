@@ -371,20 +371,13 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
             )
         val stmtCtx = StmtConverter(methodCtx)
         val body = stmtCtx.convert(firBody)
-
-        // In the end we ensure that returned value is of some type even if that type is Unit.
-        // However, for Unit we don't assign the result to any value.
-        // One of the simplest solutions is to do is directly in the beginning of the body.
-        val unitExtendedBody: ExpEmbedding =
-            if (signature.type.returnType != UnitTypeEmbedding) body
-            else blockOf(
-                Assign(stmtCtx.defaultResolvedReturnTarget.variable, UnitLit),
-                body,
-            )
-        val bodyExp = FunctionExp(signature, unitExtendedBody, returnTarget.label)
+        val bodyExp = FunctionExp(signature, body, returnTarget.label)
         val seqnBuilder = SeqnBuilder(declaration.source)
         val linearizer = Linearizer(SharedLinearizationState(anonVarProducer), seqnBuilder, declaration.source)
         bodyExp.toViperUnusedResult(linearizer)
+        // note: we must guarantee somewhere that returned value is Unit
+        // as we may not encounter any `return` statement in the body
+        returnTarget.variable.withIsUnitInvariantIfUnit().toViperUnusedResult(linearizer)
         return FunctionBodyEmbedding(seqnBuilder.block, returnTarget, bodyExp)
     }
 

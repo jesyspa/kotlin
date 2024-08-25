@@ -291,14 +291,14 @@ method f$f$TF$() returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 {
   var l0$foo: Ref
-  ret$0 := df$rt$unitValue()
   l0$foo := con$c$Foo$T$Int(df$rt$intToRef(0))
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
 /full_viper_dump.kt:(172,173): info: Generated ExpEmbedding for f$f$TF$:
 Function(
     name = f$f$TF$,
-    { Var(ret$0) := Unit; Declare(Var(l0$foo), T$c$Foo, MethodCall(callee = con$c$Foo$T$Int, Int(0))) },
+    { Declare(Var(l0$foo), T$c$Foo, MethodCall(callee = con$c$Foo$T$Int, Int(0))) },
     return = lbl$ret$0,
 )

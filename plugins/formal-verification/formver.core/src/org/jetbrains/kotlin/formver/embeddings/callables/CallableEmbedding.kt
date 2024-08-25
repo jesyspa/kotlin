@@ -7,7 +7,9 @@ package org.jetbrains.kotlin.formver.embeddings.callables
 
 import org.jetbrains.kotlin.formver.conversion.StmtConversionContext
 import org.jetbrains.kotlin.formver.embeddings.FunctionTypeEmbedding
+import org.jetbrains.kotlin.formver.embeddings.TypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.expression.ExpEmbedding
+import org.jetbrains.kotlin.formver.embeddings.expression.withNewTypeInvariants
 
 /**
  * Kotlin entity that can be called.
@@ -16,3 +18,9 @@ interface CallableEmbedding {
     val type: FunctionTypeEmbedding
     fun insertCall(args: List<ExpEmbedding>, ctx: StmtConversionContext): ExpEmbedding
 }
+
+fun CallableEmbedding.insertCall(args: List<ExpEmbedding>, ctx: StmtConversionContext, actualReturnType: TypeEmbedding) =
+    insertCall(args, ctx).withNewTypeInvariants(actualReturnType) {
+        access = true
+        proven = true
+    }
