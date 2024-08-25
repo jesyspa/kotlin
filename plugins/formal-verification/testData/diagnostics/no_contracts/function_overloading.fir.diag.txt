@@ -72,7 +72,7 @@ method f$differInNullability$TF$T$Int(p$i: Ref) returns (ret$0: Ref)
 }
 
 /function_overloading.kt:(256,275): info: Generated Viper text for differInNullability:
-method f$differInNullability$TF$T$N$Int(p$i: Ref) returns (ret$0: Ref)
+method f$differInNullability$TF$N$Int(p$i: Ref) returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 {
   inhale df$rt$isSubtype(df$rt$typeOf(p$i), df$rt$nullable(df$rt$intType()))
