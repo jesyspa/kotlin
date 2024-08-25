@@ -85,8 +85,6 @@ data class NullableTypeEmbedding(val elementType: TypeEmbedding) : TypeEmbedding
     override val name = object : MangledName {
         override val mangledScope: String?
             get() = elementType.name.mangledScope
-        override val mangledType: String?
-            get() = elementType.name.mangledType
         override val mangledBaseName: String
             get() = elementType.name.mangledBaseName.let { "N\$$it" }
     }
