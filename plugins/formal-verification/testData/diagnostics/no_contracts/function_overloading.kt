@@ -11,6 +11,9 @@ fun <!VIPER_TEXT!>fakePrint<!>(f: Foo) {  }
 fun <!VIPER_TEXT!>fakePrint<!>(value: Int) {  }
 fun <!VIPER_TEXT!>fakePrint<!>(truth: Boolean) {  }
 
+fun <!VIPER_TEXT!>differInNullability<!>(i: Int) {  }
+fun <!VIPER_TEXT!>differInNullability<!>(i: Int?) {  }
+
 fun <!VIPER_TEXT!>testGlobalScopeOverloading<!>() {
     fakePrint(42)
     fakePrint(true)
