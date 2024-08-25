@@ -39,6 +39,8 @@ fun TypeBuilder.nullableAny(): AnyPretypeBuilder {
 
 fun buildType(init: TypeBuilder.() -> PretypeBuilder): TypeEmbedding = TypeBuilder().complete(init)
 
+fun TypeEmbedding.equalToType(init: TypeBuilder.() -> PretypeBuilder) = equals(buildType { init() })
+
 fun buildFunctionType(init: FunctionPretypeBuilder.() -> Unit): FunctionTypeEmbedding =
     buildType { function { init() } } as FunctionTypeEmbedding
 

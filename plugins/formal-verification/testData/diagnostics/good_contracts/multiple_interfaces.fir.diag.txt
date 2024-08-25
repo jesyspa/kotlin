@@ -7,11 +7,11 @@ method f$take1$TF$T$c$InterfaceWithImplementation1(p$obj: Ref)
   var anon$1: Ref
   inhale df$rt$isSubtype(df$rt$typeOf(p$obj), df$rt$T$c$InterfaceWithImplementation1())
   inhale acc(p$c$InterfaceWithImplementation1$shared(p$obj), wildcard)
-  ret$0 := df$rt$unitValue()
   anon$1 := pg$public$field(p$obj)
   anon$0 := anon$1
   inhale df$rt$isSubtype(df$rt$typeOf(anon$0), df$rt$intType())
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
 method pg$public$field(this: Ref) returns (ret: Ref)
@@ -26,11 +26,11 @@ method f$take2$TF$T$c$InterfaceWithoutImplementation2(p$obj: Ref)
   var anon$1: Ref
   inhale df$rt$isSubtype(df$rt$typeOf(p$obj), df$rt$T$c$InterfaceWithoutImplementation2())
   inhale acc(p$c$InterfaceWithoutImplementation2$shared(p$obj), wildcard)
-  ret$0 := df$rt$unitValue()
   anon$1 := pg$public$field(p$obj)
   anon$0 := anon$1
   inhale df$rt$isSubtype(df$rt$typeOf(anon$0), df$rt$intType())
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
 method pg$public$field(this: Ref) returns (ret: Ref)
@@ -45,8 +45,8 @@ method f$take3$TF$T$c$AbstractWithFinalImplementation3(p$obj: Ref)
 {
   inhale df$rt$isSubtype(df$rt$typeOf(p$obj), df$rt$T$c$AbstractWithFinalImplementation3())
   inhale acc(p$c$AbstractWithFinalImplementation3$shared(p$obj), wildcard)
-  ret$0 := df$rt$unitValue()
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
 /multiple_interfaces.kt:(1025,1030): info: Generated Viper text for take4:
@@ -58,11 +58,11 @@ method f$take4$TF$T$c$AbstractWithOpenImplementation4(p$obj: Ref)
   var anon$1: Ref
   inhale df$rt$isSubtype(df$rt$typeOf(p$obj), df$rt$T$c$AbstractWithOpenImplementation4())
   inhale acc(p$c$AbstractWithOpenImplementation4$shared(p$obj), wildcard)
-  ret$0 := df$rt$unitValue()
   anon$1 := pg$public$field(p$obj)
   anon$0 := anon$1
   inhale df$rt$isSubtype(df$rt$typeOf(anon$0), df$rt$intType())
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
 method pg$public$field(this: Ref) returns (ret: Ref)

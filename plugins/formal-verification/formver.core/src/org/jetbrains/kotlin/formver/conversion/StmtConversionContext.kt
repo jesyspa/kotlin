@@ -22,6 +22,7 @@ import org.jetbrains.kotlin.formver.embeddings.expression.*
 import org.jetbrains.kotlin.formver.isCustom
 import org.jetbrains.kotlin.formver.viper.ast.Label
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.utils.addIfNotNull
 import org.jetbrains.kotlin.utils.addToStdlib.ifTrue
 import org.jetbrains.kotlin.utils.filterIsInstanceAnd
 
@@ -131,18 +132,35 @@ fun StmtConversionContext.embedPropertyAccess(accessExpression: FirPropertyAcces
             error("Property access symbol $calleeSymbol has unsupported type.")
     }
 
+
+fun StmtConversionContext.argumentDeclaration(arg: ExpEmbedding, callType: TypeEmbedding): Pair<Declare?, ExpEmbedding> =
+    when (arg.ignoringMetaNodes()) {
+        is LambdaExp -> null to arg
+        else -> {
+            val argWithInvariants = arg.withNewTypeInvariants(callType) {
+                proven = true
+                access = true
+            }
+            // If `argWithInvariants` is `Cast(...(Cast(someVariable))...)` it is fine to use it
+            // since in Viper it will always be translated to `someVariable`.
+            // On other hand, `TypeEmbedding` and invariants in Viper are guaranteed
+            // via previous line.
+            if (argWithInvariants.underlyingVariable != null) null to argWithInvariants
+            else declareAnonVar(callType, argWithInvariants).let {
+                it to it.variable
+            }
+        }
+    }
+
 fun StmtConversionContext.getInlineFunctionCallArgs(
     args: List<ExpEmbedding>,
+    formalArgTypes: List<TypeEmbedding>,
 ): Pair<List<Declare>, List<ExpEmbedding>> {
     val declarations = mutableListOf<Declare>()
-    val storedArgs = args.map { arg ->
-        when (arg.ignoringMetaNodes()) {
-            is VariableEmbedding, is LambdaExp -> arg
-            else -> {
-                val paramVarDecl = declareAnonVar(arg.type, arg)
-                declarations.add(paramVarDecl)
-                paramVarDecl.variable
-            }
+    val storedArgs = args.zip(formalArgTypes).map { (arg, callType) ->
+        argumentDeclaration(arg, callType).let { (declaration, usage) ->
+            declarations.addIfNotNull(declaration)
+            usage
         }
     }
     return Pair(declarations, storedArgs)
@@ -158,7 +176,7 @@ fun StmtConversionContext.insertInlineFunctionCall(
 ): ExpEmbedding {
     // TODO: It seems like it may be possible to avoid creating a local here, but it is not clear how.
     val returnTarget = returnTargetProducer.getFresh(calleeSignature.type.returnType)
-    val (declarations, callArgs) = getInlineFunctionCallArgs(args)
+    val (declarations, callArgs) = getInlineFunctionCallArgs(args, calleeSignature.type.formalArgTypes)
     val subs = paramNames.zip(callArgs).toMap()
     val methodCtxFactory = MethodContextFactory(
         calleeSignature,
@@ -170,7 +188,8 @@ fun StmtConversionContext.insertInlineFunctionCall(
             add(Declare(returnTarget.variable, null))
             addAll(declarations)
             add(FunctionExp(null, convert(body), returnTarget.label))
-            add(returnTarget.variable)
+            // if unit is what we return we might not guarantee it yet
+            add(returnTarget.variable.withIsUnitInvariantIfUnit())
         }
     }
 }

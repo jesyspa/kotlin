@@ -63,8 +63,8 @@ method f$useClasses$TF$T$c$ReferenceField$T$c$Recursive(p$rf: Ref, p$rec: Ref)
   inhale acc(p$c$ReferenceField$shared(p$rf), wildcard)
   inhale df$rt$isSubtype(df$rt$typeOf(p$rec), df$rt$T$c$Recursive())
   inhale acc(p$c$Recursive$shared(p$rec), wildcard)
-  ret$0 := df$rt$unitValue()
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
 /predicates.kt:(354,374): info: Generated Viper text for threeLayersHierarchy:
@@ -105,8 +105,8 @@ method f$threeLayersHierarchy$TF$T$c$C(p$c: Ref) returns (ret$0: Ref)
 {
   inhale df$rt$isSubtype(df$rt$typeOf(p$c), df$rt$T$c$C())
   inhale acc(p$c$C$shared(p$c), wildcard)
-  ret$0 := df$rt$unitValue()
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
 /predicates.kt:(390,403): info: Generated Viper text for listHierarchy:
@@ -174,6 +174,6 @@ method f$listHierarchy$TF$T$c$pkg$kotlin_collections$MutableList(p$xs: Ref)
 {
   inhale df$rt$isSubtype(df$rt$typeOf(p$xs), df$rt$T$c$pkg$kotlin_collections$MutableList())
   inhale acc(p$pkg$kotlin_collections$c$MutableList$shared(p$xs), wildcard)
-  ret$0 := df$rt$unitValue()
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }

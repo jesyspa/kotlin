@@ -2,9 +2,9 @@
 method f$verify_false$TF$() returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 {
-  ret$0 := df$rt$unitValue()
   assert false
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
 /viper_verify.kt:(153,158): warning: Viper verification error: Assert might fail. Assertion false might not hold.
@@ -14,13 +14,13 @@ method f$verify_compound$TF$() returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 {
   var anon$0: Ref
-  ret$0 := df$rt$unitValue()
   if (true) {
     anon$0 := df$rt$boolToRef(false)
   } else {
     anon$0 := df$rt$boolToRef(false)}
   assert df$rt$boolFromRef(anon$0)
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
 /viper_verify.kt:(212,225): warning: Viper verification error: Assert might fail. Assertion df$rt$boolFromRef(anon$0) might not hold.

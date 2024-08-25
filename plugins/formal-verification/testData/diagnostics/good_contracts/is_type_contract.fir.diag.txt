@@ -39,8 +39,8 @@ method f$subtypeTransitive$TF$T$Unit(p$x: Ref) returns (ret$0: Ref)
     df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$nullable(df$rt$anyType()))
 {
   inhale df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$unitType())
-  ret$0 := df$rt$unitValue()
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
 /is_type_contract.kt:(870,891): info: Generated Viper text for constructorReturnType:
@@ -72,8 +72,8 @@ method f$subtypeSuperType$TF$T$c$Bar(p$bar: Ref) returns (ret$0: Ref)
 {
   inhale df$rt$isSubtype(df$rt$typeOf(p$bar), df$rt$T$c$Bar())
   inhale acc(p$c$Bar$shared(p$bar), wildcard)
-  ret$0 := df$rt$unitValue()
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
 /is_type_contract.kt:(1149,1160): info: Generated Viper text for typeOfField:

@@ -144,11 +144,11 @@ method f$setSuperField$TF$T$c$Bar(p$bar: Ref) returns (ret$0: Ref)
 {
   inhale df$rt$isSubtype(df$rt$typeOf(p$bar), df$rt$T$c$Bar())
   inhale acc(p$c$Bar$shared(p$bar), wildcard)
-  ret$0 := df$rt$unitValue()
   inhale acc(p$bar.bf$b, write)
   p$bar.bf$b := df$rt$boolToRef(true)
   exhale acc(p$bar.bf$b, write)
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
 /inheritance.kt:(525,546): info: Generated Viper text for accessSuperSuperField:
