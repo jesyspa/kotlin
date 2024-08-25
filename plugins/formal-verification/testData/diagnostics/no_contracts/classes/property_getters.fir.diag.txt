@@ -13,7 +13,7 @@ method f$testPrimitivePropertyGetter$TF$T$c$PrimitiveProperty(p$pp: Ref)
   label lbl$ret$0
 }
 
-method pg$public$nProp(this: Ref) returns (ret: Ref)
+method pg$public$nProp(this$dispatch: Ref) returns (ret: Ref)
 
 
 /property_getters.kt:(286,313): info: Generated Viper text for testReferencePropertyGetter:
@@ -38,10 +38,10 @@ method f$testReferencePropertyGetter$TF$T$c$ReferenceProperty(p$rp: Ref)
   inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
-method pg$public$nProp(this: Ref) returns (ret: Ref)
+method pg$public$nProp(this$dispatch: Ref) returns (ret: Ref)
 
 
-method pg$public$rProp(this: Ref) returns (ret: Ref)
+method pg$public$rProp(this$dispatch: Ref) returns (ret: Ref)
 
 
 /property_getters.kt:(391,418): info: Generated Viper text for testCascadingPropertyGetter:
@@ -66,7 +66,7 @@ method f$testCascadingPropertyGetter$TF$T$c$ReferenceProperty(p$rp: Ref)
   inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
-method pg$public$nProp(this: Ref) returns (ret: Ref)
+method pg$public$nProp(this$dispatch: Ref) returns (ret: Ref)
 
 
-method pg$public$rProp(this: Ref) returns (ret: Ref)
+method pg$public$rProp(this$dispatch: Ref) returns (ret: Ref)

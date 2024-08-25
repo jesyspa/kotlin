@@ -158,6 +158,12 @@ public class FirLightTreeFormVerPluginDiagnosticsTestGenerated extends AbstractF
     }
 
     @Test
+    @TestMetadata("multiple_receivers.kt")
+    public void testMultiple_receivers() {
+      runTest("plugins/formal-verification/testData/diagnostics/good_contracts/multiple_receivers.kt");
+    }
+
+    @Test
     @TestMetadata("nullability.kt")
     public void testNullability() {
       runTest("plugins/formal-verification/testData/diagnostics/good_contracts/nullability.kt");

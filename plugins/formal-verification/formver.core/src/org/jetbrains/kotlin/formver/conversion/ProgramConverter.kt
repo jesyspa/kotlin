@@ -159,7 +159,10 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
     // Note: keep in mind that this function is necessary to resolve the name of the function!
     override fun embedType(symbol: FirFunctionSymbol<*>): FunctionTypeEmbedding = buildFunctionType {
         symbol.receiverType?.let {
-            withReceiver { embedTypeWithBuilder(it) }
+            withDispatchReceiver { embedTypeWithBuilder(it) }
+        }
+        symbol.extensionReceiverType?.let {
+            withExtensionReceiver { embedTypeWithBuilder(it) }
         }
         symbol.valueParameterSymbols.forEach { param ->
             withParam {
@@ -202,15 +205,32 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
     }
 
     override fun embedFunctionSignature(symbol: FirFunctionSymbol<*>): FunctionSignature {
-        val receiverType = symbol.receiverType
-        val isReceiverUnique = symbol.receiverParameter?.isUnique(session) ?: false
-        val isReceiverBorrowed = symbol.receiverParameter?.isBorrowed(session) ?: false
+        val dispatchReceiverType = symbol.receiverType
+        val extensionReceiverType = symbol.extensionReceiverType
+        val isExtensionReceiverUnique = symbol.receiverParameter?.isUnique(session) ?: false
+        val isExtensionReceiverBorrowed = symbol.receiverParameter?.isBorrowed(session) ?: false
         return object : FunctionSignature {
             override val type: FunctionTypeEmbedding = embedType(symbol)
 
             // TODO: figure out whether we want a symbol here and how to get it.
-            override val receiver =
-                receiverType?.let { PlaceholderVariableEmbedding(ThisReceiverName, embedType(it), isReceiverUnique, isReceiverBorrowed) }
+            override val dispatchReceiver = dispatchReceiverType?.let {
+                PlaceholderVariableEmbedding(
+                    DispatchReceiverName,
+                    embedType(it),
+                    isUnique = false,
+                    isBorrowed = false,
+                )
+            }
+
+            override val extensionReceiver = extensionReceiverType?.let {
+                PlaceholderVariableEmbedding(
+                    ExtensionReceiverName,
+                    embedType(it),
+                    isExtensionReceiverUnique,
+                    isExtensionReceiverBorrowed,
+                )
+            }
+
             override val params = symbol.valueParameterSymbols.map {
                 FirVariableEmbedding(it.embedName(), embedType(it.resolvedReturnType), it, it.isUnique(session), it.isBorrowed(session))
             }
@@ -277,14 +297,17 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         }
     }
 
-    private val FirFunctionSymbol<*>.receiverType: ConeKotlinType?
-        get() {
-            val symbol = when (this) {
-                is FirPropertyAccessorSymbol -> propertySymbol
-                else -> this
-            }
-            return symbol.dispatchReceiverType ?: symbol.resolvedReceiverTypeRef?.coneType
+    private val FirFunctionSymbol<*>.containingPropertyOrSelf
+        get() = when (this) {
+            is FirPropertyAccessorSymbol -> propertySymbol
+            else -> this
         }
+
+    private val FirFunctionSymbol<*>.receiverType: ConeKotlinType?
+        get() = containingPropertyOrSelf.dispatchReceiverType
+
+    private val FirFunctionSymbol<*>.extensionReceiverType: ConeKotlinType?
+        get() = containingPropertyOrSelf.resolvedReceiverTypeRef?.coneType
 
     /**
      * Construct and register the field embedding for this property's backing field, if any exists.
@@ -391,7 +414,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         type.isBoolean -> boolean()
         type.isNothing -> nothing()
         type.isSomeFunctionType(session) -> function {
-            type.receiverType(session)?.let { withReceiver { embedTypeWithBuilder(it) } }
+            type.receiverType(session)?.let { withDispatchReceiver { embedTypeWithBuilder(it) } }
             type.valueParameterTypesWithoutReceivers(session).forEach { param ->
                 withParam { embedTypeWithBuilder(param) }
             }

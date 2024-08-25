@@ -12,7 +12,7 @@ method f$isString$TF$Any(p$x: Ref) returns (ret$0: Ref)
   label lbl$ret$0
 }
 
-method pg$public$length(this: Ref) returns (ret: Ref)
+method pg$public$length(this$dispatch: Ref) returns (ret: Ref)
 
 
 /is_type_contract.kt:(509,517): info: Generated Viper text for isString:
@@ -29,7 +29,7 @@ method f$isString$TF$T$Any(p$obj: Ref) returns (ret$0: Ref)
   label lbl$ret$0
 }
 
-method pg$public$length(this: Ref) returns (ret: Ref)
+method pg$public$length(this$dispatch: Ref) returns (ret: Ref)
 
 
 /is_type_contract.kt:(675,692): info: Generated Viper text for subtypeTransitive:

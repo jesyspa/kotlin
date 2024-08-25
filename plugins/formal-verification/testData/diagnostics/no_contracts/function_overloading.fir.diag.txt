@@ -1,10 +1,10 @@
 /function_overloading.kt:(49,52): info: Generated Viper text for baz:
-method f$c$Bar$baz$TF$T$c$Bar$T$c$Foo(this: Ref, p$f: Ref)
+method f$c$Bar$baz$TF$T$c$Bar$T$c$Foo(this$dispatch: Ref, p$f: Ref)
   returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 {
-  inhale df$rt$isSubtype(df$rt$typeOf(this), df$rt$T$c$Bar())
-  inhale acc(p$c$Bar$shared(this), wildcard)
+  inhale df$rt$isSubtype(df$rt$typeOf(this$dispatch), df$rt$T$c$Bar())
+  inhale acc(p$c$Bar$shared(this$dispatch), wildcard)
   inhale df$rt$isSubtype(df$rt$typeOf(p$f), df$rt$T$c$Foo())
   inhale acc(p$c$Foo$shared(p$f), wildcard)
   label lbl$ret$0
@@ -12,12 +12,12 @@ method f$c$Bar$baz$TF$T$c$Bar$T$c$Foo(this: Ref, p$f: Ref)
 }
 
 /function_overloading.kt:(74,77): info: Generated Viper text for baz:
-method f$c$Bar$baz$TF$T$c$Bar$T$c$Bar(this: Ref, p$b: Ref)
+method f$c$Bar$baz$TF$T$c$Bar$T$c$Bar(this$dispatch: Ref, p$b: Ref)
   returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 {
-  inhale df$rt$isSubtype(df$rt$typeOf(this), df$rt$T$c$Bar())
-  inhale acc(p$c$Bar$shared(this), wildcard)
+  inhale df$rt$isSubtype(df$rt$typeOf(this$dispatch), df$rt$T$c$Bar())
+  inhale acc(p$c$Bar$shared(this$dispatch), wildcard)
   inhale df$rt$isSubtype(df$rt$typeOf(p$b), df$rt$T$c$Bar())
   inhale acc(p$c$Bar$shared(p$b), wildcard)
   label lbl$ret$0
@@ -123,12 +123,12 @@ method con$c$Foo$() returns (ret: Ref)
   ensures acc(p$c$Foo$unique(ret), write)
 
 
-method f$c$Bar$baz$TF$T$c$Bar$T$c$Bar(this: Ref, p$b: Ref)
+method f$c$Bar$baz$TF$T$c$Bar$T$c$Bar(this$dispatch: Ref, p$b: Ref)
   returns (ret: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$unitType())
 
 
-method f$c$Bar$baz$TF$T$c$Bar$T$c$Foo(this: Ref, p$f: Ref)
+method f$c$Bar$baz$TF$T$c$Bar$T$c$Foo(this$dispatch: Ref, p$f: Ref)
   returns (ret: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$unitType())
 
