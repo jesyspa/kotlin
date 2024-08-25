@@ -46,10 +46,11 @@ object KotlinContractFunction : SpecialKotlinFunction {
         packageScope(packageName)
         ClassKotlinName(listOf("ContractBuilder"))
     }
+
     override val type: FunctionTypeEmbedding = buildFunctionType {
         withParam {
             function {
-                withReceiver {
+                withDispatchReceiver {
                     klass {
                         withName(contractBuilderTypeName)
                     }
@@ -71,10 +72,11 @@ abstract class KotlinIntSpecialFunction : SpecialKotlinFunction {
     override val className: String? = "Int"
 
     override val type: FunctionTypeEmbedding = buildFunctionType {
-        withReceiver { int() }
+        withDispatchReceiver { int() }
         withParam { int() }
         withReturnType { int() }
     }
+
 }
 
 object KotlinIntPlusFunctionImplementation : KotlinIntSpecialFunction() {
@@ -121,7 +123,7 @@ abstract class KotlinBooleanSpecialFunction : SpecialKotlinFunction {
     override val className: String? = "Boolean"
 
     override val type: FunctionTypeEmbedding = buildFunctionType {
-        withReceiver { boolean() }
+        withDispatchReceiver { boolean() }
         withReturnType { boolean() }
     }
 }

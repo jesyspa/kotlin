@@ -7,9 +7,9 @@ package org.jetbrains.kotlin.formver.conversion
 
 import org.jetbrains.kotlin.formver.embeddings.callables.FunctionSignature
 import org.jetbrains.kotlin.formver.embeddings.expression.ExpEmbedding
+import org.jetbrains.kotlin.formver.names.ExtraSpecialNames
 import org.jetbrains.kotlin.formver.names.embedParameterName
 import org.jetbrains.kotlin.name.Name
-import org.jetbrains.kotlin.name.SpecialNames
 import org.jetbrains.kotlin.utils.addToStdlib.ifTrue
 
 /**
@@ -19,7 +19,7 @@ import org.jetbrains.kotlin.utils.addToStdlib.ifTrue
  */
 interface ParameterResolver {
     fun tryResolveParameter(name: Name): ExpEmbedding?
-    fun tryResolveReceiver(): ExpEmbedding?
+    fun tryResolveReceiver(isExtension: Boolean): ExpEmbedding?
 
     val sourceName: String?
     val defaultResolvedReturnTarget: ReturnTarget
@@ -30,14 +30,15 @@ fun ParameterResolver.resolveNamedReturnTarget(returnPointName: String): ReturnT
 
 class RootParameterResolver(
     val ctx: ProgramConversionContext,
-    signature: FunctionSignature,
+    private val signature: FunctionSignature,
     override val sourceName: String?,
     override val defaultResolvedReturnTarget: ReturnTarget,
 ) : ParameterResolver {
     private val parameters = signature.params.associateBy { it.name }
-    private val receiver = signature.receiver
     override fun tryResolveParameter(name: Name): ExpEmbedding? = parameters[name.embedParameterName()]
-    override fun tryResolveReceiver() = receiver
+    override fun tryResolveReceiver(isExtension: Boolean) =
+        if (isExtension) signature.extensionReceiver
+        else signature.dispatchReceiver
 }
 
 class InlineParameterResolver(
@@ -46,5 +47,7 @@ class InlineParameterResolver(
     override val defaultResolvedReturnTarget: ReturnTarget,
 ) : ParameterResolver {
     override fun tryResolveParameter(name: Name): ExpEmbedding? = substitutions[name]
-    override fun tryResolveReceiver(): ExpEmbedding? = substitutions[SpecialNames.THIS]
+    override fun tryResolveReceiver(isExtension: Boolean): ExpEmbedding? =
+        if (isExtension) substitutions[ExtraSpecialNames.EXTENSION_THIS]
+        else substitutions[ExtraSpecialNames.DISPATCH_THIS]
 }

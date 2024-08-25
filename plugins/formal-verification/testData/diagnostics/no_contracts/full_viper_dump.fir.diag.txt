@@ -269,14 +269,14 @@ function sp$timesInts(arg1: Ref, arg2: Ref): Ref
     df$rt$intFromRef(arg1) * df$rt$intFromRef(arg2)
 
 
-predicate p$c$Foo$shared(this: Ref) {
-  acc(this.bf$x, wildcard) &&
-  df$rt$isSubtype(df$rt$typeOf(this.bf$x), df$rt$intType())
+predicate p$c$Foo$shared(this$dispatch: Ref) {
+  acc(this$dispatch.bf$x, wildcard) &&
+  df$rt$isSubtype(df$rt$typeOf(this$dispatch.bf$x), df$rt$intType())
 }
 
-predicate p$c$Foo$unique(this: Ref) {
-  acc(this.bf$x, wildcard) &&
-  df$rt$isSubtype(df$rt$typeOf(this.bf$x), df$rt$intType())
+predicate p$c$Foo$unique(this$dispatch: Ref) {
+  acc(this$dispatch.bf$x, wildcard) &&
+  df$rt$isSubtype(df$rt$typeOf(this$dispatch.bf$x), df$rt$intType())
 }
 
 method con$c$Foo$T$Int(p$x: Ref) returns (ret: Ref)
