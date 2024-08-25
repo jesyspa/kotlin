@@ -13,7 +13,7 @@ method f$testAs$TF$T$c$Foo(p$foo: Ref) returns (ret$0: Ref)
 }
 
 /as_operator.kt:(97,111): info: Generated Viper text for testNullableAs:
-method f$testNullableAs$TF$c$Foo(p$foo: Ref) returns (ret$0: Ref)
+method f$testNullableAs$TF$N$c$Foo(p$foo: Ref) returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$nullable(df$rt$T$c$Bar()))
   ensures ret$0 != df$rt$nullValue() ==>
     acc(p$c$Bar$shared(ret$0), wildcard)
@@ -49,7 +49,7 @@ method f$testSafeAs$TF$T$c$Foo(p$foo: Ref) returns (ret$0: Ref)
 }
 
 /as_operator.kt:(194,212): info: Generated Viper text for testNullableSafeAs:
-method f$testNullableSafeAs$TF$c$Foo(p$foo: Ref) returns (ret$0: Ref)
+method f$testNullableSafeAs$TF$N$c$Foo(p$foo: Ref) returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$nullable(df$rt$T$c$Bar()))
   ensures ret$0 != df$rt$nullValue() ==>
     acc(p$c$Bar$shared(ret$0), wildcard)

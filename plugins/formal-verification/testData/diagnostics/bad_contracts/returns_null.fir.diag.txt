@@ -1,5 +1,5 @@
 /returns_null.kt:(121,146): info: Generated Viper text for returns_null_unverifiable:
-method f$returns_null_unverifiable$TF$Int(p$x: Ref) returns (ret$0: Ref)
+method f$returns_null_unverifiable$TF$N$Int(p$x: Ref) returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$nullable(df$rt$intType()))
   ensures true ==> false
 {
