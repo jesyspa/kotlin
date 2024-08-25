@@ -256,4 +256,4 @@ method f$checkPrimary$TF$T$Int$T$Int(p$x: Ref, p$y: Ref)
   label lbl$ret$0
 }
 
-method pg$public$z(this: Ref) returns (ret: Ref)
+method pg$public$z(this$dispatch: Ref) returns (ret: Ref)

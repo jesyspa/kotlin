@@ -3,23 +3,24 @@ field bf$c$CustomList$private$value: Ref
 
 field sp$size: Ref
 
-method f$c$CustomList$get$TF$T$c$CustomList$T$Int(this: Ref, p$index: Ref)
+method f$c$CustomList$get$TF$T$c$CustomList$T$Int(this$dispatch: Ref, p$index: Ref)
   returns (ret$0: Ref)
-  requires acc(this.sp$size, write)
-  requires df$rt$intFromRef(this.sp$size) >= 0
+  requires acc(this$dispatch.sp$size, write)
+  requires df$rt$intFromRef(this$dispatch.sp$size) >= 0
   requires df$rt$intFromRef(p$index) >= 0
-  requires df$rt$intFromRef(this.sp$size) > df$rt$intFromRef(p$index)
-  ensures acc(this.sp$size, write)
-  ensures df$rt$intFromRef(this.sp$size) >= 0
+  requires df$rt$intFromRef(this$dispatch.sp$size) >
+    df$rt$intFromRef(p$index)
+  ensures acc(this$dispatch.sp$size, write)
+  ensures df$rt$intFromRef(this$dispatch.sp$size) >= 0
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$intType())
-  ensures df$rt$intFromRef(this.sp$size) ==
-    old(df$rt$intFromRef(this.sp$size))
+  ensures df$rt$intFromRef(this$dispatch.sp$size) ==
+    old(df$rt$intFromRef(this$dispatch.sp$size))
 {
-  inhale df$rt$isSubtype(df$rt$typeOf(this), df$rt$T$c$CustomList())
-  inhale acc(p$c$CustomList$shared(this), wildcard)
+  inhale df$rt$isSubtype(df$rt$typeOf(this$dispatch), df$rt$T$c$CustomList())
+  inhale acc(p$c$CustomList$shared(this$dispatch), wildcard)
   inhale df$rt$isSubtype(df$rt$typeOf(p$index), df$rt$intType())
-  unfold acc(p$c$CustomList$shared(this), wildcard)
-  ret$0 := this.bf$c$CustomList$private$value
+  unfold acc(p$c$CustomList$shared(this$dispatch), wildcard)
+  ret$0 := this$dispatch.bf$c$CustomList$private$value
   goto lbl$ret$0
   label lbl$ret$0
 }
@@ -38,30 +39,33 @@ method con$c$CustomList$T$Int$T$Int(p$size: Ref, p$value: Ref)
   ensures acc(p$c$CustomList$unique(ret), write)
 
 
-method f$c$CustomList$get$TF$T$c$CustomList$T$Int(this: Ref, p$index: Ref)
+method f$c$CustomList$get$TF$T$c$CustomList$T$Int(this$dispatch: Ref, p$index: Ref)
   returns (ret: Ref)
-  requires acc(this.sp$size, write)
-  requires df$rt$intFromRef(this.sp$size) >= 0
+  requires acc(this$dispatch.sp$size, write)
+  requires df$rt$intFromRef(this$dispatch.sp$size) >= 0
   requires df$rt$intFromRef(p$index) >= 0
-  requires df$rt$intFromRef(this.sp$size) > df$rt$intFromRef(p$index)
-  ensures acc(this.sp$size, write)
-  ensures df$rt$intFromRef(this.sp$size) >= 0
+  requires df$rt$intFromRef(this$dispatch.sp$size) >
+    df$rt$intFromRef(p$index)
+  ensures acc(this$dispatch.sp$size, write)
+  ensures df$rt$intFromRef(this$dispatch.sp$size) >= 0
   ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$intType())
-  ensures df$rt$intFromRef(this.sp$size) ==
-    old(df$rt$intFromRef(this.sp$size))
+  ensures df$rt$intFromRef(this$dispatch.sp$size) ==
+    old(df$rt$intFromRef(this$dispatch.sp$size))
 
 
-method f$c$CustomList$isEmpty$TF$T$c$CustomList(this: Ref)
+method f$c$CustomList$isEmpty$TF$T$c$CustomList(this$dispatch: Ref)
   returns (ret: Ref)
-  requires acc(this.sp$size, write)
-  requires df$rt$intFromRef(this.sp$size) >= 0
-  ensures acc(this.sp$size, write)
-  ensures df$rt$intFromRef(this.sp$size) >= 0
+  requires acc(this$dispatch.sp$size, write)
+  requires df$rt$intFromRef(this$dispatch.sp$size) >= 0
+  ensures acc(this$dispatch.sp$size, write)
+  ensures df$rt$intFromRef(this$dispatch.sp$size) >= 0
   ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$boolType())
-  ensures df$rt$intFromRef(this.sp$size) ==
-    old(df$rt$intFromRef(this.sp$size))
-  ensures df$rt$boolFromRef(ret) ==> df$rt$intFromRef(this.sp$size) == 0
-  ensures !df$rt$boolFromRef(ret) ==> df$rt$intFromRef(this.sp$size) > 0
+  ensures df$rt$intFromRef(this$dispatch.sp$size) ==
+    old(df$rt$intFromRef(this$dispatch.sp$size))
+  ensures df$rt$boolFromRef(ret) ==>
+    df$rt$intFromRef(this$dispatch.sp$size) == 0
+  ensures !df$rt$boolFromRef(ret) ==>
+    df$rt$intFromRef(this$dispatch.sp$size) > 0
 
 
 method f$test$TF$T$Int(p$n: Ref) returns (ret$0: Ref)

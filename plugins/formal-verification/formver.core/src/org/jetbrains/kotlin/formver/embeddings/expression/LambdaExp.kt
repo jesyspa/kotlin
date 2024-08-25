@@ -15,7 +15,7 @@ import org.jetbrains.kotlin.formver.embeddings.callables.FunctionSignature
 import org.jetbrains.kotlin.formver.embeddings.expression.debug.PlaintextLeaf
 import org.jetbrains.kotlin.formver.embeddings.expression.debug.TreeView
 import org.jetbrains.kotlin.formver.linearization.LinearizationContext
-import org.jetbrains.kotlin.name.SpecialNames
+import org.jetbrains.kotlin.formver.names.ExtraSpecialNames
 
 class LambdaExp(
     val signature: FunctionSignature,
@@ -35,7 +35,8 @@ class LambdaExp(
     ): ExpEmbedding {
         val inlineBody = function.body ?: throw IllegalArgumentException("Lambda $function has a null body.")
         val nonReceiverParamNames = function.valueParameters.map { it.name }
-        val receiverParamNames = if (function.receiverParameter != null) listOf(SpecialNames.THIS) else emptyList()
+        //TODO: can lambdas have dispatch receiver?
+        val receiverParamNames = if (function.receiverParameter != null) listOf(ExtraSpecialNames.EXTENSION_THIS) else emptyList()
         return ctx.insertInlineFunctionCall(
             signature,
             receiverParamNames + nonReceiverParamNames,
