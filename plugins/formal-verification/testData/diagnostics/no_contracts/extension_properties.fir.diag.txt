@@ -1,5 +1,5 @@
 /extension_properties.kt:(114,137): info: Generated Viper text for extensionGetterProperty:
-method eg$intValProp$TF$T$Int(this: Ref) returns (ret: Ref)
+method eg$intValProp$TF$T$Int(this$dispatch: Ref) returns (ret: Ref)
 
 
 method f$extensionGetterProperty$TF$() returns (ret$0: Ref)
@@ -25,10 +25,10 @@ method f$extensionGetterProperty$TF$() returns (ret$0: Ref)
 }
 
 /extension_properties.kt:(210,233): info: Generated Viper text for extensionSetterProperty:
-method eg$intVarProp$TF$T$Int(this: Ref) returns (ret: Ref)
+method eg$intVarProp$TF$T$Int(this$dispatch: Ref) returns (ret: Ref)
 
 
-method es$intVarProp$TF$T$Int$T$Int(this: Ref, anon$0: Ref)
+method es$intVarProp$TF$T$Int$T$Int(this$dispatch: Ref, anon$0: Ref)
   returns (ret: Ref)
 
 
@@ -44,7 +44,8 @@ method f$extensionSetterProperty$TF$() returns (ret$0: Ref)
 /extension_properties.kt:(414,453): info: Generated Viper text for extensionGetterPropertyUserDefinedClass:
 field bf$x: Ref
 
-method eg$pfValProp$TF$T$c$PrimitiveField(this: Ref) returns (ret: Ref)
+method eg$pfValProp$TF$T$c$PrimitiveField(this$dispatch: Ref)
+  returns (ret: Ref)
 
 
 method f$extensionGetterPropertyUserDefinedClass$TF$T$c$PrimitiveField(p$pf: Ref)
@@ -65,10 +66,11 @@ method f$extensionGetterPropertyUserDefinedClass$TF$T$c$PrimitiveField(p$pf: Ref
 /extension_properties.kt:(508,547): info: Generated Viper text for extensionSetterPropertyUserDefinedClass:
 field bf$x: Ref
 
-method eg$pfVarProp$TF$T$c$PrimitiveField(this: Ref) returns (ret: Ref)
+method eg$pfVarProp$TF$T$c$PrimitiveField(this$dispatch: Ref)
+  returns (ret: Ref)
 
 
-method es$pfVarProp$TF$T$c$PrimitiveField$T$Int(this: Ref, anon$0: Ref)
+method es$pfVarProp$TF$T$c$PrimitiveField$T$Int(this$dispatch: Ref, anon$0: Ref)
   returns (ret: Ref)
 
 

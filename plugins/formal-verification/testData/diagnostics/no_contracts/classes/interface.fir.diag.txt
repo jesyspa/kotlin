@@ -22,13 +22,14 @@ method f$testProperties$TF$T$c$Foo(p$foo: Ref) returns (ret$0: Ref)
   inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
-method pg$public$valProp(this: Ref) returns (ret: Ref)
+method pg$public$valProp(this$dispatch: Ref) returns (ret: Ref)
 
 
-method pg$public$varProp(this: Ref) returns (ret: Ref)
+method pg$public$varProp(this$dispatch: Ref) returns (ret: Ref)
 
 
-method ps$public$varProp(this: Ref, anon$0: Ref) returns (ret: Ref)
+method ps$public$varProp(this$dispatch: Ref, anon$0: Ref)
+  returns (ret: Ref)
 
 
 /interface.kt:(348,358): info: Generated Viper text for createImpl:
@@ -54,4 +55,4 @@ method f$createImpl$TF$() returns (ret$0: Ref)
   inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
-method pg$public$number(this: Ref) returns (ret: Ref)
+method pg$public$number(this$dispatch: Ref) returns (ret: Ref)

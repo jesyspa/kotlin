@@ -38,14 +38,8 @@ val FirPropertySymbol.isCustom: Boolean
     }
 
 val FirFunctionCall.functionCallArguments: List<FirExpression>
-    get() {
-        val receiverArg = when {
-            dispatchReceiver != null -> dispatchReceiver
-            extensionReceiver != null -> extensionReceiver
-            else -> null
-        }
-        return listOfNotNull(receiverArg) + argumentList.arguments
-    }
+    get() = listOfNotNull(dispatchReceiver, extensionReceiver) + argumentList.arguments
+
 val FirFunctionSymbol<*>.effects: List<FirEffectDeclaration>
     get() = this.resolvedContractDescription?.effects ?: emptyList()
 val KtSourceElement?.asPosition: Position

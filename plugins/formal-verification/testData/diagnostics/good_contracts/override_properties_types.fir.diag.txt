@@ -45,7 +45,7 @@ method f$extractInt$TF$T$c$Base$T$Boolean(p$base: Ref, p$returnNull: Ref)
   label lbl$ret$0
 }
 
-method pg$public$field(this: Ref) returns (ret: Ref)
+method pg$public$field(this$dispatch: Ref) returns (ret: Ref)
 
 
-method ps$public$field(this: Ref, anon$0: Ref) returns (ret: Ref)
+method ps$public$field(this$dispatch: Ref, anon$0: Ref) returns (ret: Ref)

@@ -18,7 +18,7 @@ method f$testDiamond$TF$() returns (ret$0: Ref)
   label lbl$ret$0
 }
 
-method pg$public$field(this: Ref) returns (ret: Ref)
+method pg$public$field(this$dispatch: Ref) returns (ret: Ref)
 
 
 /multiple_interfaces.kt:(405,415): info: Generated Viper text for testVarVal:
@@ -59,7 +59,7 @@ method f$testVarVal$TF$() returns (ret$0: Ref)
   inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
-method pg$public$field(this: Ref) returns (ret: Ref)
+method pg$public$field(this$dispatch: Ref) returns (ret: Ref)
 
 
-method ps$public$field(this: Ref, anon$0: Ref) returns (ret: Ref)
+method ps$public$field(this$dispatch: Ref, anon$0: Ref) returns (ret: Ref)

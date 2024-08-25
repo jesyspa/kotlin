@@ -29,10 +29,10 @@ method f$tryCatch$TF$() returns (ret$0: Ref)
   inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
-method pg$public$cause(this: Ref) returns (ret: Ref)
+method pg$public$cause(this$dispatch: Ref) returns (ret: Ref)
 
 
-method pg$public$message(this: Ref) returns (ret: Ref)
+method pg$public$message(this$dispatch: Ref) returns (ret: Ref)
 
 
 /try_catch.kt:(271,285): info: Generated Viper text for nestedTryCatch:
@@ -79,10 +79,10 @@ method f$nestedTryCatch$TF$() returns (ret$0: Ref)
   inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
-method pg$public$cause(this: Ref) returns (ret: Ref)
+method pg$public$cause(this$dispatch: Ref) returns (ret: Ref)
 
 
-method pg$public$message(this: Ref) returns (ret: Ref)
+method pg$public$message(this$dispatch: Ref) returns (ret: Ref)
 
 
 /try_catch.kt:(574,592): info: Generated Viper text for tryCatchWithInline:
@@ -119,10 +119,10 @@ method f$tryCatchWithInline$TF$() returns (ret$0: Ref)
   inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
-method pg$public$cause(this: Ref) returns (ret: Ref)
+method pg$public$cause(this$dispatch: Ref) returns (ret: Ref)
 
 
-method pg$public$message(this: Ref) returns (ret: Ref)
+method pg$public$message(this$dispatch: Ref) returns (ret: Ref)
 
 
 /try_catch.kt:(685,702): info: Generated Viper text for tryCatchShadowing:
@@ -152,10 +152,10 @@ method f$tryCatchShadowing$TF$() returns (ret$0: Ref)
   inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
-method pg$public$cause(this: Ref) returns (ret: Ref)
+method pg$public$cause(this$dispatch: Ref) returns (ret: Ref)
 
 
-method pg$public$message(this: Ref) returns (ret: Ref)
+method pg$public$message(this$dispatch: Ref) returns (ret: Ref)
 
 
 /try_catch.kt:(813,828): info: Generated Viper text for multipleCatches:
@@ -202,10 +202,10 @@ method f$multipleCatches$TF$() returns (ret$0: Ref)
   inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
-method pg$public$cause(this: Ref) returns (ret: Ref)
+method pg$public$cause(this$dispatch: Ref) returns (ret: Ref)
 
 
-method pg$public$message(this: Ref) returns (ret: Ref)
+method pg$public$message(this$dispatch: Ref) returns (ret: Ref)
 
 
 /try_catch.kt:(1044,1056): info: Generated Viper text for useException:
@@ -241,7 +241,7 @@ method f$useException$TF$() returns (ret$0: Ref)
   inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
-method pg$public$cause(this: Ref) returns (ret: Ref)
+method pg$public$cause(this$dispatch: Ref) returns (ret: Ref)
 
 
-method pg$public$message(this: Ref) returns (ret: Ref)
+method pg$public$message(this$dispatch: Ref) returns (ret: Ref)
