@@ -42,7 +42,8 @@ object BooleanPretypeBuilder : PretypeBuilder {
 
 class FunctionPretypeBuilder : PretypeBuilder {
     private val paramTypes = mutableListOf<TypeEmbedding>()
-    private var receiverType: TypeEmbedding? = null
+    private var extensionReceiverType: TypeEmbedding? = null
+    private var dispatchReceiverType: TypeEmbedding? = null
     private var returnType: TypeEmbedding? = null
     var returnsUnique: Boolean = false
 
@@ -50,9 +51,14 @@ class FunctionPretypeBuilder : PretypeBuilder {
         paramTypes.add(buildType { paramInit() })
     }
 
-    fun withReceiver(receiverInit: TypeBuilder.() -> PretypeBuilder) {
-        require(receiverType == null) { "Receiver already set" }
-        receiverType = buildType { receiverInit() }
+    fun withDispatchReceiver(receiverInit: TypeBuilder.() -> PretypeBuilder) {
+        require(dispatchReceiverType == null) { "Receiver already set" }
+        dispatchReceiverType = buildType { receiverInit() }
+    }
+
+    fun withExtensionReceiver(receiverInit: TypeBuilder.() -> PretypeBuilder) {
+        require(extensionReceiverType == null) { "Receiver already set" }
+        extensionReceiverType = buildType { receiverInit() }
     }
 
     fun withReturnType(returnTypeInit: TypeBuilder.() -> PretypeBuilder) {
@@ -62,7 +68,7 @@ class FunctionPretypeBuilder : PretypeBuilder {
 
     override fun complete(): TypeEmbedding {
         require(returnType != null) { "Return type not set" }
-        return FunctionTypeEmbedding(receiverType, paramTypes, returnType!!, returnsUnique)
+        return FunctionTypeEmbedding(dispatchReceiverType, extensionReceiverType, paramTypes, returnType!!, returnsUnique)
     }
 }
 

@@ -23,7 +23,7 @@ sealed interface StdLibReceiverInterface {
 sealed interface PresentInterface : StdLibReceiverInterface {
     val interfaceName: String
     override fun match(function: NamedFunctionSignature): Boolean =
-        function.type.receiverType?.isInheritorOfCollectionTypeNamed(interfaceName) ?: false
+        function.type.dispatchReceiverType?.isInheritorOfCollectionTypeNamed(interfaceName) ?: false
 }
 
 data object CollectionInterface : PresentInterface {
@@ -82,7 +82,7 @@ sealed interface StdLibPostcondition : StdLibCondition {
 
 data object GetPrecondition : StdLibPrecondition {
     override fun getEmbeddings(function: NamedFunctionSignature): List<ExpEmbedding> {
-        val receiver = function.receiver!!
+        val receiver = function.dispatchReceiver!!
         val indexArg = function.formalArgs[1]
         return listOf(
             GeCmp(
@@ -104,7 +104,7 @@ data object GetPrecondition : StdLibPrecondition {
 
 data object SubListPrecondition : StdLibPrecondition {
     override fun getEmbeddings(function: NamedFunctionSignature): List<ExpEmbedding> {
-        val receiver = function.receiver!!
+        val receiver = function.dispatchReceiver!!
         val fromIndexArg = function.formalArgs[1]
         val toIndexArg = function.formalArgs[2]
         return listOf(
@@ -131,7 +131,7 @@ data object EmptyListPostcondition : StdLibPostcondition {
 
 data object IsEmptyPostcondition : StdLibPostcondition {
     override fun getEmbeddings(returnVariable: VariableEmbedding, function: NamedFunctionSignature): List<ExpEmbedding> {
-        val receiver = function.receiver!!
+        val receiver = function.dispatchReceiver!!
         return listOf(
             receiver.sameSize(),
             Implies(returnVariable, EqCmp(FieldAccess(receiver, ListSizeFieldEmbedding), IntLit(0))),
@@ -145,7 +145,7 @@ data object IsEmptyPostcondition : StdLibPostcondition {
 
 data object GetPostcondition : StdLibPostcondition {
     override fun getEmbeddings(returnVariable: VariableEmbedding, function: NamedFunctionSignature): List<ExpEmbedding> {
-        return listOf(function.receiver!!.sameSize())
+        return listOf(function.dispatchReceiver!!.sameSize())
     }
 
     override val stdLibInterface = ListInterface
@@ -157,7 +157,7 @@ data object SubListPostcondition : StdLibPostcondition {
         val fromIndexArg = function.formalArgs[1]
         val toIndexArg = function.formalArgs[2]
         return listOf(
-            function.receiver!!.sameSize(),
+            function.dispatchReceiver!!.sameSize(),
             EqCmp(FieldAccess(returnVariable, ListSizeFieldEmbedding), Sub(toIndexArg, fromIndexArg))
         )
     }
@@ -168,7 +168,7 @@ data object SubListPostcondition : StdLibPostcondition {
 
 data object AddPostcondition : StdLibPostcondition {
     override fun getEmbeddings(returnVariable: VariableEmbedding, function: NamedFunctionSignature): List<ExpEmbedding> {
-        return listOf(function.receiver!!.increasedSize(1))
+        return listOf(function.dispatchReceiver!!.increasedSize(1))
     }
 
     override val stdLibInterface = MutableListInterface

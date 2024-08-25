@@ -38,9 +38,14 @@ data class ReturnVariableName(val n: Int) : MangledName {
         get() = n.toString()
 }
 
-data object ThisReceiverName : MangledName {
+data object DispatchReceiverName : MangledName {
     override val mangledBaseName: String
-        get() = "this"
+        get() = "this\$dispatch"
+}
+
+data object ExtensionReceiverName : MangledName {
+    override val mangledBaseName: String
+        get() = "this\$extension"
 }
 
 data class SpecialName(override val mangledBaseName: String) : MangledName {
