@@ -191,7 +191,7 @@ method f$pkg$kotlin_collections$c$List$isEmpty$TF$T$c$pkg$kotlin_collections$Lis
 /list.kt:(670,683): info: Generated Viper text for nullable_list:
 field sp$size: Ref
 
-method f$nullable_list$TF$c$pkg$kotlin_collections$List(p$l: Ref)
+method f$nullable_list$TF$N$c$pkg$kotlin_collections$List(p$l: Ref)
   returns (ret$0: Ref)
   requires p$l != df$rt$nullValue() ==> acc(p$l.sp$size, write)
   requires p$l != df$rt$nullValue() ==> df$rt$intFromRef(p$l.sp$size) >= 0
