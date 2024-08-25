@@ -188,10 +188,8 @@ fun StmtConversionContext.insertInlineFunctionCall(
             add(Declare(returnTarget.variable, null))
             addAll(declarations)
             add(FunctionExp(null, convert(body), returnTarget.label))
-            add(returnTarget.variable.withInvariants {
-                // if unit is what we return we might not guarantee it yet
-                proven = returnTarget.variable.type.equalsToType { unit() }
-            })
+            // if unit is what we return we might not guarantee it yet
+            add(returnTarget.variable.withIsUnitInvariantIfUnit())
         }
     }
 }

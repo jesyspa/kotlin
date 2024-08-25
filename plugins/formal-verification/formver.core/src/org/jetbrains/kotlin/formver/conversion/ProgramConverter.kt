@@ -375,9 +375,9 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         val seqnBuilder = SeqnBuilder(declaration.source)
         val linearizer = Linearizer(SharedLinearizationState(anonVarProducer), seqnBuilder, declaration.source)
         bodyExp.toViperUnusedResult(linearizer)
-        if (returnTarget.variable.type.equalsToType { unit() }) {
-            returnTarget.variable.withInvariants { proven = true }.toViperUnusedResult(linearizer)
-        }
+        // note: we must guarantee somewhere that returned value is Unit
+        // as we may not encounter any `return` statement in the body
+        returnTarget.variable.withIsUnitInvariantIfUnit().toViperUnusedResult(linearizer)
         return FunctionBodyEmbedding(seqnBuilder.block, returnTarget, bodyExp)
     }
 
