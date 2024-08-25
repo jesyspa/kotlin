@@ -12,7 +12,6 @@ method f$tryCatch$TF$() returns (ret$0: Ref)
   var anon$3: Ref
   var l2$e: Ref
   var anon$4: Ref
-  ret$0 := df$rt$unitValue()
   if (df$rt$boolFromRef(anon$0)) {
     goto lbl$catch$0
   }
@@ -27,6 +26,7 @@ method f$tryCatch$TF$() returns (ret$0: Ref)
   goto lbl$try_exit$0
   label lbl$try_exit$0
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
 method pg$public$cause(this: Ref) returns (ret: Ref)
@@ -52,7 +52,6 @@ method f$nestedTryCatch$TF$() returns (ret$0: Ref)
   var anon$5: Ref
   var anon$6: Ref
   var l4$e: Ref
-  ret$0 := df$rt$unitValue()
   if (df$rt$boolFromRef(anon$0)) {
     goto lbl$catch$0
   }
@@ -77,6 +76,7 @@ method f$nestedTryCatch$TF$() returns (ret$0: Ref)
   goto lbl$try_exit$0
   label lbl$try_exit$0
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
 method pg$public$cause(this: Ref) returns (ret: Ref)
@@ -100,13 +100,13 @@ method f$tryCatchWithInline$TF$() returns (ret$0: Ref)
   var anon$3: Ref
   var l3$e: Ref
   var anon$4: Ref
-  ret$0 := df$rt$unitValue()
   if (df$rt$boolFromRef(anon$0)) {
     goto lbl$catch$0
   }
   anon$1 := f$call$TF$T$Int(df$rt$intToRef(0))
   anon$2 := f$call$TF$T$Int(df$rt$intToRef(1))
   label lbl$ret$1
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$1), df$rt$unitType())
   if (df$rt$boolFromRef(anon$3)) {
     goto lbl$catch$0
   }
@@ -116,6 +116,7 @@ method f$tryCatchWithInline$TF$() returns (ret$0: Ref)
   goto lbl$try_exit$0
   label lbl$try_exit$0
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
 method pg$public$cause(this: Ref) returns (ret: Ref)
@@ -134,7 +135,6 @@ method f$tryCatchShadowing$TF$() returns (ret$0: Ref)
   var anon$1: Ref
   var l2$e: Ref
   var l2$x: Ref
-  ret$0 := df$rt$unitValue()
   l0$x := df$rt$intToRef(0)
   if (df$rt$boolFromRef(anon$0)) {
     goto lbl$catch$0
@@ -149,6 +149,7 @@ method f$tryCatchShadowing$TF$() returns (ret$0: Ref)
   goto lbl$try_exit$0
   label lbl$try_exit$0
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
 method pg$public$cause(this: Ref) returns (ret: Ref)
@@ -175,7 +176,6 @@ method f$multipleCatches$TF$() returns (ret$0: Ref)
   var anon$6: Ref
   var l3$e: Ref
   var anon$7: Ref
-  ret$0 := df$rt$unitValue()
   if (df$rt$boolFromRef(anon$0)) {
     goto lbl$catch$0
   }
@@ -199,6 +199,7 @@ method f$multipleCatches$TF$() returns (ret$0: Ref)
   goto lbl$try_exit$0
   label lbl$try_exit$0
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
 method pg$public$cause(this: Ref) returns (ret: Ref)
@@ -224,7 +225,6 @@ method f$useException$TF$() returns (ret$0: Ref)
   var anon$2: Ref
   var l2$e: Ref
   var anon$3: Ref
-  ret$0 := df$rt$unitValue()
   if (df$rt$boolFromRef(anon$0)) {
     goto lbl$catch$0
   }
@@ -238,6 +238,7 @@ method f$useException$TF$() returns (ret$0: Ref)
   goto lbl$try_exit$0
   label lbl$try_exit$0
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
 method pg$public$cause(this: Ref) returns (ret: Ref)

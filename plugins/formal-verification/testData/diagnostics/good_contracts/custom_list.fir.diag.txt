@@ -70,7 +70,6 @@ method f$test$TF$T$Int(p$n: Ref) returns (ret$0: Ref)
   var l0$customList: Ref
   var anon$0: Ref
   inhale df$rt$isSubtype(df$rt$typeOf(p$n), df$rt$intType())
-  ret$0 := df$rt$unitValue()
   l0$customList := con$c$CustomList$T$Int$T$Int(p$n, df$rt$intToRef(0))
   anon$0 := f$c$CustomList$isEmpty$TF$T$c$CustomList(l0$customList)
   if (!df$rt$boolFromRef(anon$0)) {
@@ -84,4 +83,5 @@ method f$test$TF$T$Int(p$n: Ref) returns (ret$0: Ref)
     anon$3 := f$c$CustomList$get$TF$T$c$CustomList$T$Int(l0$customList, df$rt$intToRef(0))
   }
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }

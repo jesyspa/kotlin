@@ -45,7 +45,6 @@ method f$testVarVal$TF$() returns (ret$0: Ref)
   var anon$3: Ref
   var anon$4: Ref
   var anon$5: Ref
-  ret$0 := df$rt$unitValue()
   l0$g := con$c$G$()
   anon$1 := pg$public$field(l0$g)
   anon$0 := anon$1
@@ -57,10 +56,10 @@ method f$testVarVal$TF$() returns (ret$0: Ref)
   inhale df$rt$isSubtype(df$rt$typeOf(anon$3), df$rt$intType())
   anon$5 := ps$public$field(l0$i, df$rt$intToRef(1))
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
 method pg$public$field(this: Ref) returns (ret: Ref)
 
 
 method ps$public$field(this: Ref, anon$0: Ref) returns (ret: Ref)
-

@@ -60,12 +60,12 @@ method f$accessSuperTypeProperty$TF$T$c$C(p$c: Ref) returns (ret$0: Ref)
   var l0$temp: Ref
   inhale df$rt$isSubtype(df$rt$typeOf(p$c), df$rt$T$c$C())
   inhale acc(p$c$C$shared(p$c), wildcard)
-  ret$0 := df$rt$unitValue()
   unfold acc(p$c$C$shared(p$c), wildcard)
   unfold acc(p$c$B$shared(p$c), wildcard)
   unfold acc(p$c$A$shared(p$c), wildcard)
   l0$temp := p$c.bf$a
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
 method pg$public$d(this: Ref) returns (ret: Ref)
@@ -134,12 +134,12 @@ method f$accessNested$TF$T$c$C(p$c: Ref) returns (ret$0: Ref)
   var anon$0: Ref
   inhale df$rt$isSubtype(df$rt$typeOf(p$c), df$rt$T$c$C())
   inhale acc(p$c$C$shared(p$c), wildcard)
-  ret$0 := df$rt$unitValue()
   unfold acc(p$c$C$shared(p$c), wildcard)
   anon$0 := p$c.bf$x
   unfold acc(p$c$A$shared(anon$0), wildcard)
   l0$temp := anon$0.bf$a
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
 method pg$public$d(this: Ref) returns (ret: Ref)
@@ -164,12 +164,12 @@ method f$accessNullable$TF$c$A(p$x: Ref) returns (ret$0: Ref)
   var l0$n: Ref
   inhale df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$nullable(df$rt$T$c$A()))
   inhale p$x != df$rt$nullValue() ==> acc(p$c$A$shared(p$x), wildcard)
-  ret$0 := df$rt$unitValue()
   if (!(p$x == df$rt$nullValue())) {
     unfold acc(p$c$A$shared(p$x), wildcard)
     l0$n := p$x.bf$a
   }
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
 /predicates_access.kt:(442,452): info: Generated Viper text for accessCast:
@@ -205,12 +205,12 @@ method f$accessCast$TF$T$c$A(p$x: Ref) returns (ret$0: Ref)
   var l0$n: Ref
   inhale df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$T$c$A())
   inhale acc(p$c$A$shared(p$x), wildcard)
-  ret$0 := df$rt$unitValue()
   inhale df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$T$c$B())
   inhale acc(p$c$B$shared(p$x), wildcard)
   unfold acc(p$c$B$shared(p$x), wildcard)
   l0$n := p$x.bf$b
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
 /predicates_access.kt:(501,515): info: Generated Viper text for accessSafeCast:
@@ -247,7 +247,6 @@ method f$accessSafeCast$TF$T$c$A(p$x: Ref) returns (ret$0: Ref)
   var l0$y: Ref
   inhale df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$T$c$A())
   inhale acc(p$c$A$shared(p$x), wildcard)
-  ret$0 := df$rt$unitValue()
   l0$n := df$rt$intToRef(0)
   if (df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$T$c$B())) {
     l0$y := p$x
@@ -260,6 +259,7 @@ method f$accessSafeCast$TF$T$c$A(p$x: Ref) returns (ret$0: Ref)
     l0$n := l0$y.bf$b
   }
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
 /predicates_access.kt:(612,627): info: Generated Viper text for accessSmartCast:
@@ -295,7 +295,6 @@ method f$accessSmartCast$TF$T$c$A(p$x: Ref) returns (ret$0: Ref)
   var l0$n: Ref
   inhale df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$T$c$A())
   inhale acc(p$c$A$shared(p$x), wildcard)
-  ret$0 := df$rt$unitValue()
   l0$n := df$rt$intToRef(0)
   if (df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$T$c$B())) {
     inhale acc(p$c$B$shared(p$x), wildcard)
@@ -303,4 +302,5 @@ method f$accessSmartCast$TF$T$c$A(p$x: Ref) returns (ret$0: Ref)
     l0$n := p$x.bf$b
   }
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }

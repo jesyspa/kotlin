@@ -26,7 +26,6 @@ method f$whileFunctionCondition$TF$() returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 {
   var anon$0: Ref
-  ret$0 := df$rt$unitValue()
   label lbl$continue$0
   anon$0 := f$whileLoop$TF$T$Boolean(df$rt$boolToRef(true))
   while (df$rt$boolFromRef(anon$0))
@@ -36,6 +35,7 @@ method f$whileFunctionCondition$TF$() returns (ret$0: Ref)
   }
   label lbl$break$0
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
 method f$whileLoop$TF$T$Boolean(p$b: Ref) returns (ret: Ref)

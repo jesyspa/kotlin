@@ -3,8 +3,8 @@ method f$unitFunction$TF$TF$(p$f: Ref) returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 {
   inhale df$rt$isSubtype(df$rt$typeOf(p$f), df$rt$functionType())
-  ret$0 := df$rt$unitValue()
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
 /function_object.kt:(90,108): info: Generated Viper text for functionObjectCall:

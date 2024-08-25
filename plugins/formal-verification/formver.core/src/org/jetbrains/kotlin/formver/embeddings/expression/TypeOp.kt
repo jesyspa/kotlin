@@ -160,6 +160,10 @@ inline fun ExpEmbedding.withInvariants(block: InhaleInvariantsBuilder.() -> Unit
     return builder.complete()
 }
 
+fun ExpEmbedding.withIsUnitInvariantIfUnit() = withInvariants {
+    proven = type.equalToType { unit() }
+}
+
 inline fun ExpEmbedding.withNewTypeInvariants(newType: TypeEmbedding, block: InhaleInvariantsBuilder.() -> Unit) =
     if (this.type == newType) this else withType(newType).withInvariants(block)
 

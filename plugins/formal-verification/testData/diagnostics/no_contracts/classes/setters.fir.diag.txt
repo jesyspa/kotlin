@@ -7,11 +7,11 @@ method f$testPrimitiveFieldSetter$TF$T$c$PrimitiveField(p$pf: Ref)
 {
   inhale df$rt$isSubtype(df$rt$typeOf(p$pf), df$rt$T$c$PrimitiveField())
   inhale acc(p$c$PrimitiveField$shared(p$pf), wildcard)
-  ret$0 := df$rt$unitValue()
   inhale acc(p$pf.bf$a, write)
   p$pf.bf$a := df$rt$intToRef(0)
   exhale acc(p$pf.bf$a, write)
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
 /setters.kt:(170,194): info: Generated Viper text for testReferenceFieldSetter:
@@ -32,12 +32,12 @@ method f$testReferenceFieldSetter$TF$T$c$ReferenceField(p$rf: Ref)
   var anon$0: Ref
   inhale df$rt$isSubtype(df$rt$typeOf(p$rf), df$rt$T$c$ReferenceField())
   inhale acc(p$c$ReferenceField$shared(p$rf), wildcard)
-  ret$0 := df$rt$unitValue()
   anon$0 := con$c$PrimitiveField$T$Int(df$rt$intToRef(0))
   inhale acc(p$rf.bf$pf, write)
   p$rf.bf$pf := anon$0
   exhale acc(p$rf.bf$pf, write)
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
 /setters.kt:(427,454): info: Generated Viper text for testPrimitivePropertySetter:
@@ -48,9 +48,9 @@ method f$testPrimitivePropertySetter$TF$T$c$PrimitiveProperty(p$pp: Ref)
   var anon$0: Ref
   inhale df$rt$isSubtype(df$rt$typeOf(p$pp), df$rt$T$c$PrimitiveProperty())
   inhale acc(p$c$PrimitiveProperty$shared(p$pp), wildcard)
-  ret$0 := df$rt$unitValue()
   anon$0 := ps$public$aProp(p$pp, df$rt$intToRef(0))
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
 method pg$public$aProp(this: Ref) returns (ret: Ref)
@@ -74,10 +74,10 @@ method f$testReferencePropertySetter$TF$T$c$ReferenceProperty(p$rp: Ref)
   var anon$1: Ref
   inhale df$rt$isSubtype(df$rt$typeOf(p$rp), df$rt$T$c$ReferenceProperty())
   inhale acc(p$c$ReferenceProperty$shared(p$rp), wildcard)
-  ret$0 := df$rt$unitValue()
   anon$1 := con$c$PrimitiveProperty$()
   anon$0 := ps$public$ppProp(p$rp, anon$1)
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
 method pg$public$aProp(this: Ref) returns (ret: Ref)
@@ -90,4 +90,3 @@ method ps$public$aProp(this: Ref, anon$0: Ref) returns (ret: Ref)
 
 
 method ps$public$ppProp(this: Ref, anon$0: Ref) returns (ret: Ref)
-
