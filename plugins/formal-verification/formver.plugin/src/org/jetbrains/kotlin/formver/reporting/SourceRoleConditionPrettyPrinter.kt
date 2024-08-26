@@ -7,6 +7,8 @@ package org.jetbrains.kotlin.formver.reporting
 
 import org.jetbrains.kotlin.fir.analysis.diagnostics.FirDiagnosticRenderers
 import org.jetbrains.kotlin.fir.symbols.FirBasedSymbol
+import org.jetbrains.kotlin.fir.symbols.impl.FirFunctionSymbol
+import org.jetbrains.kotlin.fir.symbols.impl.FirValueParameterSymbol
 import org.jetbrains.kotlin.fir.types.renderReadable
 import org.jetbrains.kotlin.formver.embeddings.SourceRole
 
@@ -26,6 +28,13 @@ object SourceRoleConditionPrettyPrinter {
         return "($lhsExpr && $rhsExpr)"
     }
 
+    private val FirBasedSymbol<*>.shownName: String
+        get() = when (this) {
+            is FirValueParameterSymbol -> showFirSymbol()
+            is FirFunctionSymbol<*> -> "this"
+            else -> error("Variable must be either value parameter or function itself in case of receiver.")
+        }
+
     private fun SourceRole.Condition.Disjunction.showDisjunction(): String {
         val lhsExpr = lhs.prettyPrint()
         val rhsExpr = rhs.prettyPrint()
@@ -33,7 +42,7 @@ object SourceRoleConditionPrettyPrinter {
     }
 
     private fun SourceRole.Condition.IsNull.showIsNull(): String = buildString {
-        append(targetVariable.showFirSymbol())
+        append(targetVariable.shownName)
         when (negated) {
             true -> append(" != ")
             false -> append(" == ")
@@ -42,7 +51,7 @@ object SourceRoleConditionPrettyPrinter {
     }
 
     private fun SourceRole.Condition.IsType.showIsType(): String = buildString {
-        append(targetVariable.showFirSymbol())
+        append(targetVariable.shownName)
         when (negated) {
             true -> append(" !is ")
             false -> append(" is ")
