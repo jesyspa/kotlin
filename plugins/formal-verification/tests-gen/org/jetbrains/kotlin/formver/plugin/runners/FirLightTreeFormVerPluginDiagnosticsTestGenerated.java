@@ -122,6 +122,12 @@ public class FirLightTreeFormVerPluginDiagnosticsTestGenerated extends AbstractF
     }
 
     @Test
+    @TestMetadata("contracts_with_receivers.kt")
+    public void testContracts_with_receivers() {
+      runTest("plugins/formal-verification/testData/diagnostics/good_contracts/contracts_with_receivers.kt");
+    }
+
+    @Test
     @TestMetadata("custom_list.kt")
     public void testCustom_list() {
       runTest("plugins/formal-verification/testData/diagnostics/good_contracts/custom_list.kt");
@@ -200,6 +206,12 @@ public class FirLightTreeFormVerPluginDiagnosticsTestGenerated extends AbstractF
     }
 
     @Test
+    @TestMetadata("stdlib_replacement_tests.kt")
+    public void testStdlib_replacement_tests() {
+      runTest("plugins/formal-verification/testData/diagnostics/good_contracts/stdlib_replacement_tests.kt");
+    }
+
+    @Test
     @TestMetadata("unit_return_type.kt")
     public void testUnit_return_type() {
       runTest("plugins/formal-verification/testData/diagnostics/good_contracts/unit_return_type.kt");
@@ -209,12 +221,6 @@ public class FirLightTreeFormVerPluginDiagnosticsTestGenerated extends AbstractF
     @TestMetadata("viper_casts_while_inlining.kt")
     public void testViper_casts_while_inlining() {
       runTest("plugins/formal-verification/testData/diagnostics/good_contracts/viper_casts_while_inlining.kt");
-    }
-
-    @Test
-    @TestMetadata("stdlib_replacement_tests.kt")
-    public void testStdlib_replacement_tests() {
-      runTest("plugins/formal-verification/testData/diagnostics/good_contracts/stdlib_replacement_tests.kt");
     }
   }
 
