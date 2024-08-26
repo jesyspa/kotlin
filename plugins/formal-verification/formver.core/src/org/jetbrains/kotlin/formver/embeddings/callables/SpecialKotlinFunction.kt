@@ -6,9 +6,9 @@
 package org.jetbrains.kotlin.formver.embeddings.callables
 
 import org.jetbrains.kotlin.formver.conversion.StmtConversionContext
-import org.jetbrains.kotlin.formver.embeddings.FunctionTypeEmbedding
-import org.jetbrains.kotlin.formver.embeddings.buildFunctionType
 import org.jetbrains.kotlin.formver.embeddings.expression.*
+import org.jetbrains.kotlin.formver.embeddings.types.FunctionTypeEmbedding
+import org.jetbrains.kotlin.formver.embeddings.types.buildFunctionPretype
 import org.jetbrains.kotlin.formver.names.ClassKotlinName
 import org.jetbrains.kotlin.formver.names.ScopedKotlinName
 import org.jetbrains.kotlin.formver.names.buildName
@@ -36,7 +36,7 @@ interface SpecialKotlinFunction : FunctionEmbedding {
 val SpecialKotlinFunction.callableId: CallableId
     get() = CallableId(FqName.fromSegments(packageName), className?.let { FqName(it) }, Name.identifier(name))
 
-fun SpecialKotlinFunction.embedName(): ScopedKotlinName = callableId.embedFunctionName(type)
+fun SpecialKotlinFunction.embedName(): ScopedKotlinName = callableId.embedFunctionName(callableType)
 
 object KotlinContractFunction : SpecialKotlinFunction {
     override val packageName: List<String> = listOf("kotlin", "contracts")
@@ -47,7 +47,7 @@ object KotlinContractFunction : SpecialKotlinFunction {
         ClassKotlinName(listOf("ContractBuilder"))
     }
 
-    override val type: FunctionTypeEmbedding = buildFunctionType {
+    override val callableType: FunctionTypeEmbedding = buildFunctionPretype {
         withParam {
             function {
                 withDispatchReceiver {
@@ -71,12 +71,11 @@ abstract class KotlinIntSpecialFunction : SpecialKotlinFunction {
     override val packageName: List<String> = listOf("kotlin")
     override val className: String? = "Int"
 
-    override val type: FunctionTypeEmbedding = buildFunctionType {
+    override val callableType: FunctionTypeEmbedding = buildFunctionPretype {
         withDispatchReceiver { int() }
         withParam { int() }
         withReturnType { int() }
     }
-
 }
 
 object KotlinIntPlusFunctionImplementation : KotlinIntSpecialFunction() {
@@ -122,7 +121,7 @@ abstract class KotlinBooleanSpecialFunction : SpecialKotlinFunction {
     override val packageName: List<String> = listOf("kotlin")
     override val className: String? = "Boolean"
 
-    override val type: FunctionTypeEmbedding = buildFunctionType {
+    override val callableType: FunctionTypeEmbedding = buildFunctionPretype {
         withDispatchReceiver { boolean() }
         withReturnType { boolean() }
     }
@@ -148,7 +147,7 @@ object SpecialVerifyFunction : SpecialKotlinFunction {
         return Assert(args[0])
     }
 
-    override val type: FunctionTypeEmbedding = buildFunctionType {
+    override val callableType: FunctionTypeEmbedding = buildFunctionPretype {
         withParam { boolean() }
         withReturnType { unit() }
     }

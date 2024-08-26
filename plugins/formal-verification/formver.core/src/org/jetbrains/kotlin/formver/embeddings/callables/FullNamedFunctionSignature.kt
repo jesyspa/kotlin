@@ -8,13 +8,13 @@ package org.jetbrains.kotlin.formver.embeddings.callables
 import org.jetbrains.kotlin.KtSourceElement
 import org.jetbrains.kotlin.fir.symbols.impl.FirPropertySymbol
 import org.jetbrains.kotlin.formver.asPosition
-import org.jetbrains.kotlin.formver.embeddings.FunctionTypeEmbedding
-import org.jetbrains.kotlin.formver.embeddings.buildFunctionType
-import org.jetbrains.kotlin.formver.embeddings.buildType
 import org.jetbrains.kotlin.formver.embeddings.expression.ExpEmbedding
 import org.jetbrains.kotlin.formver.embeddings.expression.PlaceholderVariableEmbedding
 import org.jetbrains.kotlin.formver.embeddings.expression.VariableEmbedding
-import org.jetbrains.kotlin.formver.embeddings.nullableAny
+import org.jetbrains.kotlin.formver.embeddings.types.FunctionTypeEmbedding
+import org.jetbrains.kotlin.formver.embeddings.types.buildFunctionPretype
+import org.jetbrains.kotlin.formver.embeddings.types.buildType
+import org.jetbrains.kotlin.formver.embeddings.types.nullableAny
 import org.jetbrains.kotlin.formver.linearization.pureToViper
 import org.jetbrains.kotlin.formver.names.DispatchReceiverName
 import org.jetbrains.kotlin.formver.viper.MangledName
@@ -56,7 +56,7 @@ abstract class PropertyAccessorFunctionSignature(
 
 class GetterFunctionSignature(name: MangledName, symbol: FirPropertySymbol) :
     PropertyAccessorFunctionSignature(name, symbol) {
-    override val type: FunctionTypeEmbedding = buildFunctionType {
+    override val callableType: FunctionTypeEmbedding = buildFunctionPretype {
         withDispatchReceiver { nullableAny() }
         withReturnType { nullableAny() }
     }
@@ -64,13 +64,12 @@ class GetterFunctionSignature(name: MangledName, symbol: FirPropertySymbol) :
 
 class SetterFunctionSignature(name: MangledName, symbol: FirPropertySymbol) :
     PropertyAccessorFunctionSignature(name, symbol) {
-    override val type: FunctionTypeEmbedding = buildFunctionType {
+    override val callableType: FunctionTypeEmbedding = buildFunctionPretype {
         withDispatchReceiver { nullableAny() }
         withParam { nullableAny() }
         withReturnType { unit() }
     }
 }
-
 
 fun FullNamedFunctionSignature.toViperMethod(
     body: Stmt.Seqn?,
