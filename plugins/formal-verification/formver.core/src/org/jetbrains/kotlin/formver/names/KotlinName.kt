@@ -5,7 +5,10 @@
 
 package org.jetbrains.kotlin.formver.names
 
-import org.jetbrains.kotlin.formver.embeddings.TypeEmbedding
+import org.jetbrains.kotlin.formver.embeddings.types.TypeEmbedding
+import org.jetbrains.kotlin.formver.embeddings.types.FunctionTypeEmbedding
+import org.jetbrains.kotlin.formver.embeddings.types.PretypeEmbedding
+import org.jetbrains.kotlin.formver.embeddings.types.asTypeEmbedding
 import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.formver.viper.mangled
 import org.jetbrains.kotlin.name.FqName
@@ -31,7 +34,10 @@ abstract class TypedKotlinNameWithType(override val mangledType: String, name: N
     override val mangledBaseName: String = "${name.asStringStripSpecialMarkers()}\$${type.name.mangled}"
 }
 
-data class FunctionKotlinName(val name: Name, val type: TypeEmbedding) : TypedKotlinNameWithType("f", name, type)
+data class FunctionKotlinName(val name: Name, val type: FunctionTypeEmbedding) : TypedKotlinNameWithType(
+    "f", name,
+    type.asTypeEmbedding()
+)
 
 /**
  * This name will never occur in the viper output, but rather is used to lookup properties.
@@ -40,11 +46,11 @@ data class PropertyKotlinName(val name: Name) : TypedKotlinName("pp", name)
 data class BackingFieldKotlinName(val name: Name) : TypedKotlinName("bf", name)
 data class GetterKotlinName(val name: Name) : TypedKotlinName("pg", name)
 data class SetterKotlinName(val name: Name) : TypedKotlinName("ps", name)
-data class ExtensionSetterKotlinName(val name: Name, val type: TypeEmbedding) :
-    TypedKotlinNameWithType("es", name, type)
+data class ExtensionSetterKotlinName(val name: Name, val type: FunctionTypeEmbedding) :
+    TypedKotlinNameWithType("es", name, type.asTypeEmbedding())
 
-data class ExtensionGetterKotlinName(val name: Name, val type: TypeEmbedding) :
-    TypedKotlinNameWithType("eg", name, type)
+data class ExtensionGetterKotlinName(val name: Name, val type: FunctionTypeEmbedding) :
+    TypedKotlinNameWithType("eg", name, type.asTypeEmbedding())
 
 data class ClassKotlinName(val name: FqName) : KotlinName {
     override val mangledType: String
@@ -54,7 +60,7 @@ data class ClassKotlinName(val name: FqName) : KotlinName {
     constructor(classSegments: List<String>) : this(FqName.fromSegments(classSegments))
 }
 
-data class ConstructorKotlinName(val type: TypeEmbedding) : KotlinName {
+data class ConstructorKotlinName(val type: FunctionTypeEmbedding) : KotlinName {
     override val mangledType: String
         get() = "con"
     override val mangledBaseName: String
@@ -66,4 +72,13 @@ data class ConstructorKotlinName(val type: TypeEmbedding) : KotlinName {
 data class PredicateKotlinName(override val mangledBaseName: String) : KotlinName {
     override val mangledType: String
         get() = "p"
+}
+
+data class PretypeName(override val mangledBaseName: String) : KotlinName
+
+data class TypeName(val pretype: PretypeEmbedding, val nullable: Boolean) : KotlinName {
+    override val mangledBaseName: String
+        get() = pretype.name.mangledBaseName
+    override val mangledType: String
+        get() = listOfNotNull(if (nullable) "N" else null, "T", if (pretype is FunctionTypeEmbedding) "F" else null).joinToString("")
 }

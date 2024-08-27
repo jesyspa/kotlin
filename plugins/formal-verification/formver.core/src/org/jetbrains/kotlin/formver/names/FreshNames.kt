@@ -65,7 +65,3 @@ data class ContinueLabelName(val n: Int) : NumberedLabelName("continue", n)
 data class CatchLabelName(val n: Int) : NumberedLabelName("catch", n)
 data class TryExitLabelName(val n: Int) : NumberedLabelName("try_exit", n)
 
-data class TypeName(override val mangledBaseName: String) : MangledName {
-    override val mangledType: String
-        get() = "T"
-}

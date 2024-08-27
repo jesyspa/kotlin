@@ -3,23 +3,24 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
-package org.jetbrains.kotlin.formver.embeddings
+package org.jetbrains.kotlin.formver.embeddings.types
 
+import org.jetbrains.kotlin.formver.embeddings.FieldEmbedding
 import org.jetbrains.kotlin.formver.names.*
 import org.jetbrains.kotlin.formver.viper.ast.PermExp
 import org.jetbrains.kotlin.formver.viper.ast.Predicate
 import org.jetbrains.kotlin.utils.addToStdlib.ifTrue
 
 class ClassEmbeddingDetails(val type: ClassTypeEmbedding, val isInterface: Boolean) : TypeInvariantHolder {
-    private var _superTypes: List<TypeEmbedding>? = null
-    val superTypes: List<TypeEmbedding>
-        get() = _superTypes ?: error("Super types of ${type.className} have not been initialised yet.")
+    private var _superTypes: List<PretypeEmbedding>? = null
+    val superTypes: List<PretypeEmbedding>
+        get() = _superTypes ?: error("Super types of ${type.name} have not been initialised yet.")
 
     private val classSuperTypes: List<ClassTypeEmbedding>
         get() = superTypes.filterIsInstance<ClassTypeEmbedding>()
 
-    fun initSuperTypes(newSuperTypes: List<TypeEmbedding>) {
-        check(_superTypes == null) { "Super types of ${type.className} are already initialised." }
+    fun initSuperTypes(newSuperTypes: List<PretypeEmbedding>) {
+        check(_superTypes == null) { "Super types of ${type.name} are already initialised." }
         _superTypes = newSuperTypes
     }
 
@@ -27,16 +28,16 @@ class ClassEmbeddingDetails(val type: ClassTypeEmbedding, val isInterface: Boole
     private var _sharedPredicate: Predicate? = null
     private var _uniquePredicate: Predicate? = null
     val fields: Map<SimpleKotlinName, FieldEmbedding>
-        get() = _fields ?: error("Fields of ${type.className} have not been initialised yet.")
+        get() = _fields ?: error("Fields of ${type.name} have not been initialised yet.")
     val sharedPredicate: Predicate
-        get() = _sharedPredicate ?: error("Predicate of ${type.className} has not been initialised yet.")
+        get() = _sharedPredicate ?: error("Predicate of ${type.name} has not been initialised yet.")
     val uniquePredicate: Predicate
-        get() = _uniquePredicate ?: error("Unique Predicate of ${type.className} has not been initialised yet.")
+        get() = _uniquePredicate ?: error("Unique Predicate of ${type.name} has not been initialised yet.")
 
     fun initFields(newFields: Map<SimpleKotlinName, FieldEmbedding>) {
-        check(_fields == null) { "Fields of ${type.className} are already initialised." }
+        check(_fields == null) { "Fields of ${type.name} are already initialised." }
         _fields = newFields
-        _sharedPredicate = ClassPredicateBuilder.build(this, sharedPredicateName) {
+        _sharedPredicate = ClassPredicateBuilder.Companion.build(this, sharedPredicateName) {
             forEachField {
                 if (isAlwaysReadable) {
                     addAccessPermissions(PermExp.WildcardPerm())
@@ -50,7 +51,7 @@ class ClassEmbeddingDetails(val type: ClassTypeEmbedding, val isInterface: Boole
                 addAccessToSharedPredicate()
             }
         }
-        _uniquePredicate = ClassPredicateBuilder.build(this, uniquePredicateName) {
+        _uniquePredicate = ClassPredicateBuilder.Companion.build(this, uniquePredicateName) {
             forEachField {
                 if (isAlwaysReadable) {
                     addAccessPermissions(PermExp.WildcardPerm())
@@ -71,8 +72,8 @@ class ClassEmbeddingDetails(val type: ClassTypeEmbedding, val isInterface: Boole
         }
     }
 
-    private val sharedPredicateName = ScopedKotlinName(type.className.asScope(), PredicateKotlinName("shared"))
-    private val uniquePredicateName = ScopedKotlinName(type.className.asScope(), PredicateKotlinName("unique"))
+    private val sharedPredicateName = ScopedKotlinName(type.name.asScope(), PredicateKotlinName("shared"))
+    private val uniquePredicateName = ScopedKotlinName(type.name.asScope(), PredicateKotlinName("unique"))
 
     /**
      * Find an embedding of a backing field by this name amongst the ancestors of this type.
@@ -97,20 +98,20 @@ class ClassEmbeddingDetails(val type: ClassTypeEmbedding, val isInterface: Boole
     override fun uniquePredicateAccessInvariant() =
         PredicateAccessTypeInvariantEmbedding(uniquePredicateName, PermExp.FullPerm())
 
+    override fun subTypeInvariant(): TypeInvariantEmbedding = type.subTypeInvariant()
+
     // Returns the sequence of classes in a hierarchy that need to be unfolded in order to access the given field
     fun hierarchyUnfoldPath(field: FieldEmbedding): Sequence<ClassTypeEmbedding> = sequence {
-        val className = field.containingClass?.className
+        val className = field.containingClass?.name
         require(className != null) { "Cannot find hierarchy unfold path of a field with no class information" }
-        if (className == type.className) {
+        if (className == type.name) {
             yield(this@ClassEmbeddingDetails.type)
         } else {
-            val sup = superTypes.firstOrNull { it is ClassTypeEmbedding && !it.details.isInterface }
-            if (sup is ClassTypeEmbedding) {
-                yield(this@ClassEmbeddingDetails.type)
-                yieldAll(sup.details.hierarchyUnfoldPath(field))
-            } else {
-                throw IllegalArgumentException("Reached top of the hierarchy without finding the field")
-            }
+            val sup = classSuperTypes.firstOrNull { !it.details.isInterface }
+                ?: throw IllegalArgumentException("Reached top of the hierarchy without finding the field")
+
+            yield(this@ClassEmbeddingDetails.type)
+            yieldAll(sup.details.hierarchyUnfoldPath(field))
         }
     }
 
