@@ -6,7 +6,7 @@
 package org.jetbrains.kotlin.formver.conversion
 
 import org.jetbrains.kotlin.formver.embeddings.FieldEmbedding
-import org.jetbrains.kotlin.formver.embeddings.TypeEmbedding
+import org.jetbrains.kotlin.formver.embeddings.types.TypeEmbedding
 import org.jetbrains.kotlin.formver.names.SpecialName
 import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.formver.viper.ast.Type

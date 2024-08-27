@@ -1,5 +1,5 @@
 /interface.kt:(84,98): info: Generated Viper text for testProperties:
-method f$testProperties$TF$T$c$Foo(p$foo: Ref) returns (ret$0: Ref)
+method f$testProperties$TF$T$Foo(p$foo: Ref) returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 {
   var anon$0: Ref
@@ -8,7 +8,7 @@ method f$testProperties$TF$T$c$Foo(p$foo: Ref) returns (ret$0: Ref)
   var anon$2: Ref
   var anon$3: Ref
   var anon$4: Ref
-  inhale df$rt$isSubtype(df$rt$typeOf(p$foo), df$rt$T$c$Foo())
+  inhale df$rt$isSubtype(df$rt$typeOf(p$foo), df$rt$c$Foo())
   inhale acc(p$c$Foo$shared(p$foo), wildcard)
   anon$0 := ps$public$varProp(p$foo, df$rt$intToRef(0))
   anon$2 := pg$public$varProp(p$foo)
@@ -36,7 +36,7 @@ method ps$public$varProp(this$dispatch: Ref, anon$0: Ref)
 field bf$number: Ref
 
 method con$c$Impl$T$Int(p$number: Ref) returns (ret: Ref)
-  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$T$c$Impl())
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$c$Impl())
   ensures acc(p$c$Impl$shared(ret), wildcard)
   ensures acc(p$c$Impl$unique(ret), write)
   ensures (unfolding acc(p$c$Impl$shared(ret), wildcard) in

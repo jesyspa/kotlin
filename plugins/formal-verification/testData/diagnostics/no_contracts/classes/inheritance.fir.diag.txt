@@ -5,10 +5,10 @@ field bf$x: Ref
 
 field bf$y: Ref
 
-method f$c$Foo$getY$TF$T$c$Foo(this$dispatch: Ref) returns (ret$0: Ref)
+method f$c$Foo$getY$TF$T$Foo(this$dispatch: Ref) returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$intType())
 {
-  inhale df$rt$isSubtype(df$rt$typeOf(this$dispatch), df$rt$T$c$Foo())
+  inhale df$rt$isSubtype(df$rt$typeOf(this$dispatch), df$rt$c$Foo())
   inhale acc(p$c$Foo$shared(this$dispatch), wildcard)
   unfold acc(p$c$Foo$shared(this$dispatch), wildcard)
   ret$0 := this$dispatch.bf$y
@@ -25,12 +25,12 @@ field bf$y: Ref
 
 field bf$z: Ref
 
-method f$c$Bar$sum$TF$T$c$Bar(this$dispatch: Ref) returns (ret$0: Ref)
+method f$c$Bar$sum$TF$T$Bar(this$dispatch: Ref) returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$intType())
 {
   var anon$0: Ref
   var anon$1: Ref
-  inhale df$rt$isSubtype(df$rt$typeOf(this$dispatch), df$rt$T$c$Bar())
+  inhale df$rt$isSubtype(df$rt$typeOf(this$dispatch), df$rt$c$Bar())
   inhale acc(p$c$Bar$shared(this$dispatch), wildcard)
   unfold acc(p$c$Bar$shared(this$dispatch), wildcard)
   unfold acc(p$c$Foo$shared(this$dispatch), wildcard)
@@ -51,16 +51,16 @@ field bf$y: Ref
 
 field bf$z: Ref
 
-method f$c$Foo$getY$TF$T$c$Foo(this$dispatch: Ref) returns (ret: Ref)
+method f$c$Foo$getY$TF$T$Foo(this$dispatch: Ref) returns (ret: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$intType())
 
 
-method f$callSuperMethod$TF$T$c$Bar(p$bar: Ref) returns (ret$0: Ref)
+method f$callSuperMethod$TF$T$Bar(p$bar: Ref) returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$intType())
 {
-  inhale df$rt$isSubtype(df$rt$typeOf(p$bar), df$rt$T$c$Bar())
+  inhale df$rt$isSubtype(df$rt$typeOf(p$bar), df$rt$c$Bar())
   inhale acc(p$c$Bar$shared(p$bar), wildcard)
-  ret$0 := f$c$Foo$getY$TF$T$c$Foo(p$bar)
+  ret$0 := f$c$Foo$getY$TF$T$Foo(p$bar)
   goto lbl$ret$0
   label lbl$ret$0
 }
@@ -74,10 +74,10 @@ field bf$y: Ref
 
 field bf$z: Ref
 
-method f$accessSuperField$TF$T$c$Bar(p$bar: Ref) returns (ret$0: Ref)
+method f$accessSuperField$TF$T$Bar(p$bar: Ref) returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$boolType())
 {
-  inhale df$rt$isSubtype(df$rt$typeOf(p$bar), df$rt$T$c$Bar())
+  inhale df$rt$isSubtype(df$rt$typeOf(p$bar), df$rt$c$Bar())
   inhale acc(p$c$Bar$shared(p$bar), wildcard)
   inhale acc(p$bar.bf$b, write)
   ret$0 := p$bar.bf$b
@@ -96,10 +96,10 @@ field bf$y: Ref
 
 field bf$z: Ref
 
-method f$accessNewField$TF$T$c$Bar(p$bar: Ref) returns (ret$0: Ref)
+method f$accessNewField$TF$T$Bar(p$bar: Ref) returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$intType())
 {
-  inhale df$rt$isSubtype(df$rt$typeOf(p$bar), df$rt$T$c$Bar())
+  inhale df$rt$isSubtype(df$rt$typeOf(p$bar), df$rt$c$Bar())
   inhale acc(p$c$Bar$shared(p$bar), wildcard)
   unfold acc(p$c$Bar$shared(p$bar), wildcard)
   ret$0 := p$bar.bf$z
@@ -116,16 +116,16 @@ field bf$y: Ref
 
 field bf$z: Ref
 
-method f$c$Bar$sum$TF$T$c$Bar(this$dispatch: Ref) returns (ret: Ref)
+method f$c$Bar$sum$TF$T$Bar(this$dispatch: Ref) returns (ret: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$intType())
 
 
-method f$callNewMethod$TF$T$c$Bar(p$bar: Ref) returns (ret$0: Ref)
+method f$callNewMethod$TF$T$Bar(p$bar: Ref) returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$intType())
 {
-  inhale df$rt$isSubtype(df$rt$typeOf(p$bar), df$rt$T$c$Bar())
+  inhale df$rt$isSubtype(df$rt$typeOf(p$bar), df$rt$c$Bar())
   inhale acc(p$c$Bar$shared(p$bar), wildcard)
-  ret$0 := f$c$Bar$sum$TF$T$c$Bar(p$bar)
+  ret$0 := f$c$Bar$sum$TF$T$Bar(p$bar)
   goto lbl$ret$0
   label lbl$ret$0
 }
@@ -139,10 +139,10 @@ field bf$y: Ref
 
 field bf$z: Ref
 
-method f$setSuperField$TF$T$c$Bar(p$bar: Ref) returns (ret$0: Ref)
+method f$setSuperField$TF$T$Bar(p$bar: Ref) returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 {
-  inhale df$rt$isSubtype(df$rt$typeOf(p$bar), df$rt$T$c$Bar())
+  inhale df$rt$isSubtype(df$rt$typeOf(p$bar), df$rt$c$Bar())
   inhale acc(p$c$Bar$shared(p$bar), wildcard)
   inhale acc(p$bar.bf$b, write)
   p$bar.bf$b := df$rt$boolToRef(true)
@@ -160,10 +160,10 @@ field bf$y: Ref
 
 field bf$z: Ref
 
-method f$accessSuperSuperField$TF$T$c$Baz(p$baz: Ref) returns (ret$0: Ref)
+method f$accessSuperSuperField$TF$T$Baz(p$baz: Ref) returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$intType())
 {
-  inhale df$rt$isSubtype(df$rt$typeOf(p$baz), df$rt$T$c$Baz())
+  inhale df$rt$isSubtype(df$rt$typeOf(p$baz), df$rt$c$Baz())
   inhale acc(p$c$Baz$shared(p$baz), wildcard)
   unfold acc(p$c$Baz$shared(p$baz), wildcard)
   unfold acc(p$c$Bar$shared(p$baz), wildcard)
