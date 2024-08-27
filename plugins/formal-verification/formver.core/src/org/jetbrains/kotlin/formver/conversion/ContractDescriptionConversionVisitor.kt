@@ -10,6 +10,7 @@ import org.jetbrains.kotlin.fir.contracts.description.ConeContractConstantValues
 import org.jetbrains.kotlin.fir.diagnostics.ConeDiagnostic
 import org.jetbrains.kotlin.fir.symbols.FirBasedSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirFunctionSymbol
+import org.jetbrains.kotlin.fir.symbols.impl.FirValueParameterSymbol
 import org.jetbrains.kotlin.fir.types.ConeKotlinType
 import org.jetbrains.kotlin.formver.effects
 import org.jetbrains.kotlin.formver.embeddings.SourceRole
@@ -156,10 +157,13 @@ class ContractDescriptionConversionVisitor(
     private fun KtValueParameterReference<ConeKotlinType, ConeDiagnostic>.getTargetParameter(data: ContractVisitorContext): FirBasedSymbol<*> =
         resolveByIndex(
             parameterIndex,
-            { TODO("old code: data.functionContractOwner.receiverParameter!!.calleeSymbol") }) { data.functionContractOwner.valueParameterSymbols[it] }
+            { data.functionContractOwner }) { data.functionContractOwner.valueParameterSymbols[it] }
+
+    // If both receivers are present only references to extension receivers will be allowed in contract.
+    private fun allowedReceiver() = signature.extensionReceiver ?: signature.dispatchReceiver
 
     private fun embeddedVarByIndex(ix: Int): VariableEmbedding =
-        resolveByIndex(ix, { signature.dispatchReceiver!! }) { signature.params[it] }
+        resolveByIndex(ix, { allowedReceiver()!! }) { signature.params[it] }
 
     private fun VariableEmbedding.nullCmp(isNegated: Boolean, sourceRole: SourceRole?): ExpEmbedding =
         if (isNegated) NeCmp(this, NullLit, sourceRole)
