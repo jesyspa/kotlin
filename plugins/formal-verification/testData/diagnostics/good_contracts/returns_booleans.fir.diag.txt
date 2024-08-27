@@ -85,30 +85,30 @@ method f$call_fun_with_contracts$TF$T$Boolean(p$b: Ref)
   label lbl$ret$0
 }
 
-/returns_booleans.kt:(1467,1480): info: Generated Viper text for isNullOrEmpty:
+/returns_booleans.kt:(1268,1281): info: Generated Viper text for isNullOrEmpty:
 field sp$size: Ref
 
-method f$isNullOrEmpty$TF$NT$Collection(p$collection: Ref)
+method f$isNullOrEmpty$TF$NT$Collection(this$extension: Ref)
   returns (ret$0: Ref)
-  requires p$collection != df$rt$nullValue() ==>
-    acc(p$collection.sp$size, write)
-  requires p$collection != df$rt$nullValue() ==>
-    df$rt$intFromRef(p$collection.sp$size) >= 0
-  ensures p$collection != df$rt$nullValue() ==>
-    acc(p$collection.sp$size, write)
-  ensures p$collection != df$rt$nullValue() ==>
-    df$rt$intFromRef(p$collection.sp$size) >= 0
+  requires this$extension != df$rt$nullValue() ==>
+    acc(this$extension.sp$size, write)
+  requires this$extension != df$rt$nullValue() ==>
+    df$rt$intFromRef(this$extension.sp$size) >= 0
+  ensures this$extension != df$rt$nullValue() ==>
+    acc(this$extension.sp$size, write)
+  ensures this$extension != df$rt$nullValue() ==>
+    df$rt$intFromRef(this$extension.sp$size) >= 0
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$boolType())
   ensures df$rt$boolFromRef(ret$0) == false ==>
-    p$collection != df$rt$nullValue()
+    this$extension != df$rt$nullValue()
 {
-  inhale df$rt$isSubtype(df$rt$typeOf(p$collection), df$rt$nullable(df$rt$c$pkg$kotlin_collections$Collection()))
-  inhale p$collection != df$rt$nullValue() ==>
-    acc(p$pkg$kotlin_collections$c$Collection$shared(p$collection), wildcard)
-  if (p$collection == df$rt$nullValue()) {
+  inhale df$rt$isSubtype(df$rt$typeOf(this$extension), df$rt$nullable(df$rt$c$pkg$kotlin_collections$Collection()))
+  inhale this$extension != df$rt$nullValue() ==>
+    acc(p$pkg$kotlin_collections$c$Collection$shared(this$extension), wildcard)
+  if (this$extension == df$rt$nullValue()) {
     ret$0 := df$rt$boolToRef(true)
   } else {
-    ret$0 := f$pkg$kotlin_collections$c$Collection$isEmpty$TF$T$Collection(p$collection)}
+    ret$0 := f$pkg$kotlin_collections$c$Collection$isEmpty$TF$T$Collection(this$extension)}
   goto lbl$ret$0
   label lbl$ret$0
 }
