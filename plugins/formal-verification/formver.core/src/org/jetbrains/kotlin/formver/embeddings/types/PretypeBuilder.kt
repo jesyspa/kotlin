@@ -5,7 +5,6 @@
 
 package org.jetbrains.kotlin.formver.embeddings.types
 
-import org.jetbrains.kotlin.formver.embeddings.TypeEmbedding
 import org.jetbrains.kotlin.formver.names.ScopedKotlinName
 
 /**

@@ -11,7 +11,9 @@ import org.jetbrains.kotlin.formver.domains.RuntimeTypeDomain
 import org.jetbrains.kotlin.formver.embeddings.*
 import org.jetbrains.kotlin.formver.embeddings.expression.debug.*
 import org.jetbrains.kotlin.formver.embeddings.types.ClassTypeEmbedding
+import org.jetbrains.kotlin.formver.embeddings.types.TypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.types.buildType
+import org.jetbrains.kotlin.formver.embeddings.types.injectionOr
 import org.jetbrains.kotlin.formver.linearization.InhaleExhaleStmtModifier
 import org.jetbrains.kotlin.formver.linearization.LinearizationContext
 import org.jetbrains.kotlin.formver.linearization.pureToViper

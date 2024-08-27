@@ -3,20 +3,12 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
-package org.jetbrains.kotlin.formver.embeddings
+package org.jetbrains.kotlin.formver.embeddings.types
 
 import org.jetbrains.kotlin.formver.domains.Injection
 import org.jetbrains.kotlin.formver.domains.RuntimeTypeDomain
 import org.jetbrains.kotlin.formver.embeddings.expression.debug.PlaintextLeaf
 import org.jetbrains.kotlin.formver.embeddings.expression.debug.TreeView
-import org.jetbrains.kotlin.formver.embeddings.types.BooleanTypeEmbedding
-import org.jetbrains.kotlin.formver.embeddings.types.IfNonNullInvariant
-import org.jetbrains.kotlin.formver.embeddings.types.IntTypeEmbedding
-import org.jetbrains.kotlin.formver.embeddings.types.PretypeEmbedding
-import org.jetbrains.kotlin.formver.embeddings.types.RuntimeTypeHolder
-import org.jetbrains.kotlin.formver.embeddings.types.SubTypeInvariantEmbedding
-import org.jetbrains.kotlin.formver.embeddings.types.TypeInvariantEmbedding
-import org.jetbrains.kotlin.formver.embeddings.types.TypeInvariantHolder
 import org.jetbrains.kotlin.formver.names.*
 import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.formver.viper.ast.Exp
@@ -26,8 +18,6 @@ import org.jetbrains.kotlin.formver.viper.mangled
  * Represents our representation of a Kotlin type.
  *
  * Due to name mangling, the mapping between Kotlin types and TypeEmbeddings must be 1:1.
- *
- * All type embeddings must be `data` classes or objects!
  */
 data class TypeEmbedding(val pretype: PretypeEmbedding, val flags: TypeEmbeddingFlags) : RuntimeTypeHolder, TypeInvariantHolder {
     /**

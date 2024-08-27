@@ -6,7 +6,6 @@
 package org.jetbrains.kotlin.formver.embeddings.types
 
 import org.jetbrains.kotlin.formver.conversion.AccessPolicy
-import org.jetbrains.kotlin.formver.embeddings.TypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.UserFieldEmbedding
 import org.jetbrains.kotlin.formver.embeddings.expression.*
 import org.jetbrains.kotlin.formver.linearization.pureToViper

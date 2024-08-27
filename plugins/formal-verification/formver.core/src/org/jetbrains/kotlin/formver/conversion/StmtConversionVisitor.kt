@@ -20,7 +20,7 @@ import org.jetbrains.kotlin.fir.types.isUnit
 import org.jetbrains.kotlin.fir.types.resolvedType
 import org.jetbrains.kotlin.fir.visitors.FirVisitor
 import org.jetbrains.kotlin.formver.UnsupportedFeatureBehaviour
-import org.jetbrains.kotlin.formver.embeddings.TypeEmbedding
+import org.jetbrains.kotlin.formver.embeddings.types.TypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.callables.FullNamedFunctionSignature
 import org.jetbrains.kotlin.formver.embeddings.callables.insertCall
 import org.jetbrains.kotlin.formver.embeddings.expression.*

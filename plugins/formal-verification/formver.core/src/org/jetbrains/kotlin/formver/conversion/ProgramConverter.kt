@@ -22,6 +22,7 @@ import org.jetbrains.kotlin.formver.embeddings.*
 import org.jetbrains.kotlin.formver.embeddings.callables.*
 import org.jetbrains.kotlin.formver.embeddings.expression.*
 import org.jetbrains.kotlin.formver.embeddings.types.ClassEmbeddingDetails
+import org.jetbrains.kotlin.formver.embeddings.types.TypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.types.ClassTypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.types.FunctionPretypeBuilder
 import org.jetbrains.kotlin.formver.embeddings.types.FunctionTypeEmbedding

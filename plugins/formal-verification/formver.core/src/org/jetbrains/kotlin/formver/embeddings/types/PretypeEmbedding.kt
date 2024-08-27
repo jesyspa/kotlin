@@ -6,8 +6,6 @@
 package org.jetbrains.kotlin.formver.embeddings.types
 
 import org.jetbrains.kotlin.formver.domains.RuntimeTypeDomain
-import org.jetbrains.kotlin.formver.embeddings.TypeEmbedding
-import org.jetbrains.kotlin.formver.embeddings.TypeEmbeddingFlags
 import org.jetbrains.kotlin.formver.embeddings.expression.debug.PlaintextLeaf
 import org.jetbrains.kotlin.formver.embeddings.expression.debug.TreeView
 import org.jetbrains.kotlin.formver.names.PretypeName
@@ -21,6 +19,8 @@ import org.jetbrains.kotlin.formver.viper.mangled
  * every `PretypeEmbedding` as a `TypeEmbedding`: the goal of the separation into types and pretypes is to avoid
  * one showing up where the other is expected.  For example, the naming systems are different, and the equality
  * comparisons would not work.
+ *
+ * All pretype embeddings must be `data` classes or objects!
  */
 interface PretypeEmbedding : RuntimeTypeHolder, TypeInvariantHolder {
     val name: MangledName
@@ -58,5 +58,5 @@ data object BooleanTypeEmbedding : PretypeEmbedding {
     override val name = PretypeName("Boolean")
 }
 
-fun PretypeEmbedding.asTypeEmbedding() = TypeEmbedding(this, TypeEmbeddingFlags(false))
+fun PretypeEmbedding.asTypeEmbedding() = TypeEmbedding(this, TypeEmbeddingFlags(nullable = false))
 

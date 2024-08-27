@@ -6,7 +6,7 @@
 package org.jetbrains.kotlin.formver.embeddings.callables
 
 import org.jetbrains.kotlin.formver.conversion.StmtConversionContext
-import org.jetbrains.kotlin.formver.embeddings.TypeEmbedding
+import org.jetbrains.kotlin.formver.embeddings.types.TypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.expression.ExpEmbedding
 import org.jetbrains.kotlin.formver.embeddings.expression.withNewTypeInvariants
 import org.jetbrains.kotlin.formver.embeddings.types.FunctionTypeEmbedding

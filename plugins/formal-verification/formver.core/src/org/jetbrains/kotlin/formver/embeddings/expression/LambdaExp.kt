@@ -9,7 +9,7 @@ import org.jetbrains.kotlin.fir.declarations.FirAnonymousFunction
 import org.jetbrains.kotlin.formver.conversion.MethodConversionContext
 import org.jetbrains.kotlin.formver.conversion.StmtConversionContext
 import org.jetbrains.kotlin.formver.conversion.insertInlineFunctionCall
-import org.jetbrains.kotlin.formver.embeddings.TypeEmbedding
+import org.jetbrains.kotlin.formver.embeddings.types.TypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.callables.CallableEmbedding
 import org.jetbrains.kotlin.formver.embeddings.callables.FunctionSignature
 import org.jetbrains.kotlin.formver.embeddings.expression.debug.PlaintextLeaf

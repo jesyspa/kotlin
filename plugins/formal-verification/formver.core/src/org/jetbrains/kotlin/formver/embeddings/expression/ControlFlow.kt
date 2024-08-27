@@ -6,7 +6,7 @@
 package org.jetbrains.kotlin.formver.embeddings.expression
 
 import org.jetbrains.kotlin.formver.asPosition
-import org.jetbrains.kotlin.formver.embeddings.TypeEmbedding
+import org.jetbrains.kotlin.formver.embeddings.types.TypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.asInfo
 import org.jetbrains.kotlin.formver.embeddings.callables.FullNamedFunctionSignature
 import org.jetbrains.kotlin.formver.embeddings.callables.NamedFunctionSignature

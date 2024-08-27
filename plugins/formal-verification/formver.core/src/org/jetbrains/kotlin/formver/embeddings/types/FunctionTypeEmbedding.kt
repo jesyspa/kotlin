@@ -6,7 +6,6 @@
 package org.jetbrains.kotlin.formver.embeddings.types
 
 import org.jetbrains.kotlin.formver.domains.RuntimeTypeDomain
-import org.jetbrains.kotlin.formver.embeddings.TypeEmbedding
 import org.jetbrains.kotlin.formver.names.PretypeName
 import org.jetbrains.kotlin.formver.viper.mangled
 

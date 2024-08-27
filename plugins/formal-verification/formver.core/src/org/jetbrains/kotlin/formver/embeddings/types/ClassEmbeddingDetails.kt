@@ -17,7 +17,7 @@ class ClassEmbeddingDetails(val type: ClassTypeEmbedding, val isInterface: Boole
         get() = _superTypes ?: error("Super types of ${type.name} have not been initialised yet.")
 
     private val classSuperTypes: List<ClassTypeEmbedding>
-        get() = superTypes.mapNotNull { it as? ClassTypeEmbedding }
+        get() = superTypes.filterIsInstance<ClassTypeEmbedding>()
 
     fun initSuperTypes(newSuperTypes: List<PretypeEmbedding>) {
         check(_superTypes == null) { "Super types of ${type.name} are already initialised." }

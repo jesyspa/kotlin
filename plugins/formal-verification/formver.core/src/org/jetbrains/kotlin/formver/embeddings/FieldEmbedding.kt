@@ -16,6 +16,7 @@ import org.jetbrains.kotlin.formver.embeddings.types.FieldAccessTypeInvariantEmb
 import org.jetbrains.kotlin.formver.embeddings.types.TypeInvariantEmbedding
 import org.jetbrains.kotlin.formver.embeddings.types.buildType
 import org.jetbrains.kotlin.formver.embeddings.types.isCollectionInheritor
+import org.jetbrains.kotlin.formver.embeddings.types.TypeEmbedding
 import org.jetbrains.kotlin.formver.names.NameMatcher
 import org.jetbrains.kotlin.formver.names.ScopedKotlinName
 import org.jetbrains.kotlin.formver.names.SpecialName

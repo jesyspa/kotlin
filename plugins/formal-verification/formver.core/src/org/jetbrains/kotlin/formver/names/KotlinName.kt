@@ -5,7 +5,7 @@
 
 package org.jetbrains.kotlin.formver.names
 
-import org.jetbrains.kotlin.formver.embeddings.TypeEmbedding
+import org.jetbrains.kotlin.formver.embeddings.types.TypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.types.FunctionTypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.types.PretypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.types.asTypeEmbedding

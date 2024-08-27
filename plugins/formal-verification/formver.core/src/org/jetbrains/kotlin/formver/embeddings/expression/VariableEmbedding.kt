@@ -11,7 +11,7 @@ import org.jetbrains.kotlin.formver.asPosition
 import org.jetbrains.kotlin.formver.asSourceRole
 import org.jetbrains.kotlin.formver.conversion.StmtConversionContext
 import org.jetbrains.kotlin.formver.embeddings.*
-import org.jetbrains.kotlin.formver.embeddings.TypeEmbedding
+import org.jetbrains.kotlin.formver.embeddings.types.TypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.expression.debug.NamedBranchingNode
 import org.jetbrains.kotlin.formver.embeddings.expression.debug.PlaintextLeaf
 import org.jetbrains.kotlin.formver.embeddings.expression.debug.TreeView
