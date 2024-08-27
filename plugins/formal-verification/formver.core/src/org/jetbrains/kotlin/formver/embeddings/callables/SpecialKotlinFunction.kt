@@ -144,11 +144,20 @@ object SpecialVerifyFunction : SpecialKotlinFunction {
     override val name: String = "verify"
 
     override fun insertCall(args: List<ExpEmbedding>, ctx: StmtConversionContext): ExpEmbedding {
-        return Assert(args[0])
+        return args.map { Assert(it) }.toBlock()
     }
 
     override val callableType: FunctionTypeEmbedding = buildFunctionPretype {
-        withParam { boolean() }
+        withParam {
+            klass {
+                withName(
+                    buildName {
+                        packageScope(listOf("kotlin"))
+                        ClassKotlinName(listOf("BooleanArray"))
+                    }
+                )
+            }
+        }
         withReturnType { unit() }
     }
 }
