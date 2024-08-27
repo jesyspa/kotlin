@@ -13,7 +13,7 @@ domain d$rt  {
 
   unique function df$rt$functionType(): d$rt
 
-  unique function df$rt$T$c$Foo(): d$rt
+  unique function df$rt$c$Foo(): d$rt
 
   function df$rt$nullValue(): Ref
 
@@ -100,7 +100,7 @@ domain d$rt  {
   }
 
   axiom {
-    df$rt$isSubtype(df$rt$T$c$Foo(), df$rt$anyType())
+    df$rt$isSubtype(df$rt$c$Foo(), df$rt$anyType())
   }
 
   axiom rt$supertype_of_nothing {
@@ -280,7 +280,7 @@ predicate p$c$Foo$unique(this$dispatch: Ref) {
 }
 
 method con$c$Foo$T$Int(p$x: Ref) returns (ret: Ref)
-  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$T$c$Foo())
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$c$Foo())
   ensures acc(p$c$Foo$shared(ret), wildcard)
   ensures acc(p$c$Foo$unique(ret), write)
   ensures (unfolding acc(p$c$Foo$shared(ret), wildcard) in
@@ -299,6 +299,6 @@ method f$f$TF$() returns (ret$0: Ref)
 /full_viper_dump.kt:(172,173): info: Generated ExpEmbedding for f$f$TF$:
 Function(
     name = f$f$TF$,
-    { Declare(Var(l0$foo), T$c$Foo, MethodCall(callee = con$c$Foo$T$Int, Int(0))) },
+    { Declare(Var(l0$foo), T$Foo, MethodCall(callee = con$c$Foo$T$Int, Int(0))) },
     return = lbl$ret$0,
 )

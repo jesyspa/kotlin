@@ -9,15 +9,18 @@ import org.jetbrains.kotlin.formver.asPosition
 import org.jetbrains.kotlin.formver.domains.RuntimeTypeDomain
 import org.jetbrains.kotlin.formver.embeddings.*
 import org.jetbrains.kotlin.formver.embeddings.expression.debug.TreeView
-import org.jetbrains.kotlin.formver.embeddings.expression.debug.debugTreeView
 import org.jetbrains.kotlin.formver.embeddings.expression.debug.withDesignation
+import org.jetbrains.kotlin.formver.embeddings.types.*
 import org.jetbrains.kotlin.formver.linearization.LinearizationContext
 import org.jetbrains.kotlin.formver.linearization.pureToViper
 import org.jetbrains.kotlin.formver.viper.ast.Exp
 import org.jetbrains.kotlin.formver.viper.ast.Stmt
 import org.jetbrains.kotlin.utils.addIfNotNull
 
-data class Is(override val inner: ExpEmbedding, val comparisonType: TypeEmbedding, override val sourceRole: SourceRole? = null) :
+data class Is(
+    override val inner: ExpEmbedding, val comparisonType: RuntimeTypeHolder,
+    override val sourceRole: SourceRole? = null,
+) :
     UnaryDirectResultExpEmbedding {
     override val type = buildType { boolean() }
 
@@ -64,7 +67,7 @@ fun ExpEmbedding.withType(init: TypeBuilder.() -> PretypeBuilder): ExpEmbedding 
  * This is also why we insist the result is stored; this is a little stronger than necessary, but that does not harm correctness.
  */
 data class SafeCast(val exp: ExpEmbedding, val targetType: TypeEmbedding) : StoredResultExpEmbedding, DefaultDebugTreeViewImplementation {
-    override val type: NullableTypeEmbedding
+    override val type: TypeEmbedding
         get() = targetType.getNullable()
 
     override fun toViperStoringIn(result: VariableEmbedding, ctx: LinearizationContext) {
@@ -81,7 +84,7 @@ data class SafeCast(val exp: ExpEmbedding, val targetType: TypeEmbedding) : Stor
         get() = listOf(targetType.debugTreeView.withDesignation("type"))
 }
 
-interface InhaleInvariants: ExpEmbedding, DefaultDebugTreeViewImplementation {
+interface InhaleInvariants : ExpEmbedding, DefaultDebugTreeViewImplementation {
     val invariants: List<TypeInvariantEmbedding>
     val exp: ExpEmbedding
 
@@ -134,11 +137,10 @@ private data class InhaleInvariantsForVariable(
 }
 
 class InhaleInvariantsBuilder(val exp: ExpEmbedding) {
-
     val invariants = mutableListOf<TypeInvariantEmbedding>()
 
     fun complete(): ExpEmbedding {
-        if (proven) invariants.add(exp.type.subTypeInvariant())
+        if (proven) exp.type.subTypeInvariant()?.let { invariants.add(it) }
         if (access) {
             invariants.addAll(exp.type.accessInvariants())
             invariants.addIfNotNull(exp.type.sharedPredicateAccessInvariant())
@@ -166,4 +168,3 @@ fun ExpEmbedding.withIsUnitInvariantIfUnit() = withInvariants {
 
 inline fun ExpEmbedding.withNewTypeInvariants(newType: TypeEmbedding, block: InhaleInvariantsBuilder.() -> Unit) =
     if (this.type == newType) this else withType(newType).withInvariants(block)
-

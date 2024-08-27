@@ -5,7 +5,7 @@
 
 package org.jetbrains.kotlin.formver.domains
 
-import org.jetbrains.kotlin.formver.embeddings.ClassTypeEmbedding
+import org.jetbrains.kotlin.formver.embeddings.types.ClassTypeEmbedding
 import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.formver.viper.ast.*
 import org.jetbrains.kotlin.formver.viper.mangled

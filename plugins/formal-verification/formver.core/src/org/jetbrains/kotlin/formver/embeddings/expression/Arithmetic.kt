@@ -6,7 +6,7 @@
 package org.jetbrains.kotlin.formver.embeddings.expression
 
 import org.jetbrains.kotlin.formver.domains.RuntimeTypeDomain
-import org.jetbrains.kotlin.formver.embeddings.buildType
+import org.jetbrains.kotlin.formver.embeddings.types.buildType
 
 sealed interface IntArithmeticExpression : OperationBaseExpEmbedding {
     override val type

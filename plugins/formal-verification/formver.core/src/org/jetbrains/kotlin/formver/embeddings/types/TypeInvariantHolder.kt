@@ -3,7 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
-package org.jetbrains.kotlin.formver.embeddings
+package org.jetbrains.kotlin.formver.embeddings.types
 
 /**
  * Representation of an entity that, in Viper, should have invariants associated with it.
@@ -23,4 +23,6 @@ interface TypeInvariantHolder {
      * once they have been established once.
      */
     fun pureInvariants(): List<TypeInvariantEmbedding> = emptyList()
+
+    fun subTypeInvariant(): TypeInvariantEmbedding
 }

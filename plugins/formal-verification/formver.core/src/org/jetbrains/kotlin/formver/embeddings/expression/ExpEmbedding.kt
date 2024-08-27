@@ -10,6 +10,10 @@ import org.jetbrains.kotlin.formver.asPosition
 import org.jetbrains.kotlin.formver.domains.RuntimeTypeDomain
 import org.jetbrains.kotlin.formver.embeddings.*
 import org.jetbrains.kotlin.formver.embeddings.expression.debug.*
+import org.jetbrains.kotlin.formver.embeddings.types.ClassTypeEmbedding
+import org.jetbrains.kotlin.formver.embeddings.types.TypeEmbedding
+import org.jetbrains.kotlin.formver.embeddings.types.buildType
+import org.jetbrains.kotlin.formver.embeddings.types.injectionOr
 import org.jetbrains.kotlin.formver.linearization.InhaleExhaleStmtModifier
 import org.jetbrains.kotlin.formver.linearization.LinearizationContext
 import org.jetbrains.kotlin.formver.linearization.pureToViper
@@ -19,7 +23,7 @@ import org.jetbrains.kotlin.formver.viper.ast.PermExp
 import org.jetbrains.kotlin.formver.viper.ast.Stmt
 import org.jetbrains.kotlin.formver.viper.mangled
 
-sealed interface ExpEmbedding {
+sealed interface ExpEmbedding : DebugPrintable {
     val type: TypeEmbedding
 
     /**
@@ -74,8 +78,6 @@ sealed interface ExpEmbedding {
     // TODO: Come up with a better way to solve the problem these `ignoring` functions solve...
     // Probably either virtual functions or a visitor.
     fun ignoringCastsAndMetaNodes(): ExpEmbedding = this
-
-    val debugTreeView: TreeView
 }
 
 sealed class ToViperBuiltinMisuseError(msg: String) : RuntimeException(msg)
@@ -375,7 +377,7 @@ data class FieldAccess(val receiver: ExpEmbedding, val field: FieldEmbedding) : 
     }
 
     private fun unfoldHierarchy(receiverWrapper: ExpEmbedding, ctx: LinearizationContext) {
-        val hierarchyPath = (receiver.type as? ClassTypeEmbedding)?.details?.hierarchyUnfoldPath(field)
+        val hierarchyPath = (receiver.type.pretype as? ClassTypeEmbedding)?.details?.hierarchyUnfoldPath(field)
         hierarchyPath?.forEach { classType ->
             val predAcc = classType.sharedPredicateAccessInvariant().fillHole(receiverWrapper)
                 .pureToViper(toBuiltin = true, ctx.source) as? Exp.PredicateAccess

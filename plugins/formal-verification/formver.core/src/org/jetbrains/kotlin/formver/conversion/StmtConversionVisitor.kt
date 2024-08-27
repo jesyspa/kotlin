@@ -20,11 +20,11 @@ import org.jetbrains.kotlin.fir.types.isUnit
 import org.jetbrains.kotlin.fir.types.resolvedType
 import org.jetbrains.kotlin.fir.visitors.FirVisitor
 import org.jetbrains.kotlin.formver.UnsupportedFeatureBehaviour
-import org.jetbrains.kotlin.formver.embeddings.TypeEmbedding
-import org.jetbrains.kotlin.formver.embeddings.buildType
+import org.jetbrains.kotlin.formver.embeddings.types.TypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.callables.FullNamedFunctionSignature
 import org.jetbrains.kotlin.formver.embeddings.callables.insertCall
 import org.jetbrains.kotlin.formver.embeddings.expression.*
+import org.jetbrains.kotlin.formver.embeddings.types.buildType
 import org.jetbrains.kotlin.formver.functionCallArguments
 import org.jetbrains.kotlin.text
 import org.jetbrains.kotlin.types.ConstantValueKind
@@ -88,7 +88,7 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext>()
 
     override fun visitIntegerLiteralOperatorCall(
         integerLiteralOperatorCall: FirIntegerLiteralOperatorCall,
-        data: StmtConversionContext
+        data: StmtConversionContext,
     ): ExpEmbedding {
         return visitFunctionCall(integerLiteralOperatorCall, data)
     }
@@ -287,7 +287,7 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext>()
 
     override fun visitBooleanOperatorExpression(
         booleanOperatorExpression: FirBooleanOperatorExpression,
-        data: StmtConversionContext
+        data: StmtConversionContext,
     ): ExpEmbedding {
         val left = data.convert(booleanOperatorExpression.leftOperand)
         val right = data.convert(booleanOperatorExpression.rightOperand)
@@ -327,7 +327,7 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext>()
                 proven = true
                 access = true
             }
-            FirOperation.SAFE_AS -> SafeCast(argument, conversionType).withInvariants{
+            FirOperation.SAFE_AS -> SafeCast(argument, conversionType).withInvariants {
                 proven = true
                 access = true
             }

@@ -3,7 +3,8 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
-package org.jetbrains.kotlin.formver.embeddings
+package org.jetbrains.kotlin.formver.embeddings.types
+
 
 /**
  * Builder for a `TypeEmbedding`.
@@ -19,7 +20,7 @@ class TypeBuilder {
 
     private fun completeWithPretypeBuilder(subBuilder: PretypeBuilder): TypeEmbedding {
         val subResult = subBuilder.complete()
-        return if (isNullable) NullableTypeEmbedding(subResult) else subResult
+        return TypeEmbedding(subResult, TypeEmbeddingFlags(isNullable))
     }
 
     fun unit() = UnitPretypeBuilder
@@ -29,7 +30,7 @@ class TypeBuilder {
     fun boolean() = BooleanPretypeBuilder
     fun function(init: FunctionPretypeBuilder.() -> Unit) = FunctionPretypeBuilder().also { it.init() }
     fun klass(init: ClassPretypeBuilder.() -> Unit) = ClassPretypeBuilder().also { it.init() }
-    fun existing(embedding: TypeEmbedding) = ExistingPretypeBuilder(embedding)
+    fun existing(embedding: PretypeEmbedding) = ExistingPretypeBuilder(embedding)
 }
 
 fun TypeBuilder.nullableAny(): AnyPretypeBuilder {
@@ -40,7 +41,3 @@ fun TypeBuilder.nullableAny(): AnyPretypeBuilder {
 fun buildType(init: TypeBuilder.() -> PretypeBuilder): TypeEmbedding = TypeBuilder().complete(init)
 
 fun TypeEmbedding.equalToType(init: TypeBuilder.() -> PretypeBuilder) = equals(buildType { init() })
-
-fun buildFunctionType(init: FunctionPretypeBuilder.() -> Unit): FunctionTypeEmbedding =
-    buildType { function { init() } } as FunctionTypeEmbedding
-
