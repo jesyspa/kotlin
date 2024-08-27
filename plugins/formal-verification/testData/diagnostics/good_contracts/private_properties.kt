@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.formver.plugin.AlwaysVerify
+import org.jetbrains.kotlin.formver.plugin.verify
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
@@ -24,11 +26,8 @@ class D: B() {
     val field: Int = 0
 }
 
-@OptIn(ExperimentalContracts::class)
+@AlwaysVerify
 @Suppress("USELESS_IS_CHECK")
-fun <!VIPER_TEXT!>extractPublic<!>(): Boolean {
-    contract {
-        returns(false) implies false
-    }
-    return C().field is Int && D().field is Int
+fun <!VIPER_TEXT!>extractPublic<!>() {
+    verify(C().field is Int, D().field is Int)
 }
