@@ -1,4 +1,4 @@
-/private_properties.kt:(301,316): info: Generated Viper text for getBooleanField:
+/private_properties.kt:(222,237): info: Generated Viper text for getBooleanField:
 method f$c$A$getBooleanField$TF$T$A(this$dispatch: Ref)
   returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$boolType())
@@ -20,7 +20,7 @@ method ps$c$A$private$field(this$dispatch: Ref, anon$0: Ref)
   returns (ret: Ref)
 
 
-/private_properties.kt:(395,409): info: Generated Viper text for getStringField:
+/private_properties.kt:(316,330): info: Generated Viper text for getStringField:
 field bf$c$B$private$field: Ref
 
 field bf$length: Ref
@@ -47,7 +47,7 @@ method ps$c$A$private$field(this$dispatch: Ref, anon$0: Ref)
   returns (ret: Ref)
 
 
-/private_properties.kt:(554,567): info: Generated Viper text for extractPublic:
+/private_properties.kt:(475,488): info: Generated Viper text for extractPublic:
 field bf$c$B$private$field: Ref
 
 field bf$field: Ref

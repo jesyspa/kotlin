@@ -1,7 +1,5 @@
 import org.jetbrains.kotlin.formver.plugin.AlwaysVerify
 import org.jetbrains.kotlin.formver.plugin.verify
-import kotlin.contracts.ExperimentalContracts
-import kotlin.contracts.contract
 
 open class A {
     private var field: Boolean = false

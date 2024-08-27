@@ -1,4 +1,3 @@
-import org.jetbrains.kotlin.formver.plugin.NeverVerify
 import org.jetbrains.kotlin.formver.plugin.NeverConvert
 import org.jetbrains.kotlin.formver.plugin.AlwaysVerify
 import org.jetbrains.kotlin.formver.plugin.verify
