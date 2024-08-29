@@ -10,4 +10,4 @@ package org.jetbrains.kotlin.formver.plugin
  * This function hooks-in in the `formver` plugin, its invocation in a Kotlin
  * program does not do anything.
  */
-fun verify(@Suppress("UNUSED_PARAMETER") predicate: Boolean) = Unit
+fun verify(@Suppress("UNUSED_PARAMETER") vararg predicates: Boolean) = Unit

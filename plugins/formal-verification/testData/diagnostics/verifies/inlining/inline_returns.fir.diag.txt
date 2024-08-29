@@ -1,24 +1,27 @@
-/inline_correctness.kt:(241,254): info: Generated Viper text for simple_return:
+/inline_returns.kt:(324,337): info: Generated Viper text for simple_return:
+field bf$size: Ref
+
 method f$simple_return$TF$() returns (ret$0: Ref)
-  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$boolType())
-  ensures df$rt$boolFromRef(ret$0) == true
+  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 {
-  var ret$1: Ref
   var anon$0: Ref
+  var ret$1: Ref
+  var anon$1: Ref
   var ret$2: Ref
   ret$2 := df$rt$boolToRef(false)
   goto lbl$ret$2
   label lbl$ret$2
-  anon$0 := ret$2
-  ret$1 := sp$notBool(anon$0)
+  anon$1 := ret$2
+  ret$1 := sp$notBool(anon$1)
   goto lbl$ret$1
   label lbl$ret$1
-  ret$0 := ret$1
-  goto lbl$ret$0
+  anon$0 := ret$1
+  assert df$rt$boolFromRef(anon$0)
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
-/inline_correctness.kt:(380,394): info: Generated Viper text for unnamed_return:
+/inline_returns.kt:(412,426): info: Generated Viper text for unnamed_return:
 method f$unnamed_return$TF$() returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$boolType())
   ensures df$rt$boolFromRef(ret$0) == true
@@ -40,7 +43,7 @@ method f$unnamed_return$TF$() returns (ret$0: Ref)
   label lbl$ret$0
 }
 
-/inline_correctness.kt:(551,569): info: Generated Viper text for named_local_return:
+/inline_returns.kt:(583,601): info: Generated Viper text for named_local_return:
 method f$named_local_return$TF$() returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$boolType())
   ensures df$rt$boolFromRef(ret$0) == true
@@ -62,7 +65,7 @@ method f$named_local_return$TF$() returns (ret$0: Ref)
   label lbl$ret$0
 }
 
-/inline_correctness.kt:(731,752): info: Generated Viper text for named_nonlocal_return:
+/inline_returns.kt:(763,784): info: Generated Viper text for named_nonlocal_return:
 method f$named_nonlocal_return$TF$() returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$boolType())
   ensures df$rt$boolFromRef(ret$0) == true
@@ -84,7 +87,7 @@ method f$named_nonlocal_return$TF$() returns (ret$0: Ref)
   label lbl$ret$0
 }
 
-/inline_correctness.kt:(931,953): info: Generated Viper text for double_nonlocal_return:
+/inline_returns.kt:(963,985): info: Generated Viper text for double_nonlocal_return:
 method f$double_nonlocal_return$TF$() returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$boolType())
   ensures df$rt$boolFromRef(ret$0) == true
@@ -120,7 +123,7 @@ method f$double_nonlocal_return$TF$() returns (ret$0: Ref)
   label lbl$ret$0
 }
 
-/inline_correctness.kt:(1304,1332): info: Generated Viper text for named_double_nonlocal_return:
+/inline_returns.kt:(1336,1364): info: Generated Viper text for named_double_nonlocal_return:
 method f$named_double_nonlocal_return$TF$() returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$boolType())
   ensures df$rt$boolFromRef(ret$0) == true
