@@ -1,4 +1,4 @@
-/private_properties.kt:(195,210): info: Generated Viper text for getBooleanField:
+/private_properties.kt:(222,237): info: Generated Viper text for getBooleanField:
 method f$c$A$getBooleanField$TF$T$A(this$dispatch: Ref)
   returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$boolType())
@@ -20,7 +20,7 @@ method ps$c$A$private$field(this$dispatch: Ref, anon$0: Ref)
   returns (ret: Ref)
 
 
-/private_properties.kt:(289,303): info: Generated Viper text for getStringField:
+/private_properties.kt:(316,330): info: Generated Viper text for getStringField:
 field bf$c$B$private$field: Ref
 
 field bf$length: Ref
@@ -47,12 +47,14 @@ method ps$c$A$private$field(this$dispatch: Ref, anon$0: Ref)
   returns (ret: Ref)
 
 
-/private_properties.kt:(471,484): info: Generated Viper text for extractPublic:
+/private_properties.kt:(475,488): info: Generated Viper text for extractPublic:
 field bf$c$B$private$field: Ref
 
 field bf$field: Ref
 
 field bf$length: Ref
+
+field bf$size: Ref
 
 method con$c$C$() returns (ret: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$c$C())
@@ -67,27 +69,24 @@ method con$c$D$() returns (ret: Ref)
 
 
 method f$extractPublic$TF$() returns (ret$0: Ref)
-  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$boolType())
-  ensures df$rt$boolFromRef(ret$0) == false ==> false
+  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 {
   var anon$0: Ref
   var anon$1: Ref
+  var anon$2: Ref
+  var anon$3: Ref
   anon$1 := con$c$C$()
   inhale acc(anon$1.bf$field, write)
   anon$0 := anon$1.bf$field
   exhale acc(anon$1.bf$field, write)
   inhale df$rt$isSubtype(df$rt$typeOf(anon$0), df$rt$intType())
-  if (df$rt$isSubtype(df$rt$typeOf(anon$0), df$rt$intType())) {
-    var anon$2: Ref
-    var anon$3: Ref
-    anon$3 := con$c$D$()
-    unfold acc(p$c$D$shared(anon$3), wildcard)
-    anon$2 := anon$3.bf$field
-    ret$0 := df$rt$boolToRef(df$rt$isSubtype(df$rt$typeOf(anon$2), df$rt$intType()))
-  } else {
-    ret$0 := df$rt$boolToRef(false)}
-  goto lbl$ret$0
+  assert df$rt$isSubtype(df$rt$typeOf(anon$0), df$rt$intType())
+  anon$3 := con$c$D$()
+  unfold acc(p$c$D$shared(anon$3), wildcard)
+  anon$2 := anon$3.bf$field
+  assert df$rt$isSubtype(df$rt$typeOf(anon$2), df$rt$intType())
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
 method pg$c$A$private$field(this$dispatch: Ref) returns (ret: Ref)
