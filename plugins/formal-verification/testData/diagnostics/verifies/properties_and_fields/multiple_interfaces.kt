@@ -1,7 +1,6 @@
-import kotlin.contracts.ExperimentalContracts
-import kotlin.contracts.contract
-import org.jetbrains.kotlin.formver.plugin.NeverVerify
 import org.jetbrains.kotlin.formver.plugin.NeverConvert
+import org.jetbrains.kotlin.formver.plugin.AlwaysVerify
+import org.jetbrains.kotlin.formver.plugin.verify
 
 /*
 All parent classes are enumerated in this test to
@@ -68,12 +67,9 @@ fun create6() = object : InheritingInterfaceWithoutImplementation6 {
     override val field: Int = 0
 }
 
-@OptIn(ExperimentalContracts::class)
 @Suppress("USELESS_IS_CHECK")
-fun <!VIPER_TEXT!>createImpls<!>(): Boolean{
-    contract {
-        returns(false) implies false
-    }
+@AlwaysVerify
+fun <!VIPER_TEXT!>createImpls<!>() {
     val impl12 = Impl12()
     val start12 = impl12.field + 1 - 1
     take1(impl12)
@@ -102,12 +98,12 @@ fun <!VIPER_TEXT!>createImpls<!>(): Boolean{
     val impl6 = create6()
     val start6 = impl6.field + 1 - 1
 
-    return true &&
-//        start12 == impl12.field &&
-//        start23 == impl23.field &&
-//        start3 == impl3.field &&
-        start14 == impl14.field &&
-//        start6 is Int &&
-        true
+    verify(
+        start12 == impl12.field,
+        start23 == impl23.field,
+        start3 == impl3.field,
+        start14 == impl14.field,
+        start6 is Int,
+    )
 }
 

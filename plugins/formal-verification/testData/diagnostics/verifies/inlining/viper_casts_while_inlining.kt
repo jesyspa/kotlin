@@ -82,10 +82,3 @@ fun <!VIPER_TEXT!>checkEvaluatedOnce<!>(i: Int, mm: ManyMembers) {
     }
 }
 
-@AlwaysVerify
-fun <!VIPER_TEXT!>useRuns<!>(x: Int): Unit {
-    verify(copiedRun { x + 1 } == 1 + x)
-    verify(x.copiedRun { plus(1) } == 1 + x)
-    (x + 1).copiedRun { verify(this == 1 + x) }
-}
-

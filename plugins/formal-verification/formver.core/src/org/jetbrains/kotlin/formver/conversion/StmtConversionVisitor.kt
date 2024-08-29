@@ -22,6 +22,8 @@ import org.jetbrains.kotlin.fir.visitors.FirVisitor
 import org.jetbrains.kotlin.formver.UnsupportedFeatureBehaviour
 import org.jetbrains.kotlin.formver.embeddings.types.TypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.callables.FullNamedFunctionSignature
+import org.jetbrains.kotlin.formver.embeddings.callables.FunctionEmbedding
+import org.jetbrains.kotlin.formver.embeddings.callables.SpecialVerifyFunction
 import org.jetbrains.kotlin.formver.embeddings.callables.insertCall
 import org.jetbrains.kotlin.formver.embeddings.expression.*
 import org.jetbrains.kotlin.formver.embeddings.types.buildType
@@ -186,11 +188,24 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext>()
         }
     }
 
+    private fun List<FirExpression>.withVarargsHandled(data: StmtConversionContext, function: FunctionEmbedding?) =
+        flatMap { arg ->
+            when (arg) {
+                is FirVarargArgumentsExpression -> {
+                    check(function is SpecialVerifyFunction) {
+                        "vararg arguments are currently supported for `verify` function only"
+                    }
+                    arg.arguments.map(data::convert)
+                }
+                else -> listOf(data.convert(arg))
+            }
+        }
+
     override fun visitFunctionCall(functionCall: FirFunctionCall, data: StmtConversionContext): ExpEmbedding {
         val symbol = functionCall.toResolvedCallableSymbol()
         val callee = data.embedFunction(symbol as FirFunctionSymbol<*>)
         return callee.insertCall(
-            functionCall.functionCallArguments.map(data::convert),
+            functionCall.functionCallArguments.withVarargsHandled(data, callee),
             data,
             data.embedType(functionCall.resolvedType),
         )
@@ -204,7 +219,7 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext>()
             ?: throw NotImplementedError("Implicit invoke calls only support a limited range of receivers at the moment.")
         val returnType = data.embedType(implicitInvokeCall.resolvedType)
         val receiverSymbol = receiver.calleeReference.toResolvedSymbol<FirBasedSymbol<*>>()!!
-        val args = implicitInvokeCall.argumentList.arguments.map(data::convert)
+        val args = implicitInvokeCall.argumentList.arguments.withVarargsHandled(data, function = null)
         return when (val exp = data.embedLocalSymbol(receiverSymbol).ignoringMetaNodes()) {
             is LambdaExp -> {
                 // The lambda is already the receiver, so we do not need to convert it.

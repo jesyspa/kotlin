@@ -1,16 +1,15 @@
 import org.jetbrains.kotlin.formver.plugin.NeverConvert
+import org.jetbrains.kotlin.formver.plugin.verify
+import org.jetbrains.kotlin.formver.plugin.AlwaysVerify
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
 @NeverConvert
 inline fun not(f: () -> Boolean): Boolean = !f()
 
-@OptIn(ExperimentalContracts::class)
-fun <!VIPER_TEXT!>simple_return<!>(): Boolean {
-    contract {
-        returns(true)
-    }
-    return not { false }
+@AlwaysVerify
+fun <!VIPER_TEXT!>simple_return<!>() {
+    verify(not { false })
 }
 
 @OptIn(ExperimentalContracts::class)
