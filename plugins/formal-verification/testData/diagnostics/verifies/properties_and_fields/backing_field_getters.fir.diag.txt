@@ -1,4 +1,4 @@
-/backing_field_getters.kt:(178,188): info: Generated Viper text for cascadeGet:
+/backing_field_getters.kt:(261,271): info: Generated Viper text for cascadeGet:
 field bf$y: Ref
 
 field bf$z: Ref
@@ -6,7 +6,6 @@ field bf$z: Ref
 method f$cascadeGet$TF$T$X(p$x: Ref) returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$c$Z())
   ensures acc(p$c$Z$shared(ret$0), wildcard)
-  ensures true
 {
   var anon$0: Ref
   inhale df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$c$X())
@@ -19,7 +18,7 @@ method f$cascadeGet$TF$T$X(p$x: Ref) returns (ret$0: Ref)
   label lbl$ret$0
 }
 
-/backing_field_getters.kt:(300,321): info: Generated Viper text for receiverNotNullProved:
+/backing_field_getters.kt:(344,365): info: Generated Viper text for receiverNotNullProved:
 field bf$y: Ref
 
 field bf$z: Ref
@@ -43,7 +42,7 @@ method f$receiverNotNullProved$TF$NT$X(p$x: Ref) returns (ret$0: Ref)
   label lbl$ret$0
 }
 
-/backing_field_getters.kt:(560,578): info: Generated Viper text for cascadeNullableGet:
+/backing_field_getters.kt:(604,622): info: Generated Viper text for cascadeNullableGet:
 field bf$y: Ref
 
 field bf$z: Ref
@@ -71,7 +70,7 @@ method f$cascadeNullableGet$TF$NT$NullableX(p$x: Ref) returns (ret$0: Ref)
   label lbl$ret$0
 }
 
-/backing_field_getters.kt:(729,756): info: Generated Viper text for cascadeNullableSmartcastGet:
+/backing_field_getters.kt:(773,800): info: Generated Viper text for cascadeNullableSmartcastGet:
 field bf$y: Ref
 
 field bf$z: Ref
@@ -109,7 +108,9 @@ method f$cascadeNullableSmartcastGet$TF$NT$NullableX(p$x: Ref)
   label lbl$ret$0
 }
 
-/backing_field_getters.kt:(987,1017): info: Generated Viper text for nullableReceiverNotNullSafeGet:
+/backing_field_getters.kt:(1008,1038): info: Generated Viper text for nullableReceiverNotNullSafeGet:
+field bf$size: Ref
+
 field bf$x: Ref
 
 method con$c$Baz$() returns (ret: Ref)
@@ -119,8 +120,7 @@ method con$c$Baz$() returns (ret: Ref)
 
 
 method f$nullableReceiverNotNullSafeGet$TF$() returns (ret$0: Ref)
-  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$boolType())
-  ensures df$rt$boolFromRef(ret$0) == false
+  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 {
   var l0$f: Ref
   var anon$0: Ref
@@ -134,17 +134,18 @@ method f$nullableReceiverNotNullSafeGet$TF$() returns (ret$0: Ref)
     anon$1 := anon$2
   } else {
     anon$1 := df$rt$nullValue()}
-  ret$0 := df$rt$boolToRef(anon$1 == df$rt$nullValue())
-  goto lbl$ret$0
+  assert !(anon$1 == df$rt$nullValue())
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
-/backing_field_getters.kt:(1167,1194): info: Generated Viper text for nullableReceiverNullSafeGet:
+/backing_field_getters.kt:(1113,1140): info: Generated Viper text for nullableReceiverNullSafeGet:
+field bf$size: Ref
+
 field bf$x: Ref
 
 method f$nullableReceiverNullSafeGet$TF$() returns (ret$0: Ref)
-  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$boolType())
-  ensures df$rt$boolFromRef(ret$0) == true
+  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 {
   var l0$f: Ref
   var anon$0: Ref
@@ -156,12 +157,14 @@ method f$nullableReceiverNullSafeGet$TF$() returns (ret$0: Ref)
     anon$0 := anon$1
   } else {
     anon$0 := df$rt$nullValue()}
-  ret$0 := df$rt$boolToRef(anon$0 == df$rt$nullValue())
-  goto lbl$ret$0
+  assert anon$0 == df$rt$nullValue()
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
-/backing_field_getters.kt:(1377,1403): info: Generated Viper text for nonNullableReceiverSafeGet:
+/backing_field_getters.kt:(1249,1275): info: Generated Viper text for nonNullableReceiverSafeGet:
+field bf$size: Ref
+
 field bf$x: Ref
 
 method con$c$Baz$() returns (ret: Ref)
@@ -171,8 +174,7 @@ method con$c$Baz$() returns (ret: Ref)
 
 
 method f$nonNullableReceiverSafeGet$TF$() returns (ret$0: Ref)
-  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$boolType())
-  ensures df$rt$boolFromRef(ret$0) == false
+  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 {
   var l0$f: Ref
   var anon$0: Ref
@@ -184,12 +186,14 @@ method f$nonNullableReceiverSafeGet$TF$() returns (ret$0: Ref)
     anon$0 := anon$1
   } else {
     anon$0 := df$rt$nullValue()}
-  ret$0 := df$rt$boolToRef(anon$0 == df$rt$nullValue())
-  goto lbl$ret$0
+  assert !(anon$0 == df$rt$nullValue())
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
-/backing_field_getters.kt:(1681,1693): info: Generated Viper text for checkPrimary:
+/backing_field_getters.kt:(1477,1489): info: Generated Viper text for checkPrimary:
+field bf$size: Ref
+
 field bf$x: Ref
 
 field bf$y: Ref
@@ -221,12 +225,13 @@ method con$c$Z$() returns (ret: Ref)
 
 method f$checkPrimary$TF$T$Int$T$Int(p$x: Ref, p$y: Ref)
   returns (ret$0: Ref)
-  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$boolType())
-  ensures df$rt$boolFromRef(ret$0) == false ==> false
+  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 {
   var l0$classI: Ref
   var l0$z: Ref
   var anon$0: Ref
+  var anon$3: Ref
+  var anon$4: Ref
   inhale df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$intType())
   inhale df$rt$isSubtype(df$rt$typeOf(p$y), df$rt$intType())
   l0$classI := con$c$ClassI$T$Int$T$Int(p$x, p$y)
@@ -243,17 +248,13 @@ method f$checkPrimary$TF$T$Int$T$Int(p$x: Ref, p$y: Ref)
     anon$0 := df$rt$boolToRef(df$rt$intFromRef(anon$1) ==
       df$rt$intFromRef(anon$2))
   }
-  if (df$rt$boolFromRef(anon$0)) {
-    var anon$3: Ref
-    var anon$4: Ref
-    anon$4 := con$c$ClassII$T$Z(l0$z)
-    unfold acc(p$c$ClassII$shared(anon$4), wildcard)
-    anon$3 := anon$4.bf$z
-    ret$0 := df$rt$boolToRef(anon$3 == l0$z)
-  } else {
-    ret$0 := df$rt$boolToRef(false)}
-  goto lbl$ret$0
+  assert df$rt$boolFromRef(anon$0)
+  anon$4 := con$c$ClassII$T$Z(l0$z)
+  unfold acc(p$c$ClassII$shared(anon$4), wildcard)
+  anon$3 := anon$4.bf$z
+  assert anon$3 == l0$z
   label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
 method pg$public$z(this$dispatch: Ref) returns (ret: Ref)
