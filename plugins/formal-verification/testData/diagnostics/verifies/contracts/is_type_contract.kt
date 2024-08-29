@@ -52,7 +52,6 @@ fun <!VIPER_TEXT!>typeOfField<!>(foo: Foo): Boolean {
     contract {
         returns(true)
     }
-    if (foo.bar is Bar) return true
-    else return false
+    return foo.bar is Bar
 }
 

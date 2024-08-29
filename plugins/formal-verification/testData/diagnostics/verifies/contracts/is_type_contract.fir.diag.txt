@@ -88,12 +88,7 @@ method f$typeOfField$TF$T$Foo(p$foo: Ref) returns (ret$0: Ref)
   inhale acc(p$c$Foo$shared(p$foo), wildcard)
   unfold acc(p$c$Foo$shared(p$foo), wildcard)
   anon$0 := p$foo.bf$bar
-  if (df$rt$isSubtype(df$rt$typeOf(anon$0), df$rt$c$Bar())) {
-    ret$0 := df$rt$boolToRef(true)
-    goto lbl$ret$0
-  } else {
-    ret$0 := df$rt$boolToRef(false)
-    goto lbl$ret$0
-  }
+  ret$0 := df$rt$boolToRef(df$rt$isSubtype(df$rt$typeOf(anon$0), df$rt$c$Bar()))
+  goto lbl$ret$0
   label lbl$ret$0
 }
