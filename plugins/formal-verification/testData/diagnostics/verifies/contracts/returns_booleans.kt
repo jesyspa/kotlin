@@ -55,13 +55,11 @@ fun <!VIPER_TEXT!>call_fun_with_contracts<!>(b: Boolean): Boolean {
     return a
 }
 
-// Note: this function was originally modelled as an extension on the [Collection<T>?] type.
-// For the moment, since we do not support extension functions, we pass an object of type [Collection<T>?] as parameter.
 @OptIn(ExperimentalContracts::class)
-public fun <T> <!VIPER_TEXT!>isNullOrEmpty<!>(collection: Collection<T>?): Boolean {
+public fun <T> Collection<T>?.<!VIPER_TEXT!>isNullOrEmpty<!>(): Boolean {
     contract {
-        returns(false) implies (collection != null)
+        returns(false) implies (this@isNullOrEmpty != null)
     }
 
-    return collection == null || collection.isEmpty()
+    return this == null || isEmpty()
 }

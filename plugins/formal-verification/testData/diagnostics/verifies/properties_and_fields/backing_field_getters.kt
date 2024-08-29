@@ -1,15 +1,14 @@
 import kotlin.contracts.contract
 import kotlin.contracts.ExperimentalContracts
+import org.jetbrains.kotlin.formver.plugin.AlwaysVerify
+import org.jetbrains.kotlin.formver.plugin.verify
 
 class Z
 class Y { val z = Z() }
 class X { val y = Y() }
 
-@OptIn(ExperimentalContracts::class)
+@AlwaysVerify
 fun <!VIPER_TEXT!>cascadeGet<!>(x: X): Z {
-    contract {
-        returns()
-    }
     return x.y.z
 }
 
@@ -42,32 +41,23 @@ fun <!VIPER_TEXT!>cascadeNullableSmartcastGet<!>(x: NullableX?): Z? {
 
 class Baz { val x: Int = 4 }
 
-@OptIn(ExperimentalContracts::class)
-fun <!VIPER_TEXT!>nullableReceiverNotNullSafeGet<!>(): Boolean {
-    contract {
-        returns(false)
-    }
+@AlwaysVerify
+fun <!VIPER_TEXT!>nullableReceiverNotNullSafeGet<!>() {
     val f: Baz? = Baz()
-    return f?.x == null
+    verify(f?.x != null)
 }
 
-@OptIn(ExperimentalContracts::class)
-fun <!VIPER_TEXT!>nullableReceiverNullSafeGet<!>(): Boolean {
-    contract {
-        returns(true)
-    }
+@AlwaysVerify
+fun <!VIPER_TEXT!>nullableReceiverNullSafeGet<!>() {
     val f: Baz? = null
-    return f?.x == null
+    verify(f?.x == null)
 }
 
 @Suppress("UNNECESSARY_SAFE_CALL")
-@OptIn(ExperimentalContracts::class)
-fun <!VIPER_TEXT!>nonNullableReceiverSafeGet<!>(): Boolean {
-    contract {
-        returns(false)
-    }
+@AlwaysVerify
+fun <!VIPER_TEXT!>nonNullableReceiverSafeGet<!>() {
     val f: Baz = Baz()
-    return f?.x == null
+    verify(f?.x != null)
 }
 
 open class ClassI(val x: Int, val y: Int) {
@@ -76,13 +66,12 @@ open class ClassI(val x: Int, val y: Int) {
 
 class ClassII(final override val z: Z) : ClassI(10, 10)
 
-
-@OptIn(ExperimentalContracts::class)
-fun <!VIPER_TEXT!>checkPrimary<!>(x: Int, y: Int): Boolean {
-    contract {
-        returns(false) implies false
-    }
+@AlwaysVerify
+fun <!VIPER_TEXT!>checkPrimary<!>(x: Int, y: Int) {
     val classI = ClassI(x, y)
     val z = Z()
-    return (x != y || classI.x == classI.y) && ClassII(z).z == z
+    verify(
+        x != y || classI.x == classI.y,
+        ClassII(z).z == z
+    )
 }

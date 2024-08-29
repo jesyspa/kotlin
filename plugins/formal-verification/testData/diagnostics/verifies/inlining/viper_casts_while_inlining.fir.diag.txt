@@ -322,6 +322,8 @@ field bf$c: Ref
 
 field bf$i: Ref
 
+field bf$size: Ref
+
 method f$checkEvaluatedOnce$TF$T$Int$T$ManyMembers(p$i: Ref, p$mm: Ref)
   returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
@@ -361,77 +363,6 @@ method f$checkEvaluatedOnce$TF$T$Int$T$ManyMembers(p$i: Ref, p$mm: Ref)
   anon$3 := ret$1
   anon$2 := anon$3
   inhale df$rt$isSubtype(df$rt$typeOf(anon$2), df$rt$unitType())
-  label lbl$ret$0
-  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
-}
-
-/viper_casts_while_inlining.kt:(1686,1693): info: Generated Viper text for useRuns:
-method f$useRuns$TF$T$Int(p$x: Ref) returns (ret$0: Ref)
-  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
-{
-  var anon$4: Ref
-  var anon$5: Ref
-  var ret$1: Ref
-  var anon$6: Ref
-  var ret$2: Ref
-  var anon$7: Ref
-  var anon$8: Ref
-  var ret$3: Ref
-  var anon$0: Ref
-  var anon$9: Ref
-  var ret$4: Ref
-  var anon$1: Ref
-  var anon$10: Ref
-  var anon$11: Ref
-  var ret$5: Ref
-  var anon$2: Ref
-  var anon$12: Ref
-  var ret$6: Ref
-  var anon$3: Ref
-  inhale df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$intType())
-  ret$2 := sp$plusInts(p$x, df$rt$intToRef(1))
-  goto lbl$ret$2
-  label lbl$ret$2
-  anon$6 := ret$2
-  ret$1 := anon$6
-  inhale df$rt$isSubtype(df$rt$typeOf(ret$1), df$rt$nullable(df$rt$anyType()))
-  goto lbl$ret$1
-  label lbl$ret$1
-  anon$5 := ret$1
-  anon$4 := anon$5
-  inhale df$rt$isSubtype(df$rt$typeOf(anon$4), df$rt$intType())
-  assert df$rt$intFromRef(anon$4) == 1 + df$rt$intFromRef(p$x)
-  inhale df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$nullable(df$rt$anyType()))
-  anon$0 := p$x
-  inhale df$rt$isSubtype(df$rt$typeOf(anon$0), df$rt$intType())
-  anon$1 := anon$0
-  ret$4 := sp$plusInts(anon$1, df$rt$intToRef(1))
-  goto lbl$ret$4
-  label lbl$ret$4
-  anon$9 := ret$4
-  ret$3 := anon$9
-  inhale df$rt$isSubtype(df$rt$typeOf(ret$3), df$rt$nullable(df$rt$anyType()))
-  goto lbl$ret$3
-  label lbl$ret$3
-  anon$8 := ret$3
-  anon$7 := anon$8
-  inhale df$rt$isSubtype(df$rt$typeOf(anon$7), df$rt$intType())
-  assert df$rt$intFromRef(anon$7) == 1 + df$rt$intFromRef(p$x)
-  anon$2 := sp$plusInts(p$x, df$rt$intToRef(1))
-  inhale df$rt$isSubtype(df$rt$typeOf(anon$2), df$rt$nullable(df$rt$anyType()))
-  inhale df$rt$isSubtype(df$rt$typeOf(anon$2), df$rt$intType())
-  anon$3 := anon$2
-  assert df$rt$intFromRef(anon$3) == 1 + df$rt$intFromRef(p$x)
-  label lbl$ret$6
-  inhale df$rt$isSubtype(df$rt$typeOf(ret$6), df$rt$unitType())
-  anon$12 := ret$6
-  ret$5 := anon$12
-  inhale df$rt$isSubtype(df$rt$typeOf(ret$5), df$rt$nullable(df$rt$anyType()))
-  goto lbl$ret$5
-  label lbl$ret$5
-  anon$11 := ret$5
-  anon$10 := anon$11
-  inhale df$rt$isSubtype(df$rt$typeOf(anon$10), df$rt$unitType())
   label lbl$ret$0
   inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
