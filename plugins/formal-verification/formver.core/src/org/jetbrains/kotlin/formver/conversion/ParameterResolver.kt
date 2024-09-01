@@ -19,35 +19,38 @@ import org.jetbrains.kotlin.utils.addToStdlib.ifTrue
  */
 interface ParameterResolver {
     fun tryResolveParameter(name: Name): ExpEmbedding?
-    fun tryResolveReceiver(isExtension: Boolean): ExpEmbedding?
+    fun tryResolveDispatchReceiver(): ExpEmbedding?
+    fun tryResolveExtensionReceiver(labelName: String): ExpEmbedding?
 
-    val sourceName: String?
+    val labelName: String?
     val defaultResolvedReturnTarget: ReturnTarget
 }
 
 fun ParameterResolver.resolveNamedReturnTarget(returnPointName: String): ReturnTarget? =
-    (returnPointName == sourceName).ifTrue { defaultResolvedReturnTarget }
+    (returnPointName == labelName).ifTrue { defaultResolvedReturnTarget }
 
 class RootParameterResolver(
     val ctx: ProgramConversionContext,
     private val signature: FunctionSignature,
-    override val sourceName: String?,
+    override val labelName: String?,
     override val defaultResolvedReturnTarget: ReturnTarget,
 ) : ParameterResolver {
     private val parameters = signature.params.associateBy { it.name }
     override fun tryResolveParameter(name: Name): ExpEmbedding? = parameters[name.embedParameterName()]
-    override fun tryResolveReceiver(isExtension: Boolean) =
-        if (isExtension) signature.extensionReceiver
-        else signature.dispatchReceiver
+    override fun tryResolveDispatchReceiver() = signature.dispatchReceiver
+    override fun tryResolveExtensionReceiver(labelName: String) = (labelName == this.labelName).ifTrue {
+        signature.extensionReceiver
+    }
 }
 
 class InlineParameterResolver(
     private val substitutions: Map<Name, ExpEmbedding>,
-    override val sourceName: String?,
+    override val labelName: String?,
     override val defaultResolvedReturnTarget: ReturnTarget,
 ) : ParameterResolver {
     override fun tryResolveParameter(name: Name): ExpEmbedding? = substitutions[name]
-    override fun tryResolveReceiver(isExtension: Boolean): ExpEmbedding? =
-        if (isExtension) substitutions[ExtraSpecialNames.EXTENSION_THIS]
-        else substitutions[ExtraSpecialNames.DISPATCH_THIS]
+    override fun tryResolveDispatchReceiver() = substitutions[ExtraSpecialNames.DISPATCH_THIS]
+    override fun tryResolveExtensionReceiver(labelName: String) = (labelName == this.labelName).ifTrue {
+        substitutions[ExtraSpecialNames.EXTENSION_THIS]
+    }
 }

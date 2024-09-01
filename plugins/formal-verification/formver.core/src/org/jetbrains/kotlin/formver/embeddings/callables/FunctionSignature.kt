@@ -19,7 +19,7 @@ interface FunctionSignature {
 
     val params: List<VariableEmbedding>
 
-    val sourceName: String?
+    val labelName: String?
         get() = null
 
     val formalArgs: List<VariableEmbedding>

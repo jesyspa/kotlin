@@ -14,7 +14,6 @@ import org.jetbrains.kotlin.formver.names.ExtraSpecialNames
 
 class InlineNamedFunction(
     val signature: FullNamedFunctionSignature,
-    val symbol: FirFunctionSymbol<*>,
     val firBody: FirBlock,
 ) : RichCallableEmbedding, FullNamedFunctionSignature by signature {
     override fun insertCall(
@@ -28,7 +27,7 @@ class InlineNamedFunction(
                 add(ExtraSpecialNames.EXTENSION_THIS)
             addAll(symbol.valueParameterSymbols.map { it.name })
         }
-        return ctx.insertInlineFunctionCall(signature, paramNames, args, firBody, signature.sourceName)
+        return ctx.insertInlineFunctionCall(signature, paramNames, args, firBody, signature.labelName)
     }
 
     override fun toViperMethodHeader(): Nothing? = null
