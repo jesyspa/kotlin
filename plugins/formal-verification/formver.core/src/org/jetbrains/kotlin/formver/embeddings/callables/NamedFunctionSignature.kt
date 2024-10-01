@@ -5,20 +5,17 @@
 
 package org.jetbrains.kotlin.formver.embeddings.callables
 
-import org.jetbrains.kotlin.formver.names.FunctionKotlinName
-import org.jetbrains.kotlin.formver.names.ScopedKotlinName
+import org.jetbrains.kotlin.fir.symbols.impl.FirFunctionSymbol
 import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.formver.viper.ast.*
 
 interface NamedFunctionSignature : FunctionSignature {
     val name: MangledName
-    // TODO: Clean this up; if we want a source name, we should be storing a symbol.
-    override val sourceName: String?
-        get() = when (val signatureName = name) {
-            is FunctionKotlinName -> signatureName.name.asString()
-            is ScopedKotlinName -> (signatureName.name as? FunctionKotlinName)?.name?.asString()
-            else -> null
-        }
+
+    val symbol: FirFunctionSymbol<*>
+
+    override val labelName: String
+        get() = symbol.name.asString()
 }
 
 fun NamedFunctionSignature.toMethodCall(
