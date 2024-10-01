@@ -28,6 +28,7 @@ class TypeBuilder {
     fun any() = AnyPretypeBuilder
     fun int() = IntPretypeBuilder
     fun boolean() = BooleanPretypeBuilder
+    fun char() = CharPretypeBuilder
     fun function(init: FunctionPretypeBuilder.() -> Unit) = FunctionPretypeBuilder().also { it.init() }
     fun klass(init: ClassPretypeBuilder.() -> Unit) = ClassPretypeBuilder().also { it.init() }
     fun existing(embedding: PretypeEmbedding) = ExistingPretypeBuilder(embedding)

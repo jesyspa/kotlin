@@ -85,6 +85,7 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext>()
         when (literalExpression.kind) {
             ConstantValueKind.Int -> IntLit((literalExpression.value as Long).toInt())
             ConstantValueKind.Boolean -> BooleanLit(literalExpression.value as Boolean)
+            ConstantValueKind.Char -> CharLit(literalExpression.value as Char)
             ConstantValueKind.Null -> NullLit
             else -> handleUnimplementedElement("Constant Expression of type ${literalExpression.kind} is not yet implemented.", data)
         }

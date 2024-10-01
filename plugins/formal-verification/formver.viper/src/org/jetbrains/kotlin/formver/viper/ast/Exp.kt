@@ -556,3 +556,14 @@ infix fun Exp.implies(other: Exp) = Exp.Implies(this, other)
 fun Int.toExp() = Exp.IntLit(this)
 fun Boolean.toExp() = Exp.BoolLit(this)
 
+fun Any?.viperLiteral(
+    pos: Position = Position.NoPosition,
+    info: Info = Info.NoInfo,
+    trafos: Trafos = Trafos.NoTrafos,
+) = when (this) {
+    null -> Exp.NullLit(pos, info, trafos)
+    is Int -> Exp.IntLit(this, pos, info, trafos)
+    is Boolean -> Exp.BoolLit(this, pos, info, trafos)
+    is Char -> Exp.IntLit(this.code, pos, info, trafos)
+    else -> error("Literal type not known.")
+}
