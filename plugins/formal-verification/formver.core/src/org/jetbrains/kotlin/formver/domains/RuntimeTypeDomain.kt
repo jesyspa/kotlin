@@ -217,6 +217,13 @@ class RuntimeTypeDomain(classes: List<ClassTypeEmbedding>) : BuiltinDomain(RUNTI
         fun createDomainFunc(funcName: String, args: List<Declaration.LocalVarDecl>, type: Type, unique: Boolean = false) =
             DomainFunc(DomainFuncName(DomainName(RUNTIME_TYPE_DOMAIN_NAME), funcName), args, emptyList(), type, unique)
 
+        private fun createNewTypeDomainFunc(funcName: String) = createDomainFunc(
+            funcName,
+            emptyList(),
+            RuntimeType,
+            true,
+        )
+
         // variables for readability improving
         private val t = Var("t", RuntimeType)
         private val t1 = Var("t1", RuntimeType)
@@ -240,12 +247,13 @@ class RuntimeTypeDomain(classes: List<ClassTypeEmbedding>) : BuiltinDomain(RUNTI
         infix fun Exp.isOf(elemType: Exp) = isSubtype(typeOf(this), elemType)
 
         // built-in types function
-        val intType = createDomainFunc("intType", emptyList(), RuntimeType, true)
-        val boolType = createDomainFunc("boolType", emptyList(), RuntimeType, true)
-        val unitType = createDomainFunc("unitType", emptyList(), RuntimeType, true)
-        val nothingType = createDomainFunc("nothingType", emptyList(), RuntimeType, true)
-        val anyType = createDomainFunc("anyType", emptyList(), RuntimeType, true)
-        val functionType = createDomainFunc("functionType", emptyList(), RuntimeType, true)
+        val charType = createNewTypeDomainFunc("charType")
+        val intType = createNewTypeDomainFunc("intType")
+        val boolType = createNewTypeDomainFunc("boolType")
+        val unitType = createNewTypeDomainFunc("unitType")
+        val nothingType = createNewTypeDomainFunc("nothingType")
+        val anyType = createNewTypeDomainFunc("anyType")
+        val functionType = createNewTypeDomainFunc("functionType")
 
         // for creation of user types
         fun classTypeFunc(name: MangledName) = createDomainFunc(name.mangled, emptyList(), RuntimeType, true)
@@ -253,7 +261,8 @@ class RuntimeTypeDomain(classes: List<ClassTypeEmbedding>) : BuiltinDomain(RUNTI
         // bijections to primitive types
         val intInjection = Injection("int", Type.Int, intType)
         val boolInjection = Injection("bool", Type.Bool, boolType)
-        val allInjections = listOf(intInjection, boolInjection)
+        val charInjection = Injection("char", Type.Int, charType)
+        val allInjections = listOf(intInjection, boolInjection, charInjection)
 
 
         // Ref translations of primitive operations
@@ -293,7 +302,7 @@ class RuntimeTypeDomain(classes: List<ClassTypeEmbedding>) : BuiltinDomain(RUNTI
 
     val classTypes = classes.associateWith { type -> type.runtimeTypeFunc }
 
-    val nonNullableTypes = listOf(intType, boolType, unitType, nothingType, anyType, functionType) + classTypes.values
+    val nonNullableTypes = listOf(intType, boolType, charType, unitType, nothingType, anyType, functionType) + classTypes.values
 
     override val functions: List<DomainFunc> = nonNullableTypes + listOf(nullValue, unitValue, isSubtype, typeOf, nullable) +
             allInjections.flatMap { listOf(it.toRef, it.fromRef) }
