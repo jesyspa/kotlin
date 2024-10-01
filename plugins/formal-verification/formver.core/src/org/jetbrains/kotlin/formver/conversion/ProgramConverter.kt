@@ -241,8 +241,9 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
     private fun embedFullSignature(symbol: FirFunctionSymbol<*>): FullNamedFunctionSignature {
         val subSignature = object : NamedFunctionSignature, FunctionSignature by embedFunctionSignature(symbol) {
             override val name = symbol.embedName(this@ProgramConverter)
-            override val sourceName: String?
-                get() = super<NamedFunctionSignature>.sourceName
+            override val labelName: String
+                get() = super<NamedFunctionSignature>.labelName
+            override val symbol = symbol
         }
         val constructorParamSymbolsToFields = extractConstructorParamsAsFields(symbol)
         val contractVisitor = ContractDescriptionConversionVisitor(this@ProgramConverter, subSignature)
@@ -371,7 +372,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
     private fun processCallable(symbol: FirFunctionSymbol<*>, signature: FullNamedFunctionSignature): RichCallableEmbedding {
         val body = symbol.fir.body
         return if (symbol.isInline && body != null) {
-            InlineNamedFunction(signature, symbol, body)
+            InlineNamedFunction(signature, body)
         } else {
             // We generate a dummy method header here to ensure all required types are processed already. If we skip this, any types
             // that are used only in contracts cause an error because they are not processed until too late.
@@ -387,7 +388,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
             MethodConverter(
                 this,
                 signature,
-                RootParameterResolver(this, signature, signature.sourceName, returnTarget),
+                RootParameterResolver(this, signature, signature.labelName, returnTarget),
                 scopeDepth = scopeIndexProducer.getFresh(),
             )
         val stmtCtx = StmtConverter(methodCtx)

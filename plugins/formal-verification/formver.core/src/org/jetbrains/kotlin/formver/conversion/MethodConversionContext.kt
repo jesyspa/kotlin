@@ -40,12 +40,13 @@ interface MethodConversionContext : ProgramConversionContext {
     fun resolveLocal(name: Name): VariableEmbedding
     fun registerLocalProperty(symbol: FirPropertySymbol)
     fun registerLocalVariable(symbol: FirVariableSymbol<*>)
-    fun resolveReceiver(isExtension: Boolean): ExpEmbedding?
+    fun resolveDispatchReceiver(): ExpEmbedding?
+    fun resolveExtensionReceiver(labelName: String): ExpEmbedding?
 
     fun <R> withScopeImpl(scopeDepth: Int, action: () -> R): R
     fun addLoopIdentifier(labelName: String, index: Int)
     fun resolveLoopIndex(name: String): Int
-    fun resolveNamedReturnTarget(sourceName: String): ReturnTarget?
+    fun resolveNamedReturnTarget(labelName: String): ReturnTarget?
 }
 
 fun MethodConversionContext.resolveReturnTarget(targetSourceName: String?): ReturnTarget =
