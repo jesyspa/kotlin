@@ -22,6 +22,7 @@ class LambdaExp(
     val signature: FunctionSignature,
     val function: FirAnonymousFunction,
     private val parentCtx: MethodConversionContext,
+    override val labelName: String,
 ) : CallableEmbedding, StoredResultExpEmbedding,
     FunctionSignature by signature {
     override val type: TypeEmbedding
@@ -44,7 +45,7 @@ class LambdaExp(
             receiverParamNames + nonReceiverParamNames,
             args,
             inlineBody,
-            ctx.signature.sourceName,
+            labelName,
             parentCtx,
         )
     }
