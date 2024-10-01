@@ -13,6 +13,7 @@ import org.jetbrains.kotlin.fir.expressions.impl.FirElseIfTrueCondition
 import org.jetbrains.kotlin.fir.expressions.impl.FirUnitExpression
 import org.jetbrains.kotlin.fir.references.toResolvedSymbol
 import org.jetbrains.kotlin.fir.symbols.FirBasedSymbol
+import org.jetbrains.kotlin.fir.symbols.impl.FirAnonymousFunctionSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirClassSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirFunctionSymbol
 import org.jetbrains.kotlin.fir.types.coneType
@@ -319,14 +320,16 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext>()
         // `thisReceiverExpression` has a bound symbol which can be used for lookup
         // for extensions `this`es the bound symbol is the function they originate from
         // for member functions the bound symbol is a class they're defined in
-        // TODO: conduct more thorough lookup based on the name of this symbol as well
-        val isExtensionReceiver = when (thisReceiverExpression.calleeReference.boundSymbol) {
-            is FirClassSymbol<*> -> false
-            is FirFunctionSymbol<*> -> true
+        //
+        // since dispatch receiver can only originate from non-anonymous function we do not specify its name here
+        // as we have only one candidate to resolve it
+        val resolved = when (val symbol = thisReceiverExpression.calleeReference.boundSymbol) {
+            is FirClassSymbol<*> -> data.resolveDispatchReceiver()
+            is FirAnonymousFunctionSymbol -> data.resolveExtensionReceiver(symbol.label!!.name)
+            is FirFunctionSymbol<*> -> data.resolveExtensionReceiver(symbol.name.asString())
             else -> error("Unsupported receiver expression type.")
         }
-        return data.resolveReceiver(isExtensionReceiver)
-            ?: throw IllegalArgumentException("Can't resolve the 'this' receiver since the function does not have one.")
+        return resolved ?: throw IllegalArgumentException("Can't resolve the 'this' receiver since the function does not have one.")
     }
 
     override fun visitTypeOperatorCall(
@@ -355,7 +358,7 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext>()
         data: StmtConversionContext,
     ): ExpEmbedding {
         val function = anonymousFunctionExpression.anonymousFunction
-        return LambdaExp(data.embedFunctionSignature(function.symbol), function, data)
+        return LambdaExp(data.embedFunctionSignature(function.symbol), function, data, function.symbol.label!!.name)
     }
 
     override fun visitTryExpression(tryExpression: FirTryExpression, data: StmtConversionContext): ExpEmbedding {

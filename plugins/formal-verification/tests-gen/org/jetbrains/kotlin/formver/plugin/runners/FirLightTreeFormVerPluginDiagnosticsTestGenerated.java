@@ -567,6 +567,12 @@ public class FirLightTreeFormVerPluginDiagnosticsTestGenerated extends AbstractF
       }
 
       @Test
+      @TestMetadata("scoped_receivers.kt")
+      public void testScoped_receivers() {
+        runTest("plugins/formal-verification/testData/diagnostics/verifies/inlining/scoped_receivers.kt");
+      }
+
+      @Test
       @TestMetadata("viper_casts_while_inlining.kt")
       public void testViper_casts_while_inlining() {
         runTest("plugins/formal-verification/testData/diagnostics/verifies/inlining/viper_casts_while_inlining.kt");

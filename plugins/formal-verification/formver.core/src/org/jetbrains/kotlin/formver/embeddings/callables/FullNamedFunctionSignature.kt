@@ -6,6 +6,7 @@
 package org.jetbrains.kotlin.formver.embeddings.callables
 
 import org.jetbrains.kotlin.KtSourceElement
+import org.jetbrains.kotlin.fir.symbols.impl.FirFunctionSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirPropertySymbol
 import org.jetbrains.kotlin.formver.asPosition
 import org.jetbrains.kotlin.formver.embeddings.expression.ExpEmbedding
@@ -44,18 +45,22 @@ interface FullNamedFunctionSignature : NamedFunctionSignature {
  */
 abstract class PropertyAccessorFunctionSignature(
     override val name: MangledName,
-    symbol: FirPropertySymbol,
+    propertySymbol: FirPropertySymbol,
 ) : FullNamedFunctionSignature, GenericFunctionSignatureMixin() {
     override fun getPreconditions(returnVariable: VariableEmbedding) = emptyList<ExpEmbedding>()
     override fun getPostconditions(returnVariable: VariableEmbedding) = emptyList<ExpEmbedding>()
     override val dispatchReceiver: VariableEmbedding
         get() = PlaceholderVariableEmbedding(DispatchReceiverName, buildType { nullableAny() })
     override val extensionReceiver = null
-    override val declarationSource: KtSourceElement? = symbol.source
+    override val declarationSource: KtSourceElement? = propertySymbol.source
 }
 
 class GetterFunctionSignature(name: MangledName, symbol: FirPropertySymbol) :
     PropertyAccessorFunctionSignature(name, symbol) {
+    override val symbol: FirFunctionSymbol<*>
+        get() = error {
+            "Getter symbol should not be accessed directly as it is allowed to be null in some cases."
+        }
     override val callableType: FunctionTypeEmbedding = buildFunctionPretype {
         withDispatchReceiver { nullableAny() }
         withReturnType { nullableAny() }
@@ -64,6 +69,10 @@ class GetterFunctionSignature(name: MangledName, symbol: FirPropertySymbol) :
 
 class SetterFunctionSignature(name: MangledName, symbol: FirPropertySymbol) :
     PropertyAccessorFunctionSignature(name, symbol) {
+    override val symbol: FirFunctionSymbol<*>
+        get() = error {
+            "Setter symbol should not be accessed directly as it is allowed to be null in some cases."
+        }
     override val callableType: FunctionTypeEmbedding = buildFunctionPretype {
         withDispatchReceiver { nullableAny() }
         withParam { nullableAny() }
