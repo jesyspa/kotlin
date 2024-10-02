@@ -24,8 +24,8 @@ import org.jetbrains.kotlin.formver.UnsupportedFeatureBehaviour
 import org.jetbrains.kotlin.formver.embeddings.types.TypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.callables.FullNamedFunctionSignature
 import org.jetbrains.kotlin.formver.embeddings.callables.FunctionEmbedding
-import org.jetbrains.kotlin.formver.embeddings.callables.SpecialVerifyFunction
 import org.jetbrains.kotlin.formver.embeddings.callables.insertCall
+import org.jetbrains.kotlin.formver.embeddings.callables.isVerifyFunction
 import org.jetbrains.kotlin.formver.embeddings.expression.*
 import org.jetbrains.kotlin.formver.embeddings.types.buildType
 import org.jetbrains.kotlin.formver.functionCallArguments
@@ -194,7 +194,7 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext>()
         flatMap { arg ->
             when (arg) {
                 is FirVarargArgumentsExpression -> {
-                    check(function is SpecialVerifyFunction) {
+                    check(function != null && function.isVerifyFunction) {
                         "vararg arguments are currently supported for `verify` function only"
                     }
                     arg.arguments.map(data::convert)

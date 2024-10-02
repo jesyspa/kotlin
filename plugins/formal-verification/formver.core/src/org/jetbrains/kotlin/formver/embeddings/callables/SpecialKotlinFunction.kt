@@ -5,14 +5,10 @@
 
 package org.jetbrains.kotlin.formver.embeddings.callables
 
-import org.jetbrains.kotlin.formver.conversion.StmtConversionContext
 import org.jetbrains.kotlin.formver.embeddings.expression.*
-import org.jetbrains.kotlin.formver.embeddings.types.FunctionTypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.types.buildFunctionPretype
-import org.jetbrains.kotlin.formver.names.ClassKotlinName
-import org.jetbrains.kotlin.formver.names.ScopedKotlinName
-import org.jetbrains.kotlin.formver.names.buildName
-import org.jetbrains.kotlin.formver.names.embedFunctionName
+import org.jetbrains.kotlin.formver.names.*
+import org.jetbrains.kotlin.formver.names.NameMatcher
 import org.jetbrains.kotlin.formver.viper.ast.Method
 import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.FqName
@@ -38,138 +34,90 @@ val SpecialKotlinFunction.callableId: CallableId
 
 fun SpecialKotlinFunction.embedName(): ScopedKotlinName = callableId.embedFunctionName(callableType)
 
-object KotlinContractFunction : SpecialKotlinFunction {
-    override val packageName: List<String> = listOf("kotlin", "contracts")
-    override val name: String = "contract"
 
+object SpecialKotlinFunctions {
     private val contractBuilderTypeName = buildName {
-        packageScope(packageName)
+        packageScope(listOf("kotlin", "contracts"))
         ClassKotlinName(listOf("ContractBuilder"))
     }
+    private val booleanArrayTypeName = buildName {
+        packageScope(listOf("kotlin"))
+        ClassKotlinName(listOf("BooleanArray"))
+    }
 
-    override val callableType: FunctionTypeEmbedding = buildFunctionPretype {
-        withParam {
-            function {
-                withDispatchReceiver {
-                    klass {
-                        withName(contractBuilderTypeName)
-                    }
-                }
-                withReturnType { unit() }
-            }
+    val byName = buildSpecialFunctions {
+        val intIntToIntType = buildFunctionPretype {
+            withDispatchReceiver { int() }
+            withParam { int() }
+            withReturnType { int() }
         }
-        withReturnType { unit() }
-    }
-
-    override fun insertCall(
-        args: List<ExpEmbedding>,
-        ctx: StmtConversionContext,
-    ): ExpEmbedding = UnitLit
-}
-
-abstract class KotlinIntSpecialFunction : SpecialKotlinFunction {
-    override val packageName: List<String> = listOf("kotlin")
-    override val className: String? = "Int"
-
-    override val callableType: FunctionTypeEmbedding = buildFunctionPretype {
-        withDispatchReceiver { int() }
-        withParam { int() }
-        withReturnType { int() }
-    }
-}
-
-object KotlinIntPlusFunctionImplementation : KotlinIntSpecialFunction() {
-    override val name: String = "plus"
-    override fun insertCall(
-        args: List<ExpEmbedding>,
-        ctx: StmtConversionContext,
-    ): ExpEmbedding =
-        Add(args[0], args[1])
-}
-
-object KotlinIntMinusFunctionImplementation : KotlinIntSpecialFunction() {
-    override val name: String = "minus"
-    override fun insertCall(
-        args: List<ExpEmbedding>,
-        ctx: StmtConversionContext,
-    ): ExpEmbedding =
-        Sub(args[0], args[1])
-}
-
-object KotlinIntTimesFunctionImplementation : KotlinIntSpecialFunction() {
-    override val name: String = "times"
-    override fun insertCall(
-        args: List<ExpEmbedding>,
-        ctx: StmtConversionContext,
-    ): ExpEmbedding =
-        Mul(args[0], args[1])
-}
-
-object KotlinIntDivFunctionImplementation : KotlinIntSpecialFunction() {
-    override val name: String = "div"
-    override fun insertCall(
-        args: List<ExpEmbedding>,
-        ctx: StmtConversionContext,
-        // TODO: implement this properly, we don't want to evaluate args[1] twice.
-    ): ExpEmbedding = blockOf(
-        InhaleDirect(NeCmp(args[1], IntLit(0))),
-        Div(args[0], args[1]),
-    )
-}
-
-abstract class KotlinBooleanSpecialFunction : SpecialKotlinFunction {
-    override val packageName: List<String> = listOf("kotlin")
-    override val className: String? = "Boolean"
-
-    override val callableType: FunctionTypeEmbedding = buildFunctionPretype {
-        withDispatchReceiver { boolean() }
-        withReturnType { boolean() }
-    }
-}
-
-object KotlinBooleanNotFunctionImplementation : KotlinBooleanSpecialFunction() {
-    override val name: String = "not"
-    override fun insertCall(
-        args: List<ExpEmbedding>,
-        ctx: StmtConversionContext,
-    ): ExpEmbedding =
-        Not(args[0])
-}
-
-/**
- * Represents the `verify` function defined in `org.jetbrains.kotlin.formver.plugin`.
- */
-object SpecialVerifyFunction : SpecialKotlinFunction {
-    override val packageName: List<String> = listOf("org", "jetbrains", "kotlin", "formver", "plugin")
-    override val name: String = "verify"
-
-    override fun insertCall(args: List<ExpEmbedding>, ctx: StmtConversionContext): ExpEmbedding {
-        return args.map { Assert(it) }.toBlock()
-    }
-
-    override val callableType: FunctionTypeEmbedding = buildFunctionPretype {
-        withParam {
-            klass {
-                withName(
-                    buildName {
-                        packageScope(listOf("kotlin"))
-                        ClassKotlinName(listOf("BooleanArray"))
-                    }
+        withCallableType(intIntToIntType) {
+            addFunction("kotlin", className = "Int", name = "plus") { args, _ ->
+                Add(args[0], args[1])
+            }
+            addFunction("kotlin", className = "Int", name = "minus") { args, _ ->
+                Sub(args[0], args[1])
+            }
+            addFunction("kotlin", className = "Int", name = "times") { args, _ ->
+                Mul(args[0], args[1])
+            }
+            addFunction("kotlin", className = "Int", name = "div") { args, _ ->
+                blockOf(
+                    InhaleDirect(NeCmp(args[1], IntLit(0))),
+                    Div(args[0], args[1]),
                 )
             }
         }
-        withReturnType { unit() }
+
+        val booleanToBooleanType = buildFunctionPretype {
+            withDispatchReceiver { boolean() }
+            withReturnType { boolean() }
+        }
+
+        addFunction(booleanToBooleanType, "kotlin", className = "Boolean", name = "not") { args, _ ->
+            Not(args[0])
+        }
+
+        val verifyCallableType = buildFunctionPretype {
+            withParam {
+                klass {
+                    withName(booleanArrayTypeName)
+                }
+            }
+            withReturnType { unit() }
+        }
+        addFunction(verifyCallableType, "org", "jetbrains", "kotlin", "formver", "plugin", name = "verify") { args, _ ->
+            args.map { Assert(it) }.toBlock()
+        }
+
+        val contractCallableType = buildFunctionPretype {
+            withParam {
+                function {
+                    withDispatchReceiver {
+                        klass {
+                            withName(contractBuilderTypeName)
+                        }
+                    }
+                    withReturnType { unit() }
+                }
+            }
+            withReturnType { unit() }
+        }
+
+        addFunction(contractCallableType, "kotlin", "contracts", name = "contract") { _, _ ->
+            UnitLit
+        }
     }
 }
 
-object SpecialKotlinFunctions {
-    val byName = listOf(
-        SpecialVerifyFunction,
-        KotlinContractFunction,
-        KotlinIntPlusFunctionImplementation,
-        KotlinIntMinusFunctionImplementation,
-        KotlinIntTimesFunctionImplementation,
-        KotlinIntDivFunctionImplementation,
-        KotlinBooleanNotFunctionImplementation,
-    ).associateBy { it.embedName() }
-}
+val FunctionEmbedding.isVerifyFunction: Boolean
+    get() = this is SpecialKotlinFunction && NameMatcher.matchClassScope(this.embedName()) {
+        ifPackageName("org", "jetbrains", "kotlin", "formver", "plugin") {
+            ifNoReceiver {
+                ifFunctionName("verify") {
+                    return true
+                }
+            }
+        }
+        return false
+    }
