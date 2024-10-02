@@ -409,6 +409,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
             isNullable = true; any()
         }
         type.isUnit -> unit()
+        type.isChar -> char()
         type.isInt -> int()
         type.isBoolean -> boolean()
         type.isNothing -> nothing()
