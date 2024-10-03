@@ -264,36 +264,6 @@ class RuntimeTypeDomain(classes: List<ClassTypeEmbedding>) : BuiltinDomain(RUNTI
         val charInjection = Injection("char", Type.Int, charType)
         val allInjections = listOf(intInjection, boolInjection, charInjection)
 
-
-        // Ref translations of primitive operations
-        private val bothArgsInts = listOf(intInjection, intInjection)
-        private val bothArgsBools = listOf(boolInjection, boolInjection)
-
-        val plusInts = InjectionImageFunction("plusInts", PlusInts, bothArgsInts, intInjection)
-        val minusInts = InjectionImageFunction("minusInts", MinusInts, bothArgsInts, intInjection)
-        val timesInts = InjectionImageFunction("timesInts", TimesInts, bothArgsInts, intInjection)
-        val divInts = InjectionImageFunction("divInts", DivInts, bothArgsInts, intInjection) {
-            precondition {
-                intInjection.fromRef(args[1]) ne 0.toExp()
-            }
-        }
-        val remInts = InjectionImageFunction("remInts", RemInts, bothArgsInts, intInjection) {
-            precondition {
-                intInjection.fromRef(args[1]) ne 0.toExp()
-            }
-        }
-        val gtInts = InjectionImageFunction("gtInts", GtInts, bothArgsInts, boolInjection)
-        val ltInts = InjectionImageFunction("ltInts", LtInts, bothArgsInts, boolInjection)
-        val geInts = InjectionImageFunction("geInts", GeInts, bothArgsInts, boolInjection)
-        val leInts = InjectionImageFunction("leInts", LeInts, bothArgsInts, boolInjection)
-        val notBool = InjectionImageFunction("notBool", NotBool, listOf(boolInjection), boolInjection)
-        val andBools = InjectionImageFunction("andBools", AndBools, bothArgsBools, boolInjection)
-        val orBools = InjectionImageFunction("orBools", OrBools, bothArgsBools, boolInjection)
-        val impliesBools = InjectionImageFunction("impliesBools", ImpliesBools, bothArgsBools, boolInjection)
-        val accompanyingFunctions: List<InjectionImageFunction> = listOf(
-            plusInts, minusInts, timesInts, divInts, remInts, gtInts, ltInts, geInts, leInts, notBool, andBools, orBools, impliesBools
-        )
-
         // special values
         val nullValue = createDomainFunc("nullValue", emptyList(), Ref)
         val unitValue = createDomainFunc("unitValue", emptyList(), Ref)
