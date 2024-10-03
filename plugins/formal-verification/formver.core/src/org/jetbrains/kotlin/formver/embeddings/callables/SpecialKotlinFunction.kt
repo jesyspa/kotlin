@@ -13,6 +13,11 @@ import org.jetbrains.kotlin.formver.viper.ast.Method
 import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.AddIntInt
+import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.DivIntInt
+import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.MulIntInt
+import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.Not
+import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.SubIntInt
 
 /**
  * Kotlin function that should be handled specially by our conversion.
@@ -53,18 +58,18 @@ object SpecialKotlinFunctions {
         }
         withCallableType(intIntToIntType) {
             addFunction("kotlin", className = "Int", name = "plus") { args, _ ->
-                Add(args[0], args[1])
+                AddIntInt(args[0], args[1])
             }
             addFunction("kotlin", className = "Int", name = "minus") { args, _ ->
-                Sub(args[0], args[1])
+                SubIntInt(args[0], args[1])
             }
             addFunction("kotlin", className = "Int", name = "times") { args, _ ->
-                Mul(args[0], args[1])
+                MulIntInt(args[0], args[1])
             }
             addFunction("kotlin", className = "Int", name = "div") { args, _ ->
                 blockOf(
                     InhaleDirect(NeCmp(args[1], IntLit(0))),
-                    Div(args[0], args[1]),
+                    DivIntInt(args[0], args[1]),
                 )
             }
         }

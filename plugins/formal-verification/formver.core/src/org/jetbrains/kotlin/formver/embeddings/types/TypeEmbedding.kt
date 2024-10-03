@@ -77,13 +77,18 @@ data class TypeEmbeddingFlags(val nullable: Boolean) {
         invariant?.let { adjustInvariant(it) }
 }
 
-inline fun TypeEmbedding.injectionOr(default: () -> Injection): Injection {
-    if (flags.nullable) return default()
+inline fun TypeEmbedding.injectionOr(default: (TypeEmbedding) -> Injection): Injection {
+    if (flags.nullable) return default(this)
     return when (this.pretype) {
         CharTypeEmbedding -> RuntimeTypeDomain.charInjection
         IntTypeEmbedding -> RuntimeTypeDomain.intInjection
         BooleanTypeEmbedding -> RuntimeTypeDomain.boolInjection
-        else -> default()
+        else -> default(this)
     }
 }
+
+val TypeEmbedding.injection
+    get() = injectionOr {
+        error("Type ${it.name} has no injection specified.")
+    }
 

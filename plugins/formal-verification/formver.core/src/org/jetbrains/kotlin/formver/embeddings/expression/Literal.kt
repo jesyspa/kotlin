@@ -13,7 +13,7 @@ import org.jetbrains.kotlin.formver.embeddings.asInfo
 import org.jetbrains.kotlin.formver.embeddings.expression.debug.PlaintextLeaf
 import org.jetbrains.kotlin.formver.embeddings.expression.debug.TreeView
 import org.jetbrains.kotlin.formver.embeddings.types.buildType
-import org.jetbrains.kotlin.formver.embeddings.types.injectionOr
+import org.jetbrains.kotlin.formver.embeddings.types.injection
 import org.jetbrains.kotlin.formver.linearization.LinearizationContext
 import org.jetbrains.kotlin.formver.viper.ast.Exp
 import org.jetbrains.kotlin.formver.viper.ast.viperLiteral
@@ -25,9 +25,7 @@ interface LiteralEmbedding : PureExpEmbedding {
         get() = listOf(PlaintextLeaf(value.toString()))
 
     override fun toViper(source: KtSourceElement?): Exp =
-        type.injectionOr {
-            throw NotImplementedError("No conversion for literal $value specialized.")
-        }.toRef(
+        type.injection.toRef(
             value.viperLiteral(source.asPosition, sourceRole.asInfo),
             pos = source.asPosition,
             info = sourceRole.asInfo,

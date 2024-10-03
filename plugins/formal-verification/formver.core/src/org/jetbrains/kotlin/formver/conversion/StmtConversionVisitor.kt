@@ -27,6 +27,11 @@ import org.jetbrains.kotlin.formver.embeddings.callables.FunctionEmbedding
 import org.jetbrains.kotlin.formver.embeddings.callables.insertCall
 import org.jetbrains.kotlin.formver.embeddings.callables.isVerifyFunction
 import org.jetbrains.kotlin.formver.embeddings.expression.*
+import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.GeIntInt
+import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.GtIntInt
+import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.LeIntInt
+import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.LtIntInt
+import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.Not
 import org.jetbrains.kotlin.formver.embeddings.types.buildType
 import org.jetbrains.kotlin.formver.functionCallArguments
 import org.jetbrains.kotlin.text
@@ -182,10 +187,10 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext>()
         val left = data.convert(dispatchReceiver)
         val right = data.convert(arg)
         return when (comparisonExpression.operation) {
-            FirOperation.LT -> LtCmp(left, right)
-            FirOperation.LT_EQ -> LeCmp(left, right)
-            FirOperation.GT -> GtCmp(left, right)
-            FirOperation.GT_EQ -> GeCmp(left, right)
+            FirOperation.LT -> LtIntInt(left, right)
+            FirOperation.LT_EQ -> LeIntInt(left, right)
+            FirOperation.GT -> GtIntInt(left, right)
+            FirOperation.GT_EQ -> GeIntInt(left, right)
             else -> throw IllegalArgumentException("expected comparison operation but found ${comparisonExpression.operation}")
         }
     }
