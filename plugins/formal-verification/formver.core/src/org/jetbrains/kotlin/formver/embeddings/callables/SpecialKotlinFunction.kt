@@ -14,9 +14,12 @@ import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.AddIntInt
+import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.AddCharInt
 import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.DivIntInt
 import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.MulIntInt
 import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.Not
+import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.SubCharChar
+import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.SubCharInt
 import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.SubIntInt
 
 /**
@@ -111,6 +114,37 @@ object SpecialKotlinFunctions {
 
         addFunction(contractCallableType, "kotlin", "contracts", name = "contract") { _, _ ->
             UnitLit
+        }
+
+        val charCharToIntType = buildFunctionPretype {
+            withDispatchReceiver { char() }
+            withParam { char() }
+            withReturnType { int() }
+        }
+
+        addFunction(charCharToIntType, "kotlin", className = "Char", name = "minus") { args, _ ->
+            SubCharChar(args[0], args[1])
+        }
+
+        val charIntToCharType = buildFunctionPretype {
+            withDispatchReceiver { char() }
+            withParam { int() }
+            withReturnType { char() }
+        }
+
+        withCallableType(charIntToCharType) {
+            addFunction("kotlin", className = "Char", name = "plus") { args, _ ->
+                AddCharInt(args[0], args[1])
+            }
+            addFunction("kotlin", className = "Char", name = "minus") { args, _ ->
+                SubCharInt(args[0], args[1])
+            }
+        }
+
+        val intCharToCharType = buildFunctionPretype {
+            withDispatchReceiver { int() }
+            withParam { char() }
+            withReturnType { char() }
         }
     }
 }
