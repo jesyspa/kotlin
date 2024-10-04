@@ -251,6 +251,7 @@ class RuntimeTypeDomain(classes: List<ClassTypeEmbedding>) : BuiltinDomain(RUNTI
         val intType = createNewTypeDomainFunc("intType")
         val boolType = createNewTypeDomainFunc("boolType")
         val unitType = createNewTypeDomainFunc("unitType")
+        val stringType = createNewTypeDomainFunc("stringType")
         val nothingType = createNewTypeDomainFunc("nothingType")
         val anyType = createNewTypeDomainFunc("anyType")
         val functionType = createNewTypeDomainFunc("functionType")
@@ -262,7 +263,9 @@ class RuntimeTypeDomain(classes: List<ClassTypeEmbedding>) : BuiltinDomain(RUNTI
         val intInjection = Injection("int", Type.Int, intType)
         val boolInjection = Injection("bool", Type.Bool, boolType)
         val charInjection = Injection("char", Type.Int, charType)
-        val allInjections = listOf(intInjection, boolInjection, charInjection)
+        val stringInjection = Injection("string", Type.Seq(Type.Int), stringType)
+
+        val allInjections = listOf(intInjection, boolInjection, charInjection, stringInjection)
 
         // special values
         val nullValue = createDomainFunc("nullValue", emptyList(), Ref)
@@ -272,7 +275,7 @@ class RuntimeTypeDomain(classes: List<ClassTypeEmbedding>) : BuiltinDomain(RUNTI
 
     val classTypes = classes.associateWith { type -> type.runtimeTypeFunc }
 
-    val nonNullableTypes = listOf(intType, boolType, charType, unitType, nothingType, anyType, functionType) + classTypes.values
+    val nonNullableTypes = listOf(intType, boolType, charType, stringType, unitType, nothingType, anyType, functionType) + classTypes.values
 
     override val functions: List<DomainFunc> = nonNullableTypes + listOf(nullValue, unitValue, isSubtype, typeOf, nullable) +
             allInjections.flatMap { listOf(it.toRef, it.fromRef) }
