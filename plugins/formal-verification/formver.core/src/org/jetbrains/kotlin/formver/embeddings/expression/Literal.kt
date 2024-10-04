@@ -69,6 +69,14 @@ data class CharLit(
     override val debugName: String = "Char"
 }
 
+data class StringLit(
+    override val value: String,
+) : LiteralEmbedding {
+    override val type = buildType { string() }
+
+    override val debugName: String = "String"
+}
+
 data object NullLit : LiteralEmbedding {
 
     override val value = null

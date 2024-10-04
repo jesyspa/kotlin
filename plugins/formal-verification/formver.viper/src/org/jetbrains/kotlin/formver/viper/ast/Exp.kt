@@ -360,6 +360,40 @@ sealed interface Exp : IntoSilver<viper.silver.ast.Exp> {
             )
     }
 
+    data class ExplicitSeq(
+        val args: List<Exp>,
+        val pos: Position = Position.NoPosition,
+        val info: Info = Info.NoInfo,
+        val trafos: Trafos = Trafos.NoTrafos,
+    ) : Exp {
+        override fun toSilver(): viper.silver.ast.ExplicitSeq =
+            ExplicitSeq(
+                args.toSilver().toScalaSeq(),
+                pos.toSilver(),
+                info.toSilver(),
+                trafos.toSilver(),
+            )
+
+        override val type = Type.Seq(args.first().type)
+    }
+
+    data class EmptySeq(
+        val elementType: Type,
+        val pos: Position = Position.NoPosition,
+        val info: Info = Info.NoInfo,
+        val trafos: Trafos = Trafos.NoTrafos,
+    ) : Exp {
+        override fun toSilver(): viper.silver.ast.EmptySeq =
+            viper.silver.ast.EmptySeq.apply(
+                elementType.toSilver(),
+                pos.toSilver(),
+                info.toSilver(),
+                trafos.toSilver(),
+            )
+
+        override val type = Type.Seq(elementType)
+    }
+
     data class Old(
         val exp: Exp,
         val pos: Position = Position.NoPosition,
@@ -560,10 +594,13 @@ fun Any?.viperLiteral(
     pos: Position = Position.NoPosition,
     info: Info = Info.NoInfo,
     trafos: Trafos = Trafos.NoTrafos,
-) = when (this) {
+): Exp = when (this) {
     null -> Exp.NullLit(pos, info, trafos)
     is Int -> Exp.IntLit(this, pos, info, trafos)
     is Boolean -> Exp.BoolLit(this, pos, info, trafos)
     is Char -> Exp.IntLit(this.code, pos, info, trafos)
+    is String ->
+        if (isEmpty()) Exp.EmptySeq(Type.Int, pos, info, trafos)
+        else Exp.ExplicitSeq(map { it.viperLiteral(pos, info, trafos) }, pos, info, trafos)
     else -> error("Literal type not known.")
 }

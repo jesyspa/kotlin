@@ -83,6 +83,7 @@ inline fun TypeEmbedding.injectionOr(default: (TypeEmbedding) -> Injection): Inj
         CharTypeEmbedding -> RuntimeTypeDomain.charInjection
         IntTypeEmbedding -> RuntimeTypeDomain.intInjection
         BooleanTypeEmbedding -> RuntimeTypeDomain.boolInjection
+        StringTypeEmbedding -> RuntimeTypeDomain.stringInjection
         else -> default(this)
     }
 }
