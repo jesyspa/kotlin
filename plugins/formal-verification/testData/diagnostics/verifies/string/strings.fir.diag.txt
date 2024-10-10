@@ -1,0 +1,62 @@
+/strings.kt:(215,226): info: Generated Viper text for testStrings:
+field bf$length: Ref
+
+field bf$size: Ref
+
+field bf$str: Ref
+
+method con$c$StringBox$T$String(p$str: Ref) returns (ret: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$c$StringBox())
+  ensures acc(p$c$StringBox$shared(ret), wildcard)
+  ensures acc(p$c$StringBox$unique(ret), write)
+  ensures (unfolding acc(p$c$StringBox$shared(ret), wildcard) in
+      ret.bf$str == p$str)
+
+
+method f$testStrings$TF$T$String(p$s: Ref) returns (ret$0: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
+{
+  var anon$0: Ref
+  var anon$1: Ref
+  var anon$2: Ref
+  var anon$3: Ref
+  inhale df$rt$isSubtype(df$rt$typeOf(p$s), df$rt$c$pkg$kotlin$String())
+  inhale acc(p$pkg$kotlin$c$String$shared(p$s), wildcard)
+  anon$1 := con$c$StringBox$T$String(p$s)
+  unfold acc(p$c$StringBox$shared(anon$1), wildcard)
+  anon$0 := anon$1.bf$str
+  assert anon$0 == p$s
+  anon$3 := con$c$StringBox$T$String(df$rt$stringToRef(Seq(115, 116, 114)))
+  unfold acc(p$c$StringBox$shared(anon$3), wildcard)
+  anon$2 := anon$3.bf$str
+  assert anon$2 == df$rt$stringToRef(Seq(115, 116, 114))
+  label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
+}
+
+method pg$public$length(this$dispatch: Ref) returns (ret: Ref)
+
+
+/strings.kt:(215,226): error: An internal error has occurred.
+Details: Consistency error: No domain function named df$rt$stringType found in the program. (<no position>)
+Please report this at https://github.com/jesyspa/kotlin
+
+/strings.kt:(215,226): error: An internal error has occurred.
+Details: Consistency error: No domain function named df$rt$stringType found in the program. (<no position>)
+Please report this at https://github.com/jesyspa/kotlin
+
+/strings.kt:(215,226): error: An internal error has occurred.
+Details: Consistency error: No domain function named df$rt$stringType found in the program. (<no position>)
+Please report this at https://github.com/jesyspa/kotlin
+
+/strings.kt:(215,226): error: An internal error has occurred.
+Details: Consistency error: No matching identifier df$rt$stringType found of type DomainFunc. (<no position>)
+Please report this at https://github.com/jesyspa/kotlin
+
+/strings.kt:(215,226): error: An internal error has occurred.
+Details: Consistency error: No matching identifier df$rt$stringType found of type DomainFunc. (<no position>)
+Please report this at https://github.com/jesyspa/kotlin
+
+/strings.kt:(215,226): error: An internal error has occurred.
+Details: Consistency error: No matching identifier df$rt$stringType found of type DomainFunc. (<no position>)
+Please report this at https://github.com/jesyspa/kotlin

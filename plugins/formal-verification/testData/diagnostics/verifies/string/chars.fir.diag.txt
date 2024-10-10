@@ -1,0 +1,29 @@
+/chars.kt:(212,225): info: Generated Viper text for putAndExtract:
+field bf$char: Ref
+
+field bf$size: Ref
+
+method con$c$CharBox$T$Char(p$char: Ref) returns (ret: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$c$CharBox())
+  ensures acc(p$c$CharBox$shared(ret), wildcard)
+  ensures acc(p$c$CharBox$unique(ret), write)
+  ensures (unfolding acc(p$c$CharBox$shared(ret), wildcard) in
+      ret.bf$char == p$char)
+
+
+method f$putAndExtract$TF$T$Char(p$c: Ref) returns (ret$0: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
+{
+  var l0$box: Ref
+  var anon$0: Ref
+  var l0$charZ: Ref
+  inhale df$rt$isSubtype(df$rt$typeOf(p$c), df$rt$c$pkg$kotlin$Char())
+  inhale acc(p$pkg$kotlin$c$Char$shared(p$c), wildcard)
+  l0$box := con$c$CharBox$T$Char(df$rt$charToRef(97))
+  unfold acc(p$c$CharBox$shared(l0$box), wildcard)
+  anon$0 := l0$box.bf$char
+  assert df$rt$charToRef(97) == anon$0
+  l0$charZ := df$rt$charToRef(122)
+  label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
+}
