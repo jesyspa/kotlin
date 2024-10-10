@@ -113,19 +113,23 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         }
     }
 
-    override fun embedFunction(symbol: FirFunctionSymbol<*>): FunctionEmbedding =
-        when (val existing = methods[symbol.embedName(this)]) {
+    override fun embedFunction(symbol: FirFunctionSymbol<*>): FunctionEmbedding {
+        return when (val existing = methods[symbol.embedName(this)]) {
             null, is PartiallySpecialKotlinFunction -> {
+                if (existing is PartiallySpecialKotlinFunction && existing.baseEmbedding != null)
+                    return existing
                 val signature = embedFullSignature(symbol)
                 val callable = processCallable(symbol, signature)
                 val userFunction = UserFunctionEmbedding(callable)
-                when (existing) {
-                    is PartiallySpecialKotlinFunction -> existing.also { it.initBaseEmbedding(userFunction) }
+                when {
+                    existing is PartiallySpecialKotlinFunction ->
+                        existing.also { it.initBaseEmbedding(userFunction) }
                     else -> userFunction.also { methods[symbol.embedName(this)] = it }
                 }
             }
             else -> existing
         }
+    }
 
     /**
      * Returns an embedding of the class type, with details set.

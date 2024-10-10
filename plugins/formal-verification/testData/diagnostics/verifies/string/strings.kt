@@ -31,4 +31,5 @@ fun <!VIPER_TEXT!>testOps<!>(s: String) {
         str[1] == 'b',
     )
     verify("Kotlin" + "." + "String" == "Kotlin.String")
+    val helloWorld = "Hello World" + '!'
 }
