@@ -21,16 +21,7 @@ import org.jetbrains.kotlin.formver.domains.RuntimeTypeDomain
 import org.jetbrains.kotlin.formver.embeddings.*
 import org.jetbrains.kotlin.formver.embeddings.callables.*
 import org.jetbrains.kotlin.formver.embeddings.expression.*
-import org.jetbrains.kotlin.formver.embeddings.types.ClassEmbeddingDetails
-import org.jetbrains.kotlin.formver.embeddings.types.TypeEmbedding
-import org.jetbrains.kotlin.formver.embeddings.types.ClassTypeEmbedding
-import org.jetbrains.kotlin.formver.embeddings.types.FunctionPretypeBuilder
-import org.jetbrains.kotlin.formver.embeddings.types.FunctionTypeEmbedding
-import org.jetbrains.kotlin.formver.embeddings.types.PretypeBuilder
-import org.jetbrains.kotlin.formver.embeddings.types.TypeBuilder
-import org.jetbrains.kotlin.formver.embeddings.types.buildClassPretype
-import org.jetbrains.kotlin.formver.embeddings.types.buildFunctionPretype
-import org.jetbrains.kotlin.formver.embeddings.types.buildType
+import org.jetbrains.kotlin.formver.embeddings.types.*
 import org.jetbrains.kotlin.formver.linearization.Linearizer
 import org.jetbrains.kotlin.formver.linearization.SeqnBuilder
 import org.jetbrains.kotlin.formver.linearization.SharedLinearizationState
@@ -49,7 +40,10 @@ import org.jetbrains.kotlin.utils.addToStdlib.ifTrue
  */
 class ProgramConverter(val session: FirSession, override val config: PluginConfiguration, override val errorCollector: ErrorCollector) :
     ProgramConversionContext {
-    private val methods: MutableMap<MangledName, FunctionEmbedding> = SpecialKotlinFunctions.byName.toMutableMap()
+    private val methods: MutableMap<MangledName, FunctionEmbedding> =
+        SpecialKotlinFunctions.byName.toMutableMap().also {
+            it.putAll(PartiallySpecialKotlinFunctions.byName)
+        }
     private val classes: MutableMap<MangledName, ClassTypeEmbedding> = mutableMapOf()
     private val properties: MutableMap<MangledName, PropertyEmbedding> = mutableMapOf()
     private val fields: MutableSet<FieldEmbedding> = mutableSetOf()
@@ -120,10 +114,17 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
     }
 
     override fun embedFunction(symbol: FirFunctionSymbol<*>): FunctionEmbedding =
-        methods.getOrPut(symbol.embedName(this)) {
-            val signature = embedFullSignature(symbol)
-            val callable = processCallable(symbol, signature)
-            UserFunctionEmbedding(callable)
+        when (val existing = methods[symbol.embedName(this)]) {
+            null, is PartiallySpecialKotlinFunction -> {
+                val signature = embedFullSignature(symbol)
+                val callable = processCallable(symbol, signature)
+                val userFunction = UserFunctionEmbedding(callable)
+                when (existing) {
+                    is PartiallySpecialKotlinFunction -> existing.also { it.initBaseEmbedding(userFunction) }
+                    else -> userFunction.also { methods[symbol.embedName(this)] = it }
+                }
+            }
+            else -> existing
         }
 
     /**
@@ -138,7 +139,10 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         }
         if (embedding.hasDetails) return embedding
 
-        val newDetails = ClassEmbeddingDetails(embedding, symbol.classKind == ClassKind.INTERFACE)
+        val newDetails = when {
+            embedding.isString -> StringEmbeddingDetails(embedding)
+            else -> ClassEmbeddingDetails(embedding, symbol.classKind == ClassKind.INTERFACE)
+        }
         embedding.initDetails(newDetails)
 
         // The full class embedding is necessary to process the signatures of the properties of the class, since
@@ -289,7 +293,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
                     }
                 }
                 return if (invariants.isEmpty()) null
-                else UnfoldingClassPredicateEmbedding(returnVariable, invariants.toConjunction())
+                else UnfoldingSharedClassPredicateEmbedding(returnVariable, invariants.toConjunction())
             }
 
             override val declarationSource: KtSourceElement? = symbol.source

@@ -9,9 +9,10 @@ import org.jetbrains.kotlin.formver.conversion.StmtConversionContext
 import org.jetbrains.kotlin.formver.embeddings.expression.ExpEmbedding
 import org.jetbrains.kotlin.formver.embeddings.types.FunctionTypeEmbedding
 import org.jetbrains.kotlin.formver.names.ScopedKotlinName
+import org.jetbrains.kotlin.formver.viper.MangledName
 
 class SpecialKotlinFunctionBuilder {
-    private val byName = mutableMapOf<ScopedKotlinName, SpecialKotlinFunction>()
+    private val byName = mutableMapOf<MangledName, SpecialKotlinFunction>()
 
     fun withCallableType(
         callableType: FunctionTypeEmbedding,
@@ -58,9 +59,9 @@ class SpecialKotlinFunctionBuilder {
         }
     }
 
-    fun complete(): Map<ScopedKotlinName, SpecialKotlinFunction> = byName
+    fun complete(): Map<MangledName, SpecialKotlinFunction> = byName
 }
 
-fun buildSpecialFunctions(functionsBlock: SpecialKotlinFunctionBuilder.() -> Unit): Map<ScopedKotlinName, SpecialKotlinFunction> =
+fun buildSpecialFunctions(functionsBlock: SpecialKotlinFunctionBuilder.() -> Unit): Map<MangledName, FunctionEmbedding> =
     SpecialKotlinFunctionBuilder().apply(functionsBlock).complete()
 

@@ -15,12 +15,23 @@ import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.AddIntInt
 import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.AddCharInt
+import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.AddStringString
 import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.DivIntInt
 import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.MulIntInt
 import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.Not
+import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.StringGet
 import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.SubCharChar
 import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.SubCharInt
 import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.SubIntInt
+import org.jetbrains.kotlin.formver.viper.MangledName
+
+
+interface SeparatelyHandledKotlinFunction : FunctionEmbedding {
+    val packageName: List<String>
+    val className: String?
+        get() = null
+    val name: String
+}
 
 /**
  * Kotlin function that should be handled specially by our conversion.
@@ -28,20 +39,15 @@ import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.
  * This includes `contract` and operations on primitive types, where providing a full embedding into Viper
  * offers more possibilities for reasoning about the code.
  */
-interface SpecialKotlinFunction : FunctionEmbedding {
-    val packageName: List<String>
-    val className: String?
-        get() = null
-    val name: String
+interface SpecialKotlinFunction : SeparatelyHandledKotlinFunction {
     override val viperMethod: Method?
         get() = null
 }
 
-val SpecialKotlinFunction.callableId: CallableId
+val SeparatelyHandledKotlinFunction.callableId: CallableId
     get() = CallableId(FqName.fromSegments(packageName), className?.let { FqName(it) }, Name.identifier(name))
 
-fun SpecialKotlinFunction.embedName(): ScopedKotlinName = callableId.embedFunctionName(callableType)
-
+fun SeparatelyHandledKotlinFunction.embedName(): ScopedKotlinName = callableId.embedFunctionName(callableType)
 
 object SpecialKotlinFunctions {
     private val contractBuilderTypeName = buildName {
@@ -53,7 +59,7 @@ object SpecialKotlinFunctions {
         ClassKotlinName(listOf("BooleanArray"))
     }
 
-    val byName = buildSpecialFunctions {
+    val byName: Map<MangledName, FunctionEmbedding> = buildSpecialFunctions {
         val intIntToIntType = buildFunctionPretype {
             withDispatchReceiver { int() }
             withParam { int() }
@@ -141,10 +147,24 @@ object SpecialKotlinFunctions {
             }
         }
 
-        val intCharToCharType = buildFunctionPretype {
-            withDispatchReceiver { int() }
-            withParam { char() }
+        val stringIntToCharType = buildFunctionPretype {
+            withDispatchReceiver { string() }
+            withParam { int() }
             withReturnType { char() }
+        }
+
+        addFunction(stringIntToCharType, "kotlin", className = "String", name = "get") { args, _ ->
+            StringGet(args[0], args[1])
+        }
+
+        val stringStringToStringType = buildFunctionPretype {
+            withDispatchReceiver { string() }
+            withParam { string() }
+            withReturnType { string() }
+        }
+
+        addFunction(stringStringToStringType, "kotlin", className = "String", name = "plus") { args, _ ->
+            AddStringString(args[0], args[1])
         }
     }
 }
