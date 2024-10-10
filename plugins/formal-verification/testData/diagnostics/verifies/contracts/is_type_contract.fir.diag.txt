@@ -4,10 +4,10 @@ field bf$length: Ref
 method f$isString$TF$NT$Any(p$x: Ref) returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$boolType())
   ensures df$rt$boolFromRef(ret$0) == true ==>
-    df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$c$pkg$kotlin$String())
+    df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$stringType())
 {
   inhale df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$nullable(df$rt$anyType()))
-  ret$0 := df$rt$boolToRef(df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$c$pkg$kotlin$String()))
+  ret$0 := df$rt$boolToRef(df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$stringType()))
   goto lbl$ret$0
   label lbl$ret$0
 }
@@ -21,10 +21,10 @@ field bf$length: Ref
 method f$isString$TF$T$Any(this$extension: Ref) returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$boolType())
   ensures df$rt$boolFromRef(ret$0) == true ==>
-    df$rt$isSubtype(df$rt$typeOf(this$extension), df$rt$c$pkg$kotlin$String())
+    df$rt$isSubtype(df$rt$typeOf(this$extension), df$rt$stringType())
 {
   inhale df$rt$isSubtype(df$rt$typeOf(this$extension), df$rt$anyType())
-  ret$0 := df$rt$boolToRef(df$rt$isSubtype(df$rt$typeOf(this$extension), df$rt$c$pkg$kotlin$String()))
+  ret$0 := df$rt$boolToRef(df$rt$isSubtype(df$rt$typeOf(this$extension), df$rt$stringType()))
   goto lbl$ret$0
   label lbl$ret$0
 }
