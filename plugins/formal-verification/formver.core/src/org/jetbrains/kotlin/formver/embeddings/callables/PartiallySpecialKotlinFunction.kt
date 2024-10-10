@@ -44,7 +44,7 @@ abstract class AbstractPartiallySpecialKotlinFunction(
 
     override fun initBaseEmbedding(embedding: FunctionEmbedding) {
         check(_baseEmbedding == null) { "Base embedding for partially special function $name already initialized." }
-        _baseEmbedding = baseEmbedding
+        _baseEmbedding = embedding
     }
 }
 
