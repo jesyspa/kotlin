@@ -26,7 +26,7 @@ field bf$c$B$private$field: Ref
 field bf$length: Ref
 
 method f$c$B$getStringField$TF$T$B(this$dispatch: Ref) returns (ret$0: Ref)
-  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$c$pkg$kotlin$String())
+  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$stringType())
   ensures acc(p$pkg$kotlin$c$String$shared(ret$0), wildcard)
 {
   inhale df$rt$isSubtype(df$rt$typeOf(this$dispatch), df$rt$c$B())

@@ -5,6 +5,8 @@ domain d$rt  {
 
   unique function df$rt$boolType(): d$rt
 
+  unique function df$rt$charType(): d$rt
+
   unique function df$rt$unitType(): d$rt
 
   unique function df$rt$nothingType(): d$rt
@@ -12,6 +14,8 @@ domain d$rt  {
   unique function df$rt$anyType(): d$rt
 
   unique function df$rt$functionType(): d$rt
+
+  unique function df$rt$stringType(): d$rt
 
   unique function df$rt$c$Foo(): d$rt
 
@@ -32,6 +36,14 @@ domain d$rt  {
   function df$rt$boolToRef(v: Bool): Ref
 
   function df$rt$boolFromRef(r: Ref): Bool
+
+  function df$rt$charToRef(v: Int): Ref
+
+  function df$rt$charFromRef(r: Ref): Int
+
+  function df$rt$stringToRef(v: Seq[Int]): Ref
+
+  function df$rt$stringFromRef(r: Ref): Seq[Int]
 
   axiom rt$subtype_reflexive {
     (forall t: d$rt ::df$rt$isSubtype(t, t))
@@ -84,6 +96,10 @@ domain d$rt  {
   }
 
   axiom {
+    df$rt$isSubtype(df$rt$charType(), df$rt$anyType())
+  }
+
+  axiom {
     df$rt$isSubtype(df$rt$unitType(), df$rt$anyType())
   }
 
@@ -97,6 +113,10 @@ domain d$rt  {
 
   axiom {
     df$rt$isSubtype(df$rt$functionType(), df$rt$anyType())
+  }
+
+  axiom {
+    df$rt$isSubtype(df$rt$stringType(), df$rt$anyType())
   }
 
   axiom {
@@ -186,9 +206,59 @@ domain d$rt  {
       df$rt$isSubtype(df$rt$typeOf(r), df$rt$boolType()) ==>
       df$rt$boolToRef(df$rt$boolFromRef(r)) == r)
   }
+
+  axiom {
+    (forall v: Int ::
+      { df$rt$isSubtype(df$rt$typeOf(df$rt$charToRef(v)), df$rt$charType()) }
+      df$rt$isSubtype(df$rt$typeOf(df$rt$charToRef(v)), df$rt$charType()))
+  }
+
+  axiom {
+    (forall v: Int ::
+      { df$rt$charFromRef(df$rt$charToRef(v)) }
+      df$rt$charFromRef(df$rt$charToRef(v)) == v)
+  }
+
+  axiom {
+    (forall r: Ref ::
+      { df$rt$charToRef(df$rt$charFromRef(r)) }
+      df$rt$isSubtype(df$rt$typeOf(r), df$rt$charType()) ==>
+      df$rt$charToRef(df$rt$charFromRef(r)) == r)
+  }
+
+  axiom {
+    (forall v: Seq[Int] ::
+      { df$rt$isSubtype(df$rt$typeOf(df$rt$stringToRef(v)), df$rt$stringType()) }
+      df$rt$isSubtype(df$rt$typeOf(df$rt$stringToRef(v)), df$rt$stringType()))
+  }
+
+  axiom {
+    (forall v: Seq[Int] ::
+      { df$rt$stringFromRef(df$rt$stringToRef(v)) }
+      df$rt$stringFromRef(df$rt$stringToRef(v)) == v)
+  }
+
+  axiom {
+    (forall r: Ref ::
+      { df$rt$stringToRef(df$rt$stringFromRef(r)) }
+      df$rt$isSubtype(df$rt$typeOf(r), df$rt$stringType()) ==>
+      df$rt$stringToRef(df$rt$stringFromRef(r)) == r)
+  }
 }
 
 field bf$x: Ref
+
+function sp$addCharInt(arg1: Ref, arg2: Ref): Ref
+  ensures df$rt$isSubtype(df$rt$typeOf(result), df$rt$charType())
+  ensures df$rt$charFromRef(result) ==
+    df$rt$charFromRef(arg1) + df$rt$intFromRef(arg2)
+
+
+function sp$addStrings(arg1: Ref, arg2: Ref): Ref
+  ensures df$rt$isSubtype(df$rt$typeOf(result), df$rt$stringType())
+  ensures df$rt$stringFromRef(result) ==
+    df$rt$stringFromRef(arg1) ++ df$rt$stringFromRef(arg2)
+
 
 function sp$andBools(arg1: Ref, arg2: Ref): Ref
   ensures df$rt$isSubtype(df$rt$typeOf(result), df$rt$boolType())
@@ -203,10 +273,22 @@ function sp$divInts(arg1: Ref, arg2: Ref): Ref
     df$rt$intFromRef(arg1) / df$rt$intFromRef(arg2)
 
 
+function sp$geChars(arg1: Ref, arg2: Ref): Ref
+  ensures df$rt$isSubtype(df$rt$typeOf(result), df$rt$boolType())
+  ensures df$rt$boolFromRef(result) ==
+    df$rt$charFromRef(arg1) >= df$rt$charFromRef(arg2)
+
+
 function sp$geInts(arg1: Ref, arg2: Ref): Ref
   ensures df$rt$isSubtype(df$rt$typeOf(result), df$rt$boolType())
   ensures df$rt$boolFromRef(result) ==
     df$rt$intFromRef(arg1) >= df$rt$intFromRef(arg2)
+
+
+function sp$gtChars(arg1: Ref, arg2: Ref): Ref
+  ensures df$rt$isSubtype(df$rt$typeOf(result), df$rt$boolType())
+  ensures df$rt$boolFromRef(result) ==
+    df$rt$charFromRef(arg1) > df$rt$charFromRef(arg2)
 
 
 function sp$gtInts(arg1: Ref, arg2: Ref): Ref
@@ -221,10 +303,22 @@ function sp$impliesBools(arg1: Ref, arg2: Ref): Ref
     (df$rt$boolFromRef(arg1) ==> df$rt$boolFromRef(arg2))
 
 
+function sp$leChars(arg1: Ref, arg2: Ref): Ref
+  ensures df$rt$isSubtype(df$rt$typeOf(result), df$rt$boolType())
+  ensures df$rt$boolFromRef(result) ==
+    df$rt$charFromRef(arg1) <= df$rt$charFromRef(arg2)
+
+
 function sp$leInts(arg1: Ref, arg2: Ref): Ref
   ensures df$rt$isSubtype(df$rt$typeOf(result), df$rt$boolType())
   ensures df$rt$boolFromRef(result) ==
     df$rt$intFromRef(arg1) <= df$rt$intFromRef(arg2)
+
+
+function sp$ltChars(arg1: Ref, arg2: Ref): Ref
+  ensures df$rt$isSubtype(df$rt$typeOf(result), df$rt$boolType())
+  ensures df$rt$boolFromRef(result) ==
+    df$rt$charFromRef(arg1) < df$rt$charFromRef(arg2)
 
 
 function sp$ltInts(arg1: Ref, arg2: Ref): Ref
@@ -261,6 +355,31 @@ function sp$remInts(arg1: Ref, arg2: Ref): Ref
   ensures df$rt$isSubtype(df$rt$typeOf(result), df$rt$intType())
   ensures df$rt$intFromRef(result) ==
     df$rt$intFromRef(arg1) % df$rt$intFromRef(arg2)
+
+
+function sp$stringGet(arg1: Ref, arg2: Ref): Ref
+  requires df$rt$intFromRef(arg2) >= 0 &&
+    df$rt$intFromRef(arg2) < |df$rt$stringFromRef(arg1)|
+  ensures df$rt$isSubtype(df$rt$typeOf(result), df$rt$charType())
+  ensures df$rt$charFromRef(result) ==
+    df$rt$stringFromRef(arg1)[df$rt$intFromRef(arg2)]
+
+
+function sp$stringLength(arg1: Ref): Ref
+  ensures df$rt$isSubtype(df$rt$typeOf(result), df$rt$intType())
+  ensures df$rt$intFromRef(result) == |df$rt$stringFromRef(arg1)|
+
+
+function sp$subCharInt(arg1: Ref, arg2: Ref): Ref
+  ensures df$rt$isSubtype(df$rt$typeOf(result), df$rt$charType())
+  ensures df$rt$charFromRef(result) ==
+    df$rt$charFromRef(arg1) - df$rt$intFromRef(arg2)
+
+
+function sp$subChars(arg1: Ref, arg2: Ref): Ref
+  ensures df$rt$isSubtype(df$rt$typeOf(result), df$rt$intType())
+  ensures df$rt$intFromRef(result) ==
+    df$rt$charFromRef(arg1) - df$rt$charFromRef(arg2)
 
 
 function sp$timesInts(arg1: Ref, arg2: Ref): Ref
