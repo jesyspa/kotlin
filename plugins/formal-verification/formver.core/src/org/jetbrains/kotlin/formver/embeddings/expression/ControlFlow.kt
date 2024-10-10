@@ -162,7 +162,7 @@ data class NonDeterministically(val exp: ExpEmbedding) : UnitResultExpEmbedding,
         get() = listOf(exp)
 }
 
-data class UnfoldingClassPredicateEmbedding(val predicated: VariableEmbedding, override val inner: ExpEmbedding) :
+data class UnfoldingSharedClassPredicateEmbedding(val predicated: VariableEmbedding, override val inner: ExpEmbedding) :
     UnaryDirectResultExpEmbedding {
     override val type: TypeEmbedding = inner.type
     private fun toViperImpl(ctx: LinearizationContext, action: ExpEmbedding.() -> Exp): Exp {

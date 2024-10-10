@@ -394,6 +394,80 @@ sealed interface Exp : IntoSilver<viper.silver.ast.Exp> {
         override val type = Type.Seq(elementType)
     }
 
+    data class SeqLength(
+        val seq: Exp,
+        val pos: Position = Position.NoPosition,
+        val info: Info = Info.NoInfo,
+        val trafos: Trafos = Trafos.NoTrafos,
+    ) : Exp {
+        override fun toSilver(): viper.silver.ast.SeqLength =
+            viper.silver.ast.SeqLength.apply(
+                seq.toSilver(),
+                pos.toSilver(),
+                info.toSilver(),
+                trafos.toSilver(),
+            )
+
+        override val type = Type.Int
+    }
+
+    data class SeqTake(
+        val seq: Exp,
+        val idx: Exp,
+        val pos: Position = Position.NoPosition,
+        val info: Info = Info.NoInfo,
+        val trafos: Trafos = Trafos.NoTrafos,
+    ) : Exp {
+        override fun toSilver(): viper.silver.ast.SeqTake =
+            viper.silver.ast.SeqTake.apply(
+                seq.toSilver(),
+                idx.toSilver(),
+                pos.toSilver(),
+                info.toSilver(),
+                trafos.toSilver(),
+            )
+
+        override val type = seq.type
+    }
+
+    data class SeqIndex(
+        val seq: Exp,
+        val idx: Exp,
+        val pos: Position = Position.NoPosition,
+        val info: Info = Info.NoInfo,
+        val trafos: Trafos = Trafos.NoTrafos,
+    ) : Exp {
+        override fun toSilver(): viper.silver.ast.SeqIndex =
+            viper.silver.ast.SeqIndex.apply(
+                seq.toSilver(),
+                idx.toSilver(),
+                pos.toSilver(),
+                info.toSilver(),
+                trafos.toSilver(),
+            )
+
+        override val type = Type.Int
+    }
+
+    data class SeqAppend(
+        val left: Exp,
+        val right: Exp,
+        val pos: Position = Position.NoPosition,
+        val info: Info = Info.NoInfo,
+        val trafos: Trafos = Trafos.NoTrafos,
+    ) : Exp {
+        override fun toSilver(): viper.silver.ast.SeqAppend =
+            viper.silver.ast.SeqAppend.apply(
+                left.toSilver(),
+                right.toSilver(),
+                pos.toSilver(),
+                info.toSilver(),
+                trafos.toSilver(),
+            )
+
+        override val type = left.type
+    }
+
     data class Old(
         val exp: Exp,
         val pos: Position = Position.NoPosition,

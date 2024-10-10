@@ -7,6 +7,7 @@ package org.jetbrains.kotlin.formver.embeddings.types
 
 import org.jetbrains.kotlin.formver.domains.Injection
 import org.jetbrains.kotlin.formver.domains.RuntimeTypeDomain
+import org.jetbrains.kotlin.formver.domains.RuntimeTypeDomain.Companion.stringType
 import org.jetbrains.kotlin.formver.embeddings.expression.debug.PlaintextLeaf
 import org.jetbrains.kotlin.formver.embeddings.expression.debug.TreeView
 import org.jetbrains.kotlin.formver.names.*
@@ -79,11 +80,11 @@ data class TypeEmbeddingFlags(val nullable: Boolean) {
 
 inline fun TypeEmbedding.injectionOr(default: (TypeEmbedding) -> Injection): Injection {
     if (flags.nullable) return default(this)
+    if (equalToType { string() }) return RuntimeTypeDomain.stringInjection
     return when (this.pretype) {
         CharTypeEmbedding -> RuntimeTypeDomain.charInjection
         IntTypeEmbedding -> RuntimeTypeDomain.intInjection
         BooleanTypeEmbedding -> RuntimeTypeDomain.boolInjection
-        StringTypeEmbedding -> RuntimeTypeDomain.stringInjection
         else -> default(this)
     }
 }

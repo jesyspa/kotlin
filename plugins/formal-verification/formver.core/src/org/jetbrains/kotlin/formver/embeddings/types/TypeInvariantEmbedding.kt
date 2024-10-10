@@ -36,6 +36,11 @@ data class IfNonNullInvariant(val invariant: TypeInvariantEmbedding) : TypeInvar
         Implies(NeCmp(exp, NullLit), invariant.fillHole(exp.withType(exp.type.getNonNullable())))
 }
 
+data class FieldEqualsInvariant(val field: FieldEmbedding, val comparedWith: ExpEmbedding) : TypeInvariantEmbedding {
+    override fun fillHole(exp: ExpEmbedding): ExpEmbedding =
+        EqCmp(PrimitiveFieldAccess(exp, field), comparedWith)
+}
+
 data class FieldAccessTypeInvariantEmbedding(val field: FieldEmbedding, val perm: PermExp) : TypeInvariantEmbedding {
     override fun fillHole(exp: ExpEmbedding): ExpEmbedding = FieldAccessPermissions(exp, field, perm)
 }

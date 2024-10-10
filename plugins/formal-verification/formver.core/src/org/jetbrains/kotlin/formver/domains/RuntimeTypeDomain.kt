@@ -6,6 +6,7 @@
 package org.jetbrains.kotlin.formver.domains
 
 import org.jetbrains.kotlin.formver.embeddings.types.ClassTypeEmbedding
+import org.jetbrains.kotlin.formver.embeddings.types.embedClassTypeFunc
 import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.formver.viper.ast.*
 import org.jetbrains.kotlin.formver.viper.mangled
@@ -273,9 +274,14 @@ class RuntimeTypeDomain(classes: List<ClassTypeEmbedding>) : BuiltinDomain(RUNTI
 
     }
 
-    val classTypes = classes.associateWith { type -> type.runtimeTypeFunc }
+    val classTypes = classes.associateWith { type -> type.embedClassTypeFunc() }
+    val builtinTypes = listOf(intType, boolType, charType, unitType, nothingType, anyType, functionType, stringType)
 
-    val nonNullableTypes = listOf(intType, boolType, charType, stringType, unitType, nothingType, anyType, functionType) + classTypes.values
+    val nonNullableTypes = buildList {
+        addAll(builtinTypes)
+        addAll(classTypes.values)
+    }.distinctBy { it.name }
+
 
     override val functions: List<DomainFunc> = nonNullableTypes + listOf(nullValue, unitValue, isSubtype, typeOf, nullable) +
             allInjections.flatMap { listOf(it.toRef, it.fromRef) }

@@ -6,12 +6,14 @@
 package org.jetbrains.kotlin.formver.embeddings.types
 
 import org.jetbrains.kotlin.formver.embeddings.FieldEmbedding
+import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.StringLength
 import org.jetbrains.kotlin.formver.names.*
 import org.jetbrains.kotlin.formver.viper.ast.PermExp
 import org.jetbrains.kotlin.formver.viper.ast.Predicate
+import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.utils.addToStdlib.ifTrue
 
-class ClassEmbeddingDetails(val type: ClassTypeEmbedding, val isInterface: Boolean) : TypeInvariantHolder {
+open class ClassEmbeddingDetails(val type: ClassTypeEmbedding, val isInterface: Boolean) : TypeInvariantHolder {
     private var _superTypes: List<PretypeEmbedding>? = null
     val superTypes: List<PretypeEmbedding>
         get() = _superTypes ?: error("Super types of ${type.name} have not been initialised yet.")
@@ -33,6 +35,9 @@ class ClassEmbeddingDetails(val type: ClassTypeEmbedding, val isInterface: Boole
         get() = _sharedPredicate ?: error("Predicate of ${type.name} has not been initialised yet.")
     val uniquePredicate: Predicate
         get() = _uniquePredicate ?: error("Unique Predicate of ${type.name} has not been initialised yet.")
+    val runtimeTypeFunc = type.embedClassTypeFunc()
+
+    internal open fun ClassPredicateBuilder.additionalSharedPredicateAssertions() = Unit
 
     fun initFields(newFields: Map<SimpleKotlinName, FieldEmbedding>) {
         check(_fields == null) { "Fields of ${type.name} are already initialised." }
@@ -50,6 +55,7 @@ class ClassEmbeddingDetails(val type: ClassTypeEmbedding, val isInterface: Boole
             forEachSuperType {
                 addAccessToSharedPredicate()
             }
+            additionalSharedPredicateAssertions()
         }
         _uniquePredicate = ClassPredicateBuilder.Companion.build(this, uniquePredicateName) {
             forEachField {
@@ -121,6 +127,17 @@ class ClassEmbeddingDetails(val type: ClassTypeEmbedding, val isInterface: Boole
             seenFields.add(name).ifTrue {
                 action(name, field)
             } ?: listOf()
+        }
+    }
+}
+
+class StringEmbeddingDetails(type: ClassTypeEmbedding) : ClassEmbeddingDetails(type, false) {
+
+    override fun ClassPredicateBuilder.additionalSharedPredicateAssertions() {
+        forFieldNamed("length") {
+            addEqualsGuarantee {
+                StringLength(this)
+            }
         }
     }
 }

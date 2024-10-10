@@ -6,10 +6,10 @@
 package org.jetbrains.kotlin.formver.embeddings.expression
 
 import org.jetbrains.kotlin.formver.domains.RuntimeTypeDomain.Companion.intInjection
+import org.jetbrains.kotlin.formver.domains.RuntimeTypeDomain.Companion.stringInjection
 import org.jetbrains.kotlin.formver.embeddings.types.buildFunctionPretype
-import org.jetbrains.kotlin.formver.viper.ast.Exp
-import org.jetbrains.kotlin.formver.viper.ast.ne
-import org.jetbrains.kotlin.formver.viper.ast.toExp
+import org.jetbrains.kotlin.formver.viper.ast.*
+import org.jetbrains.kotlin.formver.viper.ast.Exp.Companion.toConjunction
 
 object OperatorExpEmbeddings {
 
@@ -183,6 +183,43 @@ object OperatorExpEmbeddings {
         viperImplementation { Exp.LtCmp(args[0], args[1], pos, info, trafos) }
     }
 
+    val StringLength = buildOperatorExpEmbedding {
+        setName("stringLength")
+        withSignature {
+            withParam { string() }
+            withReturnType { int() }
+        }
+        viperImplementation { Exp.SeqLength(args[0], pos, info, trafos) }
+    }
+
+    val StringGet = buildOperatorExpEmbedding {
+        setName("stringGet")
+        withSignature {
+            withParam { string() }
+            withParam { int() }
+            withReturnType { char() }
+        }
+        viperImplementation { Exp.SeqIndex(args[0], args[1], pos, info, trafos) }
+        additionalConditions {
+            precondition {
+                listOf(
+                    intInjection.fromRef(args[1]) ge 0.toExp(),
+                    intInjection.fromRef(args[1]) lt Exp.SeqLength(stringInjection.fromRef(args[0]))
+                ).toConjunction()
+            }
+        }
+    }
+
+    val AddStringString = buildOperatorExpEmbedding {
+        setName("addStrings")
+        withSignature {
+            withParam { string() }
+            withParam { string() }
+            withReturnType { string() }
+        }
+        viperImplementation { Exp.SeqAppend(args[0], args[1], pos, info, trafos) }
+    }
+
     val allTemplates
         get() = listOf(
             AddIntInt, SubIntInt, MulIntInt, DivIntInt, RemIntInt,
@@ -190,5 +227,6 @@ object OperatorExpEmbeddings {
             Not, And, Or, Implies,
             AddCharInt, SubCharChar, SubCharInt,
             LeCharChar, GeCharChar, LtCharChar, GtCharChar,
+            StringLength, StringGet, AddStringString
         )
 }

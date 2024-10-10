@@ -63,10 +63,5 @@ data object CharTypeEmbedding : PretypeEmbedding {
     override val name = PretypeName("Char")
 }
 
-data object StringTypeEmbedding : PretypeEmbedding {
-    override val runtimeType = RuntimeTypeDomain.stringType()
-    override val name = PretypeName("String")
-}
-
 fun PretypeEmbedding.asTypeEmbedding() = TypeEmbedding(this, TypeEmbeddingFlags(nullable = false))
 
