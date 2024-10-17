@@ -40,6 +40,10 @@ object BooleanPretypeBuilder : PretypeBuilder {
     override fun complete() = BooleanTypeEmbedding
 }
 
+object CharPretypeBuilder : PretypeBuilder {
+    override fun complete() = CharTypeEmbedding
+}
+
 class FunctionPretypeBuilder : PretypeBuilder {
     private val paramTypes = mutableListOf<TypeEmbedding>()
     private var extensionReceiverType: TypeEmbedding? = null

@@ -9,8 +9,8 @@ import org.jetbrains.kotlin.fir.symbols.impl.FirPropertySymbol
 import org.jetbrains.kotlin.formver.conversion.AccessPolicy
 import org.jetbrains.kotlin.formver.embeddings.expression.ExpEmbedding
 import org.jetbrains.kotlin.formver.embeddings.expression.FieldAccess
-import org.jetbrains.kotlin.formver.embeddings.expression.GeCmp
 import org.jetbrains.kotlin.formver.embeddings.expression.IntLit
+import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.GeIntInt
 import org.jetbrains.kotlin.formver.embeddings.types.ClassTypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.types.FieldAccessTypeInvariantEmbedding
 import org.jetbrains.kotlin.formver.embeddings.types.TypeInvariantEmbedding
@@ -88,7 +88,7 @@ object ListSizeFieldEmbedding : FieldEmbedding {
 
     object NonNegativeSizeTypeInvariantEmbedding : TypeInvariantEmbedding {
         override fun fillHole(exp: ExpEmbedding): ExpEmbedding =
-            GeCmp(FieldAccess(exp, ListSizeFieldEmbedding), IntLit(0))
+            GeIntInt(FieldAccess(exp, ListSizeFieldEmbedding), IntLit(0))
     }
 }
 

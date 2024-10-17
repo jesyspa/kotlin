@@ -6,6 +6,7 @@
 package org.jetbrains.kotlin.formver.domains
 
 import org.jetbrains.kotlin.formver.embeddings.types.ClassTypeEmbedding
+import org.jetbrains.kotlin.formver.embeddings.types.embedClassTypeFunc
 import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.formver.viper.ast.*
 import org.jetbrains.kotlin.formver.viper.mangled
@@ -217,6 +218,13 @@ class RuntimeTypeDomain(classes: List<ClassTypeEmbedding>) : BuiltinDomain(RUNTI
         fun createDomainFunc(funcName: String, args: List<Declaration.LocalVarDecl>, type: Type, unique: Boolean = false) =
             DomainFunc(DomainFuncName(DomainName(RUNTIME_TYPE_DOMAIN_NAME), funcName), args, emptyList(), type, unique)
 
+        private fun createNewTypeDomainFunc(funcName: String) = createDomainFunc(
+            funcName,
+            emptyList(),
+            RuntimeType,
+            true,
+        )
+
         // variables for readability improving
         private val t = Var("t", RuntimeType)
         private val t1 = Var("t1", RuntimeType)
@@ -240,12 +248,14 @@ class RuntimeTypeDomain(classes: List<ClassTypeEmbedding>) : BuiltinDomain(RUNTI
         infix fun Exp.isOf(elemType: Exp) = isSubtype(typeOf(this), elemType)
 
         // built-in types function
-        val intType = createDomainFunc("intType", emptyList(), RuntimeType, true)
-        val boolType = createDomainFunc("boolType", emptyList(), RuntimeType, true)
-        val unitType = createDomainFunc("unitType", emptyList(), RuntimeType, true)
-        val nothingType = createDomainFunc("nothingType", emptyList(), RuntimeType, true)
-        val anyType = createDomainFunc("anyType", emptyList(), RuntimeType, true)
-        val functionType = createDomainFunc("functionType", emptyList(), RuntimeType, true)
+        val charType = createNewTypeDomainFunc("charType")
+        val intType = createNewTypeDomainFunc("intType")
+        val boolType = createNewTypeDomainFunc("boolType")
+        val unitType = createNewTypeDomainFunc("unitType")
+        val stringType = createNewTypeDomainFunc("stringType")
+        val nothingType = createNewTypeDomainFunc("nothingType")
+        val anyType = createNewTypeDomainFunc("anyType")
+        val functionType = createNewTypeDomainFunc("functionType")
 
         // for creation of user types
         fun classTypeFunc(name: MangledName) = createDomainFunc(name.mangled, emptyList(), RuntimeType, true)
@@ -253,37 +263,10 @@ class RuntimeTypeDomain(classes: List<ClassTypeEmbedding>) : BuiltinDomain(RUNTI
         // bijections to primitive types
         val intInjection = Injection("int", Type.Int, intType)
         val boolInjection = Injection("bool", Type.Bool, boolType)
-        val allInjections = listOf(intInjection, boolInjection)
+        val charInjection = Injection("char", Type.Int, charType)
+        val stringInjection = Injection("string", Type.Seq(Type.Int), stringType)
 
-
-        // Ref translations of primitive operations
-        private val bothArgsInts = listOf(intInjection, intInjection)
-        private val bothArgsBools = listOf(boolInjection, boolInjection)
-
-        val plusInts = InjectionImageFunction("plusInts", PlusInts, bothArgsInts, intInjection)
-        val minusInts = InjectionImageFunction("minusInts", MinusInts, bothArgsInts, intInjection)
-        val timesInts = InjectionImageFunction("timesInts", TimesInts, bothArgsInts, intInjection)
-        val divInts = InjectionImageFunction("divInts", DivInts, bothArgsInts, intInjection) {
-            precondition {
-                intInjection.fromRef(args[1]) ne 0.toExp()
-            }
-        }
-        val remInts = InjectionImageFunction("remInts", RemInts, bothArgsInts, intInjection) {
-            precondition {
-                intInjection.fromRef(args[1]) ne 0.toExp()
-            }
-        }
-        val gtInts = InjectionImageFunction("gtInts", GtInts, bothArgsInts, boolInjection)
-        val ltInts = InjectionImageFunction("ltInts", LtInts, bothArgsInts, boolInjection)
-        val geInts = InjectionImageFunction("geInts", GeInts, bothArgsInts, boolInjection)
-        val leInts = InjectionImageFunction("leInts", LeInts, bothArgsInts, boolInjection)
-        val notBool = InjectionImageFunction("notBool", NotBool, listOf(boolInjection), boolInjection)
-        val andBools = InjectionImageFunction("andBools", AndBools, bothArgsBools, boolInjection)
-        val orBools = InjectionImageFunction("orBools", OrBools, bothArgsBools, boolInjection)
-        val impliesBools = InjectionImageFunction("impliesBools", ImpliesBools, bothArgsBools, boolInjection)
-        val accompanyingFunctions: List<InjectionImageFunction> = listOf(
-            plusInts, minusInts, timesInts, divInts, remInts, gtInts, ltInts, geInts, leInts, notBool, andBools, orBools, impliesBools
-        )
+        val allInjections = listOf(intInjection, boolInjection, charInjection, stringInjection)
 
         // special values
         val nullValue = createDomainFunc("nullValue", emptyList(), Ref)
@@ -291,9 +274,14 @@ class RuntimeTypeDomain(classes: List<ClassTypeEmbedding>) : BuiltinDomain(RUNTI
 
     }
 
-    val classTypes = classes.associateWith { type -> type.runtimeTypeFunc }
+    val classTypes = classes.associateWith { type -> type.embedClassTypeFunc() }
+    val builtinTypes = listOf(intType, boolType, charType, unitType, nothingType, anyType, functionType, stringType)
 
-    val nonNullableTypes = listOf(intType, boolType, unitType, nothingType, anyType, functionType) + classTypes.values
+    val nonNullableTypes = buildList {
+        addAll(builtinTypes)
+        addAll(classTypes.values)
+    }.distinctBy { it.name }
+
 
     override val functions: List<DomainFunc> = nonNullableTypes + listOf(nullValue, unitValue, isSubtype, typeOf, nullable) +
             allInjections.flatMap { listOf(it.toRef, it.fromRef) }

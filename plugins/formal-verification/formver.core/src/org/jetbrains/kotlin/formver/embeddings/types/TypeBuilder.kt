@@ -5,6 +5,9 @@
 
 package org.jetbrains.kotlin.formver.embeddings.types
 
+import org.jetbrains.kotlin.formver.names.ClassKotlinName
+import org.jetbrains.kotlin.formver.names.buildName
+
 
 /**
  * Builder for a `TypeEmbedding`.
@@ -28,6 +31,14 @@ class TypeBuilder {
     fun any() = AnyPretypeBuilder
     fun int() = IntPretypeBuilder
     fun boolean() = BooleanPretypeBuilder
+    fun char() = CharPretypeBuilder
+    fun string() = klass {
+        withName(buildName {
+            packageScope(listOf("kotlin"))
+            ClassKotlinName(listOf("String"))
+        })
+    }
+
     fun function(init: FunctionPretypeBuilder.() -> Unit) = FunctionPretypeBuilder().also { it.init() }
     fun klass(init: ClassPretypeBuilder.() -> Unit) = ClassPretypeBuilder().also { it.init() }
     fun existing(embedding: PretypeEmbedding) = ExistingPretypeBuilder(embedding)
