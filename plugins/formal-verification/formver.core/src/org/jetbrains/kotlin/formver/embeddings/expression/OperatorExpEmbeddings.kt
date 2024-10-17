@@ -20,25 +20,25 @@ object OperatorExpEmbeddings {
             withReturnType { int() }
         }
 
-    val AddIntInt = buildOperatorExpEmbedding {
+    val AddIntInt = buildBinaryOperator {
         setName("plusInts")
         setSignature(intIntToIntType)
         viperImplementation { Exp.Add(args[0], args[1], pos, info, trafos) }
     }
 
-    val SubIntInt = buildOperatorExpEmbedding {
+    val SubIntInt = buildBinaryOperator {
         setName("minusInts")
         setSignature(intIntToIntType)
         viperImplementation { Exp.Sub(args[0], args[1], pos, info, trafos) }
     }
 
-    val MulIntInt = buildOperatorExpEmbedding {
+    val MulIntInt = buildBinaryOperator {
         setName("timesInts")
         setSignature(intIntToIntType)
         viperImplementation { Exp.Mul(args[0], args[1], pos, info, trafos) }
     }
 
-    val DivIntInt = buildOperatorExpEmbedding {
+    val DivIntInt = buildBinaryOperator {
         setName("divInts")
         setSignature(intIntToIntType)
         viperImplementation { Exp.Div(args[0], args[1], pos, info, trafos) }
@@ -49,7 +49,7 @@ object OperatorExpEmbeddings {
         }
     }
 
-    val RemIntInt = buildOperatorExpEmbedding {
+    val RemIntInt = buildBinaryOperator {
         setName("remInts")
         setSignature(intIntToIntType)
         viperImplementation { Exp.Mod(args[0], args[1], pos, info, trafos) }
@@ -67,31 +67,31 @@ object OperatorExpEmbeddings {
             withReturnType { boolean() }
         }
 
-    val LeIntInt = buildOperatorExpEmbedding {
+    val LeIntInt = buildBinaryOperator {
         setName("leInts")
         setSignature(intIntToBooleanType)
         viperImplementation { Exp.LeCmp(args[0], args[1], pos, info, trafos) }
     }
 
-    val LtIntInt = buildOperatorExpEmbedding {
+    val LtIntInt = buildBinaryOperator {
         setName("ltInts")
         setSignature(intIntToBooleanType)
         viperImplementation { Exp.LtCmp(args[0], args[1], pos, info, trafos) }
     }
 
-    val GeIntInt = buildOperatorExpEmbedding {
+    val GeIntInt = buildBinaryOperator {
         setName("geInts")
         setSignature(intIntToBooleanType)
         viperImplementation { Exp.GeCmp(args[0], args[1], pos, info, trafos) }
     }
 
-    val GtIntInt = buildOperatorExpEmbedding {
+    val GtIntInt = buildBinaryOperator {
         setName("gtInts")
         setSignature(intIntToBooleanType)
         viperImplementation { Exp.GtCmp(args[0], args[1], pos, info, trafos) }
     }
 
-    val Not = buildOperatorExpEmbedding {
+    val Not = buildUnaryOperator {
         setName("notBool")
         withSignature {
             withParam { boolean() }
@@ -107,25 +107,25 @@ object OperatorExpEmbeddings {
             withReturnType { boolean() }
         }
 
-    val And = buildOperatorExpEmbedding {
+    val And = buildBinaryOperator {
         setName("andBools")
         setSignature(booleanBooleanToBooleanType)
         viperImplementation { Exp.And(args[0], args[1], pos, info, trafos) }
     }
 
-    val Or = buildOperatorExpEmbedding {
+    val Or = buildBinaryOperator {
         setName("orBools")
         setSignature(booleanBooleanToBooleanType)
         viperImplementation { Exp.Or(args[0], args[1], pos, info, trafos) }
     }
 
-    val Implies = buildOperatorExpEmbedding {
+    val Implies = buildBinaryOperator {
         setName("impliesBools")
         setSignature(booleanBooleanToBooleanType)
         viperImplementation { Exp.Implies(args[0], args[1], pos, info, trafos) }
     }
 
-    val SubCharChar = buildOperatorExpEmbedding {
+    val SubCharChar = buildBinaryOperator {
         setName("subChars")
         withSignature {
             withParam { char() }
@@ -141,13 +141,13 @@ object OperatorExpEmbeddings {
         withReturnType { char() }
     }
 
-    val AddCharInt = buildOperatorExpEmbedding {
+    val AddCharInt = buildBinaryOperator {
         setName("addCharInt")
         setSignature(charIntToCharType)
         viperImplementation { Exp.Add(args[0], args[1], pos, info, trafos) }
     }
 
-    val SubCharInt = buildOperatorExpEmbedding {
+    val SubCharInt = buildBinaryOperator {
         setName("subCharInt")
         setSignature(charIntToCharType)
         viperImplementation { Exp.Sub(args[0], args[1], pos, info, trafos) }
@@ -159,31 +159,31 @@ object OperatorExpEmbeddings {
         withReturnType { boolean() }
     }
 
-    val GeCharChar = buildOperatorExpEmbedding {
+    val GeCharChar = buildBinaryOperator {
         setName("geChars")
         setSignature(charCharToBooleanType)
         viperImplementation { Exp.GeCmp(args[0], args[1], pos, info, trafos) }
     }
 
-    val GtCharChar = buildOperatorExpEmbedding {
+    val GtCharChar = buildBinaryOperator {
         setName("gtChars")
         setSignature(charCharToBooleanType)
         viperImplementation { Exp.GtCmp(args[0], args[1], pos, info, trafos) }
     }
 
-    val LeCharChar = buildOperatorExpEmbedding {
+    val LeCharChar = buildBinaryOperator {
         setName("leChars")
         setSignature(charCharToBooleanType)
         viperImplementation { Exp.LeCmp(args[0], args[1], pos, info, trafos) }
     }
 
-    val LtCharChar = buildOperatorExpEmbedding {
+    val LtCharChar = buildBinaryOperator {
         setName("ltChars")
         setSignature(charCharToBooleanType)
         viperImplementation { Exp.LtCmp(args[0], args[1], pos, info, trafos) }
     }
 
-    val StringLength = buildOperatorExpEmbedding {
+    val StringLength = buildUnaryOperator {
         setName("stringLength")
         withSignature {
             withParam { string() }
@@ -192,7 +192,7 @@ object OperatorExpEmbeddings {
         viperImplementation { Exp.SeqLength(args[0], pos, info, trafos) }
     }
 
-    val StringGet = buildOperatorExpEmbedding {
+    val StringGet = buildBinaryOperator {
         setName("stringGet")
         withSignature {
             withParam { string() }
@@ -210,7 +210,7 @@ object OperatorExpEmbeddings {
         }
     }
 
-    val AddStringString = buildOperatorExpEmbedding {
+    val AddStringString = buildBinaryOperator {
         setName("addStrings")
         withSignature {
             withParam { string() }

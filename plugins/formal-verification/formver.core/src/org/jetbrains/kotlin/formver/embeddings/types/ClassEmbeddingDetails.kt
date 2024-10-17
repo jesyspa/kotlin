@@ -10,7 +10,6 @@ import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.
 import org.jetbrains.kotlin.formver.names.*
 import org.jetbrains.kotlin.formver.viper.ast.PermExp
 import org.jetbrains.kotlin.formver.viper.ast.Predicate
-import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.utils.addToStdlib.ifTrue
 
 open class ClassEmbeddingDetails(val type: ClassTypeEmbedding, val isInterface: Boolean) : TypeInvariantHolder {
@@ -132,7 +131,6 @@ open class ClassEmbeddingDetails(val type: ClassTypeEmbedding, val isInterface: 
 }
 
 class StringEmbeddingDetails(type: ClassTypeEmbedding) : ClassEmbeddingDetails(type, false) {
-
     override fun ClassPredicateBuilder.additionalSharedPredicateAssertions() {
         forFieldNamed("length") {
             addEqualsGuarantee {
