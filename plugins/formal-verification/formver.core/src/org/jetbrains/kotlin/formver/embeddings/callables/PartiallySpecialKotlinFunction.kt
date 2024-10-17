@@ -12,25 +12,10 @@ import org.jetbrains.kotlin.formver.embeddings.types.buildFunctionPretype
 import org.jetbrains.kotlin.formver.embeddings.types.equalToType
 import org.jetbrains.kotlin.formver.embeddings.types.nullableAny
 import org.jetbrains.kotlin.formver.viper.MangledName
-import org.jetbrains.kotlin.formver.viper.ast.Method
 
 /**
- * Functions that should sometimes be handled separately by our conversion depending on arguments they're called with.
+ * Base class for implementations of `PartiallySpecialKotlinFunction`s.
  */
-interface PartiallySpecialKotlinFunction : SeparatelyHandledKotlinFunction {
-    val baseEmbedding: FunctionEmbedding?
-    fun tryInsertCall(args: List<ExpEmbedding>, ctx: StmtConversionContext): ExpEmbedding?
-    override fun insertCall(args: List<ExpEmbedding>, ctx: StmtConversionContext): ExpEmbedding {
-        return tryInsertCall(args, ctx) ?: baseEmbedding?.insertCall(args, ctx)
-        ?: error("Base embedding for partially special function $name not specified")
-    }
-
-    fun initBaseEmbedding(embedding: FunctionEmbedding)
-
-    override val viperMethod: Method?
-        get() = baseEmbedding?.viperMethod
-}
-
 abstract class AbstractPartiallySpecialKotlinFunction(
     vararg packageName: String,
     override val className: String? = null,
@@ -60,6 +45,6 @@ data object StringPlusAnyFunction : AbstractPartiallySpecialKotlinFunction("kotl
 }
 
 object PartiallySpecialKotlinFunctions {
-    val byName: Map<MangledName, PartiallySpecialKotlinFunction> = listOf(StringPlusAnyFunction).associateBy { it.embedName() }
+    val byName: Map<MangledName, FunctionEmbedding> = listOf(StringPlusAnyFunction).associateBy { it.embedName() }
 }
 

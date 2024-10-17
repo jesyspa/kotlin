@@ -10,15 +10,14 @@ import org.jetbrains.kotlin.formver.embeddings.expression.ExpEmbedding
 import org.jetbrains.kotlin.formver.embeddings.types.FunctionTypeEmbedding
 import org.jetbrains.kotlin.formver.viper.MangledName
 
-class SpecialKotlinFunctionBuilder {
-    private val byName = mutableMapOf<MangledName, SpecialKotlinFunction>()
+class FullySpecialKotlinFunctionBuilder {
+    private val byName = mutableMapOf<MangledName, FunctionEmbedding>()
 
     fun withCallableType(
         callableType: FunctionTypeEmbedding,
-        functionsBlock: SpecialKotlinFunctionBuilderWithCallableType.() -> Unit
+        functionsBlock: SpecialKotlinFunctionBuilderWithCallableType.() -> Unit,
     ) {
-        val builderWithCallableType =
-            SpecialKotlinFunctionBuilderWithCallableType(callableType)
+        val builderWithCallableType = SpecialKotlinFunctionBuilderWithCallableType(callableType)
 
         builderWithCallableType.functionsBlock()
     }
@@ -40,10 +39,10 @@ class SpecialKotlinFunctionBuilder {
             vararg packageName: String,
             className: String? = null,
             name: String,
-            body: (List<ExpEmbedding>, StmtConversionContext) -> ExpEmbedding
+            body: (List<ExpEmbedding>, StmtConversionContext) -> ExpEmbedding,
         ) {
 
-            val newFunction = object : SpecialKotlinFunction {
+            val newFunction = object : FullySpecialKotlinFunction {
                 override val name: String = name
                 override val packageName = packageName.toList()
                 override val callableType = this@SpecialKotlinFunctionBuilderWithCallableType.callableType
@@ -58,9 +57,9 @@ class SpecialKotlinFunctionBuilder {
         }
     }
 
-    fun complete(): Map<MangledName, SpecialKotlinFunction> = byName
+    fun complete(): Map<MangledName, FunctionEmbedding> = byName
 }
 
-fun buildSpecialFunctions(functionsBlock: SpecialKotlinFunctionBuilder.() -> Unit): Map<MangledName, FunctionEmbedding> =
-    SpecialKotlinFunctionBuilder().apply(functionsBlock).complete()
+fun buildFullySpecialFunctions(functionsBlock: FullySpecialKotlinFunctionBuilder.() -> Unit): Map<MangledName, FunctionEmbedding> =
+    FullySpecialKotlinFunctionBuilder().apply(functionsBlock).complete()
 
