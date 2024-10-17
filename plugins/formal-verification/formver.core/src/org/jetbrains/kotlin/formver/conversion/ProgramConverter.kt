@@ -145,7 +145,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
 
         val newDetails = when {
             embedding.isString -> StringEmbeddingDetails(embedding)
-            else -> ClassEmbeddingDetails(embedding, symbol.classKind == ClassKind.INTERFACE)
+            else -> DefaultClassEmbeddingDetails(embedding, symbol.classKind == ClassKind.INTERFACE)
         }
         embedding.initDetails(newDetails)
 

@@ -12,7 +12,7 @@ import org.jetbrains.kotlin.formver.viper.ast.PermExp
 import org.jetbrains.kotlin.formver.viper.ast.Predicate
 import org.jetbrains.kotlin.utils.addToStdlib.ifTrue
 
-open class ClassEmbeddingDetails(val type: ClassTypeEmbedding, val isInterface: Boolean) : TypeInvariantHolder {
+sealed class ClassEmbeddingDetails(val type: ClassTypeEmbedding, val isInterface: Boolean) : TypeInvariantHolder {
     private var _superTypes: List<PretypeEmbedding>? = null
     val superTypes: List<PretypeEmbedding>
         get() = _superTypes ?: error("Super types of ${type.name} have not been initialised yet.")
@@ -139,3 +139,5 @@ class StringEmbeddingDetails(type: ClassTypeEmbedding) : ClassEmbeddingDetails(t
         }
     }
 }
+
+class DefaultClassEmbeddingDetails(type: ClassTypeEmbedding, isInterface: Boolean) : ClassEmbeddingDetails(type, isInterface)
