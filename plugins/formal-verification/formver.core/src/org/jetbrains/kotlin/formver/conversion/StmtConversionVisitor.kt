@@ -209,7 +209,7 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext>()
     }
 
     private interface ComparisonExpEmbeddingsTemplate {
-        fun retrieve(operation: FirOperation): OperatorExpEmbeddingTemplate
+        fun retrieve(operation: FirOperation): BinaryOperatorExpEmbeddingTemplate
     }
 
     private object IntComparisonExpEmbeddingsTemplate : ComparisonExpEmbeddingsTemplate {

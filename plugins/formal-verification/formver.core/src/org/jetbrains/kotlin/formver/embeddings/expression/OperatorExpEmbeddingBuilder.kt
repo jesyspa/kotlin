@@ -17,11 +17,10 @@ class OperatorExpEmbeddingBuilder {
     private var callableType: FunctionTypeEmbedding? = null
     private var additionalConditions: (FunctionBuilder.() -> Unit)? = null
 
-    fun complete(): OperatorExpEmbeddingTemplate {
+    fun complete(): OperatorExpEmbeddingTemplate? {
         val callableType = callableType ?: error("Signature not specified to buildExpEmbedding.")
         val argumentTypes = callableType.formalArgTypes
         val returnType = callableType.returnType
-        check(argumentTypes.size == 1 || argumentTypes.size == 2) { "Operator should take exactly two arguments." }
         val refsOperation = InjectionImageFunction(
             runtimeTypeFunctionName ?: error("No name specified for the underlying viper function."),
             viperApplicable ?: error("No viper operator specified to build ExpEmbedding."),
@@ -29,7 +28,7 @@ class OperatorExpEmbeddingBuilder {
             returnType.injection,
             additionalConditions ?: { }
         )
-        return OperatorExpEmbeddingTemplate(returnType, refsOperation)
+        return OperatorExpEmbeddingTemplate.create(returnType, refsOperation)
     }
 
     fun setName(name: String) {
@@ -67,6 +66,14 @@ class OperatorExpEmbeddingBuilder {
     }
 }
 
-fun buildOperatorExpEmbedding(block: OperatorExpEmbeddingBuilder.() -> Unit) =
-    OperatorExpEmbeddingBuilder().apply(block).complete()
+inline fun <reified T : OperatorExpEmbeddingTemplate> buildOperator(block: OperatorExpEmbeddingBuilder.() -> Unit) =
+    when (val completed = OperatorExpEmbeddingBuilder().apply(block).complete()) {
+        is T -> completed
+        else -> error("Attempt to create OperatorExpEmbedding with non-matching number of arguments.")
+    }
 
+fun buildUnaryOperator(block: OperatorExpEmbeddingBuilder.() -> Unit) =
+    buildOperator<UnaryOperatorExpEmbeddingTemplate>(block)
+
+fun buildBinaryOperator(block: OperatorExpEmbeddingBuilder.() -> Unit) =
+    buildOperator<BinaryOperatorExpEmbeddingTemplate>(block)
