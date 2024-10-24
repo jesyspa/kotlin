@@ -33,7 +33,7 @@ abstract class AbstractPartiallySpecialKotlinFunction(
     }
 }
 
-data object StringPlusAnyFunction : AbstractPartiallySpecialKotlinFunction("kotlin", className = "String", name = "plus") {
+class StringPlusAnyFunction : AbstractPartiallySpecialKotlinFunction("kotlin", className = "String", name = "plus") {
     override fun tryInsertCall(args: List<ExpEmbedding>, ctx: StmtConversionContext): ExpEmbedding? =
         if (args[1].type.equalToType { string() }) AddStringString(args[0], args[1]) else null
 
@@ -45,6 +45,9 @@ data object StringPlusAnyFunction : AbstractPartiallySpecialKotlinFunction("kotl
 }
 
 object PartiallySpecialKotlinFunctions {
-    val byName: Map<MangledName, FunctionEmbedding> = listOf(StringPlusAnyFunction).associateBy { it.embedName() }
+    val byName: Map<MangledName, FunctionEmbedding>
+        get() = buildList {
+            add(StringPlusAnyFunction())
+        }.associateBy { it.embedName() }
 }
 
