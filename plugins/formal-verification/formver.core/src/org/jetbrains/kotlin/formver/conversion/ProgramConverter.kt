@@ -8,6 +8,7 @@ package org.jetbrains.kotlin.formver.conversion
 import org.jetbrains.kotlin.KtSourceElement
 import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.descriptors.Visibilities
+import org.jetbrains.kotlin.descriptors.isInterface
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.declarations.FirSimpleFunction
 import org.jetbrains.kotlin.fir.declarations.utils.*
@@ -143,10 +144,10 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         }
         if (embedding.hasDetails) return embedding
 
-        val newDetails = when {
-            embedding.isString -> StringEmbeddingDetails(embedding)
-            else -> DefaultClassEmbeddingDetails(embedding, symbol.classKind == ClassKind.INTERFACE)
+        val sharedPredicateEnhancer = embedding.isString.ifTrue {
+            StringSharedPredicateEnhancer
         }
+        val newDetails = ClassEmbeddingDetails(embedding, symbol.classKind.isInterface, sharedPredicateEnhancer)
         embedding.initDetails(newDetails)
 
         // The full class embedding is necessary to process the signatures of the properties of the class, since

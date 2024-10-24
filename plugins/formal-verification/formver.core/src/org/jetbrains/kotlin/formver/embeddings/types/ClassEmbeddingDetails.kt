@@ -6,13 +6,17 @@
 package org.jetbrains.kotlin.formver.embeddings.types
 
 import org.jetbrains.kotlin.formver.embeddings.FieldEmbedding
-import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.StringLength
 import org.jetbrains.kotlin.formver.names.*
 import org.jetbrains.kotlin.formver.viper.ast.PermExp
 import org.jetbrains.kotlin.formver.viper.ast.Predicate
 import org.jetbrains.kotlin.utils.addToStdlib.ifTrue
 
-sealed class ClassEmbeddingDetails(val type: ClassTypeEmbedding, val isInterface: Boolean) : TypeInvariantHolder {
+class ClassEmbeddingDetails(
+    val type: ClassTypeEmbedding,
+    val isInterface: Boolean,
+    private val sharedPredicateEnhancer: ClassPredicateEnhancer? = null,
+    private val uniquePredicateEnhancer: ClassPredicateEnhancer? = null,
+) : TypeInvariantHolder {
     private var _superTypes: List<PretypeEmbedding>? = null
     val superTypes: List<PretypeEmbedding>
         get() = _superTypes ?: error("Super types of ${type.name} have not been initialised yet.")
@@ -34,14 +38,11 @@ sealed class ClassEmbeddingDetails(val type: ClassTypeEmbedding, val isInterface
         get() = _sharedPredicate ?: error("Predicate of ${type.name} has not been initialised yet.")
     val uniquePredicate: Predicate
         get() = _uniquePredicate ?: error("Unique Predicate of ${type.name} has not been initialised yet.")
-    val runtimeTypeFunc = type.embedClassTypeFunc()
-
-    internal open fun ClassPredicateBuilder.additionalSharedPredicateAssertions() = Unit
 
     fun initFields(newFields: Map<SimpleKotlinName, FieldEmbedding>) {
         check(_fields == null) { "Fields of ${type.name} are already initialised." }
         _fields = newFields
-        _sharedPredicate = ClassPredicateBuilder.Companion.build(this, sharedPredicateName) {
+        _sharedPredicate = ClassPredicateBuilder.build(this, sharedPredicateName) {
             forEachField {
                 if (isAlwaysReadable) {
                     addAccessPermissions(PermExp.WildcardPerm())
@@ -54,9 +55,9 @@ sealed class ClassEmbeddingDetails(val type: ClassTypeEmbedding, val isInterface
             forEachSuperType {
                 addAccessToSharedPredicate()
             }
-            additionalSharedPredicateAssertions()
+            sharedPredicateEnhancer?.applyAdditionalAssertions(this)
         }
-        _uniquePredicate = ClassPredicateBuilder.Companion.build(this, uniquePredicateName) {
+        _uniquePredicate = ClassPredicateBuilder.build(this, uniquePredicateName) {
             forEachField {
                 if (isAlwaysReadable) {
                     addAccessPermissions(PermExp.WildcardPerm())
@@ -74,6 +75,7 @@ sealed class ClassEmbeddingDetails(val type: ClassTypeEmbedding, val isInterface
             forEachSuperType {
                 addAccessToUniquePredicate()
             }
+            uniquePredicateEnhancer?.applyAdditionalAssertions(this)
         }
     }
 
@@ -129,15 +131,3 @@ sealed class ClassEmbeddingDetails(val type: ClassTypeEmbedding, val isInterface
         }
     }
 }
-
-class StringEmbeddingDetails(type: ClassTypeEmbedding) : ClassEmbeddingDetails(type, false) {
-    override fun ClassPredicateBuilder.additionalSharedPredicateAssertions() {
-        forFieldNamed("length") {
-            addEqualsGuarantee {
-                StringLength(this)
-            }
-        }
-    }
-}
-
-class DefaultClassEmbeddingDetails(type: ClassTypeEmbedding, isInterface: Boolean) : ClassEmbeddingDetails(type, isInterface)

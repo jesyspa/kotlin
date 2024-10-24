@@ -43,7 +43,7 @@ internal class ClassPredicateBuilder private constructor(private val details: Cl
                 body.addAll(builder.toAssertionsList())
             }
 
-    fun forFieldNamed(name: String, action: FieldAssertionsBuilder.() -> Unit) {
+    fun forUserFieldNamed(name: String, action: FieldAssertionsBuilder.() -> Unit) {
         when (val field = details.fields[SimpleKotlinName(Name.identifier(name))]) {
             is UserFieldEmbedding -> {
                 val builder = FieldAssertionsBuilder(subject, field)
