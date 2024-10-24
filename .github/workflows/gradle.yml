@@ -46,14 +46,8 @@ jobs:
 
     - name: Setup Gradle
       uses: gradle/gradle-build-action@v2
-    - name: Run test without contract
-      run: ./gradlew :kotlin-formver-compiler-plugin:test --tests org.jetbrains.kotlin.formver.plugin.runners.FirLightTreeFormVerPluginDiagnosticsTestGenerated\$No_contracts
-    - name: Run test with verifying
-      run: ./gradlew :kotlin-formver-compiler-plugin:test --tests org.jetbrains.kotlin.formver.plugin.runners.FirLightTreeFormVerPluginDiagnosticsTestGenerated\$Verifies
-    - name: Run test with verification errors
-      run: ./gradlew :kotlin-formver-compiler-plugin:test --tests org.jetbrains.kotlin.formver.plugin.runners.FirLightTreeFormVerPluginDiagnosticsTestGenerated\$Bad_contracts
-    - name: Run test for unique check
-      run: ./gradlew :kotlin-formver-compiler-plugin:test --tests org.jetbrains.kotlin.formver.plugin.runners.FirLightTreeFormVerPluginDiagnosticsTestGenerated\$Uniqueness
+    - name: Run all tests
+      run: ./gradlew :kotlin-formver-compiler-plugin:test --tests org.jetbrains.kotlin.formver.plugin.runners.FirLightTreeFormVerPluginDiagnosticsTestGenerated
     - name: Report failing test results
       uses: mikepenz/action-junit-report@v4
       if: failure()
