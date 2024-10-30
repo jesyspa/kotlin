@@ -66,7 +66,7 @@ method f$checkMemberAccess$TF$() returns (ret$0: Ref)
   anon$3 := anon$2
   unfold acc(p$c$ClassWithMember$shared(l0$obj), wildcard)
   anon$11 := l0$obj.bf$member
-  ret$0 := df$rt$boolToRef(df$rt$intFromRef(anon$11) == 43)
+  ret$0 := df$rt$boolToRef(df$rt$intFromRef(anon$11) == 42)
   goto lbl$ret$0
   label lbl$ret$4
   anon$10 := ret$4

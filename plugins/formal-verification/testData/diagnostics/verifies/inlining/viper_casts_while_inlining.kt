@@ -28,7 +28,7 @@ fun <!VIPER_TEXT!>checkMemberAccess<!>(): Boolean {
         member
     }
     obj.copiedRun {
-        return obj.member == 43
+        return obj.member == 42
     }
 }
 
