@@ -44,9 +44,14 @@ class StringPlusAnyFunction : AbstractPartiallySpecialKotlinFunction("kotlin", c
     }
 }
 
+/**
+ * Here all the partially special functions are stored.
+ * Since a partially special function has a state (its base embedding) we can't use a static variable here,
+ * but those functions are generated once per run anyway.
+ */
 object PartiallySpecialKotlinFunctions {
-    val byName: Map<MangledName, FunctionEmbedding>
-        get() = buildList {
+    fun generateAllByName(): Map<MangledName, FunctionEmbedding> =
+        buildList {
             add(StringPlusAnyFunction())
         }.associateBy { it.embedName() }
 }

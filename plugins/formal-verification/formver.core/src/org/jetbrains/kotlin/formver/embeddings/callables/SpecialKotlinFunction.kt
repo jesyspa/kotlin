@@ -41,6 +41,10 @@ interface FullySpecialKotlinFunction : SpecialKotlinFunction {
  * Currently, `String.plus(Any)` is the sole case when we use this interface.
  */
 interface PartiallySpecialKotlinFunction : SpecialKotlinFunction {
+    /**
+     * `baseEmbedding` stores a usual (user) embedding for the partially special function.
+     * It is initialised iff the partially special function is used in the program in any way.
+     */
     val baseEmbedding: FunctionEmbedding?
     fun tryInsertCall(args: List<ExpEmbedding>, ctx: StmtConversionContext): ExpEmbedding?
     override fun insertCall(args: List<ExpEmbedding>, ctx: StmtConversionContext): ExpEmbedding {

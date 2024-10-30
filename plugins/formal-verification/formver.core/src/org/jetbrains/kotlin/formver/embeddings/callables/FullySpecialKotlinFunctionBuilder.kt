@@ -10,6 +10,17 @@ import org.jetbrains.kotlin.formver.embeddings.expression.ExpEmbedding
 import org.jetbrains.kotlin.formver.embeddings.types.FunctionTypeEmbedding
 import org.jetbrains.kotlin.formver.viper.MangledName
 
+class FullySpecialKotlinFunctionImpl(
+    override val packageName: List<String>,
+    override val className: String?,
+    override val name: String,
+    override val callableType: FunctionTypeEmbedding,
+    val body: (List<ExpEmbedding>, StmtConversionContext) -> ExpEmbedding,
+) : FullySpecialKotlinFunction {
+    override fun insertCall(args: List<ExpEmbedding>, ctx: StmtConversionContext) =
+        body(args, ctx)
+}
+
 class FullySpecialKotlinFunctionBuilder {
     private val byName = mutableMapOf<MangledName, FunctionEmbedding>()
 
@@ -41,19 +52,7 @@ class FullySpecialKotlinFunctionBuilder {
             name: String,
             body: (List<ExpEmbedding>, StmtConversionContext) -> ExpEmbedding,
         ) {
-
-            val newFunction = object : FullySpecialKotlinFunction {
-                override val name: String = name
-                override val packageName = packageName.toList()
-                override val callableType = this@SpecialKotlinFunctionBuilderWithCallableType.callableType
-                override val className = className
-
-                override fun insertCall(
-                    args: List<ExpEmbedding>,
-                    ctx: StmtConversionContext,
-                ): ExpEmbedding = body(args, ctx)
-            }
-            newFunction.let { byName[it.embedName()] = it }
+            FullySpecialKotlinFunctionImpl(packageName.toList(), className, name, callableType, body).apply { byName[embedName()] = this }
         }
     }
 

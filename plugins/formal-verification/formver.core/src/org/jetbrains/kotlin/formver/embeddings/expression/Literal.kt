@@ -78,7 +78,6 @@ data class StringLit(
 }
 
 data object NullLit : LiteralEmbedding {
-
     override val value = null
 
     override val type = buildType { isNullable = true; nothing() }

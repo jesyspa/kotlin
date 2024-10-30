@@ -10,7 +10,12 @@ import org.jetbrains.kotlin.formver.domains.InjectionImageFunction
 import org.jetbrains.kotlin.formver.embeddings.types.*
 import org.jetbrains.kotlin.formver.viper.ast.*
 
-
+/**
+ * Builder to generate `ExpEmbedding`s with 1 or 2 arguments directly from their Viper implementation.
+ *
+ * Example: Let's imagine we want to create an `ExpEmbedding` to sum two integers.
+ * Then we should just set its signature (`(Int, Int) -> Int`) and Viper implementation (`Exp.Add`).
+ */
 class OperatorExpEmbeddingBuilder {
     private var runtimeTypeFunctionName: String? = null
     private var viperApplicable: Applicable? = null

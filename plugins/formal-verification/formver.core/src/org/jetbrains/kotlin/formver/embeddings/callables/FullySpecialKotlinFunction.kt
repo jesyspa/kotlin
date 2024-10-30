@@ -29,6 +29,11 @@ val SpecialKotlinFunction.callableId: CallableId
 
 fun SpecialKotlinFunction.embedName(): ScopedKotlinName = callableId.embedFunctionName(callableType)
 
+/**
+ * We store here all the __Kotlin__ functions that need a (fully) special `ExpEmbedding`.
+ * `byName` is stateless - it always stores the same Kotlin functions
+ * and corresponding embeddings.
+ */
 object SpecialKotlinFunctions {
     private val contractBuilderTypeName = buildName {
         packageScope(listOf("kotlin", "contracts"))
