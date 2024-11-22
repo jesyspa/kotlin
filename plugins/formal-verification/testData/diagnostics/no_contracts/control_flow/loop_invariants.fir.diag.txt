@@ -7,7 +7,7 @@ method f$dynamicLambdaInvariant$TF$TF$(p$f: Ref) returns (ret$0: Ref)
   label lbl$continue$0
   anon$0 := f$returnsBoolean$TF$()
   while (df$rt$boolFromRef(anon$0))
-    invariant df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
+    invariant df$rt$isSubtype(df$rt$typeOf(p$f), df$rt$functionType())
   {
     var anon$1: Ref
     inhale df$rt$isSubtype(df$rt$typeOf(anon$1), df$rt$intType())
@@ -33,7 +33,8 @@ method f$functionAssignment$TF$TF$(p$f: Ref) returns (ret$0: Ref)
   label lbl$continue$0
   anon$0 := f$returnsBoolean$TF$()
   while (df$rt$boolFromRef(anon$0))
-    invariant df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
+    invariant df$rt$isSubtype(df$rt$typeOf(l0$g), df$rt$functionType())
+    invariant df$rt$isSubtype(df$rt$typeOf(p$f), df$rt$functionType())
   {
     var anon$1: Ref
     inhale df$rt$isSubtype(df$rt$typeOf(anon$1), df$rt$intType())
@@ -66,7 +67,10 @@ method f$conditionalFunctionAssignment$TF$T$Boolean$TF$$TF$(p$b: Ref, p$f: Ref,
   label lbl$continue$0
   anon$0 := f$returnsBoolean$TF$()
   while (df$rt$boolFromRef(anon$0))
-    invariant df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
+    invariant df$rt$isSubtype(df$rt$typeOf(l0$g), df$rt$functionType())
+    invariant df$rt$isSubtype(df$rt$typeOf(p$b), df$rt$boolType())
+    invariant df$rt$isSubtype(df$rt$typeOf(p$f), df$rt$functionType())
+    invariant df$rt$isSubtype(df$rt$typeOf(p$h), df$rt$functionType())
   {
     var anon$1: Ref
     inhale df$rt$isSubtype(df$rt$typeOf(anon$1), df$rt$intType())

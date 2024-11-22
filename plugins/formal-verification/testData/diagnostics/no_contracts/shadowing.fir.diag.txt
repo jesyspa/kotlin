@@ -54,7 +54,10 @@ method f$shadowNested$TF$T$Int(p$x: Ref) returns (ret$0: Ref)
     label lbl$continue$0
     anon$0 := df$rt$boolToRef(true)
     while (df$rt$boolFromRef(anon$0))
-      invariant df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
+      invariant df$rt$isSubtype(df$rt$typeOf(l2$x), df$rt$intType())
+      invariant df$rt$isSubtype(df$rt$typeOf(l0$foo), df$rt$intType())
+      invariant df$rt$isSubtype(df$rt$typeOf(l0$x), df$rt$intType())
+      invariant df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$intType())
     {
       var l3$x: Ref
       l0$foo := l2$x
