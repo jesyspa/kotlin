@@ -7,6 +7,7 @@ package org.jetbrains.kotlin.formver.embeddings.types
 
 import org.jetbrains.kotlin.formver.embeddings.FieldEmbedding
 import org.jetbrains.kotlin.formver.embeddings.expression.*
+import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.Implies
 import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.formver.viper.ast.PermExp
 
@@ -33,6 +34,11 @@ data class SubTypeInvariantEmbedding(val type: RuntimeTypeHolder) : TypeInvarian
 data class IfNonNullInvariant(val invariant: TypeInvariantEmbedding) : TypeInvariantEmbedding {
     override fun fillHole(exp: ExpEmbedding): ExpEmbedding =
         Implies(NeCmp(exp, NullLit), invariant.fillHole(exp.withType(exp.type.getNonNullable())))
+}
+
+data class FieldEqualsInvariant(val field: FieldEmbedding, val comparedWith: ExpEmbedding) : TypeInvariantEmbedding {
+    override fun fillHole(exp: ExpEmbedding): ExpEmbedding =
+        EqCmp(PrimitiveFieldAccess(exp, field), comparedWith)
 }
 
 data class FieldAccessTypeInvariantEmbedding(val field: FieldEmbedding, val perm: PermExp) : TypeInvariantEmbedding {

@@ -11,7 +11,12 @@ import org.jetbrains.kotlin.formver.viper.ast.PermExp
 import org.jetbrains.kotlin.formver.viper.ast.Predicate
 import org.jetbrains.kotlin.utils.addToStdlib.ifTrue
 
-class ClassEmbeddingDetails(val type: ClassTypeEmbedding, val isInterface: Boolean) : TypeInvariantHolder {
+class ClassEmbeddingDetails(
+    val type: ClassTypeEmbedding,
+    val isInterface: Boolean,
+    private val sharedPredicateEnhancer: ClassPredicateEnhancer? = null,
+    private val uniquePredicateEnhancer: ClassPredicateEnhancer? = null,
+) : TypeInvariantHolder {
     private var _superTypes: List<PretypeEmbedding>? = null
     val superTypes: List<PretypeEmbedding>
         get() = _superTypes ?: error("Super types of ${type.name} have not been initialised yet.")
@@ -37,7 +42,7 @@ class ClassEmbeddingDetails(val type: ClassTypeEmbedding, val isInterface: Boole
     fun initFields(newFields: Map<SimpleKotlinName, FieldEmbedding>) {
         check(_fields == null) { "Fields of ${type.name} are already initialised." }
         _fields = newFields
-        _sharedPredicate = ClassPredicateBuilder.Companion.build(this, sharedPredicateName) {
+        _sharedPredicate = ClassPredicateBuilder.build(this, sharedPredicateName) {
             forEachField {
                 if (isAlwaysReadable) {
                     addAccessPermissions(PermExp.WildcardPerm())
@@ -50,8 +55,9 @@ class ClassEmbeddingDetails(val type: ClassTypeEmbedding, val isInterface: Boole
             forEachSuperType {
                 addAccessToSharedPredicate()
             }
+            sharedPredicateEnhancer?.applyAdditionalAssertions(this)
         }
-        _uniquePredicate = ClassPredicateBuilder.Companion.build(this, uniquePredicateName) {
+        _uniquePredicate = ClassPredicateBuilder.build(this, uniquePredicateName) {
             forEachField {
                 if (isAlwaysReadable) {
                     addAccessPermissions(PermExp.WildcardPerm())
@@ -69,6 +75,7 @@ class ClassEmbeddingDetails(val type: ClassTypeEmbedding, val isInterface: Boole
             forEachSuperType {
                 addAccessToUniquePredicate()
             }
+            uniquePredicateEnhancer?.applyAdditionalAssertions(this)
         }
     }
 
