@@ -499,6 +499,12 @@ public class FirLightTreeFormVerPluginDiagnosticsTestGenerated extends AbstractF
       runTest("plugins/formal-verification/testData/diagnostics/verifies/unit_return_type.kt");
     }
 
+    @Test
+    @TestMetadata("while.kt")
+    public void testWhile() {
+      runTest("plugins/formal-verification/testData/diagnostics/verifies/while.kt");
+    }
+
     @Nested
     @TestMetadata("plugins/formal-verification/testData/diagnostics/verifies/contracts")
     @TestDataPath("$PROJECT_ROOT")
