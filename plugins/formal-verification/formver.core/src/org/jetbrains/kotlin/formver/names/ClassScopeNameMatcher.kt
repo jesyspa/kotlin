@@ -24,13 +24,17 @@ internal sealed class NameMatcher(val name: MangledName) {
     protected val packageName = scopedName?.scope?.packageNameIfAny
     protected abstract val className: ClassKotlinName?
 
-    inline fun ifPackageName(vararg segments: String, action: NameMatcher.() -> Unit) {
-        if (packageName == FqName.fromSegments(segments.toList()))
+    inline fun ifPackageName(matched: List<String>, action: NameMatcher.() -> Unit) {
+        if (packageName == FqName.fromSegments(matched))
             this.action()
     }
 
+    inline fun ifPackageName(vararg segments: String, action: NameMatcher.() -> Unit) {
+        ifPackageName(segments.toList(), action)
+    }
+
     inline fun ifInCollectionsPkg(action: NameMatcher.() -> Unit) {
-        ifPackageName("kotlin", "collections") { this.action() }
+        ifPackageName(SpecialPackages.collections) { this.action() }
     }
 
     inline fun ifClassName(vararg segments: String, action: NameMatcher.() -> Unit) {

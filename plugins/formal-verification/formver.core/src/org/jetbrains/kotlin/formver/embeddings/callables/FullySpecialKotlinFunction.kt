@@ -36,12 +36,16 @@ fun SpecialKotlinFunction.embedName(): ScopedKotlinName = callableId.embedFuncti
  */
 object SpecialKotlinFunctions {
     private val contractBuilderTypeName = buildName {
-        packageScope(listOf("kotlin", "contracts"))
+        packageScope(SpecialPackages.contracts)
         ClassKotlinName(listOf("ContractBuilder"))
     }
     private val booleanArrayTypeName = buildName {
-        packageScope(listOf("kotlin"))
+        packageScope(SpecialPackages.kotlin)
         ClassKotlinName(listOf("BooleanArray"))
+    }
+    private val invariantBuilderTypeName = buildName {
+        packageScope(SpecialPackages.formver)
+        ClassKotlinName(listOf("InvariantBuilder"))
     }
 
     val byName: Map<MangledName, FunctionEmbedding> = buildFullySpecialFunctions {
@@ -51,16 +55,16 @@ object SpecialKotlinFunctions {
             withReturnType { int() }
         }
         withCallableType(intIntToIntType) {
-            addFunction("kotlin", className = "Int", name = "plus") { args, _ ->
+            addFunction(SpecialPackages.kotlin, className = "Int", name = "plus") { args, _ ->
                 AddIntInt(args[0], args[1])
             }
-            addFunction("kotlin", className = "Int", name = "minus") { args, _ ->
+            addFunction(SpecialPackages.kotlin, className = "Int", name = "minus") { args, _ ->
                 SubIntInt(args[0], args[1])
             }
-            addFunction("kotlin", className = "Int", name = "times") { args, _ ->
+            addFunction(SpecialPackages.kotlin, className = "Int", name = "times") { args, _ ->
                 MulIntInt(args[0], args[1])
             }
-            addFunction("kotlin", className = "Int", name = "div") { args, _ ->
+            addFunction(SpecialPackages.kotlin, className = "Int", name = "div") { args, _ ->
                 blockOf(
                     InhaleDirect(NeCmp(args[1], IntLit(0))),
                     DivIntInt(args[0], args[1]),
@@ -87,7 +91,7 @@ object SpecialKotlinFunctions {
             withReturnType { boolean() }
         }
 
-        addFunction(booleanToBooleanType, "kotlin", className = "Boolean", name = "not") { args, _ ->
+        addFunction(booleanToBooleanType, SpecialPackages.kotlin, className = "Boolean", name = "not") { args, _ ->
             Not(args[0])
         }
 
@@ -99,8 +103,25 @@ object SpecialKotlinFunctions {
             }
             withReturnType { unit() }
         }
-        addFunction(verifyCallableType, "org", "jetbrains", "kotlin", "formver", "plugin", name = "verify") { args, _ ->
+        addFunction(verifyCallableType, SpecialPackages.formver, name = "verify") { args, _ ->
             args.map { Assert(it) }.toBlock()
+        }
+
+        val loopInvariantsCallableType = buildFunctionPretype {
+            withParam {
+                function {
+                    withDispatchReceiver {
+                        klass {
+                            withName(invariantBuilderTypeName)
+                        }
+                    }
+                    withReturnType { unit() }
+                }
+            }
+            withReturnType { unit() }
+        }
+        addFunction(loopInvariantsCallableType, SpecialPackages.formver, name = "loopInvariants") { _, _ ->
+            UnitLit
         }
 
         val contractCallableType = buildFunctionPretype {
@@ -117,7 +138,7 @@ object SpecialKotlinFunctions {
             withReturnType { unit() }
         }
 
-        addFunction(contractCallableType, "kotlin", "contracts", name = "contract") { _, _ ->
+        addFunction(contractCallableType, SpecialPackages.contracts, name = "contract") { _, _ ->
             UnitLit
         }
 
@@ -127,7 +148,7 @@ object SpecialKotlinFunctions {
             withReturnType { int() }
         }
 
-        addFunction(charCharToIntType, "kotlin", className = "Char", name = "minus") { args, _ ->
+        addFunction(charCharToIntType, SpecialPackages.kotlin, className = "Char", name = "minus") { args, _ ->
             SubCharChar(args[0], args[1])
         }
 
@@ -138,10 +159,10 @@ object SpecialKotlinFunctions {
         }
 
         withCallableType(charIntToCharType) {
-            addFunction("kotlin", className = "Char", name = "plus") { args, _ ->
+            addFunction(SpecialPackages.kotlin, className = "Char", name = "plus") { args, _ ->
                 AddCharInt(args[0], args[1])
             }
-            addFunction("kotlin", className = "Char", name = "minus") { args, _ ->
+            addFunction(SpecialPackages.kotlin, className = "Char", name = "minus") { args, _ ->
                 SubCharInt(args[0], args[1])
             }
         }
@@ -152,7 +173,7 @@ object SpecialKotlinFunctions {
             withReturnType { char() }
         }
 
-        addFunction(stringIntToCharType, "kotlin", className = "String", name = "get") { args, _ ->
+        addFunction(stringIntToCharType, SpecialPackages.kotlin, className = "String", name = "get") { args, _ ->
             StringGet(args[0], args[1])
         }
 
@@ -162,17 +183,23 @@ object SpecialKotlinFunctions {
             withReturnType { string() }
         }
 
-        addFunction(stringStringToStringType, "kotlin", className = "String", name = "plus") { args, _ ->
+        addFunction(stringStringToStringType, SpecialPackages.kotlin, className = "String", name = "plus") { args, _ ->
             AddStringString(args[0], args[1])
         }
     }
 }
 
 val FunctionEmbedding.isVerifyFunction: Boolean
-    get() = this is FullySpecialKotlinFunction && NameMatcher.matchClassScope(this.embedName()) {
-        ifPackageName("org", "jetbrains", "kotlin", "formver", "plugin") {
+    get() = isFormverPluginFunctionNamed("verify")
+
+val FunctionEmbedding.isLoopInvariantsFunction: Boolean
+    get() = isFormverPluginFunctionNamed("loopInvariants")
+
+fun FunctionEmbedding.isFormverPluginFunctionNamed(name: String): Boolean =
+    this is FullySpecialKotlinFunction && NameMatcher.matchClassScope(this.embedName()) {
+        ifPackageName(SpecialPackages.formver) {
             ifNoReceiver {
-                ifFunctionName("verify") {
+                ifFunctionName(name) {
                     return true
                 }
             }
