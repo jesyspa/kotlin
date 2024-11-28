@@ -183,7 +183,6 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext>()
         comparisonExpression: FirComparisonExpression,
         data: StmtConversionContext,
     ): ExpEmbedding {
-        //TODO: replace with call to all non-Int types
         val dispatchReceiver = checkNotNull(comparisonExpression.compareToCall.dispatchReceiver) {
             "found 'compareTo' call with null receiver"
         }
