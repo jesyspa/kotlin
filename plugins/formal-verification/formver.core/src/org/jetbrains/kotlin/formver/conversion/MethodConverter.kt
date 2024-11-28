@@ -71,4 +71,10 @@ class MethodConverter(
     override val defaultResolvedReturnTarget = paramResolver.defaultResolvedReturnTarget
     override fun resolveNamedReturnTarget(labelName: String): ReturnTarget? =
         paramResolver.resolveNamedReturnTarget(labelName) ?: parent?.resolveNamedReturnTarget(labelName)
+
+    override fun retrievePropertiesAndParameters(): Sequence<VariableEmbedding> = sequence {
+        yieldAll(propertyResolver.retrieveAllProperties())
+        yieldAll(paramResolver.retrieveAllParams())
+        parent?.retrievePropertiesAndParameters()?.let { yieldAll(it) }
+    }
 }
