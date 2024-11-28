@@ -13,58 +13,77 @@ import org.jetbrains.kotlin.formver.embeddings.asInfo
 import org.jetbrains.kotlin.formver.embeddings.expression.debug.PlaintextLeaf
 import org.jetbrains.kotlin.formver.embeddings.expression.debug.TreeView
 import org.jetbrains.kotlin.formver.embeddings.types.buildType
+import org.jetbrains.kotlin.formver.embeddings.types.injection
 import org.jetbrains.kotlin.formver.linearization.LinearizationContext
 import org.jetbrains.kotlin.formver.viper.ast.Exp
+import org.jetbrains.kotlin.formver.viper.ast.viperLiteral
 
-data object UnitLit : UnitResultExpEmbedding {
+interface LiteralEmbedding : PureExpEmbedding {
+    val value: Any?
+
+    override val debugExtraSubtrees: List<TreeView>
+        get() = listOf(PlaintextLeaf(value.toString()))
+
+    override fun toViper(source: KtSourceElement?): Exp =
+        type.injection.toRef(
+            value.viperLiteral(source.asPosition, sourceRole.asInfo),
+            pos = source.asPosition,
+            info = sourceRole.asInfo,
+        )
+}
+
+data object UnitLit : LiteralEmbedding, UnitResultExpEmbedding {
+    override fun toViper(ctx: LinearizationContext): Exp =
+        super<UnitResultExpEmbedding>.toViper(ctx)
+
+    override fun toViperUnusedResult(ctx: LinearizationContext) =
+        super<UnitResultExpEmbedding>.toViperUnusedResult(ctx)
+
     // No operation: we just want to return unit.
     override fun toViperSideEffects(ctx: LinearizationContext) = Unit
 
-    override val debugTreeView: TreeView
-        get() = PlaintextLeaf("Unit")
+    override val value = Unit
 }
 
-data class IntLit(val value: Int) : PureExpEmbedding {
+data class IntLit(override val value: Int) : LiteralEmbedding {
     override val type = buildType { int() }
-    override fun toViper(source: KtSourceElement?): Exp =
-        RuntimeTypeDomain.intInjection.toRef(
-            Exp.IntLit(value, source.asPosition, sourceRole.asInfo),
-            pos = source.asPosition,
-            info = sourceRole.asInfo
-        )
 
-    override val debugName: String
-        get() = "Int"
-
-    override val debugExtraSubtrees: List<TreeView>
-        get() = listOf(PlaintextLeaf(value.toString()))
+    override val debugName = "Int"
 }
 
-data class BooleanLit(val value: Boolean, override val sourceRole: SourceRole? = null) : PureExpEmbedding {
+data class BooleanLit(
+    override val value: Boolean,
+    override val sourceRole: SourceRole? = null
+) : LiteralEmbedding {
+
     override val type = buildType { boolean() }
-    override fun toViper(source: KtSourceElement?): Exp =
-        RuntimeTypeDomain.boolInjection.toRef(
-            Exp.BoolLit(value, source.asPosition, sourceRole.asInfo),
-            pos = source.asPosition,
-            info = sourceRole.asInfo
-        )
 
-    override val debugName: String
-        get() = "Boolean"
-
-    override val debugExtraSubtrees: List<TreeView>
-        get() = listOf(PlaintextLeaf(value.toString()))
+    override val debugName = "Boolean"
 }
 
-data object NullLit : PureExpEmbedding {
+data class CharLit(
+    override val value: Char,
+) : LiteralEmbedding {
+    override val type = buildType { char() }
+
+    override val debugName: String = "Char"
+}
+
+data class StringLit(
+    override val value: String,
+) : LiteralEmbedding {
+    override val type = buildType { string() }
+
+    override val debugName: String = "String"
+}
+
+data object NullLit : LiteralEmbedding {
+    override val value = null
+
     override val type = buildType { isNullable = true; nothing() }
     override fun toViper(source: KtSourceElement?): Exp =
         RuntimeTypeDomain.nullValue(pos = source.asPosition)
 
-    override val debugName: String
-        get() = "Null"
-
-    override val debugExtraSubtrees: List<TreeView>
-        get() = listOf(PlaintextLeaf("null"))
+    override val debugName = "Null"
 }
 

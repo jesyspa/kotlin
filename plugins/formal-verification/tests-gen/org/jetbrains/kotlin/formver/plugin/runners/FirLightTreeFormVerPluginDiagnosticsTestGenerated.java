@@ -640,5 +640,27 @@ public class FirLightTreeFormVerPluginDiagnosticsTestGenerated extends AbstractF
         runTest("plugins/formal-verification/testData/diagnostics/verifies/properties_and_fields/private_properties.kt");
       }
     }
+
+    @Nested
+    @TestMetadata("plugins/formal-verification/testData/diagnostics/verifies/string")
+    @TestDataPath("$PROJECT_ROOT")
+    public class String {
+      @Test
+      public void testAllFilesPresentInString() {
+        KtTestUtil.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("plugins/formal-verification/testData/diagnostics/verifies/string"), Pattern.compile("^(.+)\\.kt$"), null, true);
+      }
+
+      @Test
+      @TestMetadata("chars.kt")
+      public void testChars() {
+        runTest("plugins/formal-verification/testData/diagnostics/verifies/string/chars.kt");
+      }
+
+      @Test
+      @TestMetadata("strings.kt")
+      public void testStrings() {
+        runTest("plugins/formal-verification/testData/diagnostics/verifies/string/strings.kt");
+      }
+    }
   }
 }

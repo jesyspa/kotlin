@@ -8,6 +8,7 @@ package org.jetbrains.kotlin.formver.embeddings.types
 import org.jetbrains.kotlin.formver.domains.RuntimeTypeDomain
 import org.jetbrains.kotlin.formver.names.NameMatcher
 import org.jetbrains.kotlin.formver.names.ScopedKotlinName
+import org.jetbrains.kotlin.formver.viper.ast.DomainFunc
 import org.jetbrains.kotlin.formver.viper.ast.Exp
 
 // TODO: incorporate generic parameters.
@@ -24,8 +25,7 @@ data class ClassTypeEmbedding(override val name: ScopedKotlinName) : PretypeEmbe
     val hasDetails: Boolean
         get() = _details != null
 
-    val runtimeTypeFunc = RuntimeTypeDomain.Companion.classTypeFunc(name)
-    override val runtimeType: Exp = runtimeTypeFunc()
+    override val runtimeType: Exp = this.embedClassTypeFunc()()
 
     override fun accessInvariants(): List<TypeInvariantEmbedding> = details.accessInvariants()
 
@@ -56,3 +56,17 @@ private fun PretypeEmbedding.isCollectionTypeNamed(name: String): Boolean {
         return false
     }
 }
+
+val ClassTypeEmbedding.isString: Boolean
+    get() = NameMatcher.matchGlobalScope(name) {
+        ifPackageName("kotlin") {
+            ifClassName("String") {
+                return true
+            }
+        }
+        return false
+    }
+
+fun ClassTypeEmbedding.embedClassTypeFunc(): DomainFunc =
+    if (isString) RuntimeTypeDomain.stringType
+    else RuntimeTypeDomain.classTypeFunc(name)
