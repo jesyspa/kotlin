@@ -6,8 +6,8 @@
 package org.jetbrains.kotlin.formver.conversion
 
 import org.jetbrains.kotlin.KtSourceElement
-import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.descriptors.Visibilities
+import org.jetbrains.kotlin.descriptors.isInterface
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.declarations.FirSimpleFunction
 import org.jetbrains.kotlin.fir.declarations.utils.*
@@ -21,16 +21,7 @@ import org.jetbrains.kotlin.formver.domains.RuntimeTypeDomain
 import org.jetbrains.kotlin.formver.embeddings.*
 import org.jetbrains.kotlin.formver.embeddings.callables.*
 import org.jetbrains.kotlin.formver.embeddings.expression.*
-import org.jetbrains.kotlin.formver.embeddings.types.ClassEmbeddingDetails
-import org.jetbrains.kotlin.formver.embeddings.types.TypeEmbedding
-import org.jetbrains.kotlin.formver.embeddings.types.ClassTypeEmbedding
-import org.jetbrains.kotlin.formver.embeddings.types.FunctionPretypeBuilder
-import org.jetbrains.kotlin.formver.embeddings.types.FunctionTypeEmbedding
-import org.jetbrains.kotlin.formver.embeddings.types.PretypeBuilder
-import org.jetbrains.kotlin.formver.embeddings.types.TypeBuilder
-import org.jetbrains.kotlin.formver.embeddings.types.buildClassPretype
-import org.jetbrains.kotlin.formver.embeddings.types.buildFunctionPretype
-import org.jetbrains.kotlin.formver.embeddings.types.buildType
+import org.jetbrains.kotlin.formver.embeddings.types.*
 import org.jetbrains.kotlin.formver.linearization.Linearizer
 import org.jetbrains.kotlin.formver.linearization.SeqnBuilder
 import org.jetbrains.kotlin.formver.linearization.SharedLinearizationState
@@ -49,7 +40,11 @@ import org.jetbrains.kotlin.utils.addToStdlib.ifTrue
  */
 class ProgramConverter(val session: FirSession, override val config: PluginConfiguration, override val errorCollector: ErrorCollector) :
     ProgramConversionContext {
-    private val methods: MutableMap<MangledName, FunctionEmbedding> = SpecialKotlinFunctions.byName.toMutableMap()
+    private val methods: MutableMap<MangledName, FunctionEmbedding> =
+        buildMap {
+            putAll(SpecialKotlinFunctions.byName)
+            putAll(PartiallySpecialKotlinFunctions.generateAllByName())
+        }.toMutableMap()
     private val classes: MutableMap<MangledName, ClassTypeEmbedding> = mutableMapOf()
     private val properties: MutableMap<MangledName, PropertyEmbedding> = mutableMapOf()
     private val fields: MutableSet<FieldEmbedding> = mutableSetOf()
@@ -119,12 +114,29 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         }
     }
 
-    override fun embedFunction(symbol: FirFunctionSymbol<*>): FunctionEmbedding =
-        methods.getOrPut(symbol.embedName(this)) {
-            val signature = embedFullSignature(symbol)
-            val callable = processCallable(symbol, signature)
-            UserFunctionEmbedding(callable)
+    override fun embedFunction(symbol: FirFunctionSymbol<*>): FunctionEmbedding {
+        val lookupName = symbol.embedName(this)
+        return when (val existing = methods[lookupName]) {
+            null -> {
+                val signature = embedFullSignature(symbol)
+                val callable = processCallable(symbol, signature)
+                UserFunctionEmbedding(callable).also {
+                    methods[lookupName] = it
+                }
+            }
+            is PartiallySpecialKotlinFunction -> {
+                if (existing.baseEmbedding != null)
+                    return existing
+                val signature = embedFullSignature(symbol)
+                val callable = processCallable(symbol, signature)
+                val userFunction = UserFunctionEmbedding(callable)
+                existing.also {
+                    it.initBaseEmbedding(userFunction)
+                }
+            }
+            else -> existing
         }
+    }
 
     /**
      * Returns an embedding of the class type, with details set.
@@ -138,7 +150,10 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         }
         if (embedding.hasDetails) return embedding
 
-        val newDetails = ClassEmbeddingDetails(embedding, symbol.classKind == ClassKind.INTERFACE)
+        val sharedPredicateEnhancer = embedding.isString.ifTrue {
+            StringSharedPredicateEnhancer
+        }
+        val newDetails = ClassEmbeddingDetails(embedding, symbol.classKind.isInterface, sharedPredicateEnhancer)
         embedding.initDetails(newDetails)
 
         // The full class embedding is necessary to process the signatures of the properties of the class, since
@@ -289,7 +304,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
                     }
                 }
                 return if (invariants.isEmpty()) null
-                else UnfoldingClassPredicateEmbedding(returnVariable, invariants.toConjunction())
+                else UnfoldingSharedClassPredicateEmbedding(returnVariable, invariants.toConjunction())
             }
 
             override val declarationSource: KtSourceElement? = symbol.source
@@ -409,6 +424,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
             isNullable = true; any()
         }
         type.isUnit -> unit()
+        type.isChar -> char()
         type.isInt -> int()
         type.isBoolean -> boolean()
         type.isNothing -> nothing()

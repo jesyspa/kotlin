@@ -16,6 +16,7 @@ import org.jetbrains.kotlin.formver.effects
 import org.jetbrains.kotlin.formver.embeddings.SourceRole
 import org.jetbrains.kotlin.formver.embeddings.callables.NamedFunctionSignature
 import org.jetbrains.kotlin.formver.embeddings.expression.*
+import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings
 
 data class ContractVisitorContext(
     val returnVariable: VariableEmbedding,
@@ -92,8 +93,10 @@ class ContractDescriptionConversionVisitor(
         val lhsRole = left.sourceRole as SourceRole.Condition
         val rhsRole = right.sourceRole as SourceRole.Condition
         return when (binaryLogicExpression.kind) {
-            LogicOperationKind.AND -> And(left, right, SourceRole.Condition.Conjunction(lhsRole, rhsRole))
-            LogicOperationKind.OR -> Or(left, right, SourceRole.Condition.Disjunction(lhsRole, rhsRole))
+            LogicOperationKind.AND ->
+                OperatorExpEmbeddings.And(left, right, SourceRole.Condition.Conjunction(lhsRole, rhsRole))
+            LogicOperationKind.OR ->
+                OperatorExpEmbeddings.Or(left, right, SourceRole.Condition.Disjunction(lhsRole, rhsRole))
         }
     }
 
@@ -102,7 +105,7 @@ class ContractDescriptionConversionVisitor(
         data: ContractVisitorContext,
     ): ExpEmbedding {
         val arg = logicalNot.arg.accept(this, data)
-        return Not(arg, SourceRole.Condition.Negation(arg.sourceRole as SourceRole.Condition))
+        return OperatorExpEmbeddings.Not(arg, SourceRole.Condition.Negation(arg.sourceRole as SourceRole.Condition))
     }
 
     override fun visitConditionalEffectDeclaration(
@@ -113,7 +116,7 @@ class ContractDescriptionConversionVisitor(
         val cond = conditionalEffect.condition.accept(this, data)
         // The effect's source role it is guaranteed to be not null. The same goes for the condition's source role.
         val role = SourceRole.ConditionalEffect(effect.sourceRole as SourceRole.ReturnsEffect, cond.sourceRole as SourceRole.Condition)
-        return Implies(effect, cond, role)
+        return OperatorExpEmbeddings.Implies(effect, cond, role)
     }
 
     override fun visitCallsEffectDeclaration(
@@ -131,7 +134,7 @@ class ContractDescriptionConversionVisitor(
         val argSymbol = isInstancePredicate.arg.getTargetParameter(data)
         val role = SourceRole.Condition.IsType(argSymbol, isInstancePredicate.type, isInstancePredicate.isNegated)
         return if (isInstancePredicate.isNegated) {
-            Not(Is(argVar, ctx.embedType(isInstancePredicate.type)), role)
+            OperatorExpEmbeddings.Not(Is(argVar, ctx.embedType(isInstancePredicate.type)), role)
         } else {
             Is(argVar, ctx.embedType(isInstancePredicate.type), role)
         }
