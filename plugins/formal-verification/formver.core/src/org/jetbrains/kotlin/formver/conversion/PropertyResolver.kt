@@ -52,4 +52,9 @@ class PropertyResolver(
     fun tryResolveLoopName(name: String): Int? =
         if (loopName?.targetName == name) loopName.index
         else parent?.tryResolveLoopName(name)
+
+    fun retrieveAllProperties(): Sequence<VariableEmbedding> = sequence {
+        yieldAll(names.values)
+        parent?.retrieveAllProperties()?.let { yieldAll(it) }
+    }
 }
