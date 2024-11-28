@@ -7,6 +7,8 @@ package org.jetbrains.kotlin.formver.conversion
 
 import org.jetbrains.kotlin.formver.embeddings.callables.FunctionSignature
 import org.jetbrains.kotlin.formver.embeddings.expression.ExpEmbedding
+import org.jetbrains.kotlin.formver.embeddings.expression.VariableEmbedding
+import org.jetbrains.kotlin.formver.embeddings.expression.underlyingVariable
 import org.jetbrains.kotlin.formver.names.ExtraSpecialNames
 import org.jetbrains.kotlin.formver.names.embedParameterName
 import org.jetbrains.kotlin.name.Name
@@ -21,6 +23,8 @@ interface ParameterResolver {
     fun tryResolveParameter(name: Name): ExpEmbedding?
     fun tryResolveDispatchReceiver(): ExpEmbedding?
     fun tryResolveExtensionReceiver(labelName: String): ExpEmbedding?
+
+    fun retrieveAllParams(): Sequence<VariableEmbedding>
 
     val labelName: String?
     val defaultResolvedReturnTarget: ReturnTarget
@@ -41,6 +45,10 @@ class RootParameterResolver(
     override fun tryResolveExtensionReceiver(labelName: String) = (labelName == this.labelName).ifTrue {
         signature.extensionReceiver
     }
+
+    override fun retrieveAllParams(): Sequence<VariableEmbedding> = sequence {
+        yieldAll(signature.params)
+    }
 }
 
 class InlineParameterResolver(
@@ -52,5 +60,9 @@ class InlineParameterResolver(
     override fun tryResolveDispatchReceiver() = substitutions[ExtraSpecialNames.DISPATCH_THIS]
     override fun tryResolveExtensionReceiver(labelName: String) = (labelName == this.labelName).ifTrue {
         substitutions[ExtraSpecialNames.EXTENSION_THIS]
+    }
+
+    override fun retrieveAllParams(): Sequence<VariableEmbedding> = sequence {
+        yieldAll(substitutions.values.asSequence().map { it.underlyingVariable!! })
     }
 }

@@ -41,6 +41,7 @@ import org.jetbrains.kotlin.formver.embeddings.types.equalToType
 import org.jetbrains.kotlin.formver.functionCallArguments
 import org.jetbrains.kotlin.text
 import org.jetbrains.kotlin.types.ConstantValueKind
+import org.jetbrains.kotlin.utils.addIfNotNull
 
 /**
  * Convert a statement, emitting the resulting Viper statements and
@@ -286,10 +287,11 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext>()
 
     override fun visitWhileLoop(whileLoop: FirWhileLoop, data: StmtConversionContext): ExpEmbedding {
         val condition = data.convert(whileLoop.condition).withType { boolean() }
-        val returnTarget = data.defaultResolvedReturnTarget
-        val invariants = when (val sig = data.signature) {
-            is FullNamedFunctionSignature -> sig.getPostconditions(returnTarget.variable)
-            else -> listOf()
+        val invariants = buildList {
+            data.retrievePropertiesAndParameters().forEach {
+                addIfNotNull(it.sharedPredicateAccessInvariant())
+                addAll(it.provenInvariants())
+            }
         }
         return data.withFreshWhile(whileLoop.label) {
             val body = convert(whileLoop.block)
