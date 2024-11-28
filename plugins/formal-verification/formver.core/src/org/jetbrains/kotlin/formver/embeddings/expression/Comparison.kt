@@ -47,43 +47,6 @@ sealed interface AnyComparisonExpression : BinaryDirectResultExpEmbedding {
         )
 }
 
-sealed interface IntComparisonExpression : OperationBaseExpEmbedding {
-    override val type
-        get() = buildType { boolean() }
-}
-
-data class LtCmp(
-    override val left: ExpEmbedding,
-    override val right: ExpEmbedding,
-    override val sourceRole: SourceRole? = null,
-) : IntComparisonExpression {
-    override val refsOperation: InjectionImageFunction = RuntimeTypeDomain.ltInts
-}
-
-data class LeCmp(
-    override val left: ExpEmbedding,
-    override val right: ExpEmbedding,
-    override val sourceRole: SourceRole? = null,
-) : IntComparisonExpression {
-    override val refsOperation: InjectionImageFunction = RuntimeTypeDomain.leInts
-}
-
-data class GtCmp(
-    override val left: ExpEmbedding,
-    override val right: ExpEmbedding,
-    override val sourceRole: SourceRole? = null,
-) : IntComparisonExpression {
-    override val refsOperation: InjectionImageFunction = RuntimeTypeDomain.gtInts
-}
-
-data class GeCmp(
-    override val left: ExpEmbedding,
-    override val right: ExpEmbedding,
-    override val sourceRole: SourceRole? = null,
-) : IntComparisonExpression {
-    override val refsOperation: InjectionImageFunction = RuntimeTypeDomain.geInts
-}
-
 data class EqCmp(
     override val left: ExpEmbedding,
     override val right: ExpEmbedding,

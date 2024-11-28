@@ -8,6 +8,12 @@ package org.jetbrains.kotlin.formver.conversion
 import org.jetbrains.kotlin.formver.embeddings.*
 import org.jetbrains.kotlin.formver.embeddings.callables.NamedFunctionSignature
 import org.jetbrains.kotlin.formver.embeddings.expression.*
+import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.GeIntInt
+import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.GtIntInt
+import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.Implies
+import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.LeIntInt
+import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.Not
+import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.SubIntInt
 import org.jetbrains.kotlin.formver.embeddings.types.isInheritorOfCollectionTypeNamed
 import org.jetbrains.kotlin.formver.names.NameMatcher
 
@@ -15,7 +21,10 @@ private fun VariableEmbedding.sameSize(): ExpEmbedding =
     EqCmp(FieldAccess(this, ListSizeFieldEmbedding), Old(FieldAccess(this, ListSizeFieldEmbedding)))
 
 private fun VariableEmbedding.increasedSize(amount: Int): ExpEmbedding =
-    EqCmp(FieldAccess(this, ListSizeFieldEmbedding), Add(Old(FieldAccess(this, ListSizeFieldEmbedding)), IntLit(amount)))
+    EqCmp(
+        FieldAccess(this, ListSizeFieldEmbedding),
+        OperatorExpEmbeddings.AddIntInt(Old(FieldAccess(this, ListSizeFieldEmbedding)), IntLit(amount)),
+    )
 
 sealed interface StdLibReceiverInterface {
     fun match(function: NamedFunctionSignature): Boolean
@@ -86,12 +95,12 @@ data object GetPrecondition : StdLibPrecondition {
         val receiver = function.dispatchReceiver!!
         val indexArg = function.formalArgs[1]
         return listOf(
-            GeCmp(
+            GeIntInt(
                 indexArg,
                 IntLit(0),
                 SourceRole.ListElementAccessCheck(SourceRole.ListElementAccessCheck.AccessCheckType.LESS_THAN_ZERO)
             ),
-            GtCmp(
+            GtIntInt(
                 FieldAccess(receiver, ListSizeFieldEmbedding),
                 indexArg,
                 SourceRole.ListElementAccessCheck(SourceRole.ListElementAccessCheck.AccessCheckType.GREATER_THAN_LIST_SIZE)
@@ -109,9 +118,9 @@ data object SubListPrecondition : StdLibPrecondition {
         val fromIndexArg = function.formalArgs[1]
         val toIndexArg = function.formalArgs[2]
         return listOf(
-            LeCmp(fromIndexArg, toIndexArg, SourceRole.SubListCreation.CheckInSize),
-            GeCmp(fromIndexArg, IntLit(0), SourceRole.SubListCreation.CheckNegativeIndices),
-            LeCmp(toIndexArg, FieldAccess(receiver, ListSizeFieldEmbedding), SourceRole.SubListCreation.CheckInSize)
+            LeIntInt(fromIndexArg, toIndexArg, SourceRole.SubListCreation.CheckInSize),
+            GeIntInt(fromIndexArg, IntLit(0), SourceRole.SubListCreation.CheckNegativeIndices),
+            LeIntInt(toIndexArg, FieldAccess(receiver, ListSizeFieldEmbedding), SourceRole.SubListCreation.CheckInSize)
         )
     }
 
@@ -136,7 +145,7 @@ data object IsEmptyPostcondition : StdLibPostcondition {
         return listOf(
             receiver.sameSize(),
             Implies(returnVariable, EqCmp(FieldAccess(receiver, ListSizeFieldEmbedding), IntLit(0))),
-            Implies(Not(returnVariable), GtCmp(FieldAccess(receiver, ListSizeFieldEmbedding), IntLit(0)))
+            Implies(Not(returnVariable), GtIntInt(FieldAccess(receiver, ListSizeFieldEmbedding), IntLit(0)))
         )
     }
 
@@ -159,7 +168,7 @@ data object SubListPostcondition : StdLibPostcondition {
         val toIndexArg = function.formalArgs[2]
         return listOf(
             function.dispatchReceiver!!.sameSize(),
-            EqCmp(FieldAccess(returnVariable, ListSizeFieldEmbedding), Sub(toIndexArg, fromIndexArg))
+            EqCmp(FieldAccess(returnVariable, ListSizeFieldEmbedding), SubIntInt(toIndexArg, fromIndexArg))
         )
     }
 

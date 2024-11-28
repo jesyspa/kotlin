@@ -73,7 +73,7 @@ method f$recursiveContract$TF$T$Int$NT$Any(p$n: Ref, p$x: Ref)
   returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$boolType())
   ensures df$rt$boolFromRef(ret$0) == true ==>
-    df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$c$pkg$kotlin$String())
+    df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$stringType())
 {
   inhale df$rt$isSubtype(df$rt$typeOf(p$n), df$rt$intType())
   inhale df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$nullable(df$rt$anyType()))
