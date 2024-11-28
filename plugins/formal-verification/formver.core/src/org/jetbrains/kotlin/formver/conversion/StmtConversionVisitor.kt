@@ -287,12 +287,8 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext>()
 
     override fun visitWhileLoop(whileLoop: FirWhileLoop, data: StmtConversionContext): ExpEmbedding {
         val condition = data.convert(whileLoop.condition).withType { boolean() }
-        val returnTarget = data.defaultResolvedReturnTarget
         val invariants = buildList {
-            sequence {
-                yieldAll(data.retrieveAllProperties())
-                yieldAll(data.retrieveAllParameters())
-            }.forEach {
+            data.retrievePropertiesAndParameters().forEach {
                 addIfNotNull(it.sharedPredicateAccessInvariant())
                 addAll(it.provenInvariants())
             }

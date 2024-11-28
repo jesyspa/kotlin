@@ -72,13 +72,9 @@ class MethodConverter(
     override fun resolveNamedReturnTarget(labelName: String): ReturnTarget? =
         paramResolver.resolveNamedReturnTarget(labelName) ?: parent?.resolveNamedReturnTarget(labelName)
 
-    override fun retrieveAllProperties(): Sequence<VariableEmbedding> = sequence {
+    override fun retrievePropertiesAndParameters(): Sequence<VariableEmbedding> = sequence {
         yieldAll(propertyResolver.retrieveAllProperties())
-        parent?.retrieveAllProperties()?.let { yieldAll(it) }
-    }
-
-    override fun retrieveAllParameters(): Sequence<VariableEmbedding> = sequence {
         yieldAll(paramResolver.retrieveAllParams())
-        parent?.retrieveAllParameters()?.let { yieldAll(it) }
+        parent?.retrievePropertiesAndParameters()?.let { yieldAll(it) }
     }
 }

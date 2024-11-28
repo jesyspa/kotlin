@@ -47,8 +47,7 @@ interface MethodConversionContext : ProgramConversionContext {
     fun addLoopIdentifier(labelName: String, index: Int)
     fun resolveLoopIndex(name: String): Int
     fun resolveNamedReturnTarget(labelName: String): ReturnTarget?
-    fun retrieveAllProperties(): Sequence<VariableEmbedding>
-    fun retrieveAllParameters(): Sequence<VariableEmbedding>
+    fun retrievePropertiesAndParameters(): Sequence<VariableEmbedding>
 }
 
 fun MethodConversionContext.resolveReturnTarget(targetSourceName: String?): ReturnTarget =
