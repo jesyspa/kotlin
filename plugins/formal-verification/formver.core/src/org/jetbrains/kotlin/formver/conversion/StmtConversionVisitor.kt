@@ -24,10 +24,20 @@ import org.jetbrains.kotlin.formver.UnsupportedFeatureBehaviour
 import org.jetbrains.kotlin.formver.embeddings.types.TypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.callables.FullNamedFunctionSignature
 import org.jetbrains.kotlin.formver.embeddings.callables.FunctionEmbedding
-import org.jetbrains.kotlin.formver.embeddings.callables.SpecialVerifyFunction
 import org.jetbrains.kotlin.formver.embeddings.callables.insertCall
+import org.jetbrains.kotlin.formver.embeddings.callables.isVerifyFunction
 import org.jetbrains.kotlin.formver.embeddings.expression.*
+import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.GeCharChar
+import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.GeIntInt
+import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.GtCharChar
+import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.GtIntInt
+import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.LeCharChar
+import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.LeIntInt
+import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.LtCharChar
+import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.LtIntInt
+import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.Not
 import org.jetbrains.kotlin.formver.embeddings.types.buildType
+import org.jetbrains.kotlin.formver.embeddings.types.equalToType
 import org.jetbrains.kotlin.formver.functionCallArguments
 import org.jetbrains.kotlin.text
 import org.jetbrains.kotlin.types.ConstantValueKind
@@ -85,6 +95,8 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext>()
         when (literalExpression.kind) {
             ConstantValueKind.Int -> IntLit((literalExpression.value as Long).toInt())
             ConstantValueKind.Boolean -> BooleanLit(literalExpression.value as Boolean)
+            ConstantValueKind.Char -> CharLit(literalExpression.value as Char)
+            ConstantValueKind.String -> StringLit(literalExpression.value as String)
             ConstantValueKind.Null -> NullLit
             else -> handleUnimplementedElement("Constant Expression of type ${literalExpression.kind} is not yet implemented.", data)
         }
@@ -171,7 +183,6 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext>()
         comparisonExpression: FirComparisonExpression,
         data: StmtConversionContext,
     ): ExpEmbedding {
-        //TODO: replace with call to all non-Int types
         val dispatchReceiver = checkNotNull(comparisonExpression.compareToCall.dispatchReceiver) {
             "found 'compareTo' call with null receiver"
         }
@@ -180,12 +191,43 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext>()
         }
         val left = data.convert(dispatchReceiver)
         val right = data.convert(arg)
-        return when (comparisonExpression.operation) {
-            FirOperation.LT -> LtCmp(left, right)
-            FirOperation.LT_EQ -> LeCmp(left, right)
-            FirOperation.GT -> GtCmp(left, right)
-            FirOperation.GT_EQ -> GeCmp(left, right)
-            else -> throw IllegalArgumentException("expected comparison operation but found ${comparisonExpression.operation}")
+
+        val functionSymbol = comparisonExpression.compareToCall.toResolvedCallableSymbol()
+
+        val functionType = data.embedFunctionPretype(functionSymbol as FirFunctionSymbol)
+
+        val comparisonTemplate = when {
+            functionType.formalArgTypes.all { it.equalToType { int() } } -> IntComparisonExpEmbeddingsTemplate
+            functionType.formalArgTypes.all { it.equalToType { char() } } -> CharComparisonExpEmbeddingsTemplate
+            else -> {
+                val result = data.convert(comparisonExpression.compareToCall)
+                return IntComparisonExpEmbeddingsTemplate.retrieve(comparisonExpression.operation)(result, IntLit(0))
+            }
+        }
+        return comparisonTemplate.retrieve(comparisonExpression.operation)(left, right)
+    }
+
+    private interface ComparisonExpEmbeddingsTemplate {
+        fun retrieve(operation: FirOperation): BinaryOperatorExpEmbeddingTemplate
+    }
+
+    private object IntComparisonExpEmbeddingsTemplate : ComparisonExpEmbeddingsTemplate {
+        override fun retrieve(operation: FirOperation) = when (operation) {
+            FirOperation.LT -> LtIntInt
+            FirOperation.LT_EQ -> LeIntInt
+            FirOperation.GT -> GtIntInt
+            FirOperation.GT_EQ -> GeIntInt
+            else -> throw IllegalArgumentException("Expected comparison operation but found ${operation}.")
+        }
+    }
+
+    private object CharComparisonExpEmbeddingsTemplate : ComparisonExpEmbeddingsTemplate {
+        override fun retrieve(operation: FirOperation) = when (operation) {
+            FirOperation.LT -> LtCharChar
+            FirOperation.LT_EQ -> LeCharChar
+            FirOperation.GT -> GtCharChar
+            FirOperation.GT_EQ -> GeCharChar
+            else -> throw IllegalArgumentException("Expected comparison operation but found ${operation}.")
         }
     }
 
@@ -193,7 +235,7 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext>()
         flatMap { arg ->
             when (arg) {
                 is FirVarargArgumentsExpression -> {
-                    check(function is SpecialVerifyFunction) {
+                    check(function != null && function.isVerifyFunction) {
                         "vararg arguments are currently supported for `verify` function only"
                     }
                     arg.arguments.map(data::convert)
