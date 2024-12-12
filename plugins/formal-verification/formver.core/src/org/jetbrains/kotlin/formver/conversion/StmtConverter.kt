@@ -8,9 +8,12 @@ package org.jetbrains.kotlin.formver.conversion
 import org.jetbrains.kotlin.fir.FirLabel
 import org.jetbrains.kotlin.fir.expressions.FirCatch
 import org.jetbrains.kotlin.fir.expressions.FirStatement
+import org.jetbrains.kotlin.formver.embeddings.LabelEmbedding
+import org.jetbrains.kotlin.formver.embeddings.LabelLink
 import org.jetbrains.kotlin.formver.embeddings.expression.ExpEmbedding
 import org.jetbrains.kotlin.formver.embeddings.expression.VariableEmbedding
 import org.jetbrains.kotlin.formver.embeddings.expression.withPosition
+import org.jetbrains.kotlin.formver.linearization.pureToViper
 import org.jetbrains.kotlin.formver.names.BreakLabelName
 import org.jetbrains.kotlin.formver.names.ContinueLabelName
 import org.jetbrains.kotlin.formver.viper.ast.Label
@@ -30,7 +33,7 @@ data class StmtConverter(
     override val whenSubject: VariableEmbedding? = null,
     override val checkedSafeCallSubject: ExpEmbedding? = null,
     private val scopeIndex: Int = 0,
-    override val activeCatchLabels: List<Label> = listOf(),
+    override val activeCatchLabels: List<LabelLink> = listOf(),
 ) : StmtConversionContext, MethodConversionContext by methodCtx {
     override fun convert(stmt: FirStatement): ExpEmbedding =
         stmt.accept(StmtConversionVisitorExceptionWrapper, this).withPosition(stmt.source)
@@ -47,14 +50,14 @@ data class StmtConverter(
             whileIndex
         }
 
-    override fun continueLabel(targetName: String?): Label {
+    override fun continueLabelLink(targetName: String?): LabelLink {
         val index = resolveWhileIndex(targetName)
-        return Label(ContinueLabelName(index), listOf())
+        return LabelLink(ContinueLabelName(index))
     }
 
-    override fun breakLabel(targetName: String?): Label {
+    override fun breakLabelLink(targetName: String?): LabelLink {
         val index = resolveWhileIndex(targetName)
-        return Label(BreakLabelName(index), listOf())
+        return LabelLink(BreakLabelName(index))
     }
 
     override fun addLoopName(targetName: String) {
@@ -79,8 +82,8 @@ data class StmtConverter(
         catches: List<FirCatch>,
         action: StmtConversionContext.(catchBlockListData: CatchBlockListData) -> R,
     ): Pair<CatchBlockListData, R> {
-        val newCatchLabels = catches.map { Label(catchLabelNameProducer.getFresh(), listOf()) }
-        val exitLabel = Label(tryExitLabelNameProducer.getFresh(), listOf())
+        val newCatchLabels = catches.map { LabelLink(catchLabelNameProducer.getFresh()) }
+        val exitLabel = LabelLink(tryExitLabelNameProducer.getFresh())
         val ctx = copy(activeCatchLabels = activeCatchLabels + newCatchLabels)
         val catchBlockListData =
             CatchBlockListData(exitLabel, newCatchLabels.zip(catches).map { (label, firCatch) -> CatchBlockData(label, firCatch) })

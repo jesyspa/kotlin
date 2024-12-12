@@ -674,5 +674,21 @@ public class FirLightTreeFormVerPluginDiagnosticsTestGenerated extends AbstractF
         runTest("plugins/formal-verification/testData/diagnostics/verifies/string/strings.kt");
       }
     }
+
+    @Nested
+    @TestMetadata("plugins/formal-verification/testData/diagnostics/verifies/user_invariants")
+    @TestDataPath("$PROJECT_ROOT")
+    public class User_invariants {
+      @Test
+      public void testAllFilesPresentInUser_invariants() {
+        KtTestUtil.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("plugins/formal-verification/testData/diagnostics/verifies/user_invariants"), Pattern.compile("^(.+)\\.kt$"), null, true);
+      }
+
+      @Test
+      @TestMetadata("simple.kt")
+      public void testSimple() {
+        runTest("plugins/formal-verification/testData/diagnostics/verifies/user_invariants/simple.kt");
+      }
+    }
   }
 }

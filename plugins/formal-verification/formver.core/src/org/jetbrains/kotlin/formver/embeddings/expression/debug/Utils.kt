@@ -6,12 +6,12 @@
 package org.jetbrains.kotlin.formver.embeddings.expression.debug
 
 import org.jetbrains.kotlin.formver.embeddings.FieldEmbedding
+import org.jetbrains.kotlin.formver.embeddings.LabelLink
 import org.jetbrains.kotlin.formver.embeddings.callables.NamedFunctionSignature
-import org.jetbrains.kotlin.formver.viper.ast.Label
 import org.jetbrains.kotlin.formver.viper.ast.PermExp
 import org.jetbrains.kotlin.formver.viper.mangled
 
-val Label.debugTreeView: TreeView
+val LabelLink.debugTreeView : TreeView
     get() = PlaintextLeaf(name.mangled)
 val NamedFunctionSignature.nameAsDebugTreeView: TreeView
     get() = PlaintextLeaf(name.mangled)

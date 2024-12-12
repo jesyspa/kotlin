@@ -43,10 +43,10 @@ interface StmtConversionContext : MethodConversionContext {
      * the `callSubject` again to we store it in the `StmtConversionContext`.
      */
     val checkedSafeCallSubject: ExpEmbedding?
-    val activeCatchLabels: List<Label>
+    val activeCatchLabels: List<LabelLink>
 
-    fun continueLabel(targetName: String? = null): Label
-    fun breakLabel(targetName: String? = null): Label
+    fun continueLabelLink(targetName: String? = null): LabelLink
+    fun breakLabelLink(targetName: String? = null): LabelLink
     fun addLoopName(targetName: String)
     fun convert(stmt: FirStatement): ExpEmbedding
 

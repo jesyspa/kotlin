@@ -124,6 +124,21 @@ object SpecialKotlinFunctions {
             UnitLit
         }
 
+        val loopInvariantsUnaryPlusType = buildFunctionPretype {
+            withDispatchReceiver {
+                klass {
+                    withName(invariantBuilderTypeName)
+                }
+            }
+            withExtensionReceiver {
+                boolean()
+            }
+            withReturnType { unit() }
+        }
+        addFunction(loopInvariantsUnaryPlusType, SpecialPackages.formver, className = "InvariantBuilder", name = "unaryPlus") { _, _ ->
+            UnitLit
+        }
+
         val contractCallableType = buildFunctionPretype {
             withParam {
                 function {
@@ -190,17 +205,28 @@ object SpecialKotlinFunctions {
 }
 
 val FunctionEmbedding.isVerifyFunction: Boolean
-    get() = isFormverPluginFunctionNamed("verify")
+    get() = isFormverPluginFunctionNamed(name = "verify")
 
 val FunctionEmbedding.isLoopInvariantsFunction: Boolean
-    get() = isFormverPluginFunctionNamed("loopInvariants")
+    get() = isFormverPluginFunctionNamed(name = "loopInvariants")
 
-fun FunctionEmbedding.isFormverPluginFunctionNamed(name: String): Boolean =
+val FunctionEmbedding.isAddInvariantFunction: Boolean
+    get() = isFormverPluginFunctionNamed(className = "InvariantBuilder", name = "unaryPlus")
+
+fun FunctionEmbedding.isFormverPluginFunctionNamed(className: String? = null, name: String): Boolean =
     this is FullySpecialKotlinFunction && NameMatcher.matchClassScope(this.embedName()) {
         ifPackageName(SpecialPackages.formver) {
-            ifNoReceiver {
-                ifFunctionName(name) {
-                    return true
+            if (className == null) {
+                ifNoReceiver {
+                    ifFunctionName(name) {
+                        return true
+                    }
+                }
+            } else {
+                ifClassName(className) {
+                    ifFunctionName(name) {
+                        return true
+                    }
                 }
             }
         }
