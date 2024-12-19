@@ -50,6 +50,9 @@ class RootParameterResolver(
     }
 }
 
+/**
+ * Wrapper class: in inline functions we want to substitute actual parameters with our own anonymous variables with unique names.
+ */
 sealed interface SubstitutedArgument {
     data class ValueParameter(val symbol: FirValueParameterSymbol) : SubstitutedArgument
     data object ExtensionThis : SubstitutedArgument
@@ -63,6 +66,7 @@ class InlineParameterResolver(
 ) : ParameterResolver {
     override fun tryResolveParameter(symbol: FirValueParameterSymbol): ExpEmbedding? =
         substitutions[SubstitutedArgument.ValueParameter(symbol)]
+
     override fun tryResolveDispatchReceiver() = substitutions[SubstitutedArgument.DispatchThis]
     override fun tryResolveExtensionReceiver(labelName: String) = (labelName == this.labelName).ifTrue {
         substitutions[SubstitutedArgument.ExtensionThis]

@@ -11,6 +11,7 @@ import org.jetbrains.kotlin.fir.symbols.impl.FirVariableSymbol
 import org.jetbrains.kotlin.formver.embeddings.callables.FunctionSignature
 import org.jetbrains.kotlin.formver.embeddings.expression.ExpEmbedding
 import org.jetbrains.kotlin.formver.embeddings.expression.VariableEmbedding
+import org.jetbrains.kotlin.name.Name
 
 /**
  * The symbol resolution data for a single method.
@@ -51,7 +52,10 @@ class MethodConverter(
         ?: throw IllegalArgumentException("Property ${symbol.name} not found in scope.")
 
     override fun registerLocalProperty(symbol: FirPropertySymbol) {
-        propertyResolver.registerLocalProperty(symbol, embedType(symbol.resolvedReturnType))
+        if (symbol.name.isSpecial)
+            propertyResolver.registerSpecialProperty(symbol, freshAnonVar(embedType(symbol.resolvedReturnType)))
+        else
+            propertyResolver.registerLocalProperty(symbol, embedType(symbol.resolvedReturnType))
     }
 
     override fun registerLocalVariable(symbol: FirVariableSymbol<*>) {

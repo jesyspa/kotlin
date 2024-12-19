@@ -37,6 +37,10 @@ class PropertyResolver(
         registerLocal(symbol.name, type, symbol)
     }
 
+    fun registerSpecialProperty(symbol: FirPropertySymbol, anonVar: VariableEmbedding) {
+        variables[symbol] = anonVar
+    }
+
     fun registerLocalVariable(symbol: FirVariableSymbol<*>, type: TypeEmbedding) {
         registerLocal(symbol.name, type, symbol)
     }
