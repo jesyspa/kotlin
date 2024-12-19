@@ -377,6 +377,12 @@ public class FirLightTreeFormVerPluginDiagnosticsTestGenerated extends AbstractF
       }
 
       @Test
+      @TestMetadata("increment.kt")
+      public void testIncrement() {
+        runTest("plugins/formal-verification/testData/diagnostics/no_contracts/operators/increment.kt");
+      }
+
+      @Test
       @TestMetadata("is_operator.kt")
       public void testIs_operator() {
         runTest("plugins/formal-verification/testData/diagnostics/no_contracts/operators/is_operator.kt");

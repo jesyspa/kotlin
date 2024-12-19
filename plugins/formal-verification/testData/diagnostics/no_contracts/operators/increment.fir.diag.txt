@@ -1,0 +1,16 @@
+/increment.kt:(23,34): info: Generated Viper text for test_simple:
+method f$test_simple$TF$() returns (ret$0: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
+{
+  var l0$x: Ref
+  l0$x := df$rt$intToRef(10)
+  l0$x := sp$plusInts(l0$x, df$rt$intToRef(5))
+  l0$x := sp$minusInts(l0$x, df$rt$intToRef(1))
+  l0$x := sp$minusInts(l0$x, df$rt$intToRef(3))
+  l0$x := sp$plusInts(l0$x, df$rt$intToRef(1))
+  l0$x := sp$timesInts(l0$x, df$rt$intToRef(2))
+  inhale 4 != 0
+  l0$x := sp$divInts(l0$x, df$rt$intToRef(4))
+  label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
+}
