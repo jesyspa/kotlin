@@ -14,6 +14,4 @@ fun verify(@Suppress("UNUSED_PARAMETER") vararg predicates: Boolean) = Unit
 
 fun loopInvariants(@Suppress("UNUSED_PARAMETER") body: InvariantBuilder.() -> Unit) = Unit
 
-class InvariantBuilder {
-    operator fun Boolean.unaryPlus() = Unit
-}
+class InvariantBuilder

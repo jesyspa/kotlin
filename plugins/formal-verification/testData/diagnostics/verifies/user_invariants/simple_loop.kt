@@ -9,8 +9,8 @@ fun <!VIPER_TEXT!>test<!>(n: Int) {
     var holds = true
     while (it < 10) {
         loopInvariants {
-            +(it <= 10)
-            +holds
+            it <= 10
+            holds
         }
         it = it + 1
     }
@@ -19,8 +19,8 @@ fun <!VIPER_TEXT!>test<!>(n: Int) {
     if (it <= n) {
         while (it < n) {
             loopInvariants {
-                +(it <= n)
-                +holds
+                it <= n
+                holds
             }
             it = it + 1
         }
@@ -33,13 +33,13 @@ fun <!VIPER_TEXT!>loopInsideLoop<!>() {
     var i = 0
     while (i < 10) {
         loopInvariants {
-            +(i <= 10)
+            i <= 10
         }
         var j = i + 1
         while (j < 10) {
             loopInvariants {
-                +(i < j)
-                +(j <= 10)
+                i < j
+                j <= 10
             }
             j = j + 1
         }
@@ -52,7 +52,7 @@ fun <!VIPER_TEXT!>withBreak<!>() {
     var i = 0
     while (true) {
         loopInvariants {
-            +(i <= 10)
+            i <= 10
         }
         if (i >= 10) break
     }

@@ -124,21 +124,6 @@ object SpecialKotlinFunctions {
             UnitLit
         }
 
-        val loopInvariantsUnaryPlusType = buildFunctionPretype {
-            withDispatchReceiver {
-                klass {
-                    withName(invariantBuilderTypeName)
-                }
-            }
-            withExtensionReceiver {
-                boolean()
-            }
-            withReturnType { unit() }
-        }
-        addFunction(loopInvariantsUnaryPlusType, SpecialPackages.formver, className = "InvariantBuilder", name = "unaryPlus") { _, _ ->
-            UnitLit
-        }
-
         val contractCallableType = buildFunctionPretype {
             withParam {
                 function {
@@ -209,9 +194,6 @@ val FunctionEmbedding.isVerifyFunction: Boolean
 
 val FunctionEmbedding.isLoopInvariantsFunction: Boolean
     get() = isFormverPluginFunctionNamed(name = "loopInvariants")
-
-val FunctionEmbedding.isAddInvariantFunction: Boolean
-    get() = isFormverPluginFunctionNamed(className = "InvariantBuilder", name = "unaryPlus")
 
 fun FunctionEmbedding.isFormverPluginFunctionNamed(className: String? = null, name: String): Boolean =
     this is FullySpecialKotlinFunction && NameMatcher.matchClassScope(this.embedName()) {

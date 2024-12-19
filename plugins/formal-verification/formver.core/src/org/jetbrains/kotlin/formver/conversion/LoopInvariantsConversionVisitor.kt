@@ -7,11 +7,10 @@ package org.jetbrains.kotlin.formver.conversion
 
 import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.expressions.FirBlock
-import org.jetbrains.kotlin.fir.expressions.FirFunctionCall
-import org.jetbrains.kotlin.fir.expressions.toResolvedCallableSymbol
-import org.jetbrains.kotlin.fir.symbols.impl.FirFunctionSymbol
+import org.jetbrains.kotlin.fir.expressions.FirExpression
+import org.jetbrains.kotlin.fir.types.isBoolean
+import org.jetbrains.kotlin.fir.types.resolvedType
 import org.jetbrains.kotlin.fir.visitors.FirVisitor
-import org.jetbrains.kotlin.formver.embeddings.callables.isAddInvariantFunction
 import org.jetbrains.kotlin.formver.embeddings.expression.ExpEmbedding
 
 interface LoopInvariantsConversionContext : StmtConversionContext {
@@ -23,6 +22,7 @@ class LoopInvariantsConverter(private val stmtCtx: StmtConversionContext) : Stmt
     override fun addLoopInvariant(exp: ExpEmbedding) {
         _invariants.add(exp)
     }
+
     private val _invariants = mutableListOf<ExpEmbedding>()
     override val invariants: List<ExpEmbedding>
         get() = _invariants
@@ -30,27 +30,17 @@ class LoopInvariantsConverter(private val stmtCtx: StmtConversionContext) : Stmt
 
 object LoopInvariantsConversionVisitor : FirVisitor<Unit, LoopInvariantsConversionContext>() {
     private const val INVALID_STATEMENT_MSG =
-        "Every statement in `loopInvariants` must be an invariant marked with unary plus."
+        "Every statement in `loopInvariants` must be a pure boolean invariant."
 
     override fun visitElement(element: FirElement, data: LoopInvariantsConversionContext) =
         error("`LoopInvariantsConversionVisitor` must be used to convert `FirBlock`s only.")
 
     override fun visitBlock(block: FirBlock, data: LoopInvariantsConversionContext) {
         block.statements.forEach { stmt ->
-            check(stmt is FirFunctionCall) {
+            check(stmt is FirExpression && stmt.resolvedType.isBoolean) {
                 INVALID_STATEMENT_MSG
             }
-            stmt.accept(this, data)
+            data.addLoopInvariant(stmt.accept(StmtConversionVisitor, data))
         }
-    }
-
-    override fun visitFunctionCall(functionCall: FirFunctionCall, data: LoopInvariantsConversionContext) {
-        val symbol = functionCall.toResolvedCallableSymbol()
-        val callee = data.embedFunction(symbol as FirFunctionSymbol)
-        check(callee.isAddInvariantFunction) {
-            INVALID_STATEMENT_MSG
-        }
-        val invariant = functionCall.extensionReceiver!!.accept(StmtConversionVisitor, data)
-        data.addLoopInvariant(invariant)
     }
 }
