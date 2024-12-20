@@ -58,3 +58,18 @@ fun <!VIPER_TEXT!>withBreak<!>() {
     }
     verify(i == 10)
 }
+
+class WithVar(var e: Int) {
+    @NeverConvert
+    fun doSomething() = e > 10
+}
+
+@AlwaysVerify
+fun <!VIPER_TEXT!>test_boolean_postcondition<!>() {
+    val withVar = WithVar(42)
+    var boolean = true
+    while (boolean) {
+        boolean = withVar.doSomething()
+    }
+    verify(!boolean)
+}
