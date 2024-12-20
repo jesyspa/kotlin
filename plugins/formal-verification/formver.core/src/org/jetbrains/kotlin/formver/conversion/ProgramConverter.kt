@@ -299,12 +299,12 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
                     require(param is FirVariableEmbedding) { "Constructor parameters must be represented by FirVariableEmbeddings" }
                     constructorParamSymbolsToFields[param.symbol]?.let { field ->
                         (field.accessPolicy == AccessPolicy.ALWAYS_READABLE).ifTrue {
-                            EqCmp(PrimitiveFieldAccess(returnVariable, field), param)
+                            EqCmp(FieldAccess(returnVariable, field), param)
                         }
                     }
                 }
                 return if (invariants.isEmpty()) null
-                else UnfoldingSharedClassPredicateEmbedding(returnVariable, invariants.toConjunction())
+                else invariants.toConjunction()
             }
 
             override val declarationSource: KtSourceElement? = symbol.source

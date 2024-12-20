@@ -16,6 +16,7 @@ import org.jetbrains.kotlin.formver.embeddings.types.buildType
 import org.jetbrains.kotlin.formver.embeddings.types.injectionOr
 import org.jetbrains.kotlin.formver.linearization.InhaleExhaleStmtModifier
 import org.jetbrains.kotlin.formver.linearization.LinearizationContext
+import org.jetbrains.kotlin.formver.linearization.UnfoldPolicy
 import org.jetbrains.kotlin.formver.linearization.pureToViper
 import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.formver.viper.ast.Exp
@@ -357,6 +358,7 @@ data class FieldAccess(val receiver: ExpEmbedding, val field: FieldEmbedding) : 
     override fun toViper(ctx: LinearizationContext): Exp {
         if (noInvariants && !field.unfoldToAccess) return Exp.FieldAccess(receiver.toViper(ctx), field.toViper(), ctx.source.asPosition)
 
+        if (field.unfoldToAccess && ctx.unfoldPolicy == UnfoldPolicy.UNFOLDING_IN) return unfoldingInImpl(ctx)
         val variable = ctx.freshAnonVar(type)
         toViperStoringIn(variable, ctx)
         return variable.toViper(ctx)
@@ -373,6 +375,17 @@ data class FieldAccess(val receiver: ExpEmbedding, val field: FieldEmbedding) : 
         ctx.addStatement {
             invariant?.let { addModifier(InhaleExhaleStmtModifier(it)) }
             Stmt.assign(result.toViper(ctx), fieldAccess.pureToViper(toBuiltin = false, ctx.source), ctx.source.asPosition)
+        }
+    }
+
+    private fun unfoldingInImpl(ctx: LinearizationContext): Exp {
+        val hierarchyPath = (receiver.type.pretype as? ClassTypeEmbedding)?.details?.hierarchyUnfoldPath(field)
+        val primitiveAccess: Exp = Exp.FieldAccess(receiver.toViper(ctx), field.toViper(), ctx.source.asPosition)
+        if (hierarchyPath == null) return primitiveAccess
+        return hierarchyPath.toList().foldRight(primitiveAccess) { classType, acc ->
+            val predAcc = classType.sharedPredicateAccessInvariant().fillHole(receiver)
+                .pureToViper(toBuiltin = true, ctx.source) as? Exp.PredicateAccess
+            predAcc?.let { Exp.Unfolding(it, acc) } ?: acc
         }
     }
 
