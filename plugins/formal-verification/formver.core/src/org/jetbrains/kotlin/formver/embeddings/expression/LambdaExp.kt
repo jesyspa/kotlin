@@ -8,6 +8,7 @@ package org.jetbrains.kotlin.formver.embeddings.expression
 import org.jetbrains.kotlin.fir.declarations.FirAnonymousFunction
 import org.jetbrains.kotlin.formver.conversion.MethodConversionContext
 import org.jetbrains.kotlin.formver.conversion.StmtConversionContext
+import org.jetbrains.kotlin.formver.conversion.SubstitutedArgument
 import org.jetbrains.kotlin.formver.conversion.insertInlineFunctionCall
 import org.jetbrains.kotlin.formver.embeddings.types.TypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.callables.CallableEmbedding
@@ -16,7 +17,6 @@ import org.jetbrains.kotlin.formver.embeddings.expression.debug.PlaintextLeaf
 import org.jetbrains.kotlin.formver.embeddings.expression.debug.TreeView
 import org.jetbrains.kotlin.formver.embeddings.types.asTypeEmbedding
 import org.jetbrains.kotlin.formver.linearization.LinearizationContext
-import org.jetbrains.kotlin.formver.names.ExtraSpecialNames
 
 class LambdaExp(
     val signature: FunctionSignature,
@@ -37,9 +37,9 @@ class LambdaExp(
         ctx: StmtConversionContext,
     ): ExpEmbedding {
         val inlineBody = function.body ?: throw IllegalArgumentException("Lambda $function has a null body.")
-        val nonReceiverParamNames = function.valueParameters.map { it.name }
+        val nonReceiverParamNames = function.valueParameters.map { SubstitutedArgument.ValueParameter(it.symbol) }
         //TODO: can lambdas have dispatch receiver?
-        val receiverParamNames = if (function.receiverParameter != null) listOf(ExtraSpecialNames.EXTENSION_THIS) else emptyList()
+        val receiverParamNames = if (function.receiverParameter != null) listOf(SubstitutedArgument.ExtensionThis) else emptyList()
         return ctx.insertInlineFunctionCall(
             signature,
             receiverParamNames + nonReceiverParamNames,
