@@ -169,7 +169,7 @@ fun StmtConversionContext.getInlineFunctionCallArgs(
 
 fun StmtConversionContext.insertInlineFunctionCall(
     calleeSignature: FunctionSignature,
-    paramNames: List<Name>,
+    paramNames: List<SubstitutedArgument>,
     args: List<ExpEmbedding>,
     body: FirBlock,
     returnTargetName: String?,

@@ -403,7 +403,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
             MethodConverter(
                 this,
                 signature,
-                RootParameterResolver(this, signature, signature.labelName, returnTarget),
+                RootParameterResolver(this, signature, declaration.valueParameters.map { it.symbol }, signature.labelName, returnTarget),
                 scopeDepth = scopeIndexProducer.getFresh(),
             )
         val stmtCtx = StmtConverter(methodCtx)

@@ -36,8 +36,8 @@ interface MethodConversionContext : ProgramConversionContext {
     val signature: FunctionSignature
     val defaultResolvedReturnTarget: ReturnTarget
 
-    fun resolveParameter(name: Name): ExpEmbedding
-    fun resolveLocal(name: Name): VariableEmbedding
+    fun resolveParameter(symbol: FirValueParameterSymbol): ExpEmbedding
+    fun resolveLocal(symbol: FirVariableSymbol<*>): VariableEmbedding
     fun registerLocalProperty(symbol: FirPropertySymbol)
     fun registerLocalVariable(symbol: FirVariableSymbol<*>)
     fun resolveDispatchReceiver(): ExpEmbedding?
@@ -54,9 +54,9 @@ fun MethodConversionContext.resolveReturnTarget(targetSourceName: String?): Retu
     if (targetSourceName == null) defaultResolvedReturnTarget
     else resolveNamedReturnTarget(targetSourceName) ?: throw IllegalArgumentException("Cannot resolve returnTarget of $targetSourceName")
 
-fun MethodConversionContext.embedLocalProperty(symbol: FirPropertySymbol): VariableEmbedding = resolveLocal(symbol.name)
-fun MethodConversionContext.embedParameter(symbol: FirValueParameterSymbol): ExpEmbedding = resolveParameter(symbol.name)
-fun MethodConversionContext.embedLocalVariable(symbol: FirVariableSymbol<*>): VariableEmbedding = resolveLocal(symbol.name)
+fun MethodConversionContext.embedLocalProperty(symbol: FirPropertySymbol): VariableEmbedding = resolveLocal(symbol)
+fun MethodConversionContext.embedParameter(symbol: FirValueParameterSymbol): ExpEmbedding = resolveParameter(symbol)
+fun MethodConversionContext.embedLocalVariable(symbol: FirVariableSymbol<*>): VariableEmbedding = resolveLocal(symbol)
 
 fun MethodConversionContext.embedLocalSymbol(symbol: FirBasedSymbol<*>): ExpEmbedding =
     when (symbol) {
