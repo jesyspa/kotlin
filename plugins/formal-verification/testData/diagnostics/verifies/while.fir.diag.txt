@@ -7,8 +7,9 @@ method con$c$ClassWithField$T$Int(p$field: Ref) returns (ret: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$c$ClassWithField())
   ensures acc(p$c$ClassWithField$shared(ret), wildcard)
   ensures acc(p$c$ClassWithField$unique(ret), write)
-  ensures (unfolding acc(p$c$ClassWithField$shared(ret), wildcard) in
-      df$rt$intFromRef(ret.bf$field) == df$rt$intFromRef(p$field))
+  ensures df$rt$intFromRef((unfolding acc(p$c$ClassWithField$shared(ret), wildcard) in
+      ret.bf$field)) ==
+    df$rt$intFromRef(p$field)
 
 
 method f$pkg$kotlin$c$Int$unaryMinus$TF$T$Int(this$dispatch: Ref)
@@ -78,8 +79,9 @@ method con$c$ClassWithField$T$Int(p$field: Ref) returns (ret: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$c$ClassWithField())
   ensures acc(p$c$ClassWithField$shared(ret), wildcard)
   ensures acc(p$c$ClassWithField$unique(ret), write)
-  ensures (unfolding acc(p$c$ClassWithField$shared(ret), wildcard) in
-      df$rt$intFromRef(ret.bf$field) == df$rt$intFromRef(p$field))
+  ensures df$rt$intFromRef((unfolding acc(p$c$ClassWithField$shared(ret), wildcard) in
+      ret.bf$field)) ==
+    df$rt$intFromRef(p$field)
 
 
 method f$test_while_with_inlining$TF$T$ClassWithField(p$param: Ref)

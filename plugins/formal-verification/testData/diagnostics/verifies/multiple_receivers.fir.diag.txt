@@ -66,8 +66,9 @@ method con$c$ClassWithExtension$T$Int(p$delta: Ref) returns (ret: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$c$ClassWithExtension())
   ensures acc(p$c$ClassWithExtension$shared(ret), wildcard)
   ensures acc(p$c$ClassWithExtension$unique(ret), write)
-  ensures (unfolding acc(p$c$ClassWithExtension$shared(ret), wildcard) in
-      df$rt$intFromRef(ret.bf$delta) == df$rt$intFromRef(p$delta))
+  ensures df$rt$intFromRef((unfolding acc(p$c$ClassWithExtension$shared(ret), wildcard) in
+      ret.bf$delta)) ==
+    df$rt$intFromRef(p$delta)
 
 
 method f$c$ClassWithExtension$applyDelta$TF$T$ClassWithExtension$T$Int(this$dispatch: Ref,

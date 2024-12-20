@@ -85,8 +85,9 @@ method con$c$StringBox$T$String(p$str: Ref) returns (ret: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$c$StringBox())
   ensures acc(p$c$StringBox$shared(ret), wildcard)
   ensures acc(p$c$StringBox$unique(ret), write)
-  ensures (unfolding acc(p$c$StringBox$shared(ret), wildcard) in
-      df$rt$stringFromRef(ret.bf$str) == df$rt$stringFromRef(p$str))
+  ensures df$rt$stringFromRef((unfolding acc(p$c$StringBox$shared(ret), wildcard) in
+      ret.bf$str)) ==
+    df$rt$stringFromRef(p$str)
 
 
 method f$testType$TF$T$String(p$s: Ref) returns (ret$0: Ref)
@@ -200,8 +201,9 @@ method con$c$StringBox$T$String(p$str: Ref) returns (ret: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$c$StringBox())
   ensures acc(p$c$StringBox$shared(ret), wildcard)
   ensures acc(p$c$StringBox$unique(ret), write)
-  ensures (unfolding acc(p$c$StringBox$shared(ret), wildcard) in
-      df$rt$stringFromRef(ret.bf$str) == df$rt$stringFromRef(p$str))
+  ensures df$rt$stringFromRef((unfolding acc(p$c$StringBox$shared(ret), wildcard) in
+      ret.bf$str)) ==
+    df$rt$stringFromRef(p$str)
 
 
 method f$testLengthField$TF$T$String(p$s: Ref) returns (ret$0: Ref)
@@ -342,4 +344,3 @@ method f$testOps$TF$T$String(p$s: Ref) returns (ret$0: Ref)
 }
 
 method pg$public$length(this$dispatch: Ref) returns (ret: Ref)
-
