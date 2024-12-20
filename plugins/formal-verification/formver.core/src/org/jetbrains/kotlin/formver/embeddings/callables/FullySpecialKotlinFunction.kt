@@ -68,6 +68,20 @@ object SpecialKotlinFunctions {
             }
         }
 
+        val intToIntType = buildFunctionPretype {
+            withDispatchReceiver { int() }
+            withReturnType { int() }
+        }
+
+        withCallableType(intToIntType) {
+            addFunction("kotlin", className = "Int", name = "inc") { args, _ ->
+                AddIntInt(args[0], IntLit(1))
+            }
+            addFunction("kotlin", className = "Int", name = "dec") { args, _ ->
+                SubIntInt(args[0], IntLit(1))
+            }
+        }
+
         val booleanToBooleanType = buildFunctionPretype {
             withDispatchReceiver { boolean() }
             withReturnType { boolean() }
