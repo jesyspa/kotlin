@@ -27,22 +27,26 @@ class PropertyResolver(
     val parent: PropertyResolver? = null,
     private val loopName: LoopIdentifier? = null,
 ) {
-    private val names: MutableMap<Name, VariableEmbedding> = mutableMapOf()
+    private val variables: MutableMap<FirVariableSymbol<*>, VariableEmbedding> = mutableMapOf()
 
-    fun tryResolveLocalProperty(name: Name): VariableEmbedding? =
-        names[name] ?: parent?.tryResolveLocalProperty(name)
+    fun tryResolveLocalProperty(symbol: FirVariableSymbol<*>): VariableEmbedding? =
+        variables[symbol] ?: parent?.tryResolveLocalProperty(symbol)
 
     fun registerLocalProperty(symbol: FirPropertySymbol, type: TypeEmbedding) {
         check(symbol.isLocal) { "PropertyResolver must be used with local properties." }
         registerLocal(symbol.name, type, symbol)
     }
 
+    fun registerSpecialProperty(symbol: FirPropertySymbol, anonVar: VariableEmbedding) {
+        variables[symbol] = anonVar
+    }
+
     fun registerLocalVariable(symbol: FirVariableSymbol<*>, type: TypeEmbedding) {
         registerLocal(symbol.name, type, symbol)
     }
 
-    private fun registerLocal(name: Name, type: TypeEmbedding, symbol: FirBasedSymbol<*>) {
-        names[name] = FirVariableEmbedding(name.embedScopedLocalName(scopeIndex), type, symbol)
+    private fun registerLocal(name: Name, type: TypeEmbedding, symbol: FirVariableSymbol<*>) {
+        variables[symbol] = FirVariableEmbedding(name.embedScopedLocalName(scopeIndex), type, symbol)
     }
 
     fun innerScope(innerScopeIndex: Int) = PropertyResolver(innerScopeIndex, this)
@@ -54,7 +58,7 @@ class PropertyResolver(
         else parent?.tryResolveLoopName(name)
 
     fun retrieveAllProperties(): Sequence<VariableEmbedding> = sequence {
-        yieldAll(names.values)
+        yieldAll(variables.values)
         parent?.retrieveAllProperties()?.let { yieldAll(it) }
     }
 }

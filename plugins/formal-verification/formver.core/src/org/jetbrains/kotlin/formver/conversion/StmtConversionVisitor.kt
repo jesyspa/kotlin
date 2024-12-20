@@ -317,13 +317,26 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext>()
         return Goto(continueLabel)
     }
 
+    override fun visitDesugaredAssignmentValueReferenceExpression(
+        desugaredAssignmentValueReferenceExpression: FirDesugaredAssignmentValueReferenceExpression,
+        data: StmtConversionContext
+    ): ExpEmbedding {
+        return data.convert(desugaredAssignmentValueReferenceExpression.expressionRef.value)
+    }
+
     override fun visitVariableAssignment(
         variableAssignment: FirVariableAssignment,
         data: StmtConversionContext,
     ): ExpEmbedding {
-        val propertyAccess = variableAssignment.lValue as? FirPropertyAccessExpression
-            ?: throw IllegalArgumentException("Left hand of an assignment must be a property access.")
-        val embedding = data.embedPropertyAccess(propertyAccess)
+        val embedding = when (val lValue = variableAssignment.lValue) {
+            is FirPropertyAccessExpression -> {
+                data.embedPropertyAccess(lValue)
+            }
+            is FirDesugaredAssignmentValueReferenceExpression -> {
+                data.embedPropertyAccess(lValue.expressionRef.value as FirPropertyAccessExpression)
+            }
+            else -> error("Lvalue must be either property access or desugared assignment.")
+        }
         val convertedRValue = data.convert(variableAssignment.rValue)
         return embedding.setValue(convertedRValue, data)
     }
