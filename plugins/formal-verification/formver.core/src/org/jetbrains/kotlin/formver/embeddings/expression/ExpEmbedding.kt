@@ -383,18 +383,20 @@ data class FieldAccess(val receiver: ExpEmbedding, val field: FieldEmbedding) : 
         val primitiveAccess: Exp = Exp.FieldAccess(receiver.toViper(ctx), field.toViper(), ctx.source.asPosition)
         if (hierarchyPath == null) return primitiveAccess
         return hierarchyPath.toList().foldRight(primitiveAccess) { classType, acc ->
-            val predAcc = classType.sharedPredicateAccessInvariant().fillHole(receiver)
-                .pureToViper(toBuiltin = true, ctx.source) as? Exp.PredicateAccess
-            predAcc?.let { Exp.Unfolding(it, acc) } ?: acc
+            val predAcc = classType.predicateAccess(receiver, ctx)
+            Exp.Unfolding(predAcc, acc)
         }
     }
+
+    private fun ClassTypeEmbedding.predicateAccess(receiver: ExpEmbedding, ctx: LinearizationContext): Exp.PredicateAccess =
+        sharedPredicateAccessInvariant().fillHole(receiver).pureToViper(toBuiltin = true, ctx.source) as? Exp.PredicateAccess
+            ?: error("Attempt to unfold a predicate of ${name.mangled}.")
 
     private fun unfoldHierarchy(receiverWrapper: ExpEmbedding, ctx: LinearizationContext) {
         val hierarchyPath = (receiver.type.pretype as? ClassTypeEmbedding)?.details?.hierarchyUnfoldPath(field)
         hierarchyPath?.forEach { classType ->
-            val predAcc = classType.sharedPredicateAccessInvariant().fillHole(receiverWrapper)
-                .pureToViper(toBuiltin = true, ctx.source) as? Exp.PredicateAccess
-            predAcc?.let { ctx.addStatement { Stmt.Unfold(it) } }
+            val predAcc = classType.predicateAccess(receiverWrapper, ctx)
+            predAcc.let { ctx.addStatement { Stmt.Unfold(it) } }
         }
     }
 
