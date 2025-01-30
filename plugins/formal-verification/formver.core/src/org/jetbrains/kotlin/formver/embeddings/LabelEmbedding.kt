@@ -15,12 +15,9 @@ import org.jetbrains.kotlin.formver.viper.ast.Stmt
 
 data class LabelLink(val name: MangledName)
 
-data class LabelEmbedding(val labelLink: LabelLink, val invariants: List<ExpEmbedding> = emptyList()) {
-    val name: MangledName
-        get() = labelLink.name
-}
+data class LabelEmbedding(val name: MangledName, val invariants: List<ExpEmbedding> = emptyList())
 
-fun LabelLink.toLabel(invariants: List<ExpEmbedding> = emptyList()): LabelEmbedding = LabelEmbedding(this, invariants)
+fun LabelEmbedding.toLink() = LabelLink(name)
 
 fun LabelLink.toViperGoto(ctx: LinearizationContext): Stmt.Goto = Label(name, emptyList()).toGoto(pos = ctx.source.asPosition)
 

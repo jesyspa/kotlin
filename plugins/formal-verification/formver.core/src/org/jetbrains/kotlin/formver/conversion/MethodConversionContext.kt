@@ -9,7 +9,7 @@ import org.jetbrains.kotlin.fir.symbols.FirBasedSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirPropertySymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirValueParameterSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirVariableSymbol
-import org.jetbrains.kotlin.formver.embeddings.LabelLink
+import org.jetbrains.kotlin.formver.embeddings.LabelEmbedding
 import org.jetbrains.kotlin.formver.embeddings.types.TypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.callables.FunctionSignature
 import org.jetbrains.kotlin.formver.embeddings.expression.ExpEmbedding
@@ -21,7 +21,7 @@ import org.jetbrains.kotlin.name.Name
 
 class ReturnTarget(depth: Int, type: TypeEmbedding) {
     val variable = PlaceholderVariableEmbedding(ReturnVariableName(depth), type)
-    val label = LabelLink(ReturnLabelName(depth))
+    val label = LabelEmbedding(ReturnLabelName(depth))
 }
 
 /**

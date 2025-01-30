@@ -18,8 +18,8 @@ import org.jetbrains.kotlin.formver.linearization.LinearizationContext
 import org.jetbrains.kotlin.formver.linearization.addLabel
 import org.jetbrains.kotlin.formver.linearization.freshAnonVar
 import org.jetbrains.kotlin.formver.linearization.pureToViper
+import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.formver.viper.ast.Exp
-import org.jetbrains.kotlin.formver.viper.ast.Label
 import org.jetbrains.kotlin.formver.viper.ast.PermExp
 import org.jetbrains.kotlin.formver.viper.ast.Stmt
 
@@ -70,24 +70,27 @@ data class If(val condition: ExpEmbedding, val thenBranch: ExpEmbedding, val els
 data class While(
     val condition: ExpEmbedding,
     val body: ExpEmbedding,
-    val breakLabel: LabelLink,
-    val continueLabel: LabelLink,
+    val breakLabelName: MangledName,
+    val continueLabelName: MangledName,
     val invariants: List<ExpEmbedding>,
 ) : UnitResultExpEmbedding, DefaultDebugTreeViewImplementation {
     override val type: TypeEmbedding = buildType { unit() }
 
+    val continueLabel = LabelEmbedding(continueLabelName, invariants)
+    val breakLabel = LabelEmbedding(breakLabelName, invariants)
+
     override fun toViperSideEffects(ctx: LinearizationContext) {
-        ctx.addLabel(continueLabel.toLabel(invariants).toViper(ctx))
+        ctx.addLabel(continueLabel.toViper(ctx))
         val condVar = ctx.freshAnonVar { boolean() }
         condition.toViperStoringIn(condVar, ctx)
         ctx.addStatement {
             val bodyBlock = ctx.asBlock {
                 body.toViperUnusedResult(this)
-                addStatement { continueLabel.toViperGoto(this) }
+                addStatement { continueLabel.toLink().toViperGoto(this) }
             }
             Stmt.If(condVar.toViperBuiltinType(ctx), bodyBlock, els = Stmt.Seqn(), ctx.source.asPosition)
         }
-        ctx.addLabel(breakLabel.toLabel(invariants).toViper(ctx))
+        ctx.addLabel(breakLabel.toViper(ctx))
     }
 
     // TODO: add invariants
@@ -121,7 +124,7 @@ data class LabelExp(val label: LabelEmbedding) : UnitResultExpEmbedding {
     }
 
     override val debugTreeView: TreeView
-        get() = NamedBranchingNode("Label", label.labelLink.debugTreeView)
+        get() = NamedBranchingNode("Label", label.debugTreeView)
 }
 
 /**
@@ -129,11 +132,11 @@ data class LabelExp(val label: LabelEmbedding) : UnitResultExpEmbedding {
  *
  * The result of the intermediate expression is stored.
  */
-data class GotoChainNode(val label: LabelLink?, val exp: ExpEmbedding, val next: LabelLink) : OptionalResultExpEmbedding {
+data class GotoChainNode(val label: LabelEmbedding?, val exp: ExpEmbedding, val next: LabelLink) : OptionalResultExpEmbedding {
     override val type: TypeEmbedding = exp.type
 
     override fun toViperMaybeStoringIn(result: VariableEmbedding?, ctx: LinearizationContext) {
-        label?.let { ctx.addLabel(it.toLabel().toViper(ctx)) }
+        label?.let { ctx.addLabel(it.toViper(ctx)) }
         ctx.addStatement {
             exp.toViperMaybeStoringIn(result, ctx)
             next.toViperGoto(ctx)
@@ -236,7 +239,7 @@ data class InvokeFunctionObject(val receiver: ExpEmbedding, val args: List<ExpEm
             })
 }
 
-data class FunctionExp(val signature: FullNamedFunctionSignature?, val body: ExpEmbedding, val returnLabel: LabelLink) :
+data class FunctionExp(val signature: FullNamedFunctionSignature?, val body: ExpEmbedding, val returnLabel: LabelEmbedding) :
     OptionalResultExpEmbedding {
     override val type: TypeEmbedding = body.type
 
@@ -251,7 +254,7 @@ data class FunctionExp(val signature: FullNamedFunctionSignature?, val body: Exp
             }
         }
         body.toViperMaybeStoringIn(result, ctx)
-        ctx.addLabel(returnLabel.toLabel().toViper(ctx))
+        ctx.addLabel(returnLabel.toViper(ctx))
     }
 
     override val debugTreeView: TreeView
