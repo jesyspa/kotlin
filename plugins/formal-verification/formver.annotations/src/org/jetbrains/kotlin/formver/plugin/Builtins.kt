@@ -14,6 +14,8 @@ fun verify(@Suppress("UNUSED_PARAMETER") vararg predicates: Boolean) = Unit
 
 fun loopInvariants(@Suppress("UNUSED_PARAMETER") body: InvariantBuilder.() -> Unit) = Unit
 
+fun preconditions(@Suppress("UNUSED_PARAMETER") body: InvariantBuilder.() -> Unit) = Unit
+
 /**
  * This class is designed as a receiver for lambda blocks of `loopInvariants`, `preconditions` and `postconditions`.
  * Later, it will have member methods, e.g. `forall`.

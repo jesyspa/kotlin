@@ -1,0 +1,17 @@
+/simple_precondition.kt:(221,378): error: An internal error has occurred.
+Details: null cannot be cast to non-null type org.jetbrains.kotlin.fir.symbols.impl.FirFunctionSymbol<*>
+... while converting preconditions {
+        0 <= idx
+        idx < 3
+    }
+... while converting {
+    preconditions {
+        0 <= idx
+        idx < 3
+    }
+    verify(0 <= idx && idx < 3)
+    verify("aaa"[idx] == 'a')
+}
+Please report this at https://github.com/jesyspa/kotlin
+
+/simple_precondition.kt:(260,273): error: Unresolved reference 'preconditions'.

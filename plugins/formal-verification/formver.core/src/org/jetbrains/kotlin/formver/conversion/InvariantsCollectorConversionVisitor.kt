@@ -13,13 +13,15 @@ import org.jetbrains.kotlin.fir.types.resolvedType
 import org.jetbrains.kotlin.fir.visitors.FirVisitor
 import org.jetbrains.kotlin.formver.embeddings.expression.ExpEmbedding
 
-interface LoopInvariantsConversionContext : StmtConversionContext {
-    fun addLoopInvariant(exp: ExpEmbedding)
+interface InvariantsCollectorConversionContext : StmtConversionContext {
+    fun addInvariant(exp: ExpEmbedding)
     val invariants: List<ExpEmbedding>
 }
 
-class LoopInvariantsConverter(private val stmtCtx: StmtConversionContext) : StmtConversionContext by stmtCtx, LoopInvariantsConversionContext {
-    override fun addLoopInvariant(exp: ExpEmbedding) {
+class InvariantsCollectorConverter(private val stmtCtx: StmtConversionContext) : StmtConversionContext by stmtCtx,
+    InvariantsCollectorConversionContext {
+
+    override fun addInvariant(exp: ExpEmbedding) {
         _invariants.add(exp)
     }
 
@@ -28,19 +30,19 @@ class LoopInvariantsConverter(private val stmtCtx: StmtConversionContext) : Stmt
         get() = _invariants
 }
 
-object LoopInvariantsConversionVisitor : FirVisitor<Unit, LoopInvariantsConversionContext>() {
+object InvariantsCollectorConversionVisitor : FirVisitor<Unit, InvariantsCollectorConversionContext>() {
     private const val INVALID_STATEMENT_MSG =
         "Every statement in `loopInvariants` must be a pure boolean invariant."
 
-    override fun visitElement(element: FirElement, data: LoopInvariantsConversionContext) =
+    override fun visitElement(element: FirElement, data: InvariantsCollectorConversionContext) =
         error("`LoopInvariantsConversionVisitor` must be used to convert `FirBlock`s only.")
 
-    override fun visitBlock(block: FirBlock, data: LoopInvariantsConversionContext) {
+    override fun visitBlock(block: FirBlock, data: InvariantsCollectorConversionContext) {
         block.statements.forEach { stmt ->
             check(stmt is FirExpression && stmt.resolvedType.isBoolean) {
                 INVALID_STATEMENT_MSG
             }
-            data.addLoopInvariant(stmt.accept(StmtConversionVisitor, data))
+            data.addInvariant(stmt.accept(StmtConversionVisitor, data))
         }
     }
 }
