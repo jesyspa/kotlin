@@ -29,10 +29,6 @@ internal sealed class NameMatcher(val name: MangledName) {
             this.action()
     }
 
-    inline fun ifPackageName(vararg segments: String, action: NameMatcher.() -> Unit) {
-        ifPackageName(segments.toList(), action)
-    }
-
     inline fun ifInCollectionsPkg(action: NameMatcher.() -> Unit) {
         ifPackageName(SpecialPackages.collections) { this.action() }
     }

@@ -8,6 +8,7 @@ package org.jetbrains.kotlin.formver.embeddings.types
 import org.jetbrains.kotlin.formver.domains.RuntimeTypeDomain
 import org.jetbrains.kotlin.formver.names.NameMatcher
 import org.jetbrains.kotlin.formver.names.ScopedKotlinName
+import org.jetbrains.kotlin.formver.names.SpecialPackages
 import org.jetbrains.kotlin.formver.viper.ast.DomainFunc
 import org.jetbrains.kotlin.formver.viper.ast.Exp
 
@@ -59,7 +60,7 @@ private fun PretypeEmbedding.isCollectionTypeNamed(name: String): Boolean {
 
 val ClassTypeEmbedding.isString: Boolean
     get() = NameMatcher.matchGlobalScope(name) {
-        ifPackageName("kotlin") {
+        ifPackageName(SpecialPackages.kotlin) {
             ifClassName("String") {
                 return true
             }
