@@ -22,9 +22,6 @@ import org.jetbrains.kotlin.formver.embeddings.*
 import org.jetbrains.kotlin.formver.embeddings.callables.*
 import org.jetbrains.kotlin.formver.embeddings.expression.*
 import org.jetbrains.kotlin.formver.embeddings.types.*
-import org.jetbrains.kotlin.formver.linearization.Linearizer
-import org.jetbrains.kotlin.formver.linearization.SeqnBuilder
-import org.jetbrains.kotlin.formver.linearization.SharedLinearizationState
 import org.jetbrains.kotlin.formver.names.*
 import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.formver.viper.ast.Program
@@ -58,13 +55,13 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
             .filterValues { value: ExpEmbedding? -> value != null } as Map<MangledName, ExpEmbedding>
 
     override val whileIndexProducer = indexProducer()
-    override val catchLabelNameProducer = simpleFreshEntityProducer { CatchLabelName(it) }
-    override val tryExitLabelNameProducer = simpleFreshEntityProducer { TryExitLabelName(it) }
+    override val catchLabelNameProducer = simpleFreshEntityProducer(::CatchLabelName)
+    override val tryExitLabelNameProducer = simpleFreshEntityProducer(::TryExitLabelName)
     override val scopeIndexProducer = indexProducer()
 
     // The type annotation is necessary for the code to compile.
-    override val anonVarProducer = FreshEntityProducer { n, type: TypeEmbedding -> AnonymousVariableEmbedding(n, type) }
-    override val returnTargetProducer = FreshEntityProducer { n, type: TypeEmbedding -> ReturnTarget(n, type) }
+    override val anonVarProducer = FreshEntityProducer(::AnonymousVariableEmbedding)
+    override val returnTargetProducer = FreshEntityProducer(::ReturnTarget)
 
     val program: Program
         get() = Program(
@@ -80,11 +77,29 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
 
     fun registerForVerification(declaration: FirSimpleFunction) {
         val signature = embedFullSignature(declaration.symbol)
+        val returnTarget = returnTargetProducer.getFresh(signature.callableType.returnType)
+        val stmtCtx = signature.createStatementContext(returnTarget, scopeIndexProducer.getFresh())
+
+        val userSpecifiedSignature = stmtCtx.enhanceWithUserSpecifications(declaration, signature, returnTarget)
         // Note: it is important that `body` is only set after `embedUserFunction` is complete, as we need to
         // place the embedding in the map before processing the body.
-        embedUserFunction(declaration.symbol, signature).apply {
-            body = convertMethodWithBody(declaration, signature)
+        embedUserFunction(declaration.symbol, userSpecifiedSignature).apply {
+            body = stmtCtx.convertMethodWithBody(declaration, userSpecifiedSignature, returnTarget)
         }
+    }
+
+    private fun FullNamedFunctionSignature.createStatementContext(
+        returnTarget: ReturnTarget,
+        scopeDepth: Int,
+    ): StmtConversionContext {
+        val methodCtx =
+            MethodConverter(
+                this@ProgramConverter,
+                this,
+                RootParameterResolver(this@ProgramConverter, this, this.symbol.valueParameterSymbols, this.labelName, returnTarget),
+                scopeDepth,
+            )
+        return StmtConverter(methodCtx)
     }
 
     fun embedUserFunction(symbol: FirFunctionSymbol<*>, signature: FullNamedFunctionSignature): UserFunctionEmbedding {
@@ -118,7 +133,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         val lookupName = symbol.embedName(this)
         return when (val existing = methods[lookupName]) {
             null -> {
-                val signature = embedFullSignature(symbol)
+                val signature = embedEnhancedWithUserSpecifications(symbol)
                 val callable = processCallable(symbol, signature)
                 UserFunctionEmbedding(callable).also {
                     methods[lookupName] = it
@@ -127,7 +142,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
             is PartiallySpecialKotlinFunction -> {
                 if (existing.baseEmbedding != null)
                     return existing
-                val signature = embedFullSignature(symbol)
+                val signature = embedEnhancedWithUserSpecifications(symbol)
                 val callable = processCallable(symbol, signature)
                 val userFunction = UserFunctionEmbedding(callable)
                 existing.also {
@@ -311,6 +326,15 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         }
     }
 
+    @OptIn(SymbolInternals::class)
+    fun embedEnhancedWithUserSpecifications(symbol: FirFunctionSymbol<*>): FullNamedFunctionSignature {
+        val subsignature = embedFullSignature(symbol)
+        val declaration = symbol.fir as? FirSimpleFunction ?: return subsignature
+        val returnTarget = ReturnTarget(depth = 0, subsignature.callableType.returnType)
+        val stmtCtx = subsignature.createStatementContext(returnTarget, scopeDepth = 0)
+        return stmtCtx.enhanceWithUserSpecifications(declaration, subsignature, returnTarget)
+    }
+
     private val FirFunctionSymbol<*>.containingPropertyOrSelf
         get() = when (this) {
             is FirPropertyAccessorSymbol -> propertySymbol
@@ -385,37 +409,14 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
 
     @OptIn(SymbolInternals::class)
     private fun processCallable(symbol: FirFunctionSymbol<*>, signature: FullNamedFunctionSignature): RichCallableEmbedding {
-        val body = symbol.fir.body
-        return if (symbol.isInline && body != null) {
-            InlineNamedFunction(signature, body)
+        return if (symbol.shouldBeInlined) {
+            InlineNamedFunction(signature, symbol.fir.body!!)
         } else {
             // We generate a dummy method header here to ensure all required types are processed already. If we skip this, any types
             // that are used only in contracts cause an error because they are not processed until too late.
             // TODO: fit this into the flow in some logical way instead.
             NonInlineNamedFunction(signature).also { it.toViperMethodHeader() }
         }
-    }
-
-    private fun convertMethodWithBody(declaration: FirSimpleFunction, signature: FullNamedFunctionSignature): FunctionBodyEmbedding? {
-        val firBody = declaration.body ?: return null
-        val returnTarget = returnTargetProducer.getFresh(signature.callableType.returnType)
-        val methodCtx =
-            MethodConverter(
-                this,
-                signature,
-                RootParameterResolver(this, signature, declaration.valueParameters.map { it.symbol }, signature.labelName, returnTarget),
-                scopeDepth = scopeIndexProducer.getFresh(),
-            )
-        val stmtCtx = StmtConverter(methodCtx)
-        val body = stmtCtx.convert(firBody)
-        val bodyExp = FunctionExp(signature, body, returnTarget.label)
-        val seqnBuilder = SeqnBuilder(declaration.source)
-        val linearizer = Linearizer(SharedLinearizationState(anonVarProducer), seqnBuilder, declaration.source)
-        bodyExp.toViperUnusedResult(linearizer)
-        // note: we must guarantee somewhere that returned value is Unit
-        // as we may not encounter any `return` statement in the body
-        returnTarget.variable.withIsUnitInvariantIfUnit().toViperUnusedResult(linearizer)
-        return FunctionBodyEmbedding(seqnBuilder.block, returnTarget, bodyExp)
     }
 
     private fun TypeBuilder.embedTypeWithBuilder(type: ConeKotlinType): PretypeBuilder = when {

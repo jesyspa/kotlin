@@ -6,7 +6,9 @@
 package org.jetbrains.kotlin.formver.conversion
 
 import org.jetbrains.kotlin.fir.FirLabel
+import org.jetbrains.kotlin.fir.declarations.FirSimpleFunction
 import org.jetbrains.kotlin.fir.declarations.utils.isFinal
+import org.jetbrains.kotlin.fir.declarations.utils.isInline
 import org.jetbrains.kotlin.fir.expressions.FirBlock
 import org.jetbrains.kotlin.fir.expressions.FirCatch
 import org.jetbrains.kotlin.fir.expressions.FirPropertyAccessExpression
@@ -17,12 +19,17 @@ import org.jetbrains.kotlin.fir.symbols.impl.FirPropertySymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirValueParameterSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirVariableSymbol
 import org.jetbrains.kotlin.formver.embeddings.*
+import org.jetbrains.kotlin.formver.embeddings.callables.FullNamedFunctionSignature
 import org.jetbrains.kotlin.formver.embeddings.types.TypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.callables.FunctionSignature
 import org.jetbrains.kotlin.formver.embeddings.expression.*
 import org.jetbrains.kotlin.formver.isCustom
+import org.jetbrains.kotlin.formver.linearization.Linearizer
+import org.jetbrains.kotlin.formver.linearization.SeqnBuilder
+import org.jetbrains.kotlin.formver.linearization.SharedLinearizationState
+import org.jetbrains.kotlin.formver.shouldBeInlined
 import org.jetbrains.kotlin.formver.viper.MangledName
-import org.jetbrains.kotlin.formver.viper.ast.Label
+import org.jetbrains.kotlin.formver.viper.ast.delegateToCallable
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.utils.addIfNotNull
 import org.jetbrains.kotlin.utils.addToStdlib.ifTrue
@@ -194,5 +201,46 @@ fun StmtConversionContext.insertInlineFunctionCall(
             add(returnTarget.variable.withIsUnitInvariantIfUnit())
         }
     }
+}
+
+fun StmtConversionContext.convertMethodWithBody(
+    declaration: FirSimpleFunction,
+    signature: FullNamedFunctionSignature,
+    returnTarget: ReturnTarget,
+): FunctionBodyEmbedding? {
+    val firBody = declaration.body ?: return null
+    val body = convert(firBody)
+    val bodyExp = FunctionExp(signature, body, returnTarget.label)
+    val seqnBuilder = SeqnBuilder(declaration.source)
+    val linearizer = Linearizer(SharedLinearizationState(anonVarProducer), seqnBuilder, declaration.source)
+    bodyExp.toViperUnusedResult(linearizer)
+    // note: we must guarantee somewhere that returned value is Unit
+    // as we may not encounter any `return` statement in the body
+    returnTarget.variable.withIsUnitInvariantIfUnit().toViperUnusedResult(linearizer)
+    return FunctionBodyEmbedding(seqnBuilder.block, returnTarget, bodyExp)
+}
+
+fun StmtConversionContext.enhanceWithUserSpecifications(
+    declaration: FirSimpleFunction,
+    signature: FullNamedFunctionSignature,
+    returnTarget: ReturnTarget,
+): FullNamedFunctionSignature {
+    val body = declaration.body ?: return signature
+    val specification = extractFunctionSpecification(body)
+    return object : FullNamedFunctionSignature by signature {
+        override fun getPreconditions(returnVariable: VariableEmbedding) = buildList {
+            addAll(signature.getPreconditions(returnVariable))
+
+            specification.first?.let {
+                InvariantsCollectorConverter(this@enhanceWithUserSpecifications).run {
+                    it.accept(InvariantsCollectorConversionVisitor, this)
+                    addAll(invariants)
+                }
+            }
+        }
+
+        // TODO: add postconditions
+    }
+
 }
 

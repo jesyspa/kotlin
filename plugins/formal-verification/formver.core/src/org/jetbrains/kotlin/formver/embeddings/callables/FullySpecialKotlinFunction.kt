@@ -193,12 +193,6 @@ object SpecialKotlinFunctions {
 val FunctionEmbedding.isVerifyFunction: Boolean
     get() = isFormverPluginFunctionNamed(name = "verify")
 
-val FunctionEmbedding.isLoopInvariantsFunction: Boolean
-    get() = isFormverPluginFunctionNamed(name = "loopInvariants")
-
-val FunctionEmbedding.isPreconditionsFunction: Boolean
-    get() = isFormverPluginFunctionNamed(name = "preconditions")
-
 fun FunctionEmbedding.isFormverPluginFunctionNamed(className: String? = null, name: String): Boolean =
     this is FullySpecialKotlinFunction && NameMatcher.matchClassScope(this.embedName()) {
         ifPackageName(SpecialPackages.formver) {

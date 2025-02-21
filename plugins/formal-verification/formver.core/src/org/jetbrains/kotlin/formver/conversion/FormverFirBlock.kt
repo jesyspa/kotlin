@@ -7,9 +7,7 @@ package org.jetbrains.kotlin.formver.conversion
 
 import org.jetbrains.kotlin.fir.expressions.*
 import org.jetbrains.kotlin.fir.symbols.impl.FirFunctionSymbol
-import org.jetbrains.kotlin.formver.embeddings.callables.FunctionEmbedding
-import org.jetbrains.kotlin.formver.embeddings.callables.isLoopInvariantsFunction
-import org.jetbrains.kotlin.formver.embeddings.callables.isPreconditionsFunction
+import org.jetbrains.kotlin.formver.isFormverFunctionNamed
 
 private const val SPECIFICATION_CONDITION_ERROR =
     "Only a single `preconditions` scope and a single `postconditions` scope is allowed as a function specification."
@@ -25,24 +23,33 @@ data class LoopInvariantsBlock(override val statements: FirBlock) : FormverFirBl
 data class PreconditionsBlock(override val statements: FirBlock) : FormverFirBlock
 data class PostconditionsBlock(override val statements: FirBlock) : FormverFirBlock
 
-fun FunctionEmbedding.blockType(): ((FirBlock) -> FormverFirBlock)? =
+interface FormverFirBlockBuilder {
+    fun complete(statements: FirBlock): FormverFirBlock
+}
+
+fun formverBlockBuilder(block: (FirBlock) -> FormverFirBlock) = object : FormverFirBlockBuilder {
+    override fun complete(statements: FirBlock) = block(statements)
+}
+
+
+fun FirFunctionSymbol<*>.blockBuilder(): FormverFirBlockBuilder? =
     when {
-        isLoopInvariantsFunction -> ::LoopInvariantsBlock
-        isPreconditionsFunction -> ::PreconditionsBlock
+        // To avoid recursion, we rely on FIR to identify these blocks as early as possible.
+        isFormverFunctionNamed("loopInvariants") -> formverBlockBuilder(::LoopInvariantsBlock)
+        isFormverFunctionNamed("preconditions") -> formverBlockBuilder(::PreconditionsBlock)
         else -> null
     }
 
 private fun ProgramConversionContext.extractFormverFirBlocks(parentBlock: FirBlock): List<FormverFirBlock> = buildList {
     parentBlock.statements.forEach { call ->
         if (call !is FirFunctionCall) return@buildList
-        val firFunction = call.toResolvedCallableSymbol() as FirFunctionSymbol<*>
-        val functionEmbedding = embedFunction(firFunction)
-        val constructor = functionEmbedding.blockType() ?: return@buildList
+        val firFunction = call.toResolvedCallableSymbol() as? FirFunctionSymbol<*> ?: return@buildList
+        val builder = firFunction.blockBuilder() ?: return@buildList
         val formverSpecificationArgument = call.argument
         check(formverSpecificationArgument is FirAnonymousFunctionExpression) {
             "Only lambdas are allowed as arguments of ${firFunction.name}."
         }
-        add(constructor(formverSpecificationArgument.anonymousFunction.body!!))
+        add(builder.complete(formverSpecificationArgument.anonymousFunction.body!!))
     }
 }
 
