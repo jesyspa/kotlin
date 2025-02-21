@@ -78,10 +78,10 @@ object SpecialKotlinFunctions {
         }
 
         withCallableType(intToIntType) {
-            addFunction("kotlin", className = "Int", name = "inc") { args, _ ->
+            addFunction(SpecialPackages.kotlin, className = "Int", name = "inc") { args, _ ->
                 AddIntInt(args[0], IntLit(1))
             }
-            addFunction("kotlin", className = "Int", name = "dec") { args, _ ->
+            addFunction(SpecialPackages.kotlin, className = "Int", name = "dec") { args, _ ->
                 SubIntInt(args[0], IntLit(1))
             }
         }
