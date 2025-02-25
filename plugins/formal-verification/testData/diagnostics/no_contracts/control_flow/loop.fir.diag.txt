@@ -5,17 +5,17 @@ method f$whileLoop$TF$T$Boolean(p$b: Ref) returns (ret$0: Ref)
   var anon$0: Ref
   inhale df$rt$isSubtype(df$rt$typeOf(p$b), df$rt$boolType())
   label lbl$continue$0
-  anon$0 := p$b
-  while (df$rt$boolFromRef(anon$0))
     invariant df$rt$isSubtype(df$rt$typeOf(p$b), df$rt$boolType())
-  {
+  anon$0 := p$b
+  if (df$rt$boolFromRef(anon$0)) {
     var l1$a: Ref
     var l1$c: Ref
     l1$a := df$rt$intToRef(1)
     l1$c := df$rt$intToRef(2)
-    anon$0 := p$b
+    goto lbl$continue$0
   }
   label lbl$break$0
+    invariant df$rt$isSubtype(df$rt$typeOf(p$b), df$rt$boolType())
   ret$0 := df$rt$boolToRef(false)
   goto lbl$ret$0
   label lbl$ret$0
@@ -28,8 +28,8 @@ method f$whileFunctionCondition$TF$() returns (ret$0: Ref)
   var anon$0: Ref
   label lbl$continue$0
   anon$0 := f$whileLoop$TF$T$Boolean(df$rt$boolToRef(true))
-  while (df$rt$boolFromRef(anon$0)) {
-    anon$0 := f$whileLoop$TF$T$Boolean(df$rt$boolToRef(true))
+  if (df$rt$boolFromRef(anon$0)) {
+    goto lbl$continue$0
   }
   label lbl$break$0
   label lbl$ret$0
