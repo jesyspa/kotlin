@@ -40,15 +40,14 @@ method f$test_while$TF$T$ClassWithField(p$param: Ref) returns (ret$0: Ref)
     l0$iteration := sp$timesInts(l3$intermediate, l3$intermediate)
   }
   label lbl$continue$0
-  anon$1 := sp$ltInts(l0$iteration, df$rt$intToRef(10))
-  while (df$rt$boolFromRef(anon$1))
     invariant acc(p$c$ClassWithField$shared(l0$c), wildcard)
     invariant df$rt$isSubtype(df$rt$typeOf(l0$c), df$rt$c$ClassWithField())
     invariant df$rt$isSubtype(df$rt$typeOf(l0$initParamField), df$rt$intType())
     invariant df$rt$isSubtype(df$rt$typeOf(l0$iteration), df$rt$intType())
     invariant acc(p$c$ClassWithField$shared(p$param), wildcard)
     invariant df$rt$isSubtype(df$rt$typeOf(p$param), df$rt$c$ClassWithField())
-  {
+  anon$1 := sp$ltInts(l0$iteration, df$rt$intToRef(10))
+  if (df$rt$boolFromRef(anon$1)) {
     var l4$field: Ref
     var l4$paramField: Ref
     unfold acc(p$c$ClassWithField$shared(l0$c), wildcard)
@@ -56,9 +55,15 @@ method f$test_while$TF$T$ClassWithField(p$param: Ref) returns (ret$0: Ref)
     unfold acc(p$c$ClassWithField$shared(p$param), wildcard)
     l4$paramField := p$param.bf$field
     l0$iteration := sp$plusInts(l0$iteration, df$rt$intToRef(1))
-    anon$1 := sp$ltInts(l0$iteration, df$rt$intToRef(10))
+    goto lbl$continue$0
   }
   label lbl$break$0
+    invariant acc(p$c$ClassWithField$shared(l0$c), wildcard)
+    invariant df$rt$isSubtype(df$rt$typeOf(l0$c), df$rt$c$ClassWithField())
+    invariant df$rt$isSubtype(df$rt$typeOf(l0$initParamField), df$rt$intType())
+    invariant df$rt$isSubtype(df$rt$typeOf(l0$iteration), df$rt$intType())
+    invariant acc(p$c$ClassWithField$shared(p$param), wildcard)
+    invariant df$rt$isSubtype(df$rt$typeOf(p$param), df$rt$c$ClassWithField())
   unfold acc(p$c$ClassWithField$shared(l0$c), wildcard)
   anon$2 := l0$c.bf$field
   assert df$rt$intFromRef(anon$2) == 13
@@ -110,8 +115,6 @@ method f$test_while_with_inlining$TF$T$ClassWithField(p$param: Ref)
   anon$1 := anon$0
   l2$iteration := df$rt$intToRef(0)
   label lbl$continue$0
-  anon$6 := sp$ltInts(l2$iteration, df$rt$intToRef(10))
-  while (df$rt$boolFromRef(anon$6))
     invariant df$rt$isSubtype(df$rt$typeOf(l2$iteration), df$rt$intType())
     invariant acc(p$c$ClassWithField$shared(anon$1), wildcard)
     invariant df$rt$isSubtype(df$rt$typeOf(anon$1), df$rt$c$ClassWithField())
@@ -119,7 +122,8 @@ method f$test_while_with_inlining$TF$T$ClassWithField(p$param: Ref)
     invariant df$rt$isSubtype(df$rt$typeOf(l0$local), df$rt$c$ClassWithField())
     invariant acc(p$c$ClassWithField$shared(p$param), wildcard)
     invariant df$rt$isSubtype(df$rt$typeOf(p$param), df$rt$c$ClassWithField())
-  {
+  anon$6 := sp$ltInts(l2$iteration, df$rt$intToRef(10))
+  if (df$rt$boolFromRef(anon$6)) {
     var l3$paramField: Ref
     var l3$localField: Ref
     var l3$thisField: Ref
@@ -130,9 +134,16 @@ method f$test_while_with_inlining$TF$T$ClassWithField(p$param: Ref)
     unfold acc(p$c$ClassWithField$shared(anon$1), wildcard)
     l3$thisField := anon$1.bf$field
     l2$iteration := sp$plusInts(l2$iteration, df$rt$intToRef(1))
-    anon$6 := sp$ltInts(l2$iteration, df$rt$intToRef(10))
+    goto lbl$continue$0
   }
   label lbl$break$0
+    invariant df$rt$isSubtype(df$rt$typeOf(l2$iteration), df$rt$intType())
+    invariant acc(p$c$ClassWithField$shared(anon$1), wildcard)
+    invariant df$rt$isSubtype(df$rt$typeOf(anon$1), df$rt$c$ClassWithField())
+    invariant acc(p$c$ClassWithField$shared(l0$local), wildcard)
+    invariant df$rt$isSubtype(df$rt$typeOf(l0$local), df$rt$c$ClassWithField())
+    invariant acc(p$c$ClassWithField$shared(p$param), wildcard)
+    invariant df$rt$isSubtype(df$rt$typeOf(p$param), df$rt$c$ClassWithField())
   unfold acc(p$c$ClassWithField$shared(anon$1), wildcard)
   anon$7 := anon$1.bf$field
   assert df$rt$intFromRef(anon$7) == 42
@@ -167,12 +178,11 @@ method f$test_while_with_smartcast$TF$T$Any$T$Any(p$param: Ref, p$innerParam: Re
     var anon$0: Ref
     l2$iteration := df$rt$intToRef(0)
     label lbl$continue$0
-    anon$0 := sp$ltInts(l2$iteration, df$rt$intToRef(10))
-    while (df$rt$boolFromRef(anon$0))
       invariant df$rt$isSubtype(df$rt$typeOf(l2$iteration), df$rt$intType())
       invariant df$rt$isSubtype(df$rt$typeOf(p$param), df$rt$anyType())
       invariant df$rt$isSubtype(df$rt$typeOf(p$innerParam), df$rt$anyType())
-    {
+    anon$0 := sp$ltInts(l2$iteration, df$rt$intToRef(10))
+    if (df$rt$boolFromRef(anon$0)) {
       var l3$paramField: Ref
       inhale acc(p$c$ClassWithField$shared(p$param), wildcard)
       unfold acc(p$c$ClassWithField$shared(p$param), wildcard)
@@ -184,9 +194,12 @@ method f$test_while_with_smartcast$TF$T$Any$T$Any(p$param: Ref, p$innerParam: Re
         l5$innerParamField := p$innerParam.bf$field
       }
       l2$iteration := sp$plusInts(l2$iteration, df$rt$intToRef(1))
-      anon$0 := sp$ltInts(l2$iteration, df$rt$intToRef(10))
+      goto lbl$continue$0
     }
     label lbl$break$0
+      invariant df$rt$isSubtype(df$rt$typeOf(l2$iteration), df$rt$intType())
+      invariant df$rt$isSubtype(df$rt$typeOf(p$param), df$rt$anyType())
+      invariant df$rt$isSubtype(df$rt$typeOf(p$innerParam), df$rt$anyType())
   }
   label lbl$ret$0
   inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())

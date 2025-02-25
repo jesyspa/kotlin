@@ -21,6 +21,7 @@ import org.jetbrains.kotlin.formver.embeddings.types.TypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.callables.FunctionSignature
 import org.jetbrains.kotlin.formver.embeddings.expression.*
 import org.jetbrains.kotlin.formver.isCustom
+import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.formver.viper.ast.Label
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.utils.addIfNotNull
@@ -43,10 +44,10 @@ interface StmtConversionContext : MethodConversionContext {
      * the `callSubject` again to we store it in the `StmtConversionContext`.
      */
     val checkedSafeCallSubject: ExpEmbedding?
-    val activeCatchLabels: List<Label>
+    val activeCatchLabels: List<LabelEmbedding>
 
-    fun continueLabel(targetName: String? = null): Label
-    fun breakLabel(targetName: String? = null): Label
+    fun continueLabelName(targetName: String? = null): MangledName
+    fun breakLabelName(targetName: String? = null): MangledName
     fun addLoopName(targetName: String)
     fun convert(stmt: FirStatement): ExpEmbedding
 
