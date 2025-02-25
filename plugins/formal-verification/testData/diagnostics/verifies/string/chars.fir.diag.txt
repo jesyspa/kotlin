@@ -7,8 +7,9 @@ method con$c$CharBox$T$Char(p$char: Ref) returns (ret: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$c$CharBox())
   ensures acc(p$c$CharBox$shared(ret), wildcard)
   ensures acc(p$c$CharBox$unique(ret), write)
-  ensures (unfolding acc(p$c$CharBox$shared(ret), wildcard) in
-      df$rt$charFromRef(ret.bf$char) == df$rt$charFromRef(p$char))
+  ensures df$rt$charFromRef((unfolding acc(p$c$CharBox$shared(ret), wildcard) in
+      ret.bf$char)) ==
+    df$rt$charFromRef(p$char)
 
 
 method f$testChars$TF$T$Char(p$c: Ref) returns (ret$0: Ref)

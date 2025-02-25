@@ -15,6 +15,10 @@ import org.jetbrains.kotlin.formver.viper.ast.Declaration
 import org.jetbrains.kotlin.formver.viper.ast.Label
 import org.jetbrains.kotlin.formver.viper.ast.Stmt
 
+enum class UnfoldPolicy {
+    UNFOLD, UNFOLDING_IN;
+}
+
 /**
  * Context in which an `ExpEmbedding` can be flattened to an `Exp` and a sequence of `Stmt`s.
  *
@@ -24,6 +28,7 @@ import org.jetbrains.kotlin.formver.viper.ast.Stmt
  */
 interface LinearizationContext {
     val source: KtSourceElement?
+    val unfoldPolicy: UnfoldPolicy
 
     fun freshAnonVar(type: TypeEmbedding): AnonymousVariableEmbedding
 
