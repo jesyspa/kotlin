@@ -35,24 +35,25 @@ class FullySpecialKotlinFunctionBuilder {
 
     fun addFunction(
         callableType: FunctionTypeEmbedding,
-        vararg packageName: String,
+        packageName: List<String>,
         className: String? = null,
         name: String,
         body: (List<ExpEmbedding>, StmtConversionContext) -> ExpEmbedding,
     ) {
         withCallableType(callableType) {
-            addFunction(*packageName, className = className, name = name, body = body)
+            addFunction(packageName, className = className, name = name, body = body)
         }
     }
 
     inner class SpecialKotlinFunctionBuilderWithCallableType(private val callableType: FunctionTypeEmbedding) {
+
         fun addFunction(
-            vararg packageName: String,
+            packageName: List<String>,
             className: String? = null,
             name: String,
             body: (List<ExpEmbedding>, StmtConversionContext) -> ExpEmbedding,
         ) {
-            FullySpecialKotlinFunctionImpl(packageName.toList(), className, name, callableType, body).apply { byName[embedName()] = this }
+            FullySpecialKotlinFunctionImpl(packageName, className, name, callableType, body).apply { byName[embedName()] = this }
         }
     }
 

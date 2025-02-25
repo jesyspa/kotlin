@@ -126,7 +126,7 @@ sealed interface Stmt : IntoSilver<viper.silver.ast.Stmt> {
     data class If(
         val cond: Exp,
         val then: Seqn,
-        val els: Seqn,
+        val els: Seqn?,
         val position: Position = Position.NoPosition,
         val info: Info = Info.NoInfo,
         val trafos: Trafos = Trafos.NoTrafos,
@@ -134,7 +134,7 @@ sealed interface Stmt : IntoSilver<viper.silver.ast.Stmt> {
         override fun toSilver(): viper.silver.ast.If = viper.silver.ast.If(
             cond.toSilver(),
             then.toSilver(),
-            els.toSilver(),
+            els?.toSilver() ?: Seqn().toSilver(),
             position.toSilver(),
             info.toSilver(),
             trafos.toSilver()

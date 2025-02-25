@@ -52,20 +52,23 @@ method f$shadowNested$TF$T$Int(p$x: Ref) returns (ret$0: Ref)
     l2$x := df$rt$intToRef(1)
     l0$foo := l2$x
     label lbl$continue$0
-    anon$0 := df$rt$boolToRef(true)
-    while (df$rt$boolFromRef(anon$0))
       invariant df$rt$isSubtype(df$rt$typeOf(l2$x), df$rt$intType())
       invariant df$rt$isSubtype(df$rt$typeOf(l0$foo), df$rt$intType())
       invariant df$rt$isSubtype(df$rt$typeOf(l0$x), df$rt$intType())
       invariant df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$intType())
-    {
+    anon$0 := df$rt$boolToRef(true)
+    if (df$rt$boolFromRef(anon$0)) {
       var l3$x: Ref
       l0$foo := l2$x
       l3$x := df$rt$intToRef(2)
       l0$foo := l3$x
-      anon$0 := df$rt$boolToRef(true)
+      goto lbl$continue$0
     }
     label lbl$break$0
+      invariant df$rt$isSubtype(df$rt$typeOf(l2$x), df$rt$intType())
+      invariant df$rt$isSubtype(df$rt$typeOf(l0$foo), df$rt$intType())
+      invariant df$rt$isSubtype(df$rt$typeOf(l0$x), df$rt$intType())
+      invariant df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$intType())
     l0$foo := l2$x
   }
   l0$foo := l0$x
