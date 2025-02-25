@@ -37,8 +37,9 @@ method con$c$BothConstructors$T$Int(p$a: Ref) returns (ret: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$c$BothConstructors())
   ensures acc(p$c$BothConstructors$shared(ret), wildcard)
   ensures acc(p$c$BothConstructors$unique(ret), write)
-  ensures (unfolding acc(p$c$BothConstructors$shared(ret), wildcard) in
-      df$rt$intFromRef(ret.bf$a) == df$rt$intFromRef(p$a))
+  ensures df$rt$intFromRef((unfolding acc(p$c$BothConstructors$shared(ret), wildcard) in
+      ret.bf$a)) ==
+    df$rt$intFromRef(p$a)
 
 
 method f$primaryAndSecondConstructor$TF$() returns (ret$0: Ref)

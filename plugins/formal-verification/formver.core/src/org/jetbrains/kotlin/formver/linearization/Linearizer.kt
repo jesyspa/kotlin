@@ -22,6 +22,9 @@ data class Linearizer(
     override val source: KtSourceElement?,
     val stmtModifierTracker: StmtModifierTracker? = null
 ) : LinearizationContext {
+    override val unfoldPolicy: UnfoldPolicy
+        get() = UnfoldPolicy.UNFOLD
+
     override fun freshAnonVar(type: TypeEmbedding): AnonymousVariableEmbedding {
         val variable = state.freshAnonVar(type)
         addDeclaration(variable.toLocalVarDecl())
