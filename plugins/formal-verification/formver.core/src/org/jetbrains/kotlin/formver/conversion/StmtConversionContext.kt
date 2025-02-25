@@ -17,6 +17,7 @@ import org.jetbrains.kotlin.fir.symbols.impl.FirPropertySymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirValueParameterSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirVariableSymbol
 import org.jetbrains.kotlin.formver.embeddings.*
+import org.jetbrains.kotlin.formver.embeddings.callables.FullNamedFunctionSignature
 import org.jetbrains.kotlin.formver.embeddings.types.TypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.callables.FunctionSignature
 import org.jetbrains.kotlin.formver.embeddings.expression.*
@@ -188,7 +189,13 @@ fun StmtConversionContext.insertInlineFunctionCall(
         Block {
             add(Declare(returnTarget.variable, null))
             addAll(declarations)
+            (calleeSignature as? FullNamedFunctionSignature)?.run {
+                getPreconditions(returnTarget.variable).forEach { add(Assert(it)) }
+            }
             add(FunctionExp(null, convert(body), returnTarget.label))
+            (calleeSignature as? FullNamedFunctionSignature)?.run {
+                getPostconditions(returnTarget.variable).forEach { add(Assert(it)) }
+            }
             // if unit is what we return we might not guarantee it yet
             add(returnTarget.variable.withIsUnitInvariantIfUnit())
         }
