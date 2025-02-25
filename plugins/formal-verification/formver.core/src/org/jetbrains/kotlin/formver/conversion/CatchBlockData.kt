@@ -6,7 +6,7 @@
 package org.jetbrains.kotlin.formver.conversion
 
 import org.jetbrains.kotlin.fir.expressions.FirCatch
-import org.jetbrains.kotlin.formver.viper.ast.Label
+import org.jetbrains.kotlin.formver.embeddings.LabelEmbedding
 
-class CatchBlockData(val entryLabel: Label, val firCatch: FirCatch)
-class CatchBlockListData(val exitLabel: Label, val blocks: List<CatchBlockData>)
+class CatchBlockData(val entryLabel: LabelEmbedding, val firCatch: FirCatch)
+class CatchBlockListData(val exitLabel: LabelEmbedding, val blocks: List<CatchBlockData>)

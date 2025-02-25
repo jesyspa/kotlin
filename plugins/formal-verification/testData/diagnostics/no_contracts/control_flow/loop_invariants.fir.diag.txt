@@ -5,18 +5,23 @@ method f$dynamicLambdaInvariant$TF$TF$(p$f: Ref) returns (ret$0: Ref)
   var anon$0: Ref
   inhale df$rt$isSubtype(df$rt$typeOf(p$f), df$rt$functionType())
   label lbl$continue$0
-  anon$0 := f$returnsBoolean$TF$()
-  while (df$rt$boolFromRef(anon$0))
     invariant df$rt$isSubtype(df$rt$typeOf(p$f), df$rt$functionType())
-  {
+  anon$0 := f$returnsBoolean$TF$()
+  if (df$rt$boolFromRef(anon$0)) {
     var anon$1: Ref
     inhale df$rt$isSubtype(df$rt$typeOf(anon$1), df$rt$intType())
-    anon$0 := f$returnsBoolean$TF$()
+    goto lbl$continue$0
   }
   label lbl$break$0
+    invariant df$rt$isSubtype(df$rt$typeOf(p$f), df$rt$functionType())
   label lbl$ret$0
   inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
+
+method f$pkg$kotlin$c$Function0$invoke$TF$TF$(this$dispatch: Ref)
+  returns (ret: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$intType())
+
 
 method f$returnsBoolean$TF$() returns (ret: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$boolType())
@@ -31,19 +36,25 @@ method f$functionAssignment$TF$TF$(p$f: Ref) returns (ret$0: Ref)
   inhale df$rt$isSubtype(df$rt$typeOf(p$f), df$rt$functionType())
   l0$g := p$f
   label lbl$continue$0
-  anon$0 := f$returnsBoolean$TF$()
-  while (df$rt$boolFromRef(anon$0))
     invariant df$rt$isSubtype(df$rt$typeOf(l0$g), df$rt$functionType())
     invariant df$rt$isSubtype(df$rt$typeOf(p$f), df$rt$functionType())
-  {
+  anon$0 := f$returnsBoolean$TF$()
+  if (df$rt$boolFromRef(anon$0)) {
     var anon$1: Ref
     inhale df$rt$isSubtype(df$rt$typeOf(anon$1), df$rt$intType())
-    anon$0 := f$returnsBoolean$TF$()
+    goto lbl$continue$0
   }
   label lbl$break$0
+    invariant df$rt$isSubtype(df$rt$typeOf(l0$g), df$rt$functionType())
+    invariant df$rt$isSubtype(df$rt$typeOf(p$f), df$rt$functionType())
   label lbl$ret$0
   inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
+
+method f$pkg$kotlin$c$Function0$invoke$TF$TF$(this$dispatch: Ref)
+  returns (ret: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$intType())
+
 
 method f$returnsBoolean$TF$() returns (ret: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$boolType())
@@ -65,21 +76,29 @@ method f$conditionalFunctionAssignment$TF$T$Boolean$TF$$TF$(p$b: Ref, p$f: Ref,
   } else {
     l0$g := p$h}
   label lbl$continue$0
-  anon$0 := f$returnsBoolean$TF$()
-  while (df$rt$boolFromRef(anon$0))
     invariant df$rt$isSubtype(df$rt$typeOf(l0$g), df$rt$functionType())
     invariant df$rt$isSubtype(df$rt$typeOf(p$b), df$rt$boolType())
     invariant df$rt$isSubtype(df$rt$typeOf(p$f), df$rt$functionType())
     invariant df$rt$isSubtype(df$rt$typeOf(p$h), df$rt$functionType())
-  {
+  anon$0 := f$returnsBoolean$TF$()
+  if (df$rt$boolFromRef(anon$0)) {
     var anon$1: Ref
     inhale df$rt$isSubtype(df$rt$typeOf(anon$1), df$rt$intType())
-    anon$0 := f$returnsBoolean$TF$()
+    goto lbl$continue$0
   }
   label lbl$break$0
+    invariant df$rt$isSubtype(df$rt$typeOf(l0$g), df$rt$functionType())
+    invariant df$rt$isSubtype(df$rt$typeOf(p$b), df$rt$boolType())
+    invariant df$rt$isSubtype(df$rt$typeOf(p$f), df$rt$functionType())
+    invariant df$rt$isSubtype(df$rt$typeOf(p$h), df$rt$functionType())
   label lbl$ret$0
   inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
+
+method f$pkg$kotlin$c$Function0$invoke$TF$TF$(this$dispatch: Ref)
+  returns (ret: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$intType())
+
 
 method f$returnsBoolean$TF$() returns (ret: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$boolType())
