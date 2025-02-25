@@ -21,11 +21,9 @@ import org.jetbrains.kotlin.fir.types.isUnit
 import org.jetbrains.kotlin.fir.types.resolvedType
 import org.jetbrains.kotlin.fir.visitors.FirVisitor
 import org.jetbrains.kotlin.formver.UnsupportedFeatureBehaviour
+import org.jetbrains.kotlin.formver.embeddings.LabelLink
+import org.jetbrains.kotlin.formver.embeddings.callables.*
 import org.jetbrains.kotlin.formver.embeddings.types.TypeEmbedding
-import org.jetbrains.kotlin.formver.embeddings.callables.FullNamedFunctionSignature
-import org.jetbrains.kotlin.formver.embeddings.callables.FunctionEmbedding
-import org.jetbrains.kotlin.formver.embeddings.callables.insertCall
-import org.jetbrains.kotlin.formver.embeddings.callables.isVerifyFunction
 import org.jetbrains.kotlin.formver.embeddings.expression.*
 import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.GeCharChar
 import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.GeIntInt
@@ -36,6 +34,7 @@ import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.
 import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.LtCharChar
 import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.LtIntInt
 import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.Not
+import org.jetbrains.kotlin.formver.embeddings.toLink
 import org.jetbrains.kotlin.formver.embeddings.types.buildType
 import org.jetbrains.kotlin.formver.embeddings.types.equalToType
 import org.jetbrains.kotlin.formver.functionCallArguments
@@ -75,7 +74,7 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext>()
         val target = data.resolveReturnTarget(returnTargetName)
         return blockOf(
             Assign(target.variable, expr),
-            Goto(target.label)
+            Goto(target.label.toLink())
         )
     }
 
@@ -285,6 +284,18 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext>()
         return data.declareLocalProperty(symbol, property.initializer?.let { data.convert(it).withType(type) })
     }
 
+    private fun extractLoopInvariantsBlock(whileLoop: FirWhileLoop, data: StmtConversionContext): FirBlock? =
+        whileLoop.block.statements.firstOrNull()?.let { call ->
+            if (call !is FirFunctionCall) return null
+            val functionEmbedding = data.embedFunction(call.toResolvedCallableSymbol() as FirFunctionSymbol<*>)
+            if (!functionEmbedding.isLoopInvariantsFunction) return null
+            val loopInvariantsArgument = call.argument
+            check(loopInvariantsArgument is FirAnonymousFunctionExpression) {
+                "Only lambdas are allowed as arguments of `loopInvariants`."
+            }
+            loopInvariantsArgument.anonymousFunction.body
+        }
+
     override fun visitWhileLoop(whileLoop: FirWhileLoop, data: StmtConversionContext): ExpEmbedding {
         val condition = data.convert(whileLoop.condition).withType { boolean() }
         val invariants = buildList {
@@ -292,10 +303,16 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext>()
                 addIfNotNull(it.sharedPredicateAccessInvariant())
                 addAll(it.provenInvariants())
             }
+            extractLoopInvariantsBlock(whileLoop, data)?.let {
+                LoopInvariantsConverter(data).run {
+                    it.accept(LoopInvariantsConversionVisitor, this)
+                    addAll(invariants)
+                }
+            }
         }
         return data.withFreshWhile(whileLoop.label) {
             val body = convert(whileLoop.block)
-            While(condition, body, breakLabel(), continueLabel(), invariants)
+            While(condition, body, breakLabelName(), continueLabelName(), invariants)
         }
     }
 
@@ -304,7 +321,7 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext>()
         data: StmtConversionContext,
     ): ExpEmbedding {
         val targetName = breakExpression.target.labelName
-        val breakLabel = data.breakLabel(targetName)
+        val breakLabel = LabelLink(data.breakLabelName(targetName))
         return Goto(breakLabel)
     }
 
@@ -313,7 +330,7 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext>()
         data: StmtConversionContext,
     ): ExpEmbedding {
         val targetName = continueExpression.target.labelName
-        val continueLabel = data.continueLabel(targetName)
+        val continueLabel = LabelLink(data.continueLabelName(targetName))
         return Goto(continueLabel)
     }
 
@@ -421,7 +438,7 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext>()
     override fun visitTryExpression(tryExpression: FirTryExpression, data: StmtConversionContext): ExpEmbedding {
         val (catchData, tryBody) = data.withCatches(tryExpression.catches) { catchData ->
             withNewScope {
-                val jumps = catchData.blocks.map { catchBlock -> NonDeterministically(Goto(catchBlock.entryLabel)) }
+                val jumps = catchData.blocks.map { catchBlock -> NonDeterministically(Goto(catchBlock.entryLabel.toLink())) }
                 val body = convert(tryExpression.tryBlock)
                 GotoChainNode(
                     null,
@@ -430,7 +447,7 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext>()
                         add(body)
                         addAll(jumps)
                     },
-                    catchData.exitLabel
+                    catchData.exitLabel.toLink()
                 )
             }
         }
@@ -445,7 +462,7 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext>()
                         paramDecl,
                         convert(catchBlock.firCatch.block)
                     ),
-                    catchData.exitLabel
+                    catchData.exitLabel.toLink()
                 )
             }
         }
