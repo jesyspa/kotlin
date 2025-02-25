@@ -24,6 +24,9 @@ class PureLinearizerMisuseException(val offendingFunction: String) : IllegalStat
  * would be an error.
  */
 class PureLinearizer(override val source: KtSourceElement?) : LinearizationContext {
+    override val unfoldPolicy: UnfoldPolicy
+        get() = UnfoldPolicy.UNFOLDING_IN
+
     override fun <R> withPosition(newSource: KtSourceElement, action: LinearizationContext.() -> R): R =
         PureLinearizer(newSource).action()
 

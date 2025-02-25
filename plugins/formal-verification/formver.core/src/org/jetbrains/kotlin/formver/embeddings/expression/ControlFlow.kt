@@ -160,35 +160,6 @@ data class NonDeterministically(val exp: ExpEmbedding) : UnitResultExpEmbedding,
         get() = listOf(exp)
 }
 
-data class UnfoldingSharedClassPredicateEmbedding(val predicated: VariableEmbedding, override val inner: ExpEmbedding) :
-    UnaryDirectResultExpEmbedding {
-    override val type: TypeEmbedding = inner.type
-    private fun toViperImpl(ctx: LinearizationContext, action: ExpEmbedding.() -> Exp): Exp {
-        val predicatedType = predicated.type.pretype
-        check(predicatedType is ClassTypeEmbedding) {
-            "Built-in types do not have predicates."
-        }
-        return Exp.Unfolding(
-            Exp.PredicateAccess(
-                predicatedType.details.sharedPredicate.name,
-                listOf(predicated.pureToViper(false)),
-                PermExp.WildcardPerm(),
-                pos = ctx.source.asPosition,
-                info = sourceRole.asInfo
-            ),
-            inner.action()
-        )
-    }
-
-    override fun toViper(ctx: LinearizationContext): Exp = toViperImpl(ctx) {
-        toViper(ctx)
-    }
-
-    override fun toViperBuiltinType(ctx: LinearizationContext): Exp = toViperImpl(ctx) {
-        toViperBuiltinType(ctx)
-    }
-}
-
 // Note: this is always a *real* Viper method call.
 data class MethodCall(val method: NamedFunctionSignature, val args: List<ExpEmbedding>) : StoredResultExpEmbedding {
     override val type: TypeEmbedding = method.callableType.returnType

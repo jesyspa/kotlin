@@ -15,8 +15,9 @@ method con$c$ClassWithMember$T$Int(p$member: Ref) returns (ret: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$c$ClassWithMember())
   ensures acc(p$c$ClassWithMember$shared(ret), wildcard)
   ensures acc(p$c$ClassWithMember$unique(ret), write)
-  ensures (unfolding acc(p$c$ClassWithMember$shared(ret), wildcard) in
-      df$rt$intFromRef(ret.bf$member) == df$rt$intFromRef(p$member))
+  ensures df$rt$intFromRef((unfolding acc(p$c$ClassWithMember$shared(ret), wildcard) in
+      ret.bf$member)) ==
+    df$rt$intFromRef(p$member)
 
 
 method f$checkMemberAccess$TF$() returns (ret$0: Ref)
@@ -91,8 +92,8 @@ method con$c$Box$NT$Any(p$wrapped: Ref) returns (ret: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$c$Box())
   ensures acc(p$c$Box$shared(ret), wildcard)
   ensures acc(p$c$Box$unique(ret), write)
-  ensures (unfolding acc(p$c$Box$shared(ret), wildcard) in
-      ret.bf$wrapped == p$wrapped)
+  ensures (unfolding acc(p$c$Box$shared(ret), wildcard) in ret.bf$wrapped) ==
+    p$wrapped
 
 
 method f$checkGenericMemberAccess$TF$T$Box(p$box: Ref) returns (ret$0: Ref)
