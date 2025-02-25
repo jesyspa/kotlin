@@ -39,8 +39,9 @@ method con$c$Impl$T$Int(p$number: Ref) returns (ret: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$c$Impl())
   ensures acc(p$c$Impl$shared(ret), wildcard)
   ensures acc(p$c$Impl$unique(ret), write)
-  ensures (unfolding acc(p$c$Impl$shared(ret), wildcard) in
-      df$rt$intFromRef(ret.bf$number) == df$rt$intFromRef(p$number))
+  ensures df$rt$intFromRef((unfolding acc(p$c$Impl$shared(ret), wildcard) in
+      ret.bf$number)) ==
+    df$rt$intFromRef(p$number)
 
 
 method f$createImpl$TF$() returns (ret$0: Ref)

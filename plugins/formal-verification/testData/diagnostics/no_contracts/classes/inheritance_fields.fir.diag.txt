@@ -56,8 +56,9 @@ method con$c$SecondBackingFieldClass$T$Int(p$x: Ref) returns (ret: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$c$SecondBackingFieldClass())
   ensures acc(p$c$SecondBackingFieldClass$shared(ret), wildcard)
   ensures acc(p$c$SecondBackingFieldClass$unique(ret), write)
-  ensures (unfolding acc(p$c$SecondBackingFieldClass$shared(ret), wildcard) in
-      df$rt$intFromRef(ret.bf$x) == df$rt$intFromRef(p$x))
+  ensures df$rt$intFromRef((unfolding acc(p$c$SecondBackingFieldClass$shared(ret), wildcard) in
+      ret.bf$x)) ==
+    df$rt$intFromRef(p$x)
 
 
 method f$createBFsAndNoBF$TF$() returns (ret$0: Ref)
