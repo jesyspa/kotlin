@@ -13,7 +13,6 @@ import org.jetbrains.kotlin.test.directives.DiagnosticsDirectives.RENDER_DIAGNOS
 import org.jetbrains.kotlin.test.directives.DiagnosticsDirectives.STOP_ON_FAILURE
 import org.jetbrains.kotlin.test.directives.FirDiagnosticsDirectives.ENABLE_PLUGIN_PHASES
 import org.jetbrains.kotlin.test.runners.AbstractFirLightTreeDiagnosticsTest
-import org.jetbrains.kotlin.test.runners.enableLazyResolvePhaseChecking
 
 abstract class AbstractFirLightTreeFormVerPluginDiagnosticsTest : AbstractFirLightTreeDiagnosticsTest() {
     override fun configure(builder: TestConfigurationBuilder) {
@@ -23,8 +22,6 @@ abstract class AbstractFirLightTreeFormVerPluginDiagnosticsTest : AbstractFirLig
 }
 
 fun TestConfigurationBuilder.commonFirWithPluginFrontendConfiguration() {
-    enableLazyResolvePhaseChecking()
-
     defaultDirectives {
         +ENABLE_PLUGIN_PHASES
         +RENDER_DIAGNOSTICS_FULL_TEXT

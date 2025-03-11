@@ -454,15 +454,16 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         type.isBoolean -> boolean()
         type.isNothing -> nothing()
         type.isSomeFunctionType(session) -> function {
+            check (type is ConeClassLikeType) { "Expected a ConeClassLikeType for a function type, got $type" }
             type.receiverType(session)?.let { withDispatchReceiver { embedTypeWithBuilder(it) } }
             type.valueParameterTypesWithoutReceivers(session).forEach { param ->
                 withParam { embedTypeWithBuilder(param) }
             }
             withReturnType { embedTypeWithBuilder(type.returnType(session)) }
         }
-        type.isNullable -> {
+        type.canBeNull(session) -> {
             isNullable = true
-            embedTypeWithBuilder(type.withNullability(ConeNullability.NOT_NULL, session.typeContext))
+            embedTypeWithBuilder(type.withNullability(false, session.typeContext))
         }
         type.isAny -> any()
         type is ConeClassLikeType -> {

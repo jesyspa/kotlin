@@ -22,11 +22,13 @@ import org.jetbrains.kotlin.test.services.service
  */
 class NoBackendCompilationErrorsHandler(testServices: TestServices) : AnalysisHandler<BinaryArtifacts.Jvm>(
     testServices,
+) {
     // Must go on, because we may have multiple modules emitting IR diagnostics, and we want
     // to continue processing the next modules to collect everything for `GlobalMetadataInfoHandler`.
-    failureDisablesNextSteps = false,
-    doNotRunIfThereWerePreviousFailures = false,
-) {
+    override val failureDisablesNextSteps: Boolean
+        get() = false
+    override val doNotRunIfThereWerePreviousFailures: Boolean
+        get() = false
     override val artifactKind: TestArtifactKind<BinaryArtifacts.Jvm> get() = ArtifactKinds.Jvm
 
     override val directiveContainers: List<DirectivesContainer>

@@ -29,9 +29,11 @@ import org.jetbrains.kotlin.test.utils.withExtension
 class KlibAbiDumpHandler(testServices: TestServices) : BinaryArtifactHandler<BinaryArtifacts.KLib>(
     testServices,
     ArtifactKinds.KLib,
-    failureDisablesNextSteps = true,
-    doNotRunIfThereWerePreviousFailures = true,
 ) {
+    override val failureDisablesNextSteps: Boolean
+        get() = true
+    override val doNotRunIfThereWerePreviousFailures: Boolean
+        get() = true
     override val directiveContainers get() = listOf(KlibAbiDumpDirectives)
 
     private val dumpers = hashMapOf<AbiSignatureVersion, MultiModuleInfoDumper>()

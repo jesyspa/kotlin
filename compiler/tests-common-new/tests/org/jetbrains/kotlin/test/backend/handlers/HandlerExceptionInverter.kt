@@ -17,7 +17,11 @@ import org.opentest4j.AssertionFailedError
 class HandlerExceptionInverter<A : ResultingArtifact<A>>(
     val delegate: AnalysisHandler<A>,
     val throwException: HandlerExceptionInverter<A>.(TestModule) -> Nothing,
-) : AnalysisHandler<A>(delegate.testServices, delegate.failureDisablesNextSteps, delegate.doNotRunIfThereWerePreviousFailures) {
+) : AnalysisHandler<A>(delegate.testServices) {
+    override val failureDisablesNextSteps: Boolean
+        get() = delegate.failureDisablesNextSteps
+    override val doNotRunIfThereWerePreviousFailures: Boolean
+        get() = delegate.doNotRunIfThereWerePreviousFailures
     override val artifactKind get() = delegate.artifactKind
 
     override fun processModule(module: TestModule, info: A) {

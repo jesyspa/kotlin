@@ -110,9 +110,11 @@ class FirReplCompilerFacade(
 
 class ReplCompilerDiagnosticsHandler(
     testServices: TestServices,
-    failureDisablesNextSteps: Boolean = false,
-    doNotRunIfThereWerePreviousFailures: Boolean = false
-) : AnalysisHandler<ReplCompilationArtifact>(testServices, failureDisablesNextSteps, doNotRunIfThereWerePreviousFailures) {
+) : AnalysisHandler<ReplCompilationArtifact>(testServices) {
+    override val failureDisablesNextSteps: Boolean
+        get() = false
+    override val doNotRunIfThereWerePreviousFailures: Boolean
+        get() = false
     override val artifactKind: TestArtifactKind<ReplCompilationArtifact> = ReplCompilationArtifact.Kind
 
     private val globalMetadataInfoHandler = testServices.globalMetadataInfoHandler
