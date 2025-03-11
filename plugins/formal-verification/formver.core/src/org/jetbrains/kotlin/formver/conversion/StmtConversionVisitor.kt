@@ -16,6 +16,8 @@ import org.jetbrains.kotlin.fir.symbols.FirBasedSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirAnonymousFunctionSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirClassSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirFunctionSymbol
+import org.jetbrains.kotlin.fir.symbols.impl.FirReceiverParameterSymbol
+import org.jetbrains.kotlin.fir.symbols.impl.FirValueParameterSymbol
 import org.jetbrains.kotlin.fir.types.coneType
 import org.jetbrains.kotlin.fir.types.isUnit
 import org.jetbrains.kotlin.fir.types.resolvedType
@@ -136,12 +138,12 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext>()
     override fun visitWhenExpression(whenExpression: FirWhenExpression, data: StmtConversionContext): ExpEmbedding =
         data.withNewScope {
             val type = data.embedType(whenExpression)
-            val subj: Declare? = whenExpression.subject?.let {
-                val subjExp = convert(it)
-                when (val firSubjVar = whenExpression.subjectVariable) {
-                    null -> declareAnonVar(subjExp.type, subjExp)
-                    else -> declareLocalVariable(firSubjVar.symbol, subjExp)
-                }
+            val subj: Declare? = whenExpression.subjectVariable?.let { firSubjVar ->
+                val subjExp = convert(firSubjVar.initializer!!)
+                if (firSubjVar.name.isSpecial)
+                    declareAnonVar(subjExp.type, subjExp)
+                else
+                    declareLocalVariable(firSubjVar.symbol, subjExp)
             }
             val body = withWhenSubject(subj?.variable) {
                 convertWhenBranches(whenExpression.branches.iterator(), type, this)
@@ -382,13 +384,27 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext>()
         //
         // since dispatch receiver can only originate from non-anonymous function we do not specify its name here
         // as we have only one candidate to resolve it
-        val resolved = when (val symbol = thisReceiverExpression.calleeReference.boundSymbol) {
-            is FirClassSymbol<*> -> data.resolveDispatchReceiver()
-            is FirAnonymousFunctionSymbol -> data.resolveExtensionReceiver(symbol.label!!.name)
-            is FirFunctionSymbol<*> -> data.resolveExtensionReceiver(symbol.name.asString())
+        fun tryResolve(symbol: FirBasedSymbol<*>): ExpEmbedding? {
+            val resolved = when (symbol) {
+                is FirClassSymbol<*> -> data.resolveDispatchReceiver()
+                is FirAnonymousFunctionSymbol -> data.resolveExtensionReceiver(symbol.label!!.name)
+                is FirFunctionSymbol<*> -> data.resolveExtensionReceiver(symbol.name.asString())
+                else -> return null
+            }
+
+            return resolved ?: throw IllegalArgumentException("Can't resolve the 'this' receiver since the function does not have one.")
+        }
+
+        val symbol = thisReceiverExpression.calleeReference.boundSymbol
+        tryResolve(symbol as FirBasedSymbol<*>)?.let { return it }
+        val declSymbol = when (symbol) {
+            is FirReceiverParameterSymbol -> symbol.containingDeclarationSymbol
+            is FirValueParameterSymbol -> symbol.containingDeclarationSymbol
             else -> error("Unsupported receiver expression type.")
         }
-        return resolved ?: throw IllegalArgumentException("Can't resolve the 'this' receiver since the function does not have one.")
+        tryResolve(declSymbol)?.let { return it }
+
+        throw IllegalArgumentException("No resolution approach to this symbol worked.")
     }
 
     override fun visitTypeOperatorCall(

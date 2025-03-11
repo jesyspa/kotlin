@@ -19,12 +19,14 @@ import org.jetbrains.kotlin.util.capitalizeDecapitalize.toLowerCaseAsciiOnly
 class NoFir2IrCompilationErrorsHandler(testServices: TestServices) : BackendInputHandler<IrBackendInput>(
     testServices,
     BackendKinds.IrBackend,
+) {
     // Must go on, because we may have multiple modules emitting IR diagnostics, and we want
     // to continue processing the next modules to collect everything for `GlobalMetadataInfoHandler`.
     // See: `compiler/testData/diagnostics/tests/multiplatform/topLevelFun/inlineFun.kt`
-    failureDisablesNextSteps = true,
-    doNotRunIfThereWerePreviousFailures = false,
-) {
+    override val failureDisablesNextSteps: Boolean
+        get() = false
+    override val doNotRunIfThereWerePreviousFailures: Boolean
+        get() = false
     override val additionalServices: List<ServiceRegistrationData>
         get() = listOf(service(::DiagnosticsService))
 

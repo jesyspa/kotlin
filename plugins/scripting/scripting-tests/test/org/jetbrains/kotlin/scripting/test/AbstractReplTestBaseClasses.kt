@@ -267,9 +267,11 @@ private class ReplRunViaApiChecker(
 ) : BinaryArtifactHandler<ReplCompilationArtifact>(
     testServices,
     ReplCompilationArtifact.Kind,
-    failureDisablesNextSteps = false,
-    doNotRunIfThereWerePreviousFailures = false
 ) {
+    override val failureDisablesNextSteps: Boolean
+        get() = false
+    override val doNotRunIfThereWerePreviousFailures: Boolean
+        get() = false
     val replEvaluator = K2ReplEvaluator()
 
     private var baseEvaluationConfiguration: ScriptEvaluationConfiguration? = null

@@ -22,6 +22,7 @@ import org.jetbrains.kotlin.test.model.TestFile
 import org.jetbrains.kotlin.test.model.TestModule
 import org.jetbrains.kotlin.test.services.AdditionalSourceProvider
 import org.jetbrains.kotlin.test.services.EnvironmentConfigurator
+import org.jetbrains.kotlin.test.services.TestModuleStructure
 import org.jetbrains.kotlin.test.services.TestServices
 import java.io.File
 
@@ -91,8 +92,11 @@ object FormVerDirectives : SimpleDirectivesContainer() {
 class StdlibReplacementsProvider(testServices: TestServices, baseDir: String = ".") : AdditionalSourceProvider(testServices) {
     private val libraryPath = "$baseDir/plugins/formal-verification/testData/stdlibReplacements.kt"
 
-    override fun produceAdditionalFiles(globalDirectives: RegisteredDirectives, module: TestModule) =
+    override fun produceAdditionalFiles(
+        globalDirectives: RegisteredDirectives,
+        module: TestModule,
+        testModuleStructure: TestModuleStructure,
+    ): List<TestFile> =
         if (containsDirective(globalDirectives, module, REPLACE_STDLIB_EXTENSIONS))
             listOf(File(libraryPath).toTestFile())
-        else emptyList()
-}
+        else emptyList()}
