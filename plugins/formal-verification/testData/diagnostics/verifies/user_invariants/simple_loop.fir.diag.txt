@@ -161,3 +161,65 @@ method f$test_boolean_postcondition$TF$() returns (ret$0: Ref)
   label lbl$ret$0
   inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
+
+/simple_loop.kt:(1493,1513): info: Generated Viper text for test_nested_accesses:
+field bf$int: Ref
+
+field bf$withVal: Ref
+
+method con$c$WithVal$T$Int(p$int: Ref) returns (ret: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$c$WithVal())
+  ensures acc(p$c$WithVal$shared(ret), wildcard)
+  ensures acc(p$c$WithVal$unique(ret), write)
+  ensures df$rt$intFromRef((unfolding acc(p$c$WithVal$shared(ret), wildcard) in
+      ret.bf$int)) ==
+    df$rt$intFromRef(p$int)
+
+
+method con$c$WithWithVal$T$WithVal(p$withVal: Ref) returns (ret: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$c$WithWithVal())
+  ensures acc(p$c$WithWithVal$shared(ret), wildcard)
+  ensures acc(p$c$WithWithVal$unique(ret), write)
+  ensures (unfolding acc(p$c$WithWithVal$shared(ret), wildcard) in
+      ret.bf$withVal) ==
+    p$withVal
+
+
+method f$test_nested_accesses$TF$() returns (ret$0: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
+{
+  var l0$withWithVal: Ref
+  var anon$0: Ref
+  var l0$i: Ref
+  var anon$1: Ref
+  anon$0 := con$c$WithVal$T$Int(df$rt$intToRef(42))
+  l0$withWithVal := con$c$WithWithVal$T$WithVal(anon$0)
+  l0$i := df$rt$intToRef(0)
+  label lbl$continue$0
+    invariant acc(p$c$WithWithVal$shared(l0$withWithVal), wildcard)
+    invariant df$rt$isSubtype(df$rt$typeOf(l0$withWithVal), df$rt$c$WithWithVal())
+    invariant df$rt$isSubtype(df$rt$typeOf(l0$i), df$rt$intType())
+    invariant df$rt$intFromRef((unfolding acc(p$c$WithVal$shared((unfolding acc(p$c$WithWithVal$shared(l0$withWithVal), wildcard) in
+          l0$withWithVal.bf$withVal)), wildcard) in
+        (unfolding acc(p$c$WithWithVal$shared(l0$withWithVal), wildcard) in
+          l0$withWithVal.bf$withVal).bf$int)) ==
+      42
+  anon$1 := sp$ltInts(l0$i, df$rt$intToRef(10))
+  if (df$rt$boolFromRef(anon$1)) {
+    l0$i := sp$plusInts(l0$i, df$rt$intToRef(1))
+    goto lbl$continue$0
+  }
+  label lbl$break$0
+    invariant acc(p$c$WithWithVal$shared(l0$withWithVal), wildcard)
+    invariant df$rt$isSubtype(df$rt$typeOf(l0$withWithVal), df$rt$c$WithWithVal())
+    invariant df$rt$isSubtype(df$rt$typeOf(l0$i), df$rt$intType())
+    invariant df$rt$intFromRef((unfolding acc(p$c$WithVal$shared((unfolding acc(p$c$WithWithVal$shared(l0$withWithVal), wildcard) in
+          l0$withWithVal.bf$withVal)), wildcard) in
+        (unfolding acc(p$c$WithWithVal$shared(l0$withWithVal), wildcard) in
+          l0$withWithVal.bf$withVal).bf$int)) ==
+      42
+  label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
+}
+
+/simple_loop.kt:(1583,1694): warning: Viper verification error: Contract might not be well-formed. There might be insufficient permission to access p$c$WithVal$shared((unfolding acc(p$c$WithWithVal$shared(l0$withWithVal), wildcard) in l0$withWithVal.bf$withVal))

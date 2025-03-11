@@ -73,3 +73,18 @@ fun <!VIPER_TEXT!>test_boolean_postcondition<!>() {
     }
     verify(!boolean)
 }
+
+class WithVal(val int: Int)
+class WithWithVal(val withVal: WithVal)
+
+@AlwaysVerify
+fun <!VIPER_TEXT!>test_nested_accesses<!>() {
+    val withWithVal = WithWithVal(WithVal(42))
+    var i = 0
+    while (i < 10) {
+        loopInvariants {
+            withWithVal.withVal.int == 42
+        }
+        ++i
+    }
+}
