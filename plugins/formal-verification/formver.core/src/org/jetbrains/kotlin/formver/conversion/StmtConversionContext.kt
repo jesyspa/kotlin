@@ -9,15 +9,14 @@ import org.jetbrains.kotlin.fir.FirLabel
 import org.jetbrains.kotlin.fir.declarations.FirSimpleFunction
 import org.jetbrains.kotlin.fir.declarations.utils.isFinal
 import org.jetbrains.kotlin.fir.declarations.utils.isInline
-import org.jetbrains.kotlin.fir.expressions.FirBlock
-import org.jetbrains.kotlin.fir.expressions.FirCatch
-import org.jetbrains.kotlin.fir.expressions.FirPropertyAccessExpression
-import org.jetbrains.kotlin.fir.expressions.FirStatement
+import org.jetbrains.kotlin.fir.expressions.*
 import org.jetbrains.kotlin.fir.references.symbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirIntersectionOverridePropertySymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirPropertySymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirValueParameterSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirVariableSymbol
+import org.jetbrains.kotlin.fir.types.isBoolean
+import org.jetbrains.kotlin.fir.types.resolvedType
 import org.jetbrains.kotlin.formver.embeddings.*
 import org.jetbrains.kotlin.formver.embeddings.callables.FullNamedFunctionSignature
 import org.jetbrains.kotlin.formver.embeddings.types.TypeEmbedding
@@ -220,6 +219,18 @@ fun StmtConversionContext.convertMethodWithBody(
     return FunctionBodyEmbedding(seqnBuilder.block, returnTarget, bodyExp)
 }
 
+private const val INVALID_STATEMENT_MSG =
+    "Every statement in invariant block must be a pure boolean invariant."
+
+fun StmtConversionContext.collectInvariants(block: FirBlock) = buildList {
+    block.statements.forEach { stmt ->
+        check(stmt is FirExpression && stmt.resolvedType.isBoolean) {
+            INVALID_STATEMENT_MSG
+        }
+        add(stmt.accept(StmtConversionVisitor, this@collectInvariants))
+    }
+}
+
 fun StmtConversionContext.enhanceWithUserSpecifications(
     declaration: FirSimpleFunction,
     signature: FullNamedFunctionSignature,
@@ -232,10 +243,7 @@ fun StmtConversionContext.enhanceWithUserSpecifications(
             addAll(signature.getPreconditions(returnVariable))
 
             specification.first?.let {
-                InvariantsCollectorConverter(this@enhanceWithUserSpecifications).run {
-                    it.accept(InvariantsCollectorConversionVisitor, this)
-                    addAll(invariants)
-                }
+                addAll(collectInvariants(it))
             }
         }
 

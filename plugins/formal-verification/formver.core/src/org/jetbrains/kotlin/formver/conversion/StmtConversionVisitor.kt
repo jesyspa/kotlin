@@ -292,10 +292,7 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext>()
                 addAll(it.provenInvariants())
             }
             data.extractLoopInvariants(whileLoop.block)?.let {
-                InvariantsCollectorConverter(data).run {
-                    it.accept(InvariantsCollectorConversionVisitor, this)
-                    addAll(invariants)
-                }
+                addAll(data.collectInvariants(it))
             }
         }
         return data.withFreshWhile(whileLoop.label) {
