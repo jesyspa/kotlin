@@ -242,7 +242,7 @@ fun StmtConversionContext.enhanceWithUserSpecifications(
         override fun getPreconditions(returnVariable: VariableEmbedding) = buildList {
             addAll(signature.getPreconditions(returnVariable))
 
-            specification.first?.let {
+            specification.precond?.let {
                 addAll(collectInvariants(it))
             }
         }

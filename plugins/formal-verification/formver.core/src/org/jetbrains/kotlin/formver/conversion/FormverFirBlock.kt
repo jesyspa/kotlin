@@ -9,68 +9,33 @@ import org.jetbrains.kotlin.fir.expressions.*
 import org.jetbrains.kotlin.fir.symbols.impl.FirFunctionSymbol
 import org.jetbrains.kotlin.formver.isFormverFunctionNamed
 
-private const val SPECIFICATION_CONDITION_ERROR =
-    "Only a single `preconditions` scope and a single `postconditions` scope is allowed as a function specification."
-
-private const val SPECIFICATION_LOOP_ERROR =
-    "Only a single `loopInvariants` scope is allowed in the loop."
-
-sealed interface FormverFirBlock {
-    val statements: FirBlock
+private fun FirStatement.extractFormverFirBlock(predicate: FirFunctionSymbol<*>.() -> Boolean): FirBlock? {
+    if (this !is FirFunctionCall) return null
+    val firFunction = toResolvedCallableSymbol() as? FirFunctionSymbol<*> ?: return null
+    if (!predicate(firFunction)) return null
+    val formverInvariantsArgument = argument
+    if (formverInvariantsArgument !is FirAnonymousFunctionExpression)
+        error("Only lambdas are allowed as arguments of ${firFunction.name}.")
+    return formverInvariantsArgument.anonymousFunction.body
 }
 
-data class LoopInvariantsBlock(override val statements: FirBlock) : FormverFirBlock
-data class PreconditionsBlock(override val statements: FirBlock) : FormverFirBlock
-data class PostconditionsBlock(override val statements: FirBlock) : FormverFirBlock
-
-interface FormverFirBlockBuilder {
-    fun complete(statements: FirBlock): FormverFirBlock
+fun extractLoopInvariants(parentBlock: FirBlock): FirBlock? {
+    val firstStmt = parentBlock.statements.firstOrNull() ?: return null
+    return firstStmt.extractFormverFirBlock { isFormverFunctionNamed("loopInvariants") }
 }
 
-fun formverBlockBuilder(block: (FirBlock) -> FormverFirBlock) = object : FormverFirBlockBuilder {
-    override fun complete(statements: FirBlock) = block(statements)
-}
+data class FormverSpecification(val precond: FirBlock?, val postcond: FirBlock?)
 
+fun extractFunctionSpecification(parentBlock: FirBlock): FormverSpecification {
+    val firstStmt = parentBlock.statements.firstOrNull() ?: return FormverSpecification(null, null)
 
-fun FirFunctionSymbol<*>.blockBuilder(): FormverFirBlockBuilder? =
-    when {
-        // To avoid recursion, we rely on FIR to identify these blocks as early as possible.
-        isFormverFunctionNamed("loopInvariants") -> formverBlockBuilder(::LoopInvariantsBlock)
-        isFormverFunctionNamed("preconditions") -> formverBlockBuilder(::PreconditionsBlock)
-        else -> null
+    firstStmt.extractFormverFirBlock { isFormverFunctionNamed("postconditions") }?.let {
+        return FormverSpecification(null, it)
     }
 
-private fun ProgramConversionContext.extractFormverFirBlocks(parentBlock: FirBlock): List<FormverFirBlock> = buildList {
-    parentBlock.statements.forEach { call ->
-        if (call !is FirFunctionCall) return@buildList
-        val firFunction = call.toResolvedCallableSymbol() as? FirFunctionSymbol<*> ?: return@buildList
-        val builder = firFunction.blockBuilder() ?: return@buildList
-        val formverSpecificationArgument = call.argument
-        check(formverSpecificationArgument is FirAnonymousFunctionExpression) {
-            "Only lambdas are allowed as arguments of ${firFunction.name}."
-        }
-        add(builder.complete(formverSpecificationArgument.anonymousFunction.body!!))
-    }
-}
-
-fun ProgramConversionContext.extractLoopInvariants(parentBlock: FirBlock): FirBlock? {
-    val formverBlocks = extractFormverFirBlocks(parentBlock)
-    val block = formverBlocks.firstOrNull() ?: return null
-    if (block !is LoopInvariantsBlock || formverBlocks.size != 1)
-        error(SPECIFICATION_LOOP_ERROR)
-    return block.statements
-}
-
-fun ProgramConversionContext.extractFunctionSpecification(parentBlock: FirBlock): Pair<FirBlock?, FirBlock?> {
-    val formverBlocks = extractFormverFirBlocks(parentBlock)
-    val firstBlock = formverBlocks.firstOrNull() ?: return null to null
-    val secondBlock = formverBlocks.getOrNull(1) ?: return when (firstBlock) {
-        is PreconditionsBlock -> firstBlock.statements to null
-        is PostconditionsBlock -> null to firstBlock.statements
-        else -> error(SPECIFICATION_CONDITION_ERROR)
-    }
-    if (firstBlock is PreconditionsBlock && secondBlock is PostconditionsBlock) {
-        return firstBlock.statements to secondBlock.statements
-    } else error(SPECIFICATION_CONDITION_ERROR)
+    val precond = firstStmt.extractFormverFirBlock { isFormverFunctionNamed("preconditions") }
+        ?: return FormverSpecification(null, null)
+    val postcond = parentBlock.statements.getOrNull(1)?.extractFormverFirBlock { isFormverFunctionNamed("postconditions") }
+    return FormverSpecification(precond, postcond)
 }
 

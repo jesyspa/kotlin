@@ -291,7 +291,7 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext>()
                 addIfNotNull(it.sharedPredicateAccessInvariant())
                 addAll(it.provenInvariants())
             }
-            data.extractLoopInvariants(whileLoop.block)?.let {
+            extractLoopInvariants(whileLoop.block)?.let {
                 addAll(data.collectInvariants(it))
             }
         }
