@@ -284,18 +284,6 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext>()
         return data.declareLocalProperty(symbol, property.initializer?.let { data.convert(it).withType(type) })
     }
 
-    private fun extractLoopInvariantsBlock(whileLoop: FirWhileLoop, data: StmtConversionContext): FirBlock? =
-        whileLoop.block.statements.firstOrNull()?.let { call ->
-            if (call !is FirFunctionCall) return null
-            val functionEmbedding = data.embedFunction(call.toResolvedCallableSymbol() as FirFunctionSymbol<*>)
-            if (!functionEmbedding.isLoopInvariantsFunction) return null
-            val loopInvariantsArgument = call.argument
-            check(loopInvariantsArgument is FirAnonymousFunctionExpression) {
-                "Only lambdas are allowed as arguments of `loopInvariants`."
-            }
-            loopInvariantsArgument.anonymousFunction.body
-        }
-
     override fun visitWhileLoop(whileLoop: FirWhileLoop, data: StmtConversionContext): ExpEmbedding {
         val condition = data.convert(whileLoop.condition).withType { boolean() }
         val invariants = buildList {
@@ -303,11 +291,8 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext>()
                 addIfNotNull(it.sharedPredicateAccessInvariant())
                 addAll(it.provenInvariants())
             }
-            extractLoopInvariantsBlock(whileLoop, data)?.let {
-                LoopInvariantsConverter(data).run {
-                    it.accept(LoopInvariantsConversionVisitor, this)
-                    addAll(invariants)
-                }
+            extractLoopInvariants(whileLoop.block)?.let {
+                addAll(data.collectInvariants(it))
             }
         }
         return data.withFreshWhile(whileLoop.label) {

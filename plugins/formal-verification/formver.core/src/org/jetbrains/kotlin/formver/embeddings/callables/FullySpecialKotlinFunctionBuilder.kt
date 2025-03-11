@@ -7,6 +7,7 @@ package org.jetbrains.kotlin.formver.embeddings.callables
 
 import org.jetbrains.kotlin.formver.conversion.StmtConversionContext
 import org.jetbrains.kotlin.formver.embeddings.expression.ExpEmbedding
+import org.jetbrains.kotlin.formver.embeddings.expression.UnitLit
 import org.jetbrains.kotlin.formver.embeddings.types.FunctionTypeEmbedding
 import org.jetbrains.kotlin.formver.viper.MangledName
 
@@ -54,6 +55,14 @@ class FullySpecialKotlinFunctionBuilder {
             body: (List<ExpEmbedding>, StmtConversionContext) -> ExpEmbedding,
         ) {
             FullySpecialKotlinFunctionImpl(packageName, className, name, callableType, body).apply { byName[embedName()] = this }
+        }
+
+        fun addNoOpFunction(
+            packageName: List<String>,
+            className: String? = null,
+            name: String,
+        ) = addFunction(packageName, className, name) { _, _ ->
+            UnitLit
         }
     }
 
