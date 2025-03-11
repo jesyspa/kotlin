@@ -204,7 +204,17 @@ const val RUNTIME_TYPE_DOMAIN_NAME = "rt"
  * }
  *
  * // same for subtraction, multiplication and so on
+ *
+ * function divInts(arg1: Ref, arg2: Ref): Ref
+ *      requires isSubtype(typeOf(arg1), intType())
+ *      requires isSubtype(typeOf(arg2), intType())
+ *      ensures isSubtype(typeOf(result), intType())
+ *      ensures intFromRef(arg2) != 0 ==> intFromRef(result) == intFromRef(arg1) / intFromRef(arg2)
+ * {
+ *      intToRef(intFromRef(arg1) / intFromRef(arg2))
+ * }
  * ```
+ *
  */
 class RuntimeTypeDomain(classes: List<ClassTypeEmbedding>) : BuiltinDomain(RUNTIME_TYPE_DOMAIN_NAME) {
     override val typeVars: List<Type.TypeVar> = emptyList()
