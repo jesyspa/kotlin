@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.formver.conversion
 
+import org.jetbrains.kotlin.config.AnalysisFlag.Delegates.Boolean.Companion.defaultValue
 import org.jetbrains.kotlin.fir.symbols.impl.FirValueParameterSymbol
 import org.jetbrains.kotlin.formver.embeddings.callables.FunctionSignature
 import org.jetbrains.kotlin.formver.embeddings.expression.ExpEmbedding
@@ -31,7 +32,7 @@ interface ParameterResolver {
 fun ParameterResolver.resolveNamedReturnTarget(returnPointName: String): ReturnTarget? =
     (returnPointName == labelName).ifTrue { defaultResolvedReturnTarget }
 
-class RootParameterResolver(
+open class RootParameterResolver(
     val ctx: ProgramConversionContext,
     private val signature: FunctionSignature,
     firArgs: List<FirValueParameterSymbol>,
@@ -47,6 +48,20 @@ class RootParameterResolver(
 
     override fun retrieveAllParams(): Sequence<VariableEmbedding> = sequence {
         yieldAll(signature.params)
+    }
+}
+
+class SpecificationParameterResolver(
+    ctx: ProgramConversionContext,
+    signature: FunctionSignature,
+    firArgs: List<FirValueParameterSymbol>,
+    labelName: String?,
+    defaultResolvedReturnTarget: ReturnTarget,
+    private val substitutedReturnParameter: FirValueParameterSymbol?,
+) : RootParameterResolver(ctx, signature, firArgs, labelName, defaultResolvedReturnTarget) {
+    override fun tryResolveParameter(symbol: FirValueParameterSymbol): ExpEmbedding? {
+        if (substitutedReturnParameter == symbol) return defaultResolvedReturnTarget.variable
+        return super.tryResolveParameter(symbol)
     }
 }
 

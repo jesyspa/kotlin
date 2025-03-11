@@ -1,0 +1,23 @@
+/simple_postcondition.kt:(239,250): info: Generated Viper text for testGreater:
+method f$testGreater$TF$T$Int(p$init: Ref) returns (ret$0: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$intType())
+{
+  inhale df$rt$isSubtype(df$rt$typeOf(p$init), df$rt$intType())
+  ret$0 := sp$plusInts(p$init, df$rt$intToRef(5))
+  goto lbl$ret$0
+  label lbl$ret$0
+}
+
+/simple_postcondition.kt:(376,386): info: Generated Viper text for testString:
+field bf$length: Ref
+
+method f$testString$TF$() returns (ret$0: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$charType())
+{
+  ret$0 := sp$stringGet(df$rt$stringToRef(Seq(98, 97, 98)), df$rt$intToRef(1))
+  goto lbl$ret$0
+  label lbl$ret$0
+}
+
+method pg$public$length(this$dispatch: Ref) returns (ret: Ref)
+
