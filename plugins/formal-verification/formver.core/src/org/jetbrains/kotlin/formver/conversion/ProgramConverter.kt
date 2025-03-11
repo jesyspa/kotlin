@@ -9,6 +9,7 @@ import org.jetbrains.kotlin.KtSourceElement
 import org.jetbrains.kotlin.descriptors.Visibilities
 import org.jetbrains.kotlin.descriptors.isInterface
 import org.jetbrains.kotlin.fir.FirSession
+import org.jetbrains.kotlin.fir.declarations.FirFunction
 import org.jetbrains.kotlin.fir.declarations.FirSimpleFunction
 import org.jetbrains.kotlin.fir.declarations.utils.*
 import org.jetbrains.kotlin.fir.resolve.toClassSymbol
@@ -78,7 +79,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
     fun registerForVerification(declaration: FirSimpleFunction) {
         val signature = embedFullSignature(declaration.symbol)
         val returnTarget = returnTargetProducer.getFresh(signature.callableType.returnType)
-        val stmtCtx = signature.createStatementContext(returnTarget, scopeIndexProducer.getFresh())
+        val stmtCtx = createStatementContext(signature, returnTarget, scopeIndexProducer.getFresh())
 
         // Note: it is important that `body` is only set after `embedUserFunction` is complete, as we need to
         // place the embedding in the map before processing the body.
@@ -87,15 +88,22 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         }
     }
 
-    private fun FullNamedFunctionSignature.createStatementContext(
+    private fun createStatementContext(
+        signature: NamedFunctionSignature,
         returnTarget: ReturnTarget,
         scopeDepth: Int,
     ): StmtConversionContext {
         val methodCtx =
             MethodConverter(
                 this@ProgramConverter,
-                this,
-                RootParameterResolver(this@ProgramConverter, this, this.symbol.valueParameterSymbols, this.labelName, returnTarget),
+                signature,
+                RootParameterResolver(
+                    this@ProgramConverter,
+                    signature,
+                    signature.symbol.valueParameterSymbols,
+                    signature.labelName,
+                    returnTarget
+                ),
                 scopeDepth,
             )
         return StmtConverter(methodCtx)
@@ -267,7 +275,6 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
     private val FirRegularClassSymbol.propertySymbols: List<FirPropertySymbol>
         get() = this.declarationSymbols.filterIsInstance<FirPropertySymbol>()
 
-
     @OptIn(SymbolInternals::class)
     private fun embedFullSignature(symbol: FirFunctionSymbol<*>): FullNamedFunctionSignature {
         val subSignature = object : NamedFunctionSignature, FunctionSignature by embedFunctionSignature(symbol) {
@@ -279,7 +286,10 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         val constructorParamSymbolsToFields = extractConstructorParamsAsFields(symbol)
         val contractVisitor = ContractDescriptionConversionVisitor(this@ProgramConverter, subSignature)
 
-        val signature = object : FullNamedFunctionSignature, NamedFunctionSignature by subSignature {
+        val declaration = symbol.fir
+        val embeddedSpecification = embedUserSpecifications(declaration, subSignature)
+
+        return object : FullNamedFunctionSignature, NamedFunctionSignature by subSignature {
             // TODO (inhale vs require) Decide if `predicateAccessInvariant` should be required rather than inhaled in the beginning of the body.
             override fun getPreconditions(returnVariable: VariableEmbedding) = buildList {
                 subSignature.formalArgs.forEach {
@@ -290,6 +300,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
                     }
                 }
                 addAll(subSignature.stdLibPreconditions())
+                embeddedSpecification.precond?.let { addAll(it) }
             }
 
             override fun getPostconditions(returnVariable: VariableEmbedding) = buildList {
@@ -325,32 +336,27 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
 
             override val declarationSource: KtSourceElement? = symbol.source
         }
-
-        val declaration = symbol.fir as? FirSimpleFunction ?: return signature
-        val depth = 0
-        val returnTarget = ReturnTarget(depth, signature.callableType.returnType)
-        val stmtCtx = signature.createStatementContext(returnTarget, depth)
-        return stmtCtx.enhanceWithUserSpecifications(declaration, signature)
     }
 
-    private fun StmtConversionContext.enhanceWithUserSpecifications(
-        declaration: FirSimpleFunction,
-        signature: FullNamedFunctionSignature,
-    ): FullNamedFunctionSignature {
-        val body = declaration.body ?: return signature
-        val specification = extractFunctionSpecification(body)
-        return object : FullNamedFunctionSignature by signature {
-            override fun getPreconditions(returnVariable: VariableEmbedding) = buildList {
-                addAll(signature.getPreconditions(returnVariable))
+    private class SpecificationEmbedding(val precond: List<ExpEmbedding>?, val postcond: List<ExpEmbedding>?)
 
-                specification.precond?.let {
-                    addAll(collectInvariants(it))
-                }
-            }
-
-            // TODO: add postconditions
+    private fun embedUserSpecifications(
+        declaration: FirFunction,
+        signature: NamedFunctionSignature,
+    ): SpecificationEmbedding {
+        if (declaration !is FirSimpleFunction) return SpecificationEmbedding(null, null)
+        val body = declaration.body ?: return SpecificationEmbedding(null, null)
+        val stmtCtx = createStatementContext(
+            signature,
+            ReturnTarget(depth = 0, signature.callableType.returnType),
+            scopeDepth = 0,
+        )
+        return extractFirSpecification(body).run {
+            SpecificationEmbedding(
+                precond?.let { stmtCtx.collectInvariants(it) },
+                postcond?.let { stmtCtx.collectInvariants(it) },
+            )
         }
-
     }
 
     private val FirFunctionSymbol<*>.containingPropertyOrSelf

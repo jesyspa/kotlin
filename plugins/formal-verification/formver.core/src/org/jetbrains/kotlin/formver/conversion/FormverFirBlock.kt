@@ -24,18 +24,18 @@ fun extractLoopInvariants(parentBlock: FirBlock): FirBlock? {
     return firstStmt.extractFormverFirBlock { isFormverFunctionNamed("loopInvariants") }
 }
 
-data class FormverSpecification(val precond: FirBlock?, val postcond: FirBlock?)
+data class FirSpecification(val precond: FirBlock?, val postcond: FirBlock?)
 
-fun extractFunctionSpecification(parentBlock: FirBlock): FormverSpecification {
-    val firstStmt = parentBlock.statements.firstOrNull() ?: return FormverSpecification(null, null)
+fun extractFirSpecification(parentBlock: FirBlock): FirSpecification {
+    val firstStmt = parentBlock.statements.firstOrNull() ?: return FirSpecification(null, null)
 
     firstStmt.extractFormverFirBlock { isFormverFunctionNamed("postconditions") }?.let {
-        return FormverSpecification(null, it)
+        return FirSpecification(null, it)
     }
 
     val precond = firstStmt.extractFormverFirBlock { isFormverFunctionNamed("preconditions") }
-        ?: return FormverSpecification(null, null)
+        ?: return FirSpecification(null, null)
     val postcond = parentBlock.statements.getOrNull(1)?.extractFormverFirBlock { isFormverFunctionNamed("postconditions") }
-    return FormverSpecification(precond, postcond)
+    return FirSpecification(precond, postcond)
 }
 
