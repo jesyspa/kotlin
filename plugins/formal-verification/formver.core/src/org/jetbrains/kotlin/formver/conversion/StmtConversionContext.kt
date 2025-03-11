@@ -231,24 +231,3 @@ fun StmtConversionContext.collectInvariants(block: FirBlock) = buildList {
     }
 }
 
-fun StmtConversionContext.enhanceWithUserSpecifications(
-    declaration: FirSimpleFunction,
-    signature: FullNamedFunctionSignature,
-    returnTarget: ReturnTarget,
-): FullNamedFunctionSignature {
-    val body = declaration.body ?: return signature
-    val specification = extractFunctionSpecification(body)
-    return object : FullNamedFunctionSignature by signature {
-        override fun getPreconditions(returnVariable: VariableEmbedding) = buildList {
-            addAll(signature.getPreconditions(returnVariable))
-
-            specification.precond?.let {
-                addAll(collectInvariants(it))
-            }
-        }
-
-        // TODO: add postconditions
-    }
-
-}
-

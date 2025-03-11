@@ -80,11 +80,10 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         val returnTarget = returnTargetProducer.getFresh(signature.callableType.returnType)
         val stmtCtx = signature.createStatementContext(returnTarget, scopeIndexProducer.getFresh())
 
-        val userSpecifiedSignature = stmtCtx.enhanceWithUserSpecifications(declaration, signature, returnTarget)
         // Note: it is important that `body` is only set after `embedUserFunction` is complete, as we need to
         // place the embedding in the map before processing the body.
-        embedUserFunction(declaration.symbol, userSpecifiedSignature).apply {
-            body = stmtCtx.convertMethodWithBody(declaration, userSpecifiedSignature, returnTarget)
+        embedUserFunction(declaration.symbol, signature).apply {
+            body = stmtCtx.convertMethodWithBody(declaration, signature, returnTarget)
         }
     }
 
@@ -133,7 +132,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         val lookupName = symbol.embedName(this)
         return when (val existing = methods[lookupName]) {
             null -> {
-                val signature = embedEnhancedWithUserSpecifications(symbol)
+                val signature = embedFullSignature(symbol)
                 val callable = processCallable(symbol, signature)
                 UserFunctionEmbedding(callable).also {
                     methods[lookupName] = it
@@ -142,7 +141,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
             is PartiallySpecialKotlinFunction -> {
                 if (existing.baseEmbedding != null)
                     return existing
-                val signature = embedEnhancedWithUserSpecifications(symbol)
+                val signature = embedFullSignature(symbol)
                 val callable = processCallable(symbol, signature)
                 val userFunction = UserFunctionEmbedding(callable)
                 existing.also {
@@ -268,6 +267,8 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
     private val FirRegularClassSymbol.propertySymbols: List<FirPropertySymbol>
         get() = this.declarationSymbols.filterIsInstance<FirPropertySymbol>()
 
+
+    @OptIn(SymbolInternals::class)
     private fun embedFullSignature(symbol: FirFunctionSymbol<*>): FullNamedFunctionSignature {
         val subSignature = object : NamedFunctionSignature, FunctionSignature by embedFunctionSignature(symbol) {
             override val name = symbol.embedName(this@ProgramConverter)
@@ -278,7 +279,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         val constructorParamSymbolsToFields = extractConstructorParamsAsFields(symbol)
         val contractVisitor = ContractDescriptionConversionVisitor(this@ProgramConverter, subSignature)
 
-        return object : FullNamedFunctionSignature, NamedFunctionSignature by subSignature {
+        val signature = object : FullNamedFunctionSignature, NamedFunctionSignature by subSignature {
             // TODO (inhale vs require) Decide if `predicateAccessInvariant` should be required rather than inhaled in the beginning of the body.
             override fun getPreconditions(returnVariable: VariableEmbedding) = buildList {
                 subSignature.formalArgs.forEach {
@@ -324,15 +325,32 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
 
             override val declarationSource: KtSourceElement? = symbol.source
         }
+
+        val declaration = symbol.fir as? FirSimpleFunction ?: return signature
+        val depth = 0
+        val returnTarget = ReturnTarget(depth, signature.callableType.returnType)
+        val stmtCtx = signature.createStatementContext(returnTarget, depth)
+        return stmtCtx.enhanceWithUserSpecifications(declaration, signature)
     }
 
-    @OptIn(SymbolInternals::class)
-    fun embedEnhancedWithUserSpecifications(symbol: FirFunctionSymbol<*>): FullNamedFunctionSignature {
-        val subsignature = embedFullSignature(symbol)
-        val declaration = symbol.fir as? FirSimpleFunction ?: return subsignature
-        val returnTarget = ReturnTarget(depth = 0, subsignature.callableType.returnType)
-        val stmtCtx = subsignature.createStatementContext(returnTarget, scopeDepth = 0)
-        return stmtCtx.enhanceWithUserSpecifications(declaration, subsignature, returnTarget)
+    private fun StmtConversionContext.enhanceWithUserSpecifications(
+        declaration: FirSimpleFunction,
+        signature: FullNamedFunctionSignature,
+    ): FullNamedFunctionSignature {
+        val body = declaration.body ?: return signature
+        val specification = extractFunctionSpecification(body)
+        return object : FullNamedFunctionSignature by signature {
+            override fun getPreconditions(returnVariable: VariableEmbedding) = buildList {
+                addAll(signature.getPreconditions(returnVariable))
+
+                specification.precond?.let {
+                    addAll(collectInvariants(it))
+                }
+            }
+
+            // TODO: add postconditions
+        }
+
     }
 
     private val FirFunctionSymbol<*>.containingPropertyOrSelf
