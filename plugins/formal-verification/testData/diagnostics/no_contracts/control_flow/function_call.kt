@@ -13,3 +13,7 @@ fun <!VIPER_TEXT!>functionCall<!>() {
 fun <!VIPER_TEXT!>functionCallNested<!>() {
     f(f(f(0)))
 }
+
+fun <!VIPER_TEXT!>callItself<!>() {
+    callItself()
+}

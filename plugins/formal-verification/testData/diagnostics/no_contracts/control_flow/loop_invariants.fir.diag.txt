@@ -18,11 +18,6 @@ method f$dynamicLambdaInvariant$TF$TF$(p$f: Ref) returns (ret$0: Ref)
   inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
-method f$pkg$kotlin$c$Function0$invoke$TF$TF$(this$dispatch: Ref)
-  returns (ret: Ref)
-  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$intType())
-
-
 method f$returnsBoolean$TF$() returns (ret: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$boolType())
 
@@ -50,11 +45,6 @@ method f$functionAssignment$TF$TF$(p$f: Ref) returns (ret$0: Ref)
   label lbl$ret$0
   inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
-
-method f$pkg$kotlin$c$Function0$invoke$TF$TF$(this$dispatch: Ref)
-  returns (ret: Ref)
-  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$intType())
-
 
 method f$returnsBoolean$TF$() returns (ret: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$boolType())
@@ -95,10 +85,6 @@ method f$conditionalFunctionAssignment$TF$T$Boolean$TF$$TF$(p$b: Ref, p$f: Ref,
   inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
-method f$pkg$kotlin$c$Function0$invoke$TF$TF$(this$dispatch: Ref)
-  returns (ret: Ref)
-  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$intType())
-
-
 method f$returnsBoolean$TF$() returns (ret: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$boolType())
+
