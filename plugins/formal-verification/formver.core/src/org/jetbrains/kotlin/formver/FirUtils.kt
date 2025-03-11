@@ -9,17 +9,23 @@ import org.jetbrains.kotlin.KtSourceElement
 import org.jetbrains.kotlin.fir.FirAnnotationContainer
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.contracts.FirEffectDeclaration
+import org.jetbrains.kotlin.fir.declarations.FirFunction
+import org.jetbrains.kotlin.fir.declarations.FirSimpleFunction
 import org.jetbrains.kotlin.fir.declarations.hasAnnotation
 import org.jetbrains.kotlin.fir.declarations.impl.FirDefaultPropertyGetter
 import org.jetbrains.kotlin.fir.declarations.impl.FirDefaultPropertySetter
+import org.jetbrains.kotlin.fir.declarations.utils.isInline
 import org.jetbrains.kotlin.fir.expressions.FirExpression
 import org.jetbrains.kotlin.fir.expressions.FirFunctionCall
 import org.jetbrains.kotlin.fir.symbols.FirBasedSymbol
 import org.jetbrains.kotlin.fir.symbols.SymbolInternals
 import org.jetbrains.kotlin.fir.symbols.impl.FirFunctionSymbol
+import org.jetbrains.kotlin.fir.symbols.impl.FirNamedFunctionSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirPropertySymbol
 import org.jetbrains.kotlin.formver.embeddings.SourceRole
+import org.jetbrains.kotlin.formver.names.SpecialPackages
 import org.jetbrains.kotlin.formver.viper.ast.Position
+import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
@@ -51,7 +57,10 @@ val FirBasedSymbol<*>.asSourceRole: SourceRole
     get() = SourceRole.FirSymbolHolder(this)
 
 fun annotationId(name: String): ClassId =
-    ClassId(FqName.fromSegments(listOf("org", "jetbrains", "kotlin", "formver", "plugin")), Name.identifier(name))
+    ClassId(FqName.fromSegments(SpecialPackages.formver), Name.identifier(name))
+
+fun formverCallableId(name: String): CallableId =
+    CallableId(FqName.fromSegments(SpecialPackages.formver), Name.identifier(name))
 
 fun FirBasedSymbol<*>.isUnique(session: FirSession) = hasAnnotation(annotationId("Unique"), session)
 
@@ -60,3 +69,10 @@ fun FirBasedSymbol<*>.isBorrowed(session: FirSession) = hasAnnotation(annotation
 fun FirAnnotationContainer.isUnique(session: FirSession) = hasAnnotation(annotationId("Unique"), session)
 
 fun FirAnnotationContainer.isBorrowed(session: FirSession) = hasAnnotation(annotationId("Borrowed"), session)
+
+fun FirFunctionSymbol<*>.isFormverFunctionNamed(name: String) =
+    this is FirNamedFunctionSymbol && callableId == formverCallableId(name)
+
+@OptIn(SymbolInternals::class)
+val FirFunctionSymbol<*>.shouldBeInlined
+    get() = isInline && fir.body != null

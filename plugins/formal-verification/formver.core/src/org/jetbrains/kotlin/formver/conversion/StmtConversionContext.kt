@@ -6,23 +6,29 @@
 package org.jetbrains.kotlin.formver.conversion
 
 import org.jetbrains.kotlin.fir.FirLabel
+import org.jetbrains.kotlin.fir.declarations.FirSimpleFunction
 import org.jetbrains.kotlin.fir.declarations.utils.isFinal
-import org.jetbrains.kotlin.fir.expressions.FirBlock
-import org.jetbrains.kotlin.fir.expressions.FirCatch
-import org.jetbrains.kotlin.fir.expressions.FirPropertyAccessExpression
-import org.jetbrains.kotlin.fir.expressions.FirStatement
+import org.jetbrains.kotlin.fir.declarations.utils.isInline
+import org.jetbrains.kotlin.fir.expressions.*
 import org.jetbrains.kotlin.fir.references.symbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirIntersectionOverridePropertySymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirPropertySymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirValueParameterSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirVariableSymbol
+import org.jetbrains.kotlin.fir.types.isBoolean
+import org.jetbrains.kotlin.fir.types.resolvedType
 import org.jetbrains.kotlin.formver.embeddings.*
+import org.jetbrains.kotlin.formver.embeddings.callables.FullNamedFunctionSignature
 import org.jetbrains.kotlin.formver.embeddings.types.TypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.callables.FunctionSignature
 import org.jetbrains.kotlin.formver.embeddings.expression.*
 import org.jetbrains.kotlin.formver.isCustom
+import org.jetbrains.kotlin.formver.linearization.Linearizer
+import org.jetbrains.kotlin.formver.linearization.SeqnBuilder
+import org.jetbrains.kotlin.formver.linearization.SharedLinearizationState
+import org.jetbrains.kotlin.formver.shouldBeInlined
 import org.jetbrains.kotlin.formver.viper.MangledName
-import org.jetbrains.kotlin.formver.viper.ast.Label
+import org.jetbrains.kotlin.formver.viper.ast.delegateToCallable
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.utils.addIfNotNull
 import org.jetbrains.kotlin.utils.addToStdlib.ifTrue
@@ -193,6 +199,35 @@ fun StmtConversionContext.insertInlineFunctionCall(
             // if unit is what we return we might not guarantee it yet
             add(returnTarget.variable.withIsUnitInvariantIfUnit())
         }
+    }
+}
+
+fun StmtConversionContext.convertMethodWithBody(
+    declaration: FirSimpleFunction,
+    signature: FullNamedFunctionSignature,
+    returnTarget: ReturnTarget,
+): FunctionBodyEmbedding? {
+    val firBody = declaration.body ?: return null
+    val body = convert(firBody)
+    val bodyExp = FunctionExp(signature, body, returnTarget.label)
+    val seqnBuilder = SeqnBuilder(declaration.source)
+    val linearizer = Linearizer(SharedLinearizationState(anonVarProducer), seqnBuilder, declaration.source)
+    bodyExp.toViperUnusedResult(linearizer)
+    // note: we must guarantee somewhere that returned value is Unit
+    // as we may not encounter any `return` statement in the body
+    returnTarget.variable.withIsUnitInvariantIfUnit().toViperUnusedResult(linearizer)
+    return FunctionBodyEmbedding(seqnBuilder.block, returnTarget, bodyExp)
+}
+
+private const val INVALID_STATEMENT_MSG =
+    "Every statement in invariant block must be a pure boolean invariant."
+
+fun StmtConversionContext.collectInvariants(block: FirBlock) = buildList {
+    block.statements.forEach { stmt ->
+        check(stmt is FirExpression && stmt.resolvedType.isBoolean) {
+            INVALID_STATEMENT_MSG
+        }
+        add(stmt.accept(StmtConversionVisitor, this@collectInvariants))
     }
 }
 
