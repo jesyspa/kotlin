@@ -103,6 +103,22 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext>()
             else -> handleUnimplementedElement("Constant Expression of type ${literalExpression.kind} is not yet implemented.", data)
         }
 
+    private val FirLiteralExpression.stringValue: String
+        get() = value.toString()
+
+    override fun visitStringConcatenationCall(
+        stringConcatenationCall: FirStringConcatenationCall,
+        data: StmtConversionContext
+    ): ExpEmbedding {
+        val combinedLiteral = stringConcatenationCall.arguments.joinToString("") { arg ->
+            check(arg is FirLiteralExpression) {
+                "${arg::class.simpleName} is not supported as an element of string concatenation."
+            }
+            arg.stringValue
+        }
+        return StringLit(combinedLiteral)
+    }
+
     override fun visitIntegerLiteralOperatorCall(
         integerLiteralOperatorCall: FirIntegerLiteralOperatorCall,
         data: StmtConversionContext,
