@@ -8,7 +8,6 @@ package org.jetbrains.kotlin.formver.embeddings.callables
 import org.jetbrains.kotlin.formver.embeddings.expression.*
 import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.AddCharInt
 import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.AddIntInt
-import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.AddStringString
 import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.DivIntInt
 import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.MulIntInt
 import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.Not
@@ -176,16 +175,6 @@ object SpecialKotlinFunctions {
 
         addFunction(stringIntToCharType, SpecialPackages.kotlin, className = "String", name = "get") { args, _ ->
             StringGet(args[0], args[1])
-        }
-
-        val stringStringToStringType = buildFunctionPretype {
-            withDispatchReceiver { string() }
-            withParam { string() }
-            withReturnType { string() }
-        }
-
-        addFunction(stringStringToStringType, SpecialPackages.kotlin, className = "String", name = "plus") { args, _ ->
-            AddStringString(args[0], args[1])
         }
     }
 }

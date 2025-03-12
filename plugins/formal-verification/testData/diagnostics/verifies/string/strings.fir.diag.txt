@@ -299,6 +299,12 @@ predicate p$pkg$kotlin$c$String$unique(this$dispatch: Ref) {
   acc(p$pkg$java_io$c$Serializable$unique(this$dispatch), write)
 }
 
+method f$pkg$kotlin$c$String$plus$TF$T$String$NT$Any(this$dispatch: Ref, p$other: Ref)
+  returns (ret: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$stringType())
+  ensures acc(p$pkg$kotlin$c$String$shared(ret), wildcard)
+
+
 method f$testOps$TF$T$String(p$s: Ref) returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 {
@@ -306,6 +312,7 @@ method f$testOps$TF$T$String(p$s: Ref) returns (ret$0: Ref)
   var anon$0: Ref
   var anon$1: Ref
   var l0$str: Ref
+  var l0$helloWorld: Ref
   inhale df$rt$isSubtype(df$rt$typeOf(p$s), df$rt$stringType())
   inhale acc(p$pkg$kotlin$c$String$shared(p$s), wildcard)
   unfold acc(p$pkg$kotlin$c$String$shared(p$s), wildcard)
@@ -327,6 +334,10 @@ method f$testOps$TF$T$String(p$s: Ref) returns (ret$0: Ref)
   assert df$rt$stringFromRef(l0$str)[0] == df$rt$stringFromRef(l0$str)[2]
   assert !(df$rt$stringFromRef(l0$str)[1] == df$rt$stringFromRef(l0$str)[0])
   assert df$rt$stringFromRef(l0$str)[1] == 98
+  assert Seq(75, 111, 116, 108, 105, 110, 46, 83, 116, 114, 105, 110, 103) ==
+    Seq(75, 111, 116, 108, 105, 110, 46, 83, 116, 114, 105, 110, 103)
+  l0$helloWorld := f$pkg$kotlin$c$String$plus$TF$T$String$NT$Any(df$rt$stringToRef(Seq(72,
+    101, 108, 108, 111, 32, 87, 111, 114, 108, 100)), df$rt$charToRef(33))
   label lbl$ret$0
   inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
