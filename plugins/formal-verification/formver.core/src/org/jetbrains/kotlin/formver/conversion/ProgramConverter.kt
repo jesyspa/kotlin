@@ -294,7 +294,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
 
         return object : FullNamedFunctionSignature, NamedFunctionSignature by subSignature {
             // TODO (inhale vs require) Decide if `predicateAccessInvariant` should be required rather than inhaled in the beginning of the body.
-            override fun getPreconditions(returnVariable: VariableEmbedding) = buildList {
+            override fun getPreconditions() = buildList {
                 subSignature.formalArgs.forEach {
                     addAll(it.pureInvariants())
                     addAll(it.accessInvariants())
