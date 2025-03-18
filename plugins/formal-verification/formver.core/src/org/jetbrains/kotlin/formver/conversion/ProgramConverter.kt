@@ -92,18 +92,21 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         signature: NamedFunctionSignature,
         returnTarget: ReturnTarget,
         scopeDepth: Int,
+        returnVarSymbol: FirValueParameterSymbol? = null,
     ): StmtConversionContext {
+        val rootResolver =
+            RootParameterResolver(
+                this@ProgramConverter,
+                signature,
+                signature.symbol.valueParameterSymbols,
+                signature.labelName,
+                returnTarget,
+            )
         val methodCtx =
             MethodConverter(
                 this@ProgramConverter,
                 signature,
-                RootParameterResolver(
-                    this@ProgramConverter,
-                    signature,
-                    signature.symbol.valueParameterSymbols,
-                    signature.labelName,
-                    returnTarget
-                ),
+                if (returnVarSymbol == null) rootResolver else SubstitutedReturnParameterResolver(rootResolver, returnVarSymbol),
                 scopeDepth,
             )
         return StmtConverter(methodCtx)
@@ -275,7 +278,6 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
     private val FirRegularClassSymbol.propertySymbols: List<FirPropertySymbol>
         get() = this.declarationSymbols.filterIsInstance<FirPropertySymbol>()
 
-    @OptIn(SymbolInternals::class)
     private fun embedFullSignature(symbol: FirFunctionSymbol<*>): FullNamedFunctionSignature {
         val subSignature = object : NamedFunctionSignature, FunctionSignature by embedFunctionSignature(symbol) {
             override val name = symbol.embedName(this@ProgramConverter)
@@ -286,6 +288,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         val constructorParamSymbolsToFields = extractConstructorParamsAsFields(symbol)
         val contractVisitor = ContractDescriptionConversionVisitor(this@ProgramConverter, subSignature)
 
+        @OptIn(SymbolInternals::class)
         val declaration = symbol.fir
         val embeddedSpecification = embedUserSpecifications(declaration, subSignature)
 
@@ -319,6 +322,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
                 addAll(contractVisitor.getPostconditions(ContractVisitorContext(returnVariable, symbol)))
                 addAll(subSignature.stdLibPostconditions(returnVariable))
                 addIfNotNull(primaryConstructorInvariants(returnVariable))
+                embeddedSpecification.postcond?.let { addAll(it) }
             }
 
             fun primaryConstructorInvariants(returnVariable: VariableEmbedding): ExpEmbedding? {
@@ -338,20 +342,24 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         }
     }
 
-    private class SpecificationEmbedding(val precond: List<ExpEmbedding>?, val postcond: List<ExpEmbedding>?)
+    private data class SpecificationEmbedding(val precond: List<ExpEmbedding>?, val postcond: List<ExpEmbedding>?) {
+        constructor() : this(null, null)
+    }
 
     private fun embedUserSpecifications(
         declaration: FirFunction,
         signature: NamedFunctionSignature,
     ): SpecificationEmbedding {
-        if (declaration !is FirSimpleFunction) return SpecificationEmbedding(null, null)
-        val body = declaration.body ?: return SpecificationEmbedding(null, null)
+        if (declaration !is FirSimpleFunction) return SpecificationEmbedding()
+        val body = declaration.body ?: return SpecificationEmbedding()
+        val firSpec = extractFirSpecification(body, declaration.symbol.resolvedReturnType)
         val stmtCtx = createStatementContext(
             signature,
             ReturnTarget(depth = 0, signature.callableType.returnType),
             scopeDepth = 0,
+            firSpec.returnVar,
         )
-        return extractFirSpecification(body).run {
+        return firSpec.run {
             SpecificationEmbedding(
                 precond?.let { stmtCtx.collectInvariants(it) },
                 postcond?.let { stmtCtx.collectInvariants(it) },
