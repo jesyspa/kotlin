@@ -37,4 +37,4 @@ fun <!VIPER_TEXT!>returnGreater13<!>(): Int {
 }
 
 @AlwaysVerify
-fun <!VIPER_TEXT!>scenario<!>() = testWithPrecondition(returnGreater13())
+fun <!VIPER_TEXT!>testPostconditionIsUsedByPrecondition<!>() = testWithPrecondition(returnGreater13())

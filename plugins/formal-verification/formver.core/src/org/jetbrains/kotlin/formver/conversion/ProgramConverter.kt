@@ -78,22 +78,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
     fun registerForVerification(declaration: FirSimpleFunction) {
         val signature = embedFullSignature(declaration.symbol)
         val returnTarget = returnTargetProducer.getFresh(signature.callableType.returnType)
-        val stmtCtx = createStatementContext(signature, returnTarget, scopeIndexProducer.getFresh())
-
-        // Note: it is important that `body` is only set after `embedUserFunction` is complete, as we need to
-        // place the embedding in the map before processing the body.
-        embedUserFunction(declaration.symbol, signature).apply {
-            body = stmtCtx.convertMethodWithBody(declaration, signature, returnTarget)
-        }
-    }
-
-    private fun createStatementContext(
-        signature: NamedFunctionSignature,
-        returnTarget: ReturnTarget,
-        scopeDepth: Int,
-        returnVarCtxt: ReturnVarSubstitutionContext? = null,
-    ): StmtConversionContext {
-        val rootResolver =
+        val paramResolver =
             RootParameterResolver(
                 this@ProgramConverter,
                 signature,
@@ -101,14 +86,19 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
                 signature.labelName,
                 returnTarget,
             )
-        val methodCtx =
+        val stmtCtx =
             MethodConverter(
                 this@ProgramConverter,
                 signature,
-                if (returnVarCtxt == null) rootResolver else SubstitutedReturnParameterResolver(rootResolver, returnVarCtxt),
-                scopeDepth,
-            )
-        return StmtConverter(methodCtx)
+                paramResolver,
+                scopeIndexProducer.getFresh(),
+            ).statementCtxt()
+
+        // Note: it is important that `body` is only set after `embedUserFunction` is complete, as we need to
+        // place the embedding in the map before processing the body.
+        embedUserFunction(declaration.symbol, signature).apply {
+            body = stmtCtx.convertMethodWithBody(declaration, signature, returnTarget)
+        }
     }
 
     fun embedUserFunction(symbol: FirFunctionSymbol<*>, signature: FullNamedFunctionSignature): UserFunctionEmbedding {
@@ -290,18 +280,42 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         @OptIn(SymbolInternals::class)
         val declaration = symbol.fir
         val body = declaration.body
+
+        /** Specifications are only allowed inside simple functions.
+         * We are also unable to retrieve them when body is not visible,
+         * although ideally we should be able to see preconditions and postconditions
+         * from other modules.
+         */
         val firSpec = when {
             declaration !is FirSimpleFunction -> null
             body == null -> null
             else -> extractFirSpecification(body, declaration.symbol.resolvedReturnType)
         }
 
-        fun createCtx(returnVariable: VariableEmbedding? = null) = createStatementContext(
-            subSignature,
-            ReturnTarget(depth = 0, subSignature.callableType.returnType),
-            scopeDepth = 0,
-            returnVariable?.let { ret -> firSpec?.returnVar?.let { ReturnVarSubstitutor(it, ret) } }
-        )
+        val rootResolver =
+            RootParameterResolver(
+                this@ProgramConverter,
+                subSignature,
+                subSignature.symbol.valueParameterSymbols,
+                subSignature.labelName,
+                ReturnTarget(depth = 0, subSignature.callableType.returnType),
+            )
+
+        fun createCtx(returnVariable: VariableEmbedding? = null): StmtConversionContext {
+            val returnVarCtx = returnVariable?.let { ret -> firSpec?.returnVar?.let { ReturnVarSubstitutor(it, ret) } }
+            val paramResolver =
+                if (returnVarCtx != null)
+                    SubstitutedReturnParameterResolver(rootResolver, returnVarCtx)
+                else
+                    rootResolver
+
+            return MethodConverter(
+                this@ProgramConverter,
+                subSignature,
+                paramResolver,
+                scopeDepth = 0,
+            ).statementCtxt()
+        }
 
         return object : FullNamedFunctionSignature, NamedFunctionSignature by subSignature {
             // TODO (inhale vs require) Decide if `predicateAccessInvariant` should be required rather than inhaled in the beginning of the body.
@@ -314,6 +328,9 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
                     }
                 }
                 addAll(subSignature.stdLibPreconditions())
+                // We create a separate context to embed the preconditions here.
+                // Hence, some parts of FIR are translated later than the other and less explicitly.
+                // TODO: this process should be a separate step in the conversion.
                 firSpec?.precond?.let {
                     addAll(createCtx().collectInvariants(it))
                 }
@@ -335,6 +352,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
                 addAll(contractVisitor.getPostconditions(ContractVisitorContext(returnVariable, symbol)))
                 addAll(subSignature.stdLibPostconditions(returnVariable))
                 addIfNotNull(primaryConstructorInvariants(returnVariable))
+                // TODO: this process should be a separate step in the conversion (see above)
                 firSpec?.postcond?.let {
                     addAll(createCtx(returnVariable).collectInvariants(it))
                 }

@@ -46,13 +46,13 @@ method f$returnGreater13$TF$() returns (ret$0: Ref)
   label lbl$ret$0
 }
 
-/simple_postcondition.kt:(600,608): info: Generated Viper text for scenario:
+/simple_postcondition.kt:(600,637): info: Generated Viper text for testPostconditionIsUsedByPrecondition:
 method f$returnGreater13$TF$() returns (ret: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$intType())
   ensures df$rt$intFromRef(ret) > 13
 
 
-method f$scenario$TF$() returns (ret$0: Ref)
+method f$testPostconditionIsUsedByPrecondition$TF$() returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$intType())
 {
   var anon$0: Ref
