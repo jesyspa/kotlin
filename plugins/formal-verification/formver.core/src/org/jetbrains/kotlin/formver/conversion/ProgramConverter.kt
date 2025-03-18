@@ -9,7 +9,6 @@ import org.jetbrains.kotlin.KtSourceElement
 import org.jetbrains.kotlin.descriptors.Visibilities
 import org.jetbrains.kotlin.descriptors.isInterface
 import org.jetbrains.kotlin.fir.FirSession
-import org.jetbrains.kotlin.fir.declarations.FirFunction
 import org.jetbrains.kotlin.fir.declarations.FirSimpleFunction
 import org.jetbrains.kotlin.fir.declarations.utils.*
 import org.jetbrains.kotlin.fir.resolve.toClassSymbol
@@ -92,7 +91,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         signature: NamedFunctionSignature,
         returnTarget: ReturnTarget,
         scopeDepth: Int,
-        returnVarSymbol: FirValueParameterSymbol? = null,
+        returnVarCtxt: ReturnVarSubstitutionContext? = null,
     ): StmtConversionContext {
         val rootResolver =
             RootParameterResolver(
@@ -106,7 +105,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
             MethodConverter(
                 this@ProgramConverter,
                 signature,
-                if (returnVarSymbol == null) rootResolver else SubstitutedReturnParameterResolver(rootResolver, returnVarSymbol),
+                if (returnVarCtxt == null) rootResolver else SubstitutedReturnParameterResolver(rootResolver, returnVarCtxt),
                 scopeDepth,
             )
         return StmtConverter(methodCtx)
@@ -290,7 +289,19 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
 
         @OptIn(SymbolInternals::class)
         val declaration = symbol.fir
-        val embeddedSpecification = embedUserSpecifications(declaration, subSignature)
+        val body = declaration.body
+        val firSpec = when {
+            declaration !is FirSimpleFunction -> null
+            body == null -> null
+            else -> extractFirSpecification(body, declaration.symbol.resolvedReturnType)
+        }
+
+        fun createCtx(returnVariable: VariableEmbedding? = null) = createStatementContext(
+            subSignature,
+            ReturnTarget(depth = 0, subSignature.callableType.returnType),
+            scopeDepth = 0,
+            returnVariable?.let { ret -> firSpec?.returnVar?.let { ReturnVarSubstitutor(it, ret) } }
+        )
 
         return object : FullNamedFunctionSignature, NamedFunctionSignature by subSignature {
             // TODO (inhale vs require) Decide if `predicateAccessInvariant` should be required rather than inhaled in the beginning of the body.
@@ -303,7 +314,9 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
                     }
                 }
                 addAll(subSignature.stdLibPreconditions())
-                embeddedSpecification.precond?.let { addAll(it) }
+                firSpec?.precond?.let {
+                    addAll(createCtx().collectInvariants(it))
+                }
             }
 
             override fun getPostconditions(returnVariable: VariableEmbedding) = buildList {
@@ -322,7 +335,9 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
                 addAll(contractVisitor.getPostconditions(ContractVisitorContext(returnVariable, symbol)))
                 addAll(subSignature.stdLibPostconditions(returnVariable))
                 addIfNotNull(primaryConstructorInvariants(returnVariable))
-                embeddedSpecification.postcond?.let { addAll(it) }
+                firSpec?.postcond?.let {
+                    addAll(createCtx(returnVariable).collectInvariants(it))
+                }
             }
 
             fun primaryConstructorInvariants(returnVariable: VariableEmbedding): ExpEmbedding? {
@@ -339,31 +354,6 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
             }
 
             override val declarationSource: KtSourceElement? = symbol.source
-        }
-    }
-
-    private data class SpecificationEmbedding(val precond: List<ExpEmbedding>?, val postcond: List<ExpEmbedding>?) {
-        constructor() : this(null, null)
-    }
-
-    private fun embedUserSpecifications(
-        declaration: FirFunction,
-        signature: NamedFunctionSignature,
-    ): SpecificationEmbedding {
-        if (declaration !is FirSimpleFunction) return SpecificationEmbedding()
-        val body = declaration.body ?: return SpecificationEmbedding()
-        val firSpec = extractFirSpecification(body, declaration.symbol.resolvedReturnType)
-        val stmtCtx = createStatementContext(
-            signature,
-            ReturnTarget(depth = 0, signature.callableType.returnType),
-            scopeDepth = 0,
-            firSpec.returnVar,
-        )
-        return firSpec.run {
-            SpecificationEmbedding(
-                precond?.let { stmtCtx.collectInvariants(it) },
-                postcond?.let { stmtCtx.collectInvariants(it) },
-            )
         }
     }
 

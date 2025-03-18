@@ -50,14 +50,20 @@ class RootParameterResolver(
     }
 }
 
+interface ReturnVarSubstitutionContext {
+    fun resolve(symbol: FirValueParameterSymbol): VariableEmbedding?
+}
+
+class ReturnVarSubstitutor(val substitutionSymbol: FirValueParameterSymbol, val variable: VariableEmbedding) : ReturnVarSubstitutionContext {
+    override fun resolve(symbol: FirValueParameterSymbol) = (symbol == substitutionSymbol).ifTrue { variable }
+}
+
 class SubstitutedReturnParameterResolver(
     private val rootResolver: RootParameterResolver,
-    private val substitutedReturnParameter: FirValueParameterSymbol,
+    private val substitutionContext: ReturnVarSubstitutionContext,
 ) : ParameterResolver by rootResolver {
-    override fun tryResolveParameter(symbol: FirValueParameterSymbol): ExpEmbedding? {
-        if (substitutedReturnParameter == symbol) return defaultResolvedReturnTarget.variable
-        return rootResolver.tryResolveParameter(symbol)
-    }
+    override fun tryResolveParameter(symbol: FirValueParameterSymbol): ExpEmbedding? =
+        substitutionContext.resolve(symbol) ?: rootResolver.tryResolveParameter(symbol)
 }
 
 /**
