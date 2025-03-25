@@ -16,25 +16,28 @@ method f$isNullOrEmptyWrong$TF$NT$CharSequence(p$seq: Ref)
   returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$boolType())
 {
+  var anon$0: Ref
   inhale df$rt$isSubtype(df$rt$typeOf(p$seq), df$rt$nullable(df$rt$c$pkg$kotlin$CharSequence()))
   inhale p$seq != df$rt$nullValue() ==>
     acc(p$pkg$kotlin$c$CharSequence$shared(p$seq), wildcard)
   if (p$seq == df$rt$nullValue()) {
-    var anon$0: Ref
+    var anon$1: Ref
     if (p$seq != df$rt$nullValue()) {
-      var anon$1: Ref
       var anon$2: Ref
-      anon$2 := pg$public$length(p$seq)
+      var anon$3: Ref
+      anon$3 := pg$public$length(p$seq)
+      anon$2 := anon$3
+      inhale df$rt$isSubtype(df$rt$typeOf(anon$2), df$rt$intType())
       anon$1 := anon$2
-      inhale df$rt$isSubtype(df$rt$typeOf(anon$1), df$rt$intType())
-      anon$0 := anon$1
     } else {
-      anon$0 := df$rt$nullValue()}
-    ret$0 := df$rt$boolToRef(anon$0 == df$rt$intToRef(0))
+      anon$1 := df$rt$nullValue()}
+    anon$0 := df$rt$boolToRef(anon$1 == df$rt$intToRef(0))
   } else {
-    ret$0 := df$rt$boolToRef(false)}
+    anon$0 := df$rt$boolToRef(false)}
+  ret$0 := anon$0
   goto lbl$ret$0
   label lbl$ret$0
 }
 
 method pg$public$length(this$dispatch: Ref) returns (ret: Ref)
+
