@@ -12,23 +12,39 @@ import org.jetbrains.kotlin.formver.linearization.LinearizationContext
 import org.jetbrains.kotlin.formver.linearization.LogicOperatorPolicy
 import org.jetbrains.kotlin.formver.viper.ast.Exp
 
-interface SequentialLogicOperatorEmbedding : BinaryDirectResultExpEmbedding {
+/**
+ * In pure contexts these operators can be written as simple binary operators.
+ * However, regularly their semantics is different: evaluate the first argument and then maybe the second one (not necessarily)
+ */
+sealed class SequentialLogicOperatorEmbedding: BinaryDirectResultExpEmbedding {
     override val type
         get() = buildType { boolean() }
+
+    protected abstract val ifReplacement: ExpEmbedding
+    protected abstract val expressionReplacement: ExpEmbedding
+
+    private fun operatorReplacement(ctx: LinearizationContext) = when (ctx.logicOperatorPolicy) {
+        LogicOperatorPolicy.CONVERT_TO_IF -> ifReplacement
+        LogicOperatorPolicy.CONVERT_TO_EXPRESSION -> expressionReplacement
+    }
+
+    override fun toViper(ctx: LinearizationContext): Exp =
+        operatorReplacement(ctx).toViper(ctx)
+
+    override fun toViperBuiltinType(ctx: LinearizationContext): Exp =
+        operatorReplacement(ctx).toViperBuiltinType(ctx)
 }
 
-class SequentialAnd(override val left: ExpEmbedding, override val right: ExpEmbedding) : SequentialLogicOperatorEmbedding {
-    override fun toViper(ctx: LinearizationContext): Exp =
-        when (ctx.logicOperatorPolicy) {
-            LogicOperatorPolicy.CONVERT_TO_IF -> If(left, right, BooleanLit(false), buildType { boolean() })
-            LogicOperatorPolicy.CONVERT_TO_EXPRESSION -> And(left, right)
-        }.toViper(ctx)
+class SequentialAnd(override val left: ExpEmbedding, override val right: ExpEmbedding) : SequentialLogicOperatorEmbedding() {
+    override val ifReplacement
+        get() = If(left, right, BooleanLit(false), buildType { boolean() })
+    override val expressionReplacement
+        get() = And(left, right)
 }
 
-class SequentialOr(override val left: ExpEmbedding, override val right: ExpEmbedding) : SequentialLogicOperatorEmbedding {
-    override fun toViper(ctx: LinearizationContext): Exp =
-        when (ctx.logicOperatorPolicy) {
-            LogicOperatorPolicy.CONVERT_TO_IF -> If(left, BooleanLit(true), right, buildType { boolean() })
-            LogicOperatorPolicy.CONVERT_TO_EXPRESSION -> Or(left, right)
-        }.toViper(ctx)
+class SequentialOr(override val left: ExpEmbedding, override val right: ExpEmbedding) : SequentialLogicOperatorEmbedding() {
+    override val ifReplacement
+        get() = If(left, BooleanLit(true), right, buildType { boolean() })
+    override val expressionReplacement
+        get() = Or(left, right)
 }

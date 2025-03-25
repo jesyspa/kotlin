@@ -5,7 +5,6 @@
 
 package org.jetbrains.kotlin.formver.linearization
 
-import com.sun.org.apache.xpath.internal.operations.Variable
 import org.jetbrains.kotlin.KtSourceElement
 import org.jetbrains.kotlin.formver.embeddings.types.TypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.expression.AnonymousVariableEmbedding
