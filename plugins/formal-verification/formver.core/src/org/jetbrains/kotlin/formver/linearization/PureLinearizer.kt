@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.formver.linearization
 
+import com.sun.org.apache.xpath.internal.operations.Variable
 import org.jetbrains.kotlin.KtSourceElement
 import org.jetbrains.kotlin.formver.embeddings.types.TypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.expression.AnonymousVariableEmbedding
@@ -26,6 +27,9 @@ class PureLinearizerMisuseException(val offendingFunction: String) : IllegalStat
 class PureLinearizer(override val source: KtSourceElement?) : LinearizationContext {
     override val unfoldPolicy: UnfoldPolicy
         get() = UnfoldPolicy.UNFOLDING_IN
+
+    override val logicOperatorPolicy: LogicOperatorPolicy
+        get() = LogicOperatorPolicy.CONVERT_TO_EXPRESSION
 
     override fun <R> withPosition(newSource: KtSourceElement, action: LinearizationContext.() -> R): R =
         PureLinearizer(newSource).action()
