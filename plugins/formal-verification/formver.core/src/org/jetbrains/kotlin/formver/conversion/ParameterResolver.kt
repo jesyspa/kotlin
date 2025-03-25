@@ -50,6 +50,22 @@ class RootParameterResolver(
     }
 }
 
+interface ReturnVarSubstitutionContext {
+    fun resolve(symbol: FirValueParameterSymbol): VariableEmbedding?
+}
+
+class ReturnVarSubstitutor(val substitutionSymbol: FirValueParameterSymbol, val variable: VariableEmbedding) : ReturnVarSubstitutionContext {
+    override fun resolve(symbol: FirValueParameterSymbol) = (symbol == substitutionSymbol).ifTrue { variable }
+}
+
+class SubstitutedReturnParameterResolver(
+    private val rootResolver: RootParameterResolver,
+    private val substitutionContext: ReturnVarSubstitutionContext,
+) : ParameterResolver by rootResolver {
+    override fun tryResolveParameter(symbol: FirValueParameterSymbol): ExpEmbedding? =
+        substitutionContext.resolve(symbol) ?: rootResolver.tryResolveParameter(symbol)
+}
+
 /**
  * Wrapper class: in inline functions we want to substitute actual parameters with our own anonymous variables with unique names.
  */

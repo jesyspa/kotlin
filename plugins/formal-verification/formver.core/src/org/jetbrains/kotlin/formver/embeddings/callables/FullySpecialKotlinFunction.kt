@@ -16,6 +16,7 @@ import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.
 import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.SubCharInt
 import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.SubIntInt
 import org.jetbrains.kotlin.formver.embeddings.types.buildFunctionPretype
+import org.jetbrains.kotlin.formver.embeddings.types.nullableAny
 import org.jetbrains.kotlin.formver.names.*
 import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.name.CallableId
@@ -122,6 +123,25 @@ object SpecialKotlinFunctions {
         withCallableType(invariantsBuilderCallableType) {
             addNoOpFunction(SpecialPackages.formver, name = "loopInvariants")
             addNoOpFunction(SpecialPackages.formver, name = "preconditions")
+        }
+
+        val postconditionsBuilderCallableType = buildFunctionPretype {
+            withParam {
+                function {
+                    withDispatchReceiver {
+                        klass {
+                            withName(invariantBuilderTypeName)
+                        }
+                    }
+                    withParam { nullableAny() }
+                    withReturnType { unit() }
+                }
+            }
+            withReturnType { unit() }
+        }
+
+        withCallableType(postconditionsBuilderCallableType) {
+            addNoOpFunction(SpecialPackages.formver, name = "postconditions")
         }
 
         val contractCallableType = buildFunctionPretype {

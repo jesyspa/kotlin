@@ -26,7 +26,7 @@ interface FullNamedFunctionSignature : NamedFunctionSignature {
     /**
      * Preconditions of function in form of `ExpEmbedding`s with type `boolType()`.
      */
-    fun getPreconditions(returnVariable: VariableEmbedding): List<ExpEmbedding>
+    fun getPreconditions(): List<ExpEmbedding>
 
     /**
      * Postconditions of function in form of `ExpEmbedding`s with type `boolType()`.
@@ -47,7 +47,7 @@ abstract class PropertyAccessorFunctionSignature(
     override val name: MangledName,
     propertySymbol: FirPropertySymbol,
 ) : FullNamedFunctionSignature, GenericFunctionSignatureMixin() {
-    override fun getPreconditions(returnVariable: VariableEmbedding) = emptyList<ExpEmbedding>()
+    override fun getPreconditions() = emptyList<ExpEmbedding>()
     override fun getPostconditions(returnVariable: VariableEmbedding) = emptyList<ExpEmbedding>()
     override val dispatchReceiver: VariableEmbedding
         get() = PlaceholderVariableEmbedding(DispatchReceiverName, buildType { nullableAny() })
@@ -87,7 +87,7 @@ fun FullNamedFunctionSignature.toViperMethod(
     name,
     formalArgs.map { it.toLocalVarDecl() },
     returnVariable.toLocalVarDecl(),
-    getPreconditions(returnVariable).pureToViper(toBuiltin = true),
+    getPreconditions().pureToViper(toBuiltin = true),
     getPostconditions(returnVariable).pureToViper(toBuiltin = true),
     body,
     declarationSource.asPosition

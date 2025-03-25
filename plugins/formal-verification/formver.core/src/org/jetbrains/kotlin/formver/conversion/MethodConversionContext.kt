@@ -17,7 +17,6 @@ import org.jetbrains.kotlin.formver.embeddings.expression.PlaceholderVariableEmb
 import org.jetbrains.kotlin.formver.embeddings.expression.VariableEmbedding
 import org.jetbrains.kotlin.formver.names.ReturnLabelName
 import org.jetbrains.kotlin.formver.names.ReturnVariableName
-import org.jetbrains.kotlin.name.Name
 
 class ReturnTarget(depth: Int, type: TypeEmbedding) {
     val variable = PlaceholderVariableEmbedding(ReturnVariableName(depth), type)
@@ -65,3 +64,5 @@ fun MethodConversionContext.embedLocalSymbol(symbol: FirBasedSymbol<*>): ExpEmbe
         is FirVariableSymbol<*> -> embedLocalVariable(symbol)
         else -> throw IllegalArgumentException("Symbol $symbol cannot be embedded as a local symbol.")
     }
+
+fun MethodConversionContext.statementCtxt() : StmtConversionContext = StmtConverter(this)
