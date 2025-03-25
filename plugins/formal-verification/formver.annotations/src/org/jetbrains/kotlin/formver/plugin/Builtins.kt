@@ -16,6 +16,8 @@ fun loopInvariants(@Suppress("UNUSED_PARAMETER") body: InvariantBuilder.() -> Un
 
 fun preconditions(@Suppress("UNUSED_PARAMETER") body: InvariantBuilder.() -> Unit) = Unit
 
+fun <T> postconditions(@Suppress("UNUSED_PARAMETER") body: InvariantBuilder.(T) -> Unit) = Unit
+
 /**
  * This class is designed as a receiver for lambda blocks of `loopInvariants`, `preconditions` and `postconditions`.
  * Later, it will have member methods, e.g. `forall`.
