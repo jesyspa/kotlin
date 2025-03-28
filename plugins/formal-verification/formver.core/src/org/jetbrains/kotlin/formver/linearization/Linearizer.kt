@@ -24,6 +24,8 @@ data class Linearizer(
 ) : LinearizationContext {
     override val unfoldPolicy: UnfoldPolicy
         get() = UnfoldPolicy.UNFOLD
+    override val logicOperatorPolicy: LogicOperatorPolicy
+        get() = LogicOperatorPolicy.CONVERT_TO_IF
 
     override fun freshAnonVar(type: TypeEmbedding): AnonymousVariableEmbedding {
         val variable = state.freshAnonVar(type)

@@ -27,6 +27,9 @@ class PureLinearizer(override val source: KtSourceElement?) : LinearizationConte
     override val unfoldPolicy: UnfoldPolicy
         get() = UnfoldPolicy.UNFOLDING_IN
 
+    override val logicOperatorPolicy: LogicOperatorPolicy
+        get() = LogicOperatorPolicy.CONVERT_TO_EXPRESSION
+
     override fun <R> withPosition(newSource: KtSourceElement, action: LinearizationContext.() -> R): R =
         PureLinearizer(newSource).action()
 

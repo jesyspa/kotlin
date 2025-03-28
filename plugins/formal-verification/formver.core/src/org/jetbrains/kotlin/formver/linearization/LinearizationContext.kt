@@ -19,6 +19,10 @@ enum class UnfoldPolicy {
     UNFOLD, UNFOLDING_IN;
 }
 
+enum class LogicOperatorPolicy {
+    CONVERT_TO_IF, CONVERT_TO_EXPRESSION;
+}
+
 /**
  * Context in which an `ExpEmbedding` can be flattened to an `Exp` and a sequence of `Stmt`s.
  *
@@ -29,6 +33,7 @@ enum class UnfoldPolicy {
 interface LinearizationContext {
     val source: KtSourceElement?
     val unfoldPolicy: UnfoldPolicy
+    val logicOperatorPolicy: LogicOperatorPolicy
 
     fun freshAnonVar(type: TypeEmbedding): AnonymousVariableEmbedding
 
