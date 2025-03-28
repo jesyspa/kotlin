@@ -102,15 +102,13 @@ method f$isNullOrEmpty$TF$NT$Collection(this$extension: Ref)
   ensures df$rt$boolFromRef(ret$0) == false ==>
     this$extension != df$rt$nullValue()
 {
-  var anon$0: Ref
   inhale df$rt$isSubtype(df$rt$typeOf(this$extension), df$rt$nullable(df$rt$c$pkg$kotlin_collections$Collection()))
   inhale this$extension != df$rt$nullValue() ==>
     acc(p$pkg$kotlin_collections$c$Collection$shared(this$extension), wildcard)
   if (this$extension == df$rt$nullValue()) {
-    anon$0 := df$rt$boolToRef(true)
+    ret$0 := df$rt$boolToRef(true)
   } else {
-    anon$0 := f$pkg$kotlin_collections$c$Collection$isEmpty$TF$T$Collection(this$extension)}
-  ret$0 := anon$0
+    ret$0 := f$pkg$kotlin_collections$c$Collection$isEmpty$TF$T$Collection(this$extension)}
   goto lbl$ret$0
   label lbl$ret$0
 }

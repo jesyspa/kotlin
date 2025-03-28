@@ -11,10 +11,10 @@ fun <!VIPER_TEXT!>resultOrArg<!>(arg: Boolean): Boolean {
 @AlwaysVerify
 fun <!VIPER_TEXT!>testImplies<!>(arg: Boolean): Boolean {
     postconditions<Boolean> { res ->
-        arg then !res
-        res then !arg
-        !arg then res
-        !res then arg
+        arg implies !res
+        res implies !arg
+        !arg implies res
+        !res implies arg
     }
     return !arg
 }
@@ -22,11 +22,11 @@ fun <!VIPER_TEXT!>testImplies<!>(arg: Boolean): Boolean {
 @AlwaysVerify
 fun <!VIPER_TEXT!>testAnd<!>(arg1: Boolean, arg2: Boolean): Boolean {
     postconditions<Boolean> { res ->
-        res then (arg1 && arg2)
-        !res then (!arg1 || !arg2)
-        (arg1 && arg2) then res
-        !arg1 then !res
-        !arg2 then !res
+        res implies (arg1 && arg2)
+        !res implies (!arg1 || !arg2)
+        (arg1 && arg2) implies res
+        !arg1 implies !res
+        !arg2 implies !res
     }
     return arg1 && arg2
 }

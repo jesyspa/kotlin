@@ -33,6 +33,10 @@ sealed class SequentialLogicOperatorEmbedding: BinaryDirectResultExpEmbedding {
 
     override fun toViperBuiltinType(ctx: LinearizationContext): Exp =
         operatorReplacement(ctx).toViperBuiltinType(ctx)
+
+    override fun toViperStoringIn(result: VariableEmbedding, ctx: LinearizationContext) {
+        operatorReplacement(ctx).toViperStoringIn(result, ctx)
+    }
 }
 
 class SequentialAnd(override val left: ExpEmbedding, override val right: ExpEmbedding) : SequentialLogicOperatorEmbedding() {

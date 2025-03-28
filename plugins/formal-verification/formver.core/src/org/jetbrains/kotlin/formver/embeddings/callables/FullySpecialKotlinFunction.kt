@@ -102,7 +102,7 @@ object SpecialKotlinFunctions {
             withReturnType { boolean() }
         }
 
-        addFunction(extBooleanBooleanToBooleanType, SpecialPackages.formver, name = "then") { args, _ ->
+        addFunction(extBooleanBooleanToBooleanType, SpecialPackages.formver, name = "implies") { args, _ ->
             Implies(args[0], args[1])
         }
 

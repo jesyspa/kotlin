@@ -12,7 +12,7 @@ package org.jetbrains.kotlin.formver.plugin
  */
 fun verify(@Suppress("UNUSED_PARAMETER") vararg predicates: Boolean) = Unit
 
-infix fun Boolean.then(other: Boolean) = !this || other
+infix fun Boolean.implies(other: Boolean) = !this || other
 
 fun loopInvariants(@Suppress("UNUSED_PARAMETER") body: InvariantBuilder.() -> Unit) = Unit
 
