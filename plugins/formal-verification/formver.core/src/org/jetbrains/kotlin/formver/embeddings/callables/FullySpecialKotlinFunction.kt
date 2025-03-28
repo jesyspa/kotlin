@@ -9,6 +9,7 @@ import org.jetbrains.kotlin.formver.embeddings.expression.*
 import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.AddCharInt
 import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.AddIntInt
 import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.DivIntInt
+import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.Implies
 import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.MulIntInt
 import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.Not
 import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.StringGet
@@ -93,6 +94,16 @@ object SpecialKotlinFunctions {
 
         addFunction(booleanToBooleanType, SpecialPackages.kotlin, className = "Boolean", name = "not") { args, _ ->
             Not(args[0])
+        }
+
+        val extBooleanBooleanToBooleanType = buildFunctionPretype {
+            withExtensionReceiver { boolean() }
+            withParam { boolean() }
+            withReturnType { boolean() }
+        }
+
+        addFunction(extBooleanBooleanToBooleanType, SpecialPackages.formver, name = "implies") { args, _ ->
+            Implies(args[0], args[1])
         }
 
         val verifyCallableType = buildFunctionPretype {

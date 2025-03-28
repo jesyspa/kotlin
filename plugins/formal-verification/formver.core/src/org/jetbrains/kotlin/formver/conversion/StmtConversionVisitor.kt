@@ -385,8 +385,8 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext>()
         val left = data.convert(booleanOperatorExpression.leftOperand)
         val right = data.convert(booleanOperatorExpression.rightOperand)
         return when (booleanOperatorExpression.kind) {
-            LogicOperationKind.AND -> If(left, right, BooleanLit(false), buildType { boolean() })
-            LogicOperationKind.OR -> If(left, BooleanLit(true), right, buildType { boolean() })
+            LogicOperationKind.AND -> SequentialAnd(left, right)
+            LogicOperationKind.OR -> SequentialOr(left, right)
         }
     }
 
