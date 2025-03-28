@@ -42,7 +42,7 @@ interface MethodConversionContext : ProgramConversionContext {
     fun resolveDispatchReceiver(): ExpEmbedding?
     fun resolveExtensionReceiver(labelName: String): ExpEmbedding?
 
-    fun <R> withScopeImpl(scopeDepth: Int, action: () -> R): R
+    fun <R> withScopeImpl(scopeDepth: ScopeIndex, action: () -> R): R
     fun addLoopIdentifier(labelName: String, index: Int)
     fun resolveLoopIndex(name: String): Int
     fun resolveNamedReturnTarget(labelName: String): ReturnTarget?

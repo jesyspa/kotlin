@@ -9,6 +9,7 @@ import org.jetbrains.kotlin.descriptors.Visibilities
 import org.jetbrains.kotlin.fir.declarations.utils.visibility
 import org.jetbrains.kotlin.fir.symbols.impl.*
 import org.jetbrains.kotlin.formver.conversion.ProgramConversionContext
+import org.jetbrains.kotlin.formver.conversion.ScopeIndex
 import org.jetbrains.kotlin.formver.embeddings.types.FunctionTypeEmbedding
 import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.ClassId
@@ -76,8 +77,12 @@ fun CallableId.embedFunctionName(type: FunctionTypeEmbedding): ScopedKotlinName 
     FunctionKotlinName(callableName, type)
 }
 
-fun Name.embedScopedLocalName(scope: Int) = buildName {
-    localScope(scope)
+fun Name.embedScopedLocalName(scope: ScopeIndex) = buildName {
+    // TODO : otherwise, an error should be reported at some point
+    if (scope is ScopeIndex.Indexed)
+        localScope(scope.index)
+    else
+        badScope()
     SimpleKotlinName(this@embedScopedLocalName)
 }
 

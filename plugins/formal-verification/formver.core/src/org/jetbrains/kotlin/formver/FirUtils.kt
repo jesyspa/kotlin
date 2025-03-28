@@ -9,8 +9,6 @@ import org.jetbrains.kotlin.KtSourceElement
 import org.jetbrains.kotlin.fir.FirAnnotationContainer
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.contracts.FirEffectDeclaration
-import org.jetbrains.kotlin.fir.declarations.FirFunction
-import org.jetbrains.kotlin.fir.declarations.FirSimpleFunction
 import org.jetbrains.kotlin.fir.declarations.hasAnnotation
 import org.jetbrains.kotlin.fir.declarations.impl.FirDefaultPropertyGetter
 import org.jetbrains.kotlin.fir.declarations.impl.FirDefaultPropertySetter
@@ -59,8 +57,12 @@ val FirBasedSymbol<*>.asSourceRole: SourceRole
 fun annotationId(name: String): ClassId =
     ClassId(FqName.fromSegments(SpecialPackages.formver), Name.identifier(name))
 
-fun formverCallableId(name: String): CallableId =
-    CallableId(FqName.fromSegments(SpecialPackages.formver), Name.identifier(name))
+fun formverCallableId(className: String? = null, name: String): CallableId =
+    if (className == null)
+        CallableId(FqName.fromSegments(SpecialPackages.formver), Name.identifier(name))
+    else
+        CallableId(FqName.fromSegments(SpecialPackages.formver), FqName.fromSegments(listOf(className)), Name.identifier(name))
+
 
 fun FirBasedSymbol<*>.isUnique(session: FirSession) = hasAnnotation(annotationId("Unique"), session)
 
@@ -71,7 +73,10 @@ fun FirAnnotationContainer.isUnique(session: FirSession) = hasAnnotation(annotat
 fun FirAnnotationContainer.isBorrowed(session: FirSession) = hasAnnotation(annotationId("Borrowed"), session)
 
 fun FirFunctionSymbol<*>.isFormverFunctionNamed(name: String) =
-    this is FirNamedFunctionSymbol && callableId == formverCallableId(name)
+    this is FirNamedFunctionSymbol && callableId == formverCallableId(null, name)
+
+fun FirFunctionSymbol<*>.isInvariantBuilderFunctionNamed(name: String) =
+    this is FirNamedFunctionSymbol && callableId == formverCallableId("InvariantBuilder", name)
 
 @OptIn(SymbolInternals::class)
 val FirFunctionSymbol<*>.shouldBeInlined

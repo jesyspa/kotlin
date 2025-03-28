@@ -22,7 +22,7 @@ data class LoopIdentifier(val targetName: String, val index: Int)
  * to the resolver for the outer scopes, and automatically searches them.
  */
 class PropertyResolver(
-    private val scopeIndex: Int,
+    private val scopeIndex: ScopeIndex,
     val parent: PropertyResolver? = null,
     private val loopName: LoopIdentifier? = null,
 ) {
@@ -48,7 +48,7 @@ class PropertyResolver(
         variables[symbol] = FirVariableEmbedding(name.embedScopedLocalName(scopeIndex), type, symbol)
     }
 
-    fun innerScope(innerScopeIndex: Int) = PropertyResolver(innerScopeIndex, this)
+    fun innerScope(innerScopeIndex: ScopeIndex) = PropertyResolver(innerScopeIndex, this)
 
     fun addLoopIdentifier(labelName: String, index: Int) = PropertyResolver(scopeIndex, parent, LoopIdentifier(labelName, index))
 

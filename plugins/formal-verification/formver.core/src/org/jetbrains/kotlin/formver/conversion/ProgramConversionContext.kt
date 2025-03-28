@@ -29,7 +29,7 @@ interface ProgramConversionContext {
     val whileIndexProducer: SimpleFreshEntityProducer<Int>
     val catchLabelNameProducer: SimpleFreshEntityProducer<CatchLabelName>
     val tryExitLabelNameProducer: SimpleFreshEntityProducer<TryExitLabelName>
-    val scopeIndexProducer: SimpleFreshEntityProducer<Int>
+    val scopeIndexProducer: SimpleFreshEntityProducer<ScopeIndex.Indexed>
 
     val anonVarProducer: FreshEntityProducer<AnonymousVariableEmbedding, TypeEmbedding>
     val returnTargetProducer: FreshEntityProducer<ReturnTarget, TypeEmbedding>

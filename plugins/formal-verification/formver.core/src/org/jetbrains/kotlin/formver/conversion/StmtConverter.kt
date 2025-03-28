@@ -30,7 +30,7 @@ data class StmtConverter(
     private val whileIndex: Int = 0,
     override val whenSubject: VariableEmbedding? = null,
     override val checkedSafeCallSubject: ExpEmbedding? = null,
-    private val scopeIndex: Int = 0,
+    private val scopeIndex: ScopeIndex = ScopeIndex.Indexed(0),
     override val activeCatchLabels: List<LabelEmbedding> = listOf(),
 ) : StmtConversionContext, MethodConversionContext by methodCtx {
     override fun convert(stmt: FirStatement): ExpEmbedding =
@@ -38,8 +38,12 @@ data class StmtConverter(
 
     override fun <R> withNewScope(action: StmtConversionContext.() -> R): R = withNewScopeImpl(action)
 
-    override fun <R> withMethodCtx(factory: MethodContextFactory, action: StmtConversionContext.() -> R): R =
-        copy(methodCtx = factory.create(this, scopeIndex)).withNewScope { action() }
+    override fun <R> withMethodCtx(factory: MethodContextFactory, action: StmtConversionContext.() -> R): R {
+        return copy(methodCtx = factory.create(this, scopeIndex)).run {
+            if (scopeIndex is ScopeIndex.Indexed) withNewScope(action)
+            else withScopeImpl(ScopeIndex.NoScope) { action() }
+        }
+    }
 
     private fun resolveWhileIndex(targetName: String?) =
         if (targetName != null) {

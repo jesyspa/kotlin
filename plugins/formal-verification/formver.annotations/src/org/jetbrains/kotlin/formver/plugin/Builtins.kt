@@ -5,6 +5,9 @@
 
 package org.jetbrains.kotlin.formver.plugin
 
+private class FormverFunctionCalledInRuntimeError(offendingFunction: String) :
+    RuntimeException("Function `$offendingFunction` should never be called in runtime")
+
 /**
  * Built-in function used to mark a boolean predicate to be verified in Viper.
  * This function hooks-in in the `formver` plugin, its invocation in a Kotlin
@@ -22,6 +25,7 @@ fun <T> postconditions(@Suppress("UNUSED_PARAMETER") body: InvariantBuilder.(T) 
 
 /**
  * This class is designed as a receiver for lambda blocks of `loopInvariants`, `preconditions` and `postconditions`.
- * Later, it will have member methods, e.g. `forall`.
  */
-class InvariantBuilder
+class InvariantBuilder {
+    fun <T> forAll(@Suppress("UNUSED_PARAMETER") body: (T) -> Unit): Boolean = throw FormverFunctionCalledInRuntimeError("forAll")
+}
