@@ -198,11 +198,13 @@ fun StmtConversionContext.insertInlineFunctionCall(
     }
 }
 
-fun StmtConversionContext.insertForAllScope(
+/**
+ * Insert `ForAllEmbedding` where `forAll` function call was encountered.
+ */
+fun StmtConversionContext.insertForAllFunctionCall(
     symbol: FirValueParameterSymbol,
-    block: FirBlock?,
+    block: FirBlock,
 ): ExpEmbedding {
-    if (block  == null) return BooleanLit(true)
     val anonVar = freshAnonVar(embedType(symbol.resolvedReturnType))
     val methodCtxFactory = MethodContextFactory(
         signature,

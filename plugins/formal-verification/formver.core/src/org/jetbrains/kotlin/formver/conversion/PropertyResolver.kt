@@ -28,6 +28,9 @@ class PropertyResolver(
 ) {
     private val variables: MutableMap<FirVariableSymbol<*>, VariableEmbedding> = mutableMapOf()
 
+    val canCreateLocals: Boolean
+        get() = scopeIndex is ScopeIndex.Indexed
+
     fun tryResolveLocalProperty(symbol: FirVariableSymbol<*>): VariableEmbedding? =
         variables[symbol] ?: parent?.tryResolveLocalProperty(symbol)
 

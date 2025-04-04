@@ -5,6 +5,11 @@
 
 package org.jetbrains.kotlin.formver.conversion
 
+/**
+ * When converting Kotlin methods, we explicitly track what local variables are declared in each scope
+ * to resolve shadowing. In scopes where local variables are not permitted, we use a special `NoScope`
+ * placeholder that is treated as an error downstream.
+ */
 sealed class ScopeIndex {
     data class Indexed(val index: Int) : ScopeIndex()
     data object NoScope : ScopeIndex()

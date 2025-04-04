@@ -32,6 +32,9 @@ class MethodConverter(
 ) : MethodConversionContext, ProgramConversionContext by programCtx {
     private var propertyResolver = PropertyResolver(scopeDepth)
 
+    override val isValidForForAllBlock: Boolean
+        get() = !propertyResolver.canCreateLocals
+
     override fun <R> withScopeImpl(scopeDepth: ScopeIndex, action: () -> R): R {
         propertyResolver = propertyResolver.innerScope(scopeDepth)
         val result = action()

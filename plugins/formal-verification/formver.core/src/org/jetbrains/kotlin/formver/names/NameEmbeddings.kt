@@ -78,11 +78,15 @@ fun CallableId.embedFunctionName(type: FunctionTypeEmbedding): ScopedKotlinName 
 }
 
 fun Name.embedScopedLocalName(scope: ScopeIndex) = buildName {
-    // TODO : otherwise, an error should be reported at some point
-    if (scope is ScopeIndex.Indexed)
-        localScope(scope.index)
-    else
-        badScope()
+    when (scope) {
+        is ScopeIndex.Indexed -> localScope(scope.index)
+        // If we're in the context where creating locals is not permitted
+        // an error would be reported down the stream (most likely, when we convert
+        // ExpEmbedding to Viper)
+        // For extra safety, we produce a name for such a variable that does not compile
+        // TODO: make reporting more transparent here
+        ScopeIndex.NoScope -> badScope()
+    }
     SimpleKotlinName(this@embedScopedLocalName)
 }
 

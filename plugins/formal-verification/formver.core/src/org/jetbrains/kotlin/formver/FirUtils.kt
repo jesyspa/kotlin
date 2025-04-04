@@ -57,7 +57,7 @@ val FirBasedSymbol<*>.asSourceRole: SourceRole
 fun annotationId(name: String): ClassId =
     ClassId(FqName.fromSegments(SpecialPackages.formver), Name.identifier(name))
 
-fun formverCallableId(className: String? = null, name: String): CallableId =
+fun formverCallableId(className: String?, name: String): CallableId =
     if (className == null)
         CallableId(FqName.fromSegments(SpecialPackages.formver), Name.identifier(name))
     else
@@ -73,7 +73,7 @@ fun FirAnnotationContainer.isUnique(session: FirSession) = hasAnnotation(annotat
 fun FirAnnotationContainer.isBorrowed(session: FirSession) = hasAnnotation(annotationId("Borrowed"), session)
 
 fun FirFunctionSymbol<*>.isFormverFunctionNamed(name: String) =
-    this is FirNamedFunctionSymbol && callableId == formverCallableId(null, name)
+    this is FirNamedFunctionSymbol && callableId == formverCallableId(className = null, name)
 
 fun FirFunctionSymbol<*>.isInvariantBuilderFunctionNamed(name: String) =
     this is FirNamedFunctionSymbol && callableId == formverCallableId("InvariantBuilder", name)

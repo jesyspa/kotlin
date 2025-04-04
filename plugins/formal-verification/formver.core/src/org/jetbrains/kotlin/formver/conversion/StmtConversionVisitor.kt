@@ -276,8 +276,12 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext>()
                 )
             }
             else -> {
+                if (!data.isValidForForAllBlock)
+                    error("`forAll` scope is only allowed inside one of the `loopInvariants`, `preconditions` or `postconditions`.")
                 val forAllArg = forAllLambda.valueParameters.first()
-                return data.insertForAllScope(forAllArg.symbol, forAllLambda.body)
+                val forAllBody = forAllLambda.body
+                    ?: error("Lambda body should be accessible in `forAll` function call.")
+                return data.insertForAllFunctionCall(forAllArg.symbol, forAllBody)
             }
         }
     }
