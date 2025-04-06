@@ -310,6 +310,22 @@ public class FirLightTreeFormVerPluginDiagnosticsTestGenerated extends AbstractF
     }
 
     @Nested
+    @TestMetadata("plugins/formal-verification/testData/diagnostics/no_contracts/henrikTesting")
+    @TestDataPath("$PROJECT_ROOT")
+    public class HenrikTesting {
+      @Test
+      public void testAllFilesPresentInHenrikTesting() {
+        KtTestUtil.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("plugins/formal-verification/testData/diagnostics/no_contracts/henrikTesting"), Pattern.compile("^(.+)\\.kt$"), null, true);
+      }
+
+      @Test
+      @TestMetadata("average.kt")
+      public void testAverage() {
+        runTest("plugins/formal-verification/testData/diagnostics/no_contracts/henrikTesting/average.kt");
+      }
+    }
+
+    @Nested
     @TestMetadata("plugins/formal-verification/testData/diagnostics/no_contracts/inlining")
     @TestDataPath("$PROJECT_ROOT")
     public class Inlining {
