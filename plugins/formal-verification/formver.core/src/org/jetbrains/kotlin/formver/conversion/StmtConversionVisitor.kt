@@ -37,9 +37,9 @@ import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.
 import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.LtIntInt
 import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.Not
 import org.jetbrains.kotlin.formver.embeddings.toLink
-import org.jetbrains.kotlin.formver.embeddings.types.buildType
 import org.jetbrains.kotlin.formver.embeddings.types.equalToType
 import org.jetbrains.kotlin.formver.functionCallArguments
+import org.jetbrains.kotlin.formver.isInvariantBuilderFunctionNamed
 import org.jetbrains.kotlin.text
 import org.jetbrains.kotlin.types.ConstantValueKind
 import org.jetbrains.kotlin.utils.addIfNotNull
@@ -263,13 +263,27 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext>()
         }
 
     override fun visitFunctionCall(functionCall: FirFunctionCall, data: StmtConversionContext): ExpEmbedding {
-        val symbol = functionCall.toResolvedCallableSymbol()
-        val callee = data.embedFunction(symbol as FirFunctionSymbol<*>)
-        return callee.insertCall(
-            functionCall.functionCallArguments.withVarargsHandled(data, callee),
-            data,
-            data.embedType(functionCall.resolvedType),
-        )
+        val symbol = functionCall.toResolvedCallableSymbol() as? FirFunctionSymbol<*>
+            ?: throw NotImplementedError("Only functions are expected as callables of function calls, got ${functionCall.toResolvedCallableSymbol()}")
+
+        when (val forAllLambda = functionCall.extractFormverFirBlock { isInvariantBuilderFunctionNamed("forAll") }) {
+            null -> {
+                val callee = data.embedFunction(symbol)
+                return callee.insertCall(
+                    functionCall.functionCallArguments.withVarargsHandled(data, callee),
+                    data,
+                    data.embedType(functionCall.resolvedType),
+                )
+            }
+            else -> {
+                if (!data.isValidForForAllBlock)
+                    error("`forAll` scope is only allowed inside one of the `loopInvariants`, `preconditions` or `postconditions`.")
+                val forAllArg = forAllLambda.valueParameters.first()
+                val forAllBody = forAllLambda.body
+                    ?: error("Lambda body should be accessible in `forAll` function call.")
+                return data.insertForAllFunctionCall(forAllArg.symbol, forAllBody)
+            }
+        }
     }
 
     override fun visitImplicitInvokeCall(
@@ -310,7 +324,7 @@ object StmtConversionVisitor : FirVisitor<ExpEmbedding, StmtConversionContext>()
                 addAll(it.provenInvariants())
             }
             extractLoopInvariants(whileLoop.block)?.let {
-                addAll(data.collectInvariants(it))
+                addAll(data.withScopeImpl(ScopeIndex.NoScope) { data.collectInvariants(it) })
             }
         }
         return data.withFreshWhile(whileLoop.label) {

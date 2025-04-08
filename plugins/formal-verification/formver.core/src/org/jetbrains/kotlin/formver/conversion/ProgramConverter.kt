@@ -58,7 +58,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
     override val whileIndexProducer = indexProducer()
     override val catchLabelNameProducer = simpleFreshEntityProducer(::CatchLabelName)
     override val tryExitLabelNameProducer = simpleFreshEntityProducer(::TryExitLabelName)
-    override val scopeIndexProducer = indexProducer()
+    override val scopeIndexProducer = scopeIndexProducer()
 
     // The type annotation is necessary for the code to compile.
     override val anonVarProducer = FreshEntityProducer(::AnonymousVariableEmbedding)
@@ -321,7 +321,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
                 this@ProgramConverter,
                 subSignature,
                 paramResolver,
-                scopeDepth = 0,
+                scopeDepth = ScopeIndex.NoScope,
             ).statementCtxt()
         }
 

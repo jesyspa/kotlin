@@ -80,6 +80,12 @@ data object ParameterScope : NameScope {
         get() = "p"
 }
 
+data object BadScope : NameScope {
+    override val parent: NameScope? = null
+    override val mangledScopeName: String
+        get() = "<BAD>"
+}
+
 data class LocalScope(val level: Int) : NameScope {
     override val parent: NameScope? = null
     override val mangledScopeName = "l$level"

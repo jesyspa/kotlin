@@ -8,7 +8,6 @@ package org.jetbrains.kotlin.formver.conversion
 import org.jetbrains.kotlin.fir.FirLabel
 import org.jetbrains.kotlin.fir.declarations.FirSimpleFunction
 import org.jetbrains.kotlin.fir.declarations.utils.isFinal
-import org.jetbrains.kotlin.fir.declarations.utils.isInline
 import org.jetbrains.kotlin.fir.expressions.*
 import org.jetbrains.kotlin.fir.references.symbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirIntersectionOverridePropertySymbol
@@ -26,10 +25,7 @@ import org.jetbrains.kotlin.formver.isCustom
 import org.jetbrains.kotlin.formver.linearization.Linearizer
 import org.jetbrains.kotlin.formver.linearization.SeqnBuilder
 import org.jetbrains.kotlin.formver.linearization.SharedLinearizationState
-import org.jetbrains.kotlin.formver.shouldBeInlined
 import org.jetbrains.kotlin.formver.viper.MangledName
-import org.jetbrains.kotlin.formver.viper.ast.delegateToCallable
-import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.utils.addIfNotNull
 import org.jetbrains.kotlin.utils.addToStdlib.ifTrue
 import org.jetbrains.kotlin.utils.filterIsInstanceAnd
@@ -199,6 +195,29 @@ fun StmtConversionContext.insertInlineFunctionCall(
             // if unit is what we return we might not guarantee it yet
             add(returnTarget.variable.withIsUnitInvariantIfUnit())
         }
+    }
+}
+
+/**
+ * Insert `ForAllEmbedding` where `forAll` function call was encountered.
+ */
+fun StmtConversionContext.insertForAllFunctionCall(
+    symbol: FirValueParameterSymbol,
+    block: FirBlock,
+): ExpEmbedding {
+    val anonVar = freshAnonVar(embedType(symbol.resolvedReturnType))
+    val methodCtxFactory = MethodContextFactory(
+        signature,
+        InlineParameterResolver(
+            substitutions = mapOf(SubstitutedArgument.ValueParameter(symbol) to anonVar),
+            labelName = null,
+            // TODO: ideally, there shouldn't be a return target since return is prohibited
+            defaultResolvedReturnTarget = defaultResolvedReturnTarget,
+        ),
+        parent = this,
+    )
+    return withMethodCtx(methodCtxFactory) {
+        ForAllEmbedding(anonVar, collectInvariants(block))
     }
 }
 

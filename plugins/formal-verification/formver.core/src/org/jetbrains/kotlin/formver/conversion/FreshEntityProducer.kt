@@ -15,4 +15,5 @@ typealias SimpleFreshEntityProducer<R> = FreshEntityProducer<R, Unit>
 fun <R> simpleFreshEntityProducer(build: (Int) -> R): SimpleFreshEntityProducer<R> = FreshEntityProducer { n, _ -> build(n) }
 fun <R> SimpleFreshEntityProducer<R>.getFresh() = getFresh(Unit)
 
-fun indexProducer(): SimpleFreshEntityProducer<Int> = simpleFreshEntityProducer { it }
+fun scopeIndexProducer(): SimpleFreshEntityProducer<ScopeIndex.Indexed> = simpleFreshEntityProducer(ScopeIndex::Indexed)
+fun indexProducer() = simpleFreshEntityProducer { it }

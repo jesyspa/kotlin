@@ -12,7 +12,7 @@ import org.jetbrains.kotlin.fir.symbols.impl.FirValueParameterSymbol
 import org.jetbrains.kotlin.fir.types.ConeKotlinType
 import org.jetbrains.kotlin.formver.isFormverFunctionNamed
 
-private fun FirStatement.extractFormverFirBlock(predicate: FirFunctionSymbol<*>.() -> Boolean): FirAnonymousFunction? {
+fun FirStatement.extractFormverFirBlock(predicate: FirFunctionSymbol<*>.() -> Boolean): FirAnonymousFunction? {
     if (this !is FirFunctionCall) return null
     val firFunction = toResolvedCallableSymbol() as? FirFunctionSymbol<*> ?: return null
     if (!predicate(firFunction)) return null

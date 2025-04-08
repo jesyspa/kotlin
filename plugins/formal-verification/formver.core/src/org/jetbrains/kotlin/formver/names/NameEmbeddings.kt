@@ -9,6 +9,7 @@ import org.jetbrains.kotlin.descriptors.Visibilities
 import org.jetbrains.kotlin.fir.declarations.utils.visibility
 import org.jetbrains.kotlin.fir.symbols.impl.*
 import org.jetbrains.kotlin.formver.conversion.ProgramConversionContext
+import org.jetbrains.kotlin.formver.conversion.ScopeIndex
 import org.jetbrains.kotlin.formver.embeddings.types.FunctionTypeEmbedding
 import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.ClassId
@@ -76,8 +77,16 @@ fun CallableId.embedFunctionName(type: FunctionTypeEmbedding): ScopedKotlinName 
     FunctionKotlinName(callableName, type)
 }
 
-fun Name.embedScopedLocalName(scope: Int) = buildName {
-    localScope(scope)
+fun Name.embedScopedLocalName(scope: ScopeIndex) = buildName {
+    when (scope) {
+        is ScopeIndex.Indexed -> localScope(scope.index)
+        // If we're in the context where creating locals is not permitted
+        // an error would be reported down the stream (most likely, when we convert
+        // ExpEmbedding to Viper)
+        // For extra safety, we produce a name for such a variable that does not compile
+        // TODO: make reporting more transparent here
+        ScopeIndex.NoScope -> badScope()
+    }
     SimpleKotlinName(this@embedScopedLocalName)
 }
 
