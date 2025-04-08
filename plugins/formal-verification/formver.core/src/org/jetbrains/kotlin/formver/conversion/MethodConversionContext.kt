@@ -34,6 +34,7 @@ class ReturnTarget(depth: Int, type: TypeEmbedding) {
 interface MethodConversionContext : ProgramConversionContext {
     val signature: FunctionSignature
     val defaultResolvedReturnTarget: ReturnTarget
+    val isValidForForAllBlock: Boolean
 
     fun resolveParameter(symbol: FirValueParameterSymbol): ExpEmbedding
     fun resolveLocal(symbol: FirVariableSymbol<*>): VariableEmbedding
@@ -42,7 +43,7 @@ interface MethodConversionContext : ProgramConversionContext {
     fun resolveDispatchReceiver(): ExpEmbedding?
     fun resolveExtensionReceiver(labelName: String): ExpEmbedding?
 
-    fun <R> withScopeImpl(scopeDepth: Int, action: () -> R): R
+    fun <R> withScopeImpl(scopeDepth: ScopeIndex, action: () -> R): R
     fun addLoopIdentifier(labelName: String, index: Int)
     fun resolveLoopIndex(name: String): Int
     fun resolveNamedReturnTarget(labelName: String): ReturnTarget?
