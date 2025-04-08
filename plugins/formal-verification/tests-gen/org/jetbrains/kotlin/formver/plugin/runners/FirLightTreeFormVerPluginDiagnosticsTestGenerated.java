@@ -691,6 +691,12 @@ public class FirLightTreeFormVerPluginDiagnosticsTestGenerated extends AbstractF
       }
 
       @Test
+      @TestMetadata("simple_forall.kt")
+      public void testSimple_forall() {
+        runTest("plugins/formal-verification/testData/diagnostics/verifies/user_invariants/simple_forall.kt");
+      }
+
+      @Test
       @TestMetadata("simple_loop.kt")
       public void testSimple_loop() {
         runTest("plugins/formal-verification/testData/diagnostics/verifies/user_invariants/simple_loop.kt");
