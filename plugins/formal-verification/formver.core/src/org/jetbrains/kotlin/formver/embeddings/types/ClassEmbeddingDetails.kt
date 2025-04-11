@@ -14,8 +14,6 @@ import org.jetbrains.kotlin.utils.addToStdlib.ifTrue
 class ClassEmbeddingDetails(
     val type: ClassTypeEmbedding,
     val isInterface: Boolean,
-    private val sharedPredicateEnhancer: ClassPredicateEnhancer? = null,
-    private val uniquePredicateEnhancer: ClassPredicateEnhancer? = null,
 ) : TypeInvariantHolder {
     private var _superTypes: List<PretypeEmbedding>? = null
     val superTypes: List<PretypeEmbedding>
@@ -55,7 +53,6 @@ class ClassEmbeddingDetails(
             forEachSuperType {
                 addAccessToSharedPredicate()
             }
-            sharedPredicateEnhancer?.applyAdditionalAssertions(this)
         }
         _uniquePredicate = ClassPredicateBuilder.build(this, uniquePredicateName) {
             forEachField {
@@ -75,7 +72,6 @@ class ClassEmbeddingDetails(
             forEachSuperType {
                 addAccessToUniquePredicate()
             }
-            uniquePredicateEnhancer?.applyAdditionalAssertions(this)
         }
     }
 

@@ -67,6 +67,7 @@ class FieldAssertionsBuilder(private val subject: VariableEmbedding, private val
 
     val isAlwaysReadable = field.accessPolicy == AccessPolicy.ALWAYS_READABLE
     val isUnique = field.isUnique
+    val nameAsString: String = field.name.name.mangledBaseName
 
     fun forType(action: TypeInvariantsBuilder.() -> Unit) {
         val builder = TypeInvariantsBuilder(field.type)
