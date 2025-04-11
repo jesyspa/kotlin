@@ -5,7 +5,7 @@
 
 package org.jetbrains.kotlin.formver.embeddings.types
 
-import org.jetbrains.kotlin.formver.embeddings.FieldEmbedding
+import org.jetbrains.kotlin.formver.embeddings.properties.FieldEmbedding
 import org.jetbrains.kotlin.formver.names.*
 import org.jetbrains.kotlin.formver.viper.ast.PermExp
 import org.jetbrains.kotlin.formver.viper.ast.Predicate

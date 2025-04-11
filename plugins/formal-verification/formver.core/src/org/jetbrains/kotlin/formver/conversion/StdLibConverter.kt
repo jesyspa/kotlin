@@ -14,6 +14,7 @@ import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.
 import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.LeIntInt
 import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.Not
 import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.SubIntInt
+import org.jetbrains.kotlin.formver.embeddings.properties.ListSizeFieldEmbedding
 import org.jetbrains.kotlin.formver.embeddings.types.isInheritorOfCollectionTypeNamed
 import org.jetbrains.kotlin.formver.names.NameMatcher
 

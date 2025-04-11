@@ -21,6 +21,9 @@ import org.jetbrains.kotlin.formver.embeddings.callables.FullNamedFunctionSignat
 import org.jetbrains.kotlin.formver.embeddings.types.TypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.callables.FunctionSignature
 import org.jetbrains.kotlin.formver.embeddings.expression.*
+import org.jetbrains.kotlin.formver.embeddings.properties.ClassPropertyAccess
+import org.jetbrains.kotlin.formver.embeddings.properties.PropertyAccessEmbedding
+import org.jetbrains.kotlin.formver.embeddings.properties.asPropertyAccess
 import org.jetbrains.kotlin.formver.isCustom
 import org.jetbrains.kotlin.formver.linearization.Linearizer
 import org.jetbrains.kotlin.formver.linearization.SeqnBuilder

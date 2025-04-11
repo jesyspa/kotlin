@@ -5,7 +5,7 @@
 
 package org.jetbrains.kotlin.formver.embeddings.expression.debug
 
-import org.jetbrains.kotlin.formver.embeddings.FieldEmbedding
+import org.jetbrains.kotlin.formver.embeddings.properties.FieldEmbedding
 import org.jetbrains.kotlin.formver.embeddings.LabelEmbedding
 import org.jetbrains.kotlin.formver.embeddings.LabelLink
 import org.jetbrains.kotlin.formver.embeddings.callables.NamedFunctionSignature
