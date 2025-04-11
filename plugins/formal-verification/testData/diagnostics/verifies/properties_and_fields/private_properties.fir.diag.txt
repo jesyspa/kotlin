@@ -23,8 +23,6 @@ method ps$c$A$private$field(this$dispatch: Ref, anon$0: Ref)
 /private_properties.kt:(316,330): info: Generated Viper text for getStringField:
 field bf$c$B$private$field: Ref
 
-field bf$length: Ref
-
 method f$c$B$getStringField$TF$T$B(this$dispatch: Ref) returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$stringType())
   ensures acc(p$pkg$kotlin$c$String$shared(ret$0), wildcard)
@@ -51,8 +49,6 @@ method ps$c$A$private$field(this$dispatch: Ref, anon$0: Ref)
 field bf$c$B$private$field: Ref
 
 field bf$field: Ref
-
-field bf$length: Ref
 
 field bf$size: Ref
 

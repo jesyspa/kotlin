@@ -1,6 +1,4 @@
 /strings.kt:(237,245): info: Generated Viper text for testType:
-field bf$length: Ref
-
 field bf$size: Ref
 
 field bf$str: Ref
@@ -64,18 +62,12 @@ predicate p$pkg$kotlin$c$Comparable$unique(this$dispatch: Ref) {
 }
 
 predicate p$pkg$kotlin$c$String$shared(this$dispatch: Ref) {
-  acc(this$dispatch.bf$length, wildcard) &&
-  df$rt$isSubtype(df$rt$typeOf(this$dispatch.bf$length), df$rt$intType()) &&
   acc(p$pkg$kotlin$c$Comparable$shared(this$dispatch), wildcard) &&
   acc(p$pkg$kotlin$c$CharSequence$shared(this$dispatch), wildcard) &&
-  acc(p$pkg$java_io$c$Serializable$shared(this$dispatch), wildcard) &&
-  df$rt$intFromRef(this$dispatch.bf$length) ==
-  |df$rt$stringFromRef(this$dispatch)|
+  acc(p$pkg$java_io$c$Serializable$shared(this$dispatch), wildcard)
 }
 
 predicate p$pkg$kotlin$c$String$unique(this$dispatch: Ref) {
-  acc(this$dispatch.bf$length, wildcard) &&
-  df$rt$isSubtype(df$rt$typeOf(this$dispatch.bf$length), df$rt$intType()) &&
   acc(p$pkg$kotlin$c$Comparable$unique(this$dispatch), write) &&
   acc(p$pkg$kotlin$c$CharSequence$unique(this$dispatch), write) &&
   acc(p$pkg$java_io$c$Serializable$unique(this$dispatch), write)
@@ -115,8 +107,6 @@ method pg$public$length(this$dispatch: Ref) returns (ret: Ref)
 
 
 /strings.kt:(368,383): info: Generated Viper text for testLengthField:
-field bf$length: Ref
-
 field bf$size: Ref
 
 field bf$str: Ref
@@ -180,18 +170,12 @@ predicate p$pkg$kotlin$c$Comparable$unique(this$dispatch: Ref) {
 }
 
 predicate p$pkg$kotlin$c$String$shared(this$dispatch: Ref) {
-  acc(this$dispatch.bf$length, wildcard) &&
-  df$rt$isSubtype(df$rt$typeOf(this$dispatch.bf$length), df$rt$intType()) &&
   acc(p$pkg$kotlin$c$Comparable$shared(this$dispatch), wildcard) &&
   acc(p$pkg$kotlin$c$CharSequence$shared(this$dispatch), wildcard) &&
-  acc(p$pkg$java_io$c$Serializable$shared(this$dispatch), wildcard) &&
-  df$rt$intFromRef(this$dispatch.bf$length) ==
-  |df$rt$stringFromRef(this$dispatch)|
+  acc(p$pkg$java_io$c$Serializable$shared(this$dispatch), wildcard)
 }
 
 predicate p$pkg$kotlin$c$String$unique(this$dispatch: Ref) {
-  acc(this$dispatch.bf$length, wildcard) &&
-  df$rt$isSubtype(df$rt$typeOf(this$dispatch.bf$length), df$rt$intType()) &&
   acc(p$pkg$kotlin$c$Comparable$unique(this$dispatch), write) &&
   acc(p$pkg$kotlin$c$CharSequence$unique(this$dispatch), write) &&
   acc(p$pkg$java_io$c$Serializable$unique(this$dispatch), write)
@@ -212,17 +196,13 @@ method f$testLengthField$TF$T$String(p$s: Ref) returns (ret$0: Ref)
   var l0$len: Ref
   var anon$0: Ref
   var anon$1: Ref
-  var anon$2: Ref
   inhale df$rt$isSubtype(df$rt$typeOf(p$s), df$rt$stringType())
   inhale acc(p$pkg$kotlin$c$String$shared(p$s), wildcard)
-  unfold acc(p$pkg$kotlin$c$String$shared(p$s), wildcard)
-  l0$len := p$s.bf$length
-  anon$2 := con$c$StringBox$T$String(df$rt$stringToRef(Seq(115, 116, 114)))
-  unfold acc(p$c$StringBox$shared(anon$2), wildcard)
-  anon$1 := anon$2.bf$str
-  unfold acc(p$pkg$kotlin$c$String$shared(anon$1), wildcard)
-  anon$0 := anon$1.bf$length
-  assert df$rt$intFromRef(anon$0) == 3
+  l0$len := sp$stringLength(p$s)
+  anon$1 := con$c$StringBox$T$String(df$rt$stringToRef(Seq(115, 116, 114)))
+  unfold acc(p$c$StringBox$shared(anon$1), wildcard)
+  anon$0 := anon$1.bf$str
+  assert |df$rt$stringFromRef(anon$0)| == 3
   label lbl$ret$0
   inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
@@ -231,8 +211,6 @@ method pg$public$length(this$dispatch: Ref) returns (ret: Ref)
 
 
 /strings.kt:(486,493): info: Generated Viper text for testOps:
-field bf$length: Ref
-
 field bf$size: Ref
 
 predicate p$pkg$java_io$c$Serializable$shared(this$dispatch: Ref) {
@@ -282,18 +260,12 @@ predicate p$pkg$kotlin$c$Comparable$unique(this$dispatch: Ref) {
 }
 
 predicate p$pkg$kotlin$c$String$shared(this$dispatch: Ref) {
-  acc(this$dispatch.bf$length, wildcard) &&
-  df$rt$isSubtype(df$rt$typeOf(this$dispatch.bf$length), df$rt$intType()) &&
   acc(p$pkg$kotlin$c$Comparable$shared(this$dispatch), wildcard) &&
   acc(p$pkg$kotlin$c$CharSequence$shared(this$dispatch), wildcard) &&
-  acc(p$pkg$java_io$c$Serializable$shared(this$dispatch), wildcard) &&
-  df$rt$intFromRef(this$dispatch.bf$length) ==
-  |df$rt$stringFromRef(this$dispatch)|
+  acc(p$pkg$java_io$c$Serializable$shared(this$dispatch), wildcard)
 }
 
 predicate p$pkg$kotlin$c$String$unique(this$dispatch: Ref) {
-  acc(this$dispatch.bf$length, wildcard) &&
-  df$rt$isSubtype(df$rt$typeOf(this$dispatch.bf$length), df$rt$intType()) &&
   acc(p$pkg$kotlin$c$Comparable$unique(this$dispatch), write) &&
   acc(p$pkg$kotlin$c$CharSequence$unique(this$dispatch), write) &&
   acc(p$pkg$java_io$c$Serializable$unique(this$dispatch), write)
@@ -310,26 +282,19 @@ method f$testOps$TF$T$String(p$s: Ref) returns (ret$0: Ref)
 {
   var l0$c: Ref
   var anon$0: Ref
-  var anon$1: Ref
   var l0$str: Ref
   var l0$helloWorld: Ref
   inhale df$rt$isSubtype(df$rt$typeOf(p$s), df$rt$stringType())
   inhale acc(p$pkg$kotlin$c$String$shared(p$s), wildcard)
-  unfold acc(p$pkg$kotlin$c$String$shared(p$s), wildcard)
-  anon$0 := p$s.bf$length
-  if (df$rt$intFromRef(anon$0) > 0) {
+  if (|df$rt$stringFromRef(p$s)| > 0) {
     l0$c := sp$stringGet(p$s, df$rt$intToRef(0))
   } else {
     l0$c := df$rt$charToRef(97)}
   if (df$rt$charFromRef(l0$c) == 97) {
-    anon$1 := df$rt$boolToRef(true)
+    anon$0 := df$rt$boolToRef(true)
   } else {
-    var anon$2: Ref
-    unfold acc(p$pkg$kotlin$c$String$shared(p$s), wildcard)
-    anon$2 := p$s.bf$length
-    anon$1 := sp$gtInts(anon$2, df$rt$intToRef(0))
-  }
-  assert df$rt$boolFromRef(anon$1)
+    anon$0 := sp$gtInts(sp$stringLength(p$s), df$rt$intToRef(0))}
+  assert df$rt$boolFromRef(anon$0)
   l0$str := df$rt$stringToRef(Seq(97, 98, 97))
   assert df$rt$stringFromRef(l0$str)[0] == df$rt$stringFromRef(l0$str)[2]
   assert !(df$rt$stringFromRef(l0$str)[1] == df$rt$stringFromRef(l0$str)[0])
@@ -343,4 +308,3 @@ method f$testOps$TF$T$String(p$s: Ref) returns (ret$0: Ref)
 }
 
 method pg$public$length(this$dispatch: Ref) returns (ret: Ref)
-
