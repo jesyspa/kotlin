@@ -165,10 +165,6 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
             }
         }
         if (embedding.hasDetails) return embedding
-        val skipFields = when {
-            embedding.isString -> setOf("length")
-            else -> emptySet()
-        }
 
         val newDetails =
             ClassEmbeddingDetails(
@@ -192,9 +188,9 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
 
         // Phase 2
         val properties = symbol.propertySymbols
-        newDetails.initFields(properties.mapNotNull {
-            skipFields.contains(it.name.identifier).ifFalse {
-                processBackingField(it, symbol)
+        newDetails.initFields(properties.mapNotNull { propertySymbol ->
+            SpecialProperties.isSpecial(propertySymbol).ifFalse {
+                processBackingField(propertySymbol, symbol)
             }
         }.toMap())
 
@@ -440,13 +436,10 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
      */
     private fun processProperty(symbol: FirPropertySymbol, embedding: ClassEmbeddingDetails) {
         val unscopedName = symbol.callableId.embedUnscopedPropertyName()
-        properties[symbol.embedMemberPropertyName()] = when {
-            symbol.isKotlinPropertyNamed("String", "length") -> PropertyEmbedding(LengthFieldGetter, setter = null)
-            else -> {
-                val backingField = embedding.findField(unscopedName)
-                backingField?.let { fields.add(it) }
-                embedProperty(symbol, backingField)
-            }
+        properties[symbol.embedMemberPropertyName()] = SpecialProperties.byCallableId[symbol.callableId] ?: run {
+            val backingField = embedding.findField(unscopedName)
+            backingField?.let { fields.add(it) }
+            embedProperty(symbol, backingField)
         }
     }
 

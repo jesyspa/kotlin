@@ -81,9 +81,6 @@ fun FirFunctionSymbol<*>.isFormverFunctionNamed(name: String) =
 fun FirFunctionSymbol<*>.isInvariantBuilderFunctionNamed(name: String) =
     this is FirNamedFunctionSymbol && callableId == formverCallableId("InvariantBuilder", name)
 
-fun FirPropertySymbol.isKotlinPropertyNamed(className: String, name: String) =
-    callableId == kotlinCallableId(className, name)
-
 @OptIn(SymbolInternals::class)
 val FirFunctionSymbol<*>.shouldBeInlined
     get() = isInline && fir.body != null
