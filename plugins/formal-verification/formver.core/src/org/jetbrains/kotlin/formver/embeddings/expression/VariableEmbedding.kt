@@ -15,6 +15,7 @@ import org.jetbrains.kotlin.formver.embeddings.types.TypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.expression.debug.NamedBranchingNode
 import org.jetbrains.kotlin.formver.embeddings.expression.debug.PlaintextLeaf
 import org.jetbrains.kotlin.formver.embeddings.expression.debug.TreeView
+import org.jetbrains.kotlin.formver.embeddings.properties.PropertyAccessEmbedding
 import org.jetbrains.kotlin.formver.embeddings.types.fillHoles
 import org.jetbrains.kotlin.formver.names.AnonymousName
 import org.jetbrains.kotlin.formver.viper.MangledName
