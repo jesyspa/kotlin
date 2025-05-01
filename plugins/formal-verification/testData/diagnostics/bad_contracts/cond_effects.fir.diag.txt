@@ -67,8 +67,6 @@ method pg$public$length(this$dispatch: Ref) returns (ret: Ref)
 /cond_effects.kt:(796,832): warning: Cannot verify that if a false value is returned then seq != null.
 
 /cond_effects.kt:(925,942): info: Generated Viper text for recursiveContract:
-field bf$length: Ref
-
 method f$recursiveContract$TF$T$Int$NT$Any(p$n: Ref, p$x: Ref)
   returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$boolType())

@@ -19,15 +19,16 @@ import org.jetbrains.kotlin.fir.symbols.impl.*
 import org.jetbrains.kotlin.fir.types.*
 import org.jetbrains.kotlin.formver.*
 import org.jetbrains.kotlin.formver.domains.RuntimeTypeDomain
-import org.jetbrains.kotlin.formver.embeddings.*
 import org.jetbrains.kotlin.formver.embeddings.callables.*
 import org.jetbrains.kotlin.formver.embeddings.expression.*
+import org.jetbrains.kotlin.formver.embeddings.properties.*
 import org.jetbrains.kotlin.formver.embeddings.types.*
 import org.jetbrains.kotlin.formver.names.*
 import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.formver.viper.ast.Program
 import org.jetbrains.kotlin.formver.viper.mangled
 import org.jetbrains.kotlin.utils.addIfNotNull
+import org.jetbrains.kotlin.utils.addToStdlib.ifFalse
 import org.jetbrains.kotlin.utils.addToStdlib.ifTrue
 
 /**
@@ -165,10 +166,11 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         }
         if (embedding.hasDetails) return embedding
 
-        val sharedPredicateEnhancer = embedding.isString.ifTrue {
-            StringSharedPredicateEnhancer
-        }
-        val newDetails = ClassEmbeddingDetails(embedding, symbol.classKind.isInterface, sharedPredicateEnhancer)
+        val newDetails =
+            ClassEmbeddingDetails(
+                embedding,
+                symbol.classKind.isInterface,
+            )
         embedding.initDetails(newDetails)
 
         // The full class embedding is necessary to process the signatures of the properties of the class, since
@@ -186,7 +188,11 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
 
         // Phase 2
         val properties = symbol.propertySymbols
-        newDetails.initFields(properties.mapNotNull { processBackingField(it, symbol) }.toMap())
+        newDetails.initFields(properties.mapNotNull { propertySymbol ->
+            SpecialProperties.isSpecial(propertySymbol).ifFalse {
+                processBackingField(propertySymbol, symbol)
+            }
+        }.toMap())
 
         // Phase 3
         properties.forEach { processProperty(it, newDetails) }
@@ -430,16 +436,20 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
      */
     private fun processProperty(symbol: FirPropertySymbol, embedding: ClassEmbeddingDetails) {
         val unscopedName = symbol.callableId.embedUnscopedPropertyName()
-        val backingField = embedding.findField(unscopedName)
-        backingField?.let { fields.add(it) }
-        properties[symbol.embedMemberPropertyName()] = embedProperty(symbol, backingField)
+        properties[symbol.embedMemberPropertyName()] = SpecialProperties.byCallableId[symbol.callableId] ?: run {
+            val backingField = embedding.findField(unscopedName)
+            backingField?.let { fields.add(it) }
+            embedProperty(symbol, backingField)
+        }
     }
 
     private fun embedCustomProperty(symbol: FirPropertySymbol) = embedProperty(symbol, null)
 
     private fun embedProperty(symbol: FirPropertySymbol, backingField: FieldEmbedding?) =
-        PropertyEmbedding(embedGetter(symbol, backingField),
-                          symbol.isVar.ifTrue { embedSetter(symbol, backingField) })
+        PropertyEmbedding(
+            embedGetter(symbol, backingField),
+            symbol.isVar.ifTrue { embedSetter(symbol, backingField) },
+        )
 
     private fun embedGetter(symbol: FirPropertySymbol, backingField: FieldEmbedding?): GetterEmbedding =
         if (backingField != null) {

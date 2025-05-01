@@ -57,12 +57,15 @@ val FirBasedSymbol<*>.asSourceRole: SourceRole
 fun annotationId(name: String): ClassId =
     ClassId(FqName.fromSegments(SpecialPackages.formver), Name.identifier(name))
 
-fun formverCallableId(className: String?, name: String): CallableId =
-    if (className == null)
-        CallableId(FqName.fromSegments(SpecialPackages.formver), Name.identifier(name))
-    else
-        CallableId(FqName.fromSegments(SpecialPackages.formver), FqName.fromSegments(listOf(className)), Name.identifier(name))
+private fun callableId(packageName: List<String>, className: String?, name: String): CallableId =
+    CallableId(
+        FqName.fromSegments(packageName),
+        className?.let { FqName.fromSegments(listOf(it)) },
+        Name.identifier(name)
+    )
 
+fun formverCallableId(className: String?, name: String): CallableId = callableId(SpecialPackages.formver, className, name)
+fun kotlinCallableId(className: String?, name: String): CallableId = callableId(SpecialPackages.kotlin, className, name)
 
 fun FirBasedSymbol<*>.isUnique(session: FirSession) = hasAnnotation(annotationId("Unique"), session)
 

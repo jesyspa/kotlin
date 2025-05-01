@@ -1,6 +1,4 @@
 /simple_precondition.kt:(238,242): info: Generated Viper text for test:
-field bf$length: Ref
-
 field bf$size: Ref
 
 method f$test$TF$T$Int(p$idx: Ref) returns (ret$0: Ref)
@@ -56,4 +54,3 @@ method f$test$TF$T$Int(p$idx: Ref) returns (ret: Ref)
   requires 0 <= df$rt$intFromRef(p$idx)
   requires df$rt$intFromRef(p$idx) < 3
   ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$unitType())
-
