@@ -6,7 +6,7 @@
 package org.jetbrains.kotlin.formver.embeddings.types
 
 import org.jetbrains.kotlin.formver.conversion.AccessPolicy
-import org.jetbrains.kotlin.formver.embeddings.UserFieldEmbedding
+import org.jetbrains.kotlin.formver.embeddings.properties.UserFieldEmbedding
 import org.jetbrains.kotlin.formver.embeddings.expression.*
 import org.jetbrains.kotlin.formver.linearization.pureToViper
 import org.jetbrains.kotlin.formver.names.DispatchReceiverName
@@ -67,6 +67,7 @@ class FieldAssertionsBuilder(private val subject: VariableEmbedding, private val
 
     val isAlwaysReadable = field.accessPolicy == AccessPolicy.ALWAYS_READABLE
     val isUnique = field.isUnique
+    val nameAsString: String = field.name.name.mangledBaseName
 
     fun forType(action: TypeInvariantsBuilder.() -> Unit) {
         val builder = TypeInvariantsBuilder(field.type)

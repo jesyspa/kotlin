@@ -1,0 +1,57 @@
+/strings_in_conditions.kt:(50,69): info: Generated Viper text for firstNotSortedIndex:
+method f$firstNotSortedIndex$TF$T$String(p$s: Ref) returns (ret$0: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$intType())
+  ensures 0 <= df$rt$intFromRef(ret$0) &&
+    df$rt$intFromRef(ret$0) <= |df$rt$stringFromRef(p$s)|
+  ensures (forall anon$3: Ref ::df$rt$isSubtype(df$rt$typeOf(anon$3), df$rt$intType()) ==>
+      0 <= df$rt$intFromRef(anon$3) &&
+      df$rt$intFromRef(anon$3) + 1 < df$rt$intFromRef(ret$0) ==>
+      df$rt$stringFromRef(p$s)[df$rt$intFromRef(anon$3)] <=
+      df$rt$stringFromRef(p$s)[df$rt$intFromRef(anon$3) + 1])
+{
+  inhale df$rt$isSubtype(df$rt$typeOf(p$s), df$rt$stringType())
+  inhale acc(p$pkg$kotlin$c$String$shared(p$s), wildcard)
+  if (|df$rt$stringFromRef(p$s)| == 0) {
+    ret$0 := df$rt$intToRef(0)
+    goto lbl$ret$0
+  } else {
+    var l4$i: Ref
+    var anon$2: Ref
+    l4$i := df$rt$intToRef(1)
+    label lbl$continue$0
+      invariant df$rt$isSubtype(df$rt$typeOf(l4$i), df$rt$intType())
+      invariant acc(p$pkg$kotlin$c$String$shared(p$s), wildcard)
+      invariant df$rt$isSubtype(df$rt$typeOf(p$s), df$rt$stringType())
+      invariant (forall anon$1: Ref ::df$rt$isSubtype(df$rt$typeOf(anon$1),
+          df$rt$intType()) ==>
+          0 <= df$rt$intFromRef(anon$1) &&
+          df$rt$intFromRef(anon$1) + 1 < df$rt$intFromRef(l4$i) ==>
+          df$rt$stringFromRef(p$s)[df$rt$intFromRef(anon$1)] <=
+          df$rt$stringFromRef(p$s)[df$rt$intFromRef(anon$1) + 1])
+    if (df$rt$intFromRef(l4$i) < |df$rt$stringFromRef(p$s)|) {
+      anon$2 := sp$leChars(sp$stringGet(p$s, sp$minusInts(l4$i, df$rt$intToRef(1))),
+        sp$stringGet(p$s, l4$i))
+    } else {
+      anon$2 := df$rt$boolToRef(false)}
+    if (df$rt$boolFromRef(anon$2)) {
+      l4$i := sp$plusInts(l4$i, df$rt$intToRef(1))
+      goto lbl$continue$0
+    }
+    label lbl$break$0
+      invariant df$rt$isSubtype(df$rt$typeOf(l4$i), df$rt$intType())
+      invariant acc(p$pkg$kotlin$c$String$shared(p$s), wildcard)
+      invariant df$rt$isSubtype(df$rt$typeOf(p$s), df$rt$stringType())
+      invariant (forall anon$1: Ref ::df$rt$isSubtype(df$rt$typeOf(anon$1),
+          df$rt$intType()) ==>
+          0 <= df$rt$intFromRef(anon$1) &&
+          df$rt$intFromRef(anon$1) + 1 < df$rt$intFromRef(l4$i) ==>
+          df$rt$stringFromRef(p$s)[df$rt$intFromRef(anon$1)] <=
+          df$rt$stringFromRef(p$s)[df$rt$intFromRef(anon$1) + 1])
+    ret$0 := l4$i
+    goto lbl$ret$0
+  }
+  label lbl$ret$0
+}
+
+method pg$public$length(this$dispatch: Ref) returns (ret: Ref)
+

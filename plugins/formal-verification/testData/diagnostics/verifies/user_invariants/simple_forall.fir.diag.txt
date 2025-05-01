@@ -25,8 +25,6 @@ method f$anyIntegerSquaredIsAtLeastOneExceptZero$TF$() returns (ret$0: Ref)
 }
 
 /simple_forall.kt:(460,503): info: Generated Viper text for anyIntegerSquaredIsAtLeastZeroStringVersion:
-field bf$length: Ref
-
 method f$anyIntegerSquaredIsAtLeastZeroStringVersion$TF$T$String(p$str: Ref)
   returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$intType())
@@ -45,9 +43,7 @@ method f$anyIntegerSquaredIsAtLeastZeroStringVersion$TF$T$String(p$str: Ref)
     invariant df$rt$isSubtype(df$rt$typeOf(p$str), df$rt$stringType())
     invariant (forall anon$0: Ref ::df$rt$isSubtype(df$rt$typeOf(anon$0), df$rt$intType()) ==>
         0 <= df$rt$intFromRef(anon$0) &&
-        df$rt$intFromRef(anon$0) <
-        df$rt$intFromRef((unfolding acc(p$pkg$kotlin$c$String$shared(p$str), wildcard) in
-          p$str.bf$length)) ==>
+        df$rt$intFromRef(anon$0) < |df$rt$stringFromRef(p$str)| ==>
         (df$rt$stringFromRef(p$str)[df$rt$intFromRef(anon$0)] - 97) *
         (df$rt$stringFromRef(p$str)[df$rt$intFromRef(anon$0)] - 97) >=
         df$rt$intFromRef(l0$res))
@@ -65,9 +61,7 @@ method f$anyIntegerSquaredIsAtLeastZeroStringVersion$TF$T$String(p$str: Ref)
     invariant df$rt$isSubtype(df$rt$typeOf(p$str), df$rt$stringType())
     invariant (forall anon$0: Ref ::df$rt$isSubtype(df$rt$typeOf(anon$0), df$rt$intType()) ==>
         0 <= df$rt$intFromRef(anon$0) &&
-        df$rt$intFromRef(anon$0) <
-        df$rt$intFromRef((unfolding acc(p$pkg$kotlin$c$String$shared(p$str), wildcard) in
-          p$str.bf$length)) ==>
+        df$rt$intFromRef(anon$0) < |df$rt$stringFromRef(p$str)| ==>
         (df$rt$stringFromRef(p$str)[df$rt$intFromRef(anon$0)] - 97) *
         (df$rt$stringFromRef(p$str)[df$rt$intFromRef(anon$0)] - 97) >=
         df$rt$intFromRef(l0$res))
@@ -77,4 +71,3 @@ method f$anyIntegerSquaredIsAtLeastZeroStringVersion$TF$T$String(p$str: Ref)
 }
 
 method pg$public$length(this$dispatch: Ref) returns (ret: Ref)
-
