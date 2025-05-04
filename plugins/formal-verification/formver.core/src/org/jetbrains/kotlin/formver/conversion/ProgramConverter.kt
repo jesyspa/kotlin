@@ -536,4 +536,6 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
                 unit()
             }
         }
+
+    public fun getMangledName(declaration: FirSimpleFunction) = embedFullSignature(declaration.symbol).name.mangled
 }

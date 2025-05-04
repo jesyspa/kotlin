@@ -46,6 +46,11 @@ object OperatorExpEmbeddings {
             precondition {
                 intInjection.fromRef(args[1]) ne 0.toExp()
             }
+            postcondition {
+                intInjection.fromRef(args[1]) ne 0.toExp() implies (
+                    intInjection.fromRef(result) eq (intInjection.fromRef(args[0]) div intInjection.fromRef(args[1]))
+                )
+            }
         }
     }
 

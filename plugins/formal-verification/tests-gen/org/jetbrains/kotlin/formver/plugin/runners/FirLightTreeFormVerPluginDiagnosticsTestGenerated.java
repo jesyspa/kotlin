@@ -319,9 +319,9 @@ public class FirLightTreeFormVerPluginDiagnosticsTestGenerated extends AbstractF
       }
 
       @Test
-      @TestMetadata("average.kt")
-      public void testAverage() {
-        runTest("plugins/formal-verification/testData/diagnostics/no_contracts/henrikTesting/average.kt");
+      @TestMetadata("pureAnnotation.kt")
+      public void testPureAnnotation() {
+        runTest("plugins/formal-verification/testData/diagnostics/no_contracts/henrikTesting/pureAnnotation.kt");
       }
     }
 

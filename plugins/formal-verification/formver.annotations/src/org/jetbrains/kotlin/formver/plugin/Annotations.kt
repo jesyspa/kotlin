@@ -15,3 +15,6 @@ annotation class DumpExpEmbeddings
 annotation class Unique
 @Target(AnnotationTarget.VALUE_PARAMETER)
 annotation class Borrowed
+
+// We annotate the function to trigger the purity check, and if that succeeds, convert the function to a Viper function.
+annotation class Pure

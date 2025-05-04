@@ -17,7 +17,9 @@ import org.jetbrains.kotlin.fir.declarations.FirSimpleFunction
 import org.jetbrains.kotlin.fir.declarations.hasAnnotation
 import org.jetbrains.kotlin.formver.conversion.ProgramConverter
 import org.jetbrains.kotlin.formver.embeddings.expression.debug.print
+import org.jetbrains.kotlin.formver.purity.PurityChecker
 import org.jetbrains.kotlin.formver.reporting.reportVerifierError
+import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.formver.viper.Verifier
 import org.jetbrains.kotlin.formver.viper.mangled
 import org.jetbrains.kotlin.formver.viper.ast.Program
@@ -65,6 +67,31 @@ class ViperPoweredDeclarationChecker(private val session: FirSession, private va
                 }
             }
 
+            // this is wrong on so many levels, the function checks only if the current added declaration is pure, then runs the purity check on all embeddings anyway
+            if (shouldTriggerPurityCheck(declaration)) {
+                val checker = PurityChecker()
+                val sig = programConversionContext.getMangledName(declaration)
+                for ((name, embedding) in programConversionContext.debugExpEmbeddings) {
+                    reporter.reportOn(
+                        declaration.source,
+                        PluginErrors.PURE_ANNOTATION_REGISTERED,
+                        name.mangled,
+                        context
+                    )
+                    val isPure = checker.isPure(embedding)
+                    val factory = if (isPure)
+                        PluginErrors.PURE_ANNOTATION_ON_PURE_FUNCTION
+                    else
+                        PluginErrors.PURE_ANNOTATION_ON_IMPURE_FUNCTION
+                    reporter.reportOn(
+                        declaration.source,
+                        factory,
+                        name.mangled,
+                        context
+                    )
+                }
+            }
+
             val verifier = Verifier()
             val onFailure = { err: VerifierError ->
                 val source = err.position.unwrapOr { declaration.source }
@@ -100,6 +127,7 @@ class ViperPoweredDeclarationChecker(private val session: FirSession, private va
     private val neverVerifyId: ClassId = getAnnotationId("NeverVerify")
     private val alwaysVerifyId: ClassId = getAnnotationId("AlwaysVerify")
     private val dumpExpEmbeddingsId: ClassId = getAnnotationId("DumpExpEmbeddings")
+    private val pureId: ClassId = getAnnotationId("Pure")
 
     private fun PluginConfiguration.shouldConvert(declaration: FirSimpleFunction): Boolean = when {
         declaration.hasAnnotation(neverConvertId, session) -> false
@@ -115,4 +143,7 @@ class ViperPoweredDeclarationChecker(private val session: FirSession, private va
 
     private fun shouldDumpExpEmbeddings(declaration: FirSimpleFunction): Boolean =
         declaration.hasAnnotation(dumpExpEmbeddingsId, session)
+
+    private fun shouldTriggerPurityCheck(declaration: FirSimpleFunction): Boolean =
+        declaration.hasAnnotation(pureId, session)
 }

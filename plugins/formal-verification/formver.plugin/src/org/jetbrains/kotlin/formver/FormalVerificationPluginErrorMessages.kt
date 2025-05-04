@@ -61,5 +61,20 @@ object FormalVerificationPluginErrorMessages : BaseDiagnosticRendererFactory() {
             CommonRenderers.STRING,
             CommonRenderers.STRING
         )
+        put(
+            PluginErrors.PURE_ANNOTATION_REGISTERED,
+            "{0} is annotated as pure and should therefore trigger a purity check.",
+            CommonRenderers.STRING
+        )
+        put(
+            PluginErrors.PURE_ANNOTATION_ON_PURE_FUNCTION,
+            "Purity check on {0} succeeded!",
+            CommonRenderers.STRING
+        )
+        put(
+            PluginErrors.PURE_ANNOTATION_ON_IMPURE_FUNCTION,
+            "{0} is annotated @Pure but is impure",
+            CommonRenderers.STRING
+        )
     }
 }
