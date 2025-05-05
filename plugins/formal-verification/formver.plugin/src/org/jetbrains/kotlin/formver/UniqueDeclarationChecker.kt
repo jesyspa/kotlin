@@ -16,7 +16,8 @@ import org.jetbrains.kotlin.fir.declarations.FirSimpleFunction
 class UniqueDeclarationChecker(private val session: FirSession, private val config: PluginConfiguration) :
     FirSimpleFunctionChecker(MppCheckerKind.Common) {
 
-    override fun check(declaration: FirSimpleFunction, context: CheckerContext, reporter: DiagnosticReporter) {
+    context(context: CheckerContext, reporter: DiagnosticReporter)
+    override fun check(declaration: FirSimpleFunction) {
         if (!config.checkUniqueness) return
         val errorCollector = ErrorCollector()
         try {
@@ -24,7 +25,7 @@ class UniqueDeclarationChecker(private val session: FirSession, private val conf
             declaration.accept(UniquenessCheckExceptionWrapper, uniqueCheckerContext)
         } catch (e: Exception) {
             val error = errorCollector.formatErrorWithInfos(e.message ?: "No message provided")
-            reporter.reportOn(declaration.source, PluginErrors.UNIQUENESS_VIOLATION, error, context)
+            reporter.reportOn(declaration.source, PluginErrors.UNIQUENESS_VIOLATION, error)
         }
     }
 }

@@ -23,28 +23,29 @@ private fun VerificationError.formatByErrorStyle(errorStyle: ErrorStyle): List<F
     ErrorStyle.BOTH -> listOfNotNull(formatUserFriendly(), DefaultError(this))
 }
 
+context(context: CheckerContext)
 private fun DiagnosticReporter.reportVerificationError(
     source: KtSourceElement?,
     error: VerificationError,
     errorStyle: ErrorStyle,
-    context: CheckerContext,
-) = error.formatByErrorStyle(errorStyle).forEach { it.report(this, source, context) }
+) = error.formatByErrorStyle(errorStyle).forEach { it.report(source) }
 
-private fun DiagnosticReporter.reportConsistencyError(source: KtSourceElement?, error: ConsistencyError, context: CheckerContext) {
+context(context: CheckerContext)
+private fun DiagnosticReporter.reportConsistencyError(source: KtSourceElement?, error: ConsistencyError) {
     val sourceIsFunctionDeclaration = source?.elementType?.let { it == KtNodeTypes.FUN } ?: false
     val positionStrategy = when (sourceIsFunctionDeclaration) {
         true -> SourceElementPositioningStrategies.DECLARATION_NAME
         false -> SourceElementPositioningStrategies.DEFAULT
     }
-    reportOn(source, PluginErrors.INTERNAL_ERROR, error.msg, context, positioningStrategy = positionStrategy)
+    reportOn(source, PluginErrors.INTERNAL_ERROR, error.msg, positioningStrategy = positionStrategy)
 }
 
+context(context: CheckerContext)
 fun DiagnosticReporter.reportVerifierError(
     source: KtSourceElement?,
     error: VerifierError,
     errorStyle: ErrorStyle,
-    context: CheckerContext,
 ) = when (error) {
-    is ConsistencyError -> reportConsistencyError(source, error, context)
-    is VerificationError -> reportVerificationError(source, error, errorStyle, context)
+    is ConsistencyError -> reportConsistencyError(source, error)
+    is VerificationError -> reportVerificationError(source, error, errorStyle)
 }
