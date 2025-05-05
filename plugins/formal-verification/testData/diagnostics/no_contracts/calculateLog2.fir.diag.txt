@@ -1,0 +1,18 @@
+/calculateLog2.kt:(47,376): error: An internal error has occurred.
+Details: Expected type kotlin/Int based on signature, got kotlin/Boolean
+
+Please report this at https://github.com/jesyspa/kotlin
+
+/calculateLog2.kt:(129,138): error: No type arguments expected for fun preconditions(body: InvariantBuilder.() -> Unit): Unit.
+
+/calculateLog2.kt:(139,194): error: Argument type mismatch: actual type is 'Function2<InvariantBuilder, ERROR CLASS: Cannot infer type for parameter n, Unit>', but 'Function1<InvariantBuilder, Unit>' was expected.
+
+/calculateLog2.kt:(141,142): error: Cannot infer type for this parameter. Specify it explicitly.
+
+/calculateLog2.kt:(156,157): error: Unresolved reference 'compareTo'.
+
+/calculateLog2.kt:(171,174): error: Unresolved reference 'and'.
+
+/calculateLog2.kt:(178,179): error: Unresolved reference 'minus' for operator '-'.
+
+/calculateLog2.kt:(246,247): error: Argument type mismatch: actual type is 'Int', but 'Boolean' was expected.

@@ -238,7 +238,8 @@ fun StmtConversionContext.convertMethodWithBody(
     // note: we must guarantee somewhere that returned value is Unit
     // as we may not encounter any `return` statement in the body
     returnTarget.variable.withIsUnitInvariantIfUnit().toViperUnusedResult(linearizer)
-    return FunctionBodyEmbedding(seqnBuilder.block, returnTarget, bodyExp)
+    val bodyEmbedding = FunctionBodyEmbedding(seqnBuilder.block, returnTarget, bodyExp, body)
+    return bodyEmbedding
 }
 
 private const val INVALID_STATEMENT_MSG =

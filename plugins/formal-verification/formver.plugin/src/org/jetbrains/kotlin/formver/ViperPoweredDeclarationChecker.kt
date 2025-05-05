@@ -16,6 +16,7 @@ import org.jetbrains.kotlin.fir.declarations.FirContractDescriptionOwner
 import org.jetbrains.kotlin.fir.declarations.FirSimpleFunction
 import org.jetbrains.kotlin.fir.declarations.hasAnnotation
 import org.jetbrains.kotlin.formver.conversion.ProgramConverter
+import org.jetbrains.kotlin.formver.embeddings.callables.UserFunctionEmbedding
 import org.jetbrains.kotlin.formver.embeddings.expression.debug.print
 import org.jetbrains.kotlin.formver.purity.PurityChecker
 import org.jetbrains.kotlin.formver.reporting.reportVerifierError
@@ -54,7 +55,6 @@ class ViperPoweredDeclarationChecker(private val session: FirSession, private va
             getProgramForLogging(program)?.let {
                 reporter.reportOn(declaration.source, PluginErrors.VIPER_TEXT, declaration.name.asString(), it.toDebugOutput(), context)
             }
-
             if (shouldDumpExpEmbeddings(declaration)) {
                 for ((name, embedding) in programConversionContext.debugExpEmbeddings) {
                     reporter.reportOn(
@@ -70,15 +70,14 @@ class ViperPoweredDeclarationChecker(private val session: FirSession, private va
             // this is wrong on so many levels, the function checks only if the current added declaration is pure, then runs the purity check on all embeddings anyway
             if (shouldTriggerPurityCheck(declaration)) {
                 val checker = PurityChecker()
-                val sig = programConversionContext.getMangledName(declaration)
-                for ((name, embedding) in programConversionContext.debugExpEmbeddings) {
+                for ((name, embedding) in programConversionContext.debugUserFunctionEmbedding) {
                     reporter.reportOn(
                         declaration.source,
                         PluginErrors.PURE_ANNOTATION_REGISTERED,
                         name.mangled,
                         context
                     )
-                    val isPure = checker.isPure(embedding)
+                    val isPure = checker.checkIsPure(embedding)
                     val factory = if (isPure)
                         PluginErrors.PURE_ANNOTATION_ON_PURE_FUNCTION
                     else

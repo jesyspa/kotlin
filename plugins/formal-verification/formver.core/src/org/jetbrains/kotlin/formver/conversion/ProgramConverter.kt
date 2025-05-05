@@ -52,9 +52,20 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
     // loss of type information earlier.
     @Suppress("UNCHECKED_CAST")
     val debugExpEmbeddings: Map<MangledName, ExpEmbedding>
-        get() = methods
-            .mapValues { (it.value as? UserFunctionEmbedding)?.body?.debugExpEmbedding }
-            .filterValues { value: ExpEmbedding? -> value != null } as Map<MangledName, ExpEmbedding>
+        get() = methods.mapNotNull { (name, value) ->
+            val debugExp = (value as? UserFunctionEmbedding)?.body?.debugExpEmbedding
+            debugExp?.let { name to it }
+        }.toMap()
+
+    val debugUserFunctionEmbedding: Map<MangledName, UserFunctionEmbedding>
+        get() = buildMap {
+            for ((name, value) in methods) {
+                val embedding = value as? UserFunctionEmbedding
+                if (embedding != null) {
+                    put(name, embedding)
+                }
+            }
+        }
 
     override val whileIndexProducer = indexProducer()
     override val catchLabelNameProducer = simpleFreshEntityProducer(::CatchLabelName)
@@ -536,6 +547,4 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
                 unit()
             }
         }
-
-    public fun getMangledName(declaration: FirSimpleFunction) = embedFullSignature(declaration.symbol).name.mangled
 }

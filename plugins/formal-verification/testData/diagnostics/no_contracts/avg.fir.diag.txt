@@ -1,0 +1,18 @@
+/avg.kt:(83,93): info: Generated Viper text for isPositive:
+method f$isPositive$TF$T$Int(p$x: Ref) returns (ret$0: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$intType())
+{
+  inhale df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$intType())
+  ret$0 := sp$gtInts(p$x, df$rt$intToRef(0))
+  goto lbl$ret$0
+  label lbl$ret$0
+}
+
+/avg.kt:(83,93): info: Generated ExpEmbedding for f$isPositive$TF$T$Int:
+Function(
+    name = f$isPositive$TF$T$Int,
+    { Var(ret$0) := (Var(p$x), Int(0)); Goto(lbl$ret$0) },
+    return = lbl$ret$0,
+)
+
+/avg.kt:(119,124): error: Return type mismatch: expected 'Int', actual 'Boolean'.

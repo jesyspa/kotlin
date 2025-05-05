@@ -310,22 +310,6 @@ public class FirLightTreeFormVerPluginDiagnosticsTestGenerated extends AbstractF
     }
 
     @Nested
-    @TestMetadata("plugins/formal-verification/testData/diagnostics/no_contracts/henrikTesting")
-    @TestDataPath("$PROJECT_ROOT")
-    public class HenrikTesting {
-      @Test
-      public void testAllFilesPresentInHenrikTesting() {
-        KtTestUtil.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("plugins/formal-verification/testData/diagnostics/no_contracts/henrikTesting"), Pattern.compile("^(.+)\\.kt$"), null, true);
-      }
-
-      @Test
-      @TestMetadata("pureAnnotation.kt")
-      public void testPureAnnotation() {
-        runTest("plugins/formal-verification/testData/diagnostics/no_contracts/henrikTesting/pureAnnotation.kt");
-      }
-    }
-
-    @Nested
     @TestMetadata("plugins/formal-verification/testData/diagnostics/no_contracts/inlining")
     @TestDataPath("$PROJECT_ROOT")
     public class Inlining {
@@ -443,6 +427,22 @@ public class FirLightTreeFormVerPluginDiagnosticsTestGenerated extends AbstractF
       public void testSmartcast() {
         runTest("plugins/formal-verification/testData/diagnostics/no_contracts/types/smartcast.kt");
       }
+    }
+  }
+
+  @Nested
+  @TestMetadata("plugins/formal-verification/testData/diagnostics/purity")
+  @TestDataPath("$PROJECT_ROOT")
+  public class Purity {
+    @Test
+    public void testAllFilesPresentInPurity() {
+      KtTestUtil.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("plugins/formal-verification/testData/diagnostics/purity"), Pattern.compile("^(.+)\\.kt$"), null, true);
+    }
+
+    @Test
+    @TestMetadata("pureAnnotation.kt")
+    public void testPureAnnotation() {
+      runTest("plugins/formal-verification/testData/diagnostics/purity/pureAnnotation.kt");
     }
   }
 

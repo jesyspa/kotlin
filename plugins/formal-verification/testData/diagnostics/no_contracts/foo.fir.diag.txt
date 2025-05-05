@@ -1,0 +1,45 @@
+/foo.kt:(84,87): info: Generated Viper text for fib:
+method f$fib$TF$T$Int(p$n: Ref) returns (ret$0: Ref)
+  requires df$rt$intFromRef(p$n) > 0
+  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$intType())
+{
+  var anon$0: Ref
+  inhale df$rt$isSubtype(df$rt$typeOf(p$n), df$rt$intType())
+  if (df$rt$intFromRef(p$n) == 1) {
+    anon$0 := df$rt$boolToRef(true)
+  } else {
+    anon$0 := df$rt$boolToRef(df$rt$intFromRef(p$n) == 2)}
+  if (df$rt$boolFromRef(anon$0)) {
+    ret$0 := df$rt$intToRef(1)
+  } else {
+    var anon$1: Ref
+    var anon$2: Ref
+    anon$1 := f$fib$TF$T$Int(sp$minusInts(p$n, df$rt$intToRef(1)))
+    anon$2 := f$fib$TF$T$Int(sp$minusInts(p$n, df$rt$intToRef(2)))
+    ret$0 := sp$plusInts(anon$1, anon$2)
+  }
+  goto lbl$ret$0
+  label lbl$ret$0
+}
+
+/foo.kt:(84,87): info: Generated ExpEmbedding for f$fib$TF$T$Int:
+Function(
+    name = f$fib$TF$T$Int,
+    {
+        UnitLit(kotlin.Unit);
+        Var(ret$0) := If(
+            SequentialOr(EqCmp(Var(p$n), Int(1)), EqCmp(Var(p$n), Int(2))),
+            { Int(1) },
+            {
+                (
+                    MethodCall(callee = f$fib$TF$T$Int, (Var(p$n), Int(1))),
+                    MethodCall(callee = f$fib$TF$T$Int, (Var(p$n), Int(2))),
+                );
+            },
+        );
+        Goto(lbl$ret$0);
+    },
+    return = lbl$ret$0,
+)
+
+/foo.kt:(120,129): error: No type arguments expected for fun preconditions(body: InvariantBuilder.() -> Unit): Unit.
