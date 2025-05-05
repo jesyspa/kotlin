@@ -7,7 +7,6 @@ package org.jetbrains.kotlin.formver.embeddings
 
 import org.jetbrains.kotlin.formver.domains.Injection
 import org.jetbrains.kotlin.formver.domains.RuntimeTypeDomain
-import org.jetbrains.kotlin.formver.embeddings.callables.CallableSignatureData
 import org.jetbrains.kotlin.formver.names.*
 import org.jetbrains.kotlin.formver.names.NameMatcher
 import org.jetbrains.kotlin.formver.viper.MangledName
@@ -36,14 +35,6 @@ interface TypeEmbedding : TypeInvariantHolder {
      * represent these names, but we do it inline for now.
      */
     val name: MangledName
-
-    /**
-     * Perform an action on every field and collect the results.
-     *
-     * Note that for fake fields that are taken from interfaces, this may visit some fields twice.
-     * Use `flatMapUniqueFields` if you want to avoid that.
-     */
-    fun <R> flatMapFields(action: (SimpleKotlinName, FieldEmbedding) -> List<R>): List<R> = listOf()
 
     /**
      * Get a nullable version of this type embedding.
@@ -113,15 +104,29 @@ data class NullableTypeEmbedding(val elementType: TypeEmbedding) : TypeEmbedding
     override val isNullable = true
 }
 
-data class FunctionTypeEmbedding(val signature: CallableSignatureData) : TypeEmbedding {
+data class FunctionTypeEmbedding(
+    val receiverType: TypeEmbedding?,
+    val paramTypes: List<TypeEmbedding>,
+    val returnType: TypeEmbedding,
+    val returnsUnique: Boolean,
+) : TypeEmbedding {
     override val runtimeType = RuntimeTypeDomain.functionType()
     override val name = object : MangledName {
         // TODO: this can cause some number of collisions; fix it if it becomes an issue.
         override val mangledBaseName: String =
-            signature.formalArgTypes.joinToString("$") { it.name.mangled }
+            formalArgTypes.joinToString("$") { it.name.mangled }
         override val mangledType: String
             get() = "TF"
     }
+
+    /**
+     * The flattened structure of the callable parameters: in case the callable has a receiver
+     * it becomes the first argument of the function.
+     *
+     * `Foo.(Int) -> Int --> (Foo, Int) -> Int`
+     */
+    val formalArgTypes: List<TypeEmbedding>
+        get() = listOfNotNull(receiverType) + paramTypes
 }
 
 data class ClassTypeEmbedding(val className: ScopedKotlinName) : TypeEmbedding {
