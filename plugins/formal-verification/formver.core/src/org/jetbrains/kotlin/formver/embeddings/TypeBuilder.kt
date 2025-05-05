@@ -29,6 +29,7 @@ class TypeBuilder {
     fun boolean() = BooleanPretypeBuilder
     fun function(init: FunctionPretypeBuilder.() -> Unit) = FunctionPretypeBuilder().also { it.init() }
     fun klass(init: ClassPretypeBuilder.() -> Unit) = ClassPretypeBuilder().also { it.init() }
+    fun existing(embedding: TypeEmbedding) = ExistingPretypeBuilder(embedding)
 }
 
 fun TypeBuilder.nullableAny(): AnyPretypeBuilder {
