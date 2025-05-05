@@ -21,6 +21,16 @@ import org.jetbrains.kotlin.formver.domains.RuntimeTypeDomain
 import org.jetbrains.kotlin.formver.embeddings.*
 import org.jetbrains.kotlin.formver.embeddings.callables.*
 import org.jetbrains.kotlin.formver.embeddings.expression.*
+import org.jetbrains.kotlin.formver.embeddings.types.ClassEmbeddingDetails
+import org.jetbrains.kotlin.formver.embeddings.types.TypeEmbedding
+import org.jetbrains.kotlin.formver.embeddings.types.ClassTypeEmbedding
+import org.jetbrains.kotlin.formver.embeddings.types.FunctionPretypeBuilder
+import org.jetbrains.kotlin.formver.embeddings.types.FunctionTypeEmbedding
+import org.jetbrains.kotlin.formver.embeddings.types.PretypeBuilder
+import org.jetbrains.kotlin.formver.embeddings.types.TypeBuilder
+import org.jetbrains.kotlin.formver.embeddings.types.buildClassPretype
+import org.jetbrains.kotlin.formver.embeddings.types.buildFunctionPretype
+import org.jetbrains.kotlin.formver.embeddings.types.buildType
 import org.jetbrains.kotlin.formver.linearization.Linearizer
 import org.jetbrains.kotlin.formver.linearization.SeqnBuilder
 import org.jetbrains.kotlin.formver.linearization.SharedLinearizationState
@@ -122,9 +132,9 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
     private fun embedClass(symbol: FirRegularClassSymbol): ClassTypeEmbedding {
         val className = symbol.classId.embedName()
         val embedding = classes.getOrPut(className) {
-            buildType {
-                klass { withName(className) }
-            } as ClassTypeEmbedding
+            buildClassPretype {
+                withName(className)
+            }
         }
         if (embedding.hasDetails) return embedding
 
@@ -142,7 +152,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         // `ProgramConverter`.
 
         // Phase 1
-        newDetails.initSuperTypes(symbol.resolvedSuperTypes.map(::embedType))
+        newDetails.initSuperTypes(symbol.resolvedSuperTypes.map { embedType(it).pretype })
 
         // Phase 2
         val properties = symbol.propertySymbols
@@ -157,20 +167,8 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
     override fun embedType(type: ConeKotlinType): TypeEmbedding = buildType { embedTypeWithBuilder(type) }
 
     // Note: keep in mind that this function is necessary to resolve the name of the function!
-    override fun embedType(symbol: FirFunctionSymbol<*>): FunctionTypeEmbedding = buildFunctionType {
-        symbol.receiverType?.let {
-            withDispatchReceiver { embedTypeWithBuilder(it) }
-        }
-        symbol.extensionReceiverType?.let {
-            withExtensionReceiver { embedTypeWithBuilder(it) }
-        }
-        symbol.valueParameterSymbols.forEach { param ->
-            withParam {
-                embedTypeWithBuilder(param.resolvedReturnType)
-            }
-        }
-        withReturnType { embedTypeWithBuilder(symbol.resolvedReturnType) }
-        returnsUnique = symbol.isUnique(session) || symbol is FirConstructorSymbol
+    override fun embedFunctionPretype(symbol: FirFunctionSymbol<*>): FunctionTypeEmbedding = buildFunctionPretype {
+        embedFunctionPretypeWithBuilder(symbol)
     }
 
     override fun embedProperty(symbol: FirPropertySymbol): PropertyEmbedding = if (symbol.isExtension) {
@@ -210,7 +208,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         val isExtensionReceiverUnique = symbol.receiverParameter?.isUnique(session) ?: false
         val isExtensionReceiverBorrowed = symbol.receiverParameter?.isBorrowed(session) ?: false
         return object : FunctionSignature {
-            override val type: FunctionTypeEmbedding = embedType(symbol)
+            override val callableType: FunctionTypeEmbedding = embedFunctionPretype(symbol)
 
             // TODO: figure out whether we want a symbol here and how to get it.
             override val dispatchReceiver = dispatchReceiverType?.let {
@@ -272,7 +270,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
                 addAll(returnVariable.pureInvariants())
                 addAll(returnVariable.provenInvariants())
                 addAll(returnVariable.allAccessInvariants())
-                if (subSignature.type.returnsUnique) {
+                if (subSignature.callableType.returnsUnique) {
                     addIfNotNull(returnVariable.uniquePredicateAccessInvariant())
                 }
                 addAll(contractVisitor.getPostconditions(ContractVisitorContext(returnVariable, symbol)))
@@ -384,7 +382,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
 
     private fun convertMethodWithBody(declaration: FirSimpleFunction, signature: FullNamedFunctionSignature): FunctionBodyEmbedding? {
         val firBody = declaration.body ?: return null
-        val returnTarget = returnTargetProducer.getFresh(signature.type.returnType)
+        val returnTarget = returnTargetProducer.getFresh(signature.callableType.returnType)
         val methodCtx =
             MethodConverter(
                 this,
@@ -434,6 +432,22 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
             }
         }
         else -> unimplementedTypeEmbedding(type)
+    }
+
+    private fun FunctionPretypeBuilder.embedFunctionPretypeWithBuilder(symbol: FirFunctionSymbol<*>) {
+        symbol.receiverType?.let {
+            withDispatchReceiver { embedTypeWithBuilder(it) }
+        }
+        symbol.extensionReceiverType?.let {
+            withExtensionReceiver { embedTypeWithBuilder(it) }
+        }
+        symbol.valueParameterSymbols.forEach { param ->
+            withParam {
+                embedTypeWithBuilder(param.resolvedReturnType)
+            }
+        }
+        withReturnType { embedTypeWithBuilder(symbol.resolvedReturnType) }
+        returnsUnique = symbol.isUnique(session) || symbol is FirConstructorSymbol
     }
 
     private fun TypeBuilder.unimplementedTypeEmbedding(type: ConeKotlinType): PretypeBuilder =

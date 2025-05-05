@@ -1,14 +1,14 @@
 /inheritance_fields.kt:(227,234): info: Generated Viper text for createB:
 field bf$fieldNotOverride: Ref
 
-method con$c$B$T$c$FieldB(p$fieldOverride: Ref) returns (ret: Ref)
-  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$T$c$B())
+method con$c$B$T$FieldB(p$fieldOverride: Ref) returns (ret: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$c$B())
   ensures acc(p$c$B$shared(ret), wildcard)
   ensures acc(p$c$B$unique(ret), write)
 
 
 method con$c$FieldB$() returns (ret: Ref)
-  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$T$c$FieldB())
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$c$FieldB())
   ensures acc(p$c$FieldB$shared(ret), wildcard)
   ensures acc(p$c$FieldB$unique(ret), write)
 
@@ -22,10 +22,10 @@ method f$createB$TF$() returns (ret$0: Ref)
   var anon$0: Ref
   var l0$fieldNotOverride: Ref
   l0$fieldB := con$c$FieldB$()
-  l0$b := con$c$B$T$c$FieldB(l0$fieldB)
+  l0$b := con$c$B$T$FieldB(l0$fieldB)
   anon$0 := pg$public$fieldOverride(l0$b)
   l0$fieldOverride := anon$0
-  inhale df$rt$isSubtype(df$rt$typeOf(l0$fieldOverride), df$rt$T$c$FieldB())
+  inhale df$rt$isSubtype(df$rt$typeOf(l0$fieldOverride), df$rt$c$FieldB())
   inhale acc(p$c$FieldB$shared(l0$fieldOverride), wildcard)
   unfold acc(p$c$B$shared(l0$b), wildcard)
   unfold acc(p$c$A$shared(l0$b), wildcard)
@@ -41,19 +41,19 @@ method pg$public$fieldOverride(this$dispatch: Ref) returns (ret: Ref)
 field bf$x: Ref
 
 method con$c$FirstBackingFieldClass$() returns (ret: Ref)
-  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$T$c$FirstBackingFieldClass())
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$c$FirstBackingFieldClass())
   ensures acc(p$c$FirstBackingFieldClass$shared(ret), wildcard)
   ensures acc(p$c$FirstBackingFieldClass$unique(ret), write)
 
 
 method con$c$NoBackingFieldClass$() returns (ret: Ref)
-  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$T$c$NoBackingFieldClass())
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$c$NoBackingFieldClass())
   ensures acc(p$c$NoBackingFieldClass$shared(ret), wildcard)
   ensures acc(p$c$NoBackingFieldClass$unique(ret), write)
 
 
 method con$c$SecondBackingFieldClass$T$Int(p$x: Ref) returns (ret: Ref)
-  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$T$c$SecondBackingFieldClass())
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$c$SecondBackingFieldClass())
   ensures acc(p$c$SecondBackingFieldClass$shared(ret), wildcard)
   ensures acc(p$c$SecondBackingFieldClass$unique(ret), write)
   ensures (unfolding acc(p$c$SecondBackingFieldClass$shared(ret), wildcard) in
@@ -93,7 +93,7 @@ method pg$public$x(this$dispatch: Ref) returns (ret: Ref)
 field bf$a: Ref
 
 method con$c$Y$T$Int(p$a: Ref) returns (ret: Ref)
-  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$T$c$Y())
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$c$Y())
   ensures acc(p$c$Y$shared(ret), wildcard)
   ensures acc(p$c$Y$unique(ret), write)
 

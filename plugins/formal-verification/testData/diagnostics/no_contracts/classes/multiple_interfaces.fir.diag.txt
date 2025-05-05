@@ -1,6 +1,6 @@
 /multiple_interfaces.kt:(162,173): info: Generated Viper text for testDiamond:
 method con$c$D$() returns (ret: Ref)
-  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$T$c$D())
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$c$D())
   ensures acc(p$c$D$shared(ret), wildcard)
   ensures acc(p$c$D$unique(ret), write)
 
@@ -23,13 +23,13 @@ method pg$public$field(this$dispatch: Ref) returns (ret: Ref)
 
 /multiple_interfaces.kt:(405,415): info: Generated Viper text for testVarVal:
 method con$c$G$() returns (ret: Ref)
-  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$T$c$G())
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$c$G())
   ensures acc(p$c$G$shared(ret), wildcard)
   ensures acc(p$c$G$unique(ret), write)
 
 
 method con$c$I$() returns (ret: Ref)
-  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$T$c$I())
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$c$I())
   ensures acc(p$c$I$shared(ret), wildcard)
   ensures acc(p$c$I$unique(ret), write)
 
@@ -63,3 +63,4 @@ method pg$public$field(this$dispatch: Ref) returns (ret: Ref)
 
 
 method ps$public$field(this$dispatch: Ref, anon$0: Ref) returns (ret: Ref)
+

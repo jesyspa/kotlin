@@ -11,9 +11,11 @@ import org.jetbrains.kotlin.formver.asPosition
 import org.jetbrains.kotlin.formver.asSourceRole
 import org.jetbrains.kotlin.formver.conversion.StmtConversionContext
 import org.jetbrains.kotlin.formver.embeddings.*
+import org.jetbrains.kotlin.formver.embeddings.types.TypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.expression.debug.NamedBranchingNode
 import org.jetbrains.kotlin.formver.embeddings.expression.debug.PlaintextLeaf
 import org.jetbrains.kotlin.formver.embeddings.expression.debug.TreeView
+import org.jetbrains.kotlin.formver.embeddings.types.fillHoles
 import org.jetbrains.kotlin.formver.names.AnonymousName
 import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.formver.viper.ast.*
@@ -83,8 +85,7 @@ class FirVariableEmbedding(
     val symbol: FirBasedSymbol<*>,
     override val isUnique: Boolean = false,
     override val isBorrowed: Boolean = false,
-) :
-    VariableEmbedding {
+) : VariableEmbedding {
     override val sourceRole: SourceRole
         get() = symbol.asSourceRole
 }
