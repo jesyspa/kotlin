@@ -17,7 +17,8 @@ import org.jetbrains.kotlin.formver.viper.ast.unwrapOr
 import org.jetbrains.kotlin.formver.viper.errors.VerificationError
 
 sealed interface FormattedError {
-    fun report(reporter: DiagnosticReporter, source: KtSourceElement?, context: CheckerContext)
+    context(context: CheckerContext, reporter: DiagnosticReporter)
+    fun report(source: KtSourceElement?)
 }
 
 class ReturnsEffectError(private val sourceRole: SourceRole.ReturnsEffect) : FormattedError {
@@ -28,8 +29,9 @@ class ReturnsEffectError(private val sourceRole: SourceRole.ReturnsEffect) : For
             else -> throw IllegalStateException("Unknown returns effect: $this")
         }
 
-    override fun report(reporter: DiagnosticReporter, source: KtSourceElement?, context: CheckerContext) {
-        reporter.reportOn(source, PluginErrors.UNEXPECTED_RETURNED_VALUE, sourceRole.asUserFriendlyMessage, context)
+    context(context: CheckerContext, reporter: DiagnosticReporter)
+    override fun report(source: KtSourceElement?) {
+        reporter.reportOn(source, PluginErrors.UNEXPECTED_RETURNED_VALUE, sourceRole.asUserFriendlyMessage)
     }
 }
 
@@ -40,19 +42,21 @@ class ConditionalEffectError(private val sourceRole: SourceRole.ConditionalEffec
             SourceRole.ReturnsEffect.Wildcard -> "the function returns"
         }
 
-    override fun report(reporter: DiagnosticReporter, source: KtSourceElement?, context: CheckerContext) {
+    context(context: CheckerContext, reporter: DiagnosticReporter)
+    override fun report(source: KtSourceElement?) {
         val (returnEffect, condition) = sourceRole
         val returnEffectMsg = returnEffect.asUserFriendlyMessage
         val conditionPrettyPrinted = with(SourceRoleConditionPrettyPrinter) {
             condition.prettyPrint()
         }
-        reporter.reportOn(source, PluginErrors.CONDITIONAL_EFFECT_ERROR, returnEffectMsg, conditionPrettyPrinted, context)
+        reporter.reportOn(source, PluginErrors.CONDITIONAL_EFFECT_ERROR, returnEffectMsg, conditionPrettyPrinted)
     }
 }
 
 class DefaultError(private val error: VerificationError) : FormattedError {
-    override fun report(reporter: DiagnosticReporter, source: KtSourceElement?, context: CheckerContext) {
-        reporter.reportOn(source, PluginErrors.VIPER_VERIFICATION_ERROR, error.msg, context)
+    context(context: CheckerContext, reporter: DiagnosticReporter)
+    override fun report(source: KtSourceElement?) {
+        reporter.reportOn(source, PluginErrors.VIPER_VERIFICATION_ERROR, error.msg)
     }
 }
 
@@ -65,7 +69,8 @@ class IndexOutOfBoundError(private val error: VerificationError, private val sou
             SourceRole.ListElementAccessCheck.AccessCheckType.GREATER_THAN_LIST_SIZE -> "greater than the list's size"
         }
 
-    override fun report(reporter: DiagnosticReporter, source: KtSourceElement?, context: CheckerContext) {
+    context(context: CheckerContext, reporter: DiagnosticReporter)
+    override fun report(source: KtSourceElement?) {
         /**
          * When we are dealing with inlined expressions returning a list, we do not have access to any list symbol.
          * Therefore, we do not report any name since the compiler would highlight the sub-expression causing the problem.
@@ -77,7 +82,6 @@ class IndexOutOfBoundError(private val error: VerificationError, private val sou
             PluginErrors.POSSIBLE_INDEX_OUT_OF_BOUND,
             targetList.formatListMessage(),
             sourceRole.accessType.asUserFriendlyMessage,
-            context
         )
     }
 }
@@ -89,7 +93,8 @@ class InvalidSubListRangeError(private val error: VerificationError, private val
             is SourceRole.SubListCreation.CheckInSize -> "greater than the list's size"
         }
 
-    override fun report(reporter: DiagnosticReporter, source: KtSourceElement?, context: CheckerContext) {
+    context(context: CheckerContext, reporter: DiagnosticReporter)
+    override fun report(source: KtSourceElement?) {
         val targetListInfo = error.locationNode.asCallable().arg(0).info
         val targetList = targetListInfo.unwrapOr<SourceRole.FirSymbolHolder> { null }
         reporter.reportOn(
@@ -97,7 +102,6 @@ class InvalidSubListRangeError(private val error: VerificationError, private val
             PluginErrors.INVALID_SUBLIST_RANGE,
             targetList.formatListMessage(),
             sourceRole.asUserFriendlyMessage,
-            context
         )
     }
 }

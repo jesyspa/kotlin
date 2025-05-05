@@ -41,7 +41,8 @@ private fun TargetsSelection.applicable(declaration: FirSimpleFunction): Boolean
 
 class ViperPoweredDeclarationChecker(private val session: FirSession, private val config: PluginConfiguration) :
     FirSimpleFunctionChecker(MppCheckerKind.Common) {
-    override fun check(declaration: FirSimpleFunction, context: CheckerContext, reporter: DiagnosticReporter) {
+    context(context: CheckerContext, reporter: DiagnosticReporter)
+    override fun check(declaration: FirSimpleFunction) {
         if (!config.shouldConvert(declaration)) return
         val errorCollector = ErrorCollector()
         try {
@@ -50,7 +51,7 @@ class ViperPoweredDeclarationChecker(private val session: FirSession, private va
             val program = programConversionContext.program
 
             getProgramForLogging(program)?.let {
-                reporter.reportOn(declaration.source, PluginErrors.VIPER_TEXT, declaration.name.asString(), it.toDebugOutput(), context)
+                reporter.reportOn(declaration.source, PluginErrors.VIPER_TEXT, declaration.name.asString(), it.toDebugOutput())
             }
 
             if (shouldDumpExpEmbeddings(declaration)) {
@@ -59,8 +60,7 @@ class ViperPoweredDeclarationChecker(private val session: FirSession, private va
                         declaration.source,
                         PluginErrors.EXP_EMBEDDING,
                         name.mangled,
-                        embedding.debugTreeView.print(),
-                        context
+                        embedding.debugTreeView.print()
                     )
                 }
             }
@@ -68,7 +68,7 @@ class ViperPoweredDeclarationChecker(private val session: FirSession, private va
             val verifier = Verifier()
             val onFailure = { err: VerifierError ->
                 val source = err.position.unwrapOr { declaration.source }
-                reporter.reportVerifierError(source, err, config.errorStyle, context)
+                reporter.reportVerifierError(source, err, config.errorStyle)
             }
 
             val consistent = verifier.checkConsistency(program, onFailure)
@@ -78,11 +78,11 @@ class ViperPoweredDeclarationChecker(private val session: FirSession, private va
             verifier.verify(program, onFailure)
         } catch (e: Exception) {
             val error = errorCollector.formatErrorWithInfos(e.message ?: "No message provided")
-            reporter.reportOn(declaration.source, PluginErrors.INTERNAL_ERROR, error, context)
+            reporter.reportOn(declaration.source, PluginErrors.INTERNAL_ERROR, error)
         }
 
         errorCollector.forEachMinorError {
-            reporter.reportOn(declaration.source, PluginErrors.MINOR_INTERNAL_ERROR, it, context)
+            reporter.reportOn(declaration.source, PluginErrors.MINOR_INTERNAL_ERROR, it)
         }
     }
 
