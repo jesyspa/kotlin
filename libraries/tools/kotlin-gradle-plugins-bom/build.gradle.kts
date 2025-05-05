@@ -20,6 +20,7 @@ dependencies {
         api(project(":atomicfu"))
         api(project(":compose-compiler-gradle-plugin"))
         api(project(":kotlin-allopen"))
+        api(project(":kotlin-formver"))
         api(project(":kotlin-lombok"))
         api(project(":kotlin-noarg"))
         api(project(":kotlin-power-assert"))
