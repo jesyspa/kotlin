@@ -28,7 +28,7 @@ method pg$public$valProp(this: Ref) returns (ret: Ref)
 method pg$public$varProp(this: Ref) returns (ret: Ref)
 
 
-method ps$public$varProp(this: Ref, value: Ref) returns (ret: Ref)
+method ps$public$varProp(this: Ref, anon$0: Ref) returns (ret: Ref)
 
 
 /interface.kt:(348,358): info: Generated Viper text for createImpl:
