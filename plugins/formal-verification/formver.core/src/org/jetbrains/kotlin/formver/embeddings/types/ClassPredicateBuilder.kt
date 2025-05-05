@@ -3,9 +3,10 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
-package org.jetbrains.kotlin.formver.embeddings
+package org.jetbrains.kotlin.formver.embeddings.types
 
 import org.jetbrains.kotlin.formver.conversion.AccessPolicy
+import org.jetbrains.kotlin.formver.embeddings.UserFieldEmbedding
 import org.jetbrains.kotlin.formver.embeddings.expression.*
 import org.jetbrains.kotlin.formver.linearization.pureToViper
 import org.jetbrains.kotlin.formver.names.DispatchReceiverName
@@ -15,7 +16,7 @@ import org.jetbrains.kotlin.formver.viper.ast.Predicate
 import org.jetbrains.kotlin.utils.addIfNotNull
 
 internal class ClassPredicateBuilder private constructor(private val details: ClassEmbeddingDetails) {
-    private val subject = PlaceholderVariableEmbedding(DispatchReceiverName, details.type)
+    private val subject = PlaceholderVariableEmbedding(DispatchReceiverName, details.type.asTypeEmbedding())
     private val body = mutableListOf<ExpEmbedding>()
 
     companion object {
@@ -42,7 +43,7 @@ internal class ClassPredicateBuilder private constructor(private val details: Cl
 
     fun forEachSuperType(action: TypeInvariantsBuilder.() -> Unit) =
         details.superTypes.forEach { type ->
-            val builder = TypeInvariantsBuilder(type)
+            val builder = TypeInvariantsBuilder(type.asTypeEmbedding())
             builder.action()
             body.addAll(builder.toInvariantsList().fillHoles(subject))
         }
@@ -78,6 +79,6 @@ class TypeInvariantsBuilder(private val type: TypeEmbedding) {
     )
 
     fun includeSubTypeInvariants() = invariants.add(
-        type.subTypeInvariant()
+        SubTypeInvariantEmbedding(type)
     )
 }

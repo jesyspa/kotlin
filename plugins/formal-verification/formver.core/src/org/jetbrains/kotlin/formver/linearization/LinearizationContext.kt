@@ -6,11 +6,11 @@
 package org.jetbrains.kotlin.formver.linearization
 
 import org.jetbrains.kotlin.KtSourceElement
-import org.jetbrains.kotlin.formver.embeddings.PretypeBuilder
-import org.jetbrains.kotlin.formver.embeddings.TypeBuilder
-import org.jetbrains.kotlin.formver.embeddings.TypeEmbedding
-import org.jetbrains.kotlin.formver.embeddings.buildType
+import org.jetbrains.kotlin.formver.embeddings.types.TypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.expression.AnonymousVariableEmbedding
+import org.jetbrains.kotlin.formver.embeddings.types.PretypeBuilder
+import org.jetbrains.kotlin.formver.embeddings.types.TypeBuilder
+import org.jetbrains.kotlin.formver.embeddings.types.buildType
 import org.jetbrains.kotlin.formver.viper.ast.Declaration
 import org.jetbrains.kotlin.formver.viper.ast.Label
 import org.jetbrains.kotlin.formver.viper.ast.Stmt

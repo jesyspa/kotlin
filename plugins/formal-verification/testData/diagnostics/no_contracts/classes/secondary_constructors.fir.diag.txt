@@ -2,13 +2,13 @@
 field bf$a: Ref
 
 method con$c$NoPrimaryConstructor$T$Boolean(p$b: Ref) returns (ret: Ref)
-  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$T$c$NoPrimaryConstructor())
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$c$NoPrimaryConstructor())
   ensures acc(p$c$NoPrimaryConstructor$shared(ret), wildcard)
   ensures acc(p$c$NoPrimaryConstructor$unique(ret), write)
 
 
 method con$c$NoPrimaryConstructor$T$Int(p$n: Ref) returns (ret: Ref)
-  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$T$c$NoPrimaryConstructor())
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$c$NoPrimaryConstructor())
   ensures acc(p$c$NoPrimaryConstructor$shared(ret), wildcard)
   ensures acc(p$c$NoPrimaryConstructor$unique(ret), write)
 
@@ -28,13 +28,13 @@ method f$onlySecondConstructors$TF$() returns (ret$0: Ref)
 field bf$a: Ref
 
 method con$c$BothConstructors$T$Boolean(p$b: Ref) returns (ret: Ref)
-  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$T$c$BothConstructors())
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$c$BothConstructors())
   ensures acc(p$c$BothConstructors$shared(ret), wildcard)
   ensures acc(p$c$BothConstructors$unique(ret), write)
 
 
 method con$c$BothConstructors$T$Int(p$a: Ref) returns (ret: Ref)
-  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$T$c$BothConstructors())
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$c$BothConstructors())
   ensures acc(p$c$BothConstructors$shared(ret), wildcard)
   ensures acc(p$c$BothConstructors$unique(ret), write)
   ensures (unfolding acc(p$c$BothConstructors$shared(ret), wildcard) in

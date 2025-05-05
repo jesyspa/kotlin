@@ -17,6 +17,7 @@ import org.jetbrains.kotlin.fir.symbols.impl.FirPropertySymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirValueParameterSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirVariableSymbol
 import org.jetbrains.kotlin.formver.embeddings.*
+import org.jetbrains.kotlin.formver.embeddings.types.TypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.callables.FunctionSignature
 import org.jetbrains.kotlin.formver.embeddings.expression.*
 import org.jetbrains.kotlin.formver.isCustom
@@ -175,8 +176,8 @@ fun StmtConversionContext.insertInlineFunctionCall(
     parentCtx: MethodConversionContext? = null,
 ): ExpEmbedding {
     // TODO: It seems like it may be possible to avoid creating a local here, but it is not clear how.
-    val returnTarget = returnTargetProducer.getFresh(calleeSignature.type.returnType)
-    val (declarations, callArgs) = getInlineFunctionCallArgs(args, calleeSignature.type.formalArgTypes)
+    val returnTarget = returnTargetProducer.getFresh(calleeSignature.callableType.returnType)
+    val (declarations, callArgs) = getInlineFunctionCallArgs(args, calleeSignature.callableType.formalArgTypes)
     val subs = paramNames.zip(callArgs).toMap()
     val methodCtxFactory = MethodContextFactory(
         calleeSignature,

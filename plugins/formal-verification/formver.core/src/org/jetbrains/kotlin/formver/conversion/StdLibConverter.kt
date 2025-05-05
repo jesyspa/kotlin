@@ -8,6 +8,7 @@ package org.jetbrains.kotlin.formver.conversion
 import org.jetbrains.kotlin.formver.embeddings.*
 import org.jetbrains.kotlin.formver.embeddings.callables.NamedFunctionSignature
 import org.jetbrains.kotlin.formver.embeddings.expression.*
+import org.jetbrains.kotlin.formver.embeddings.types.isInheritorOfCollectionTypeNamed
 import org.jetbrains.kotlin.formver.names.NameMatcher
 
 private fun VariableEmbedding.sameSize(): ExpEmbedding =
@@ -23,7 +24,7 @@ sealed interface StdLibReceiverInterface {
 sealed interface PresentInterface : StdLibReceiverInterface {
     val interfaceName: String
     override fun match(function: NamedFunctionSignature): Boolean =
-        function.type.dispatchReceiverType?.isInheritorOfCollectionTypeNamed(interfaceName) ?: false
+        function.callableType.dispatchReceiverType?.pretype?.isInheritorOfCollectionTypeNamed(interfaceName) ?: false
 }
 
 data object CollectionInterface : PresentInterface {

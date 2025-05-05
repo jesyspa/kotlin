@@ -22,9 +22,9 @@ class InlineNamedFunction(
         ctx: StmtConversionContext,
     ): ExpEmbedding {
         val paramNames = buildList {
-            if (type.dispatchReceiverType != null)
+            if (callableType.dispatchReceiverType != null)
                 add(ExtraSpecialNames.DISPATCH_THIS)
-            if (type.extensionReceiverType != null)
+            if (callableType.extensionReceiverType != null)
                 add(ExtraSpecialNames.EXTENSION_THIS)
             addAll(symbol.valueParameterSymbols.map { it.name })
         }

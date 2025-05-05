@@ -11,6 +11,12 @@ import org.jetbrains.kotlin.formver.embeddings.expression.ExpEmbedding
 import org.jetbrains.kotlin.formver.embeddings.expression.FieldAccess
 import org.jetbrains.kotlin.formver.embeddings.expression.GeCmp
 import org.jetbrains.kotlin.formver.embeddings.expression.IntLit
+import org.jetbrains.kotlin.formver.embeddings.types.ClassTypeEmbedding
+import org.jetbrains.kotlin.formver.embeddings.types.FieldAccessTypeInvariantEmbedding
+import org.jetbrains.kotlin.formver.embeddings.types.TypeInvariantEmbedding
+import org.jetbrains.kotlin.formver.embeddings.types.buildType
+import org.jetbrains.kotlin.formver.embeddings.types.isCollectionInheritor
+import org.jetbrains.kotlin.formver.embeddings.types.TypeEmbedding
 import org.jetbrains.kotlin.formver.names.NameMatcher
 import org.jetbrains.kotlin.formver.names.ScopedKotlinName
 import org.jetbrains.kotlin.formver.names.SpecialName

@@ -6,14 +6,14 @@
 package org.jetbrains.kotlin.formver.embeddings.expression
 
 import org.jetbrains.kotlin.formver.asPosition
-import org.jetbrains.kotlin.formver.embeddings.ClassTypeEmbedding
-import org.jetbrains.kotlin.formver.embeddings.TypeEmbedding
+import org.jetbrains.kotlin.formver.embeddings.types.TypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.asInfo
-import org.jetbrains.kotlin.formver.embeddings.buildType
 import org.jetbrains.kotlin.formver.embeddings.callables.FullNamedFunctionSignature
 import org.jetbrains.kotlin.formver.embeddings.callables.NamedFunctionSignature
 import org.jetbrains.kotlin.formver.embeddings.callables.toMethodCall
 import org.jetbrains.kotlin.formver.embeddings.expression.debug.*
+import org.jetbrains.kotlin.formver.embeddings.types.ClassTypeEmbedding
+import org.jetbrains.kotlin.formver.embeddings.types.buildType
 import org.jetbrains.kotlin.formver.linearization.LinearizationContext
 import org.jetbrains.kotlin.formver.linearization.addLabel
 import org.jetbrains.kotlin.formver.linearization.freshAnonVar
@@ -166,7 +166,7 @@ data class UnfoldingClassPredicateEmbedding(val predicated: VariableEmbedding, o
     UnaryDirectResultExpEmbedding {
     override val type: TypeEmbedding = inner.type
     private fun toViperImpl(ctx: LinearizationContext, action: ExpEmbedding.() -> Exp): Exp {
-        val predicatedType = predicated.type
+        val predicatedType = predicated.type.pretype
         check(predicatedType is ClassTypeEmbedding) {
             "Built-in types do not have predicates."
         }
@@ -193,7 +193,7 @@ data class UnfoldingClassPredicateEmbedding(val predicated: VariableEmbedding, o
 
 // Note: this is always a *real* Viper method call.
 data class MethodCall(val method: NamedFunctionSignature, val args: List<ExpEmbedding>) : StoredResultExpEmbedding {
-    override val type: TypeEmbedding = method.type.returnType
+    override val type: TypeEmbedding = method.callableType.returnType
 
     override fun toViperStoringIn(result: VariableEmbedding, ctx: LinearizationContext) {
         ctx.addStatement {

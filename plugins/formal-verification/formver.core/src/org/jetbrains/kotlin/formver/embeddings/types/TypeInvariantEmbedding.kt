@@ -1,10 +1,11 @@
 /*
- * Copyright 2010-2023 JetBrains s.r.o. and Kotlin Programming Language contributors.
+ * Copyright 2010-2024 JetBrains s.r.o. and Kotlin Programming Language contributors.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
-package org.jetbrains.kotlin.formver.embeddings
+package org.jetbrains.kotlin.formver.embeddings.types
 
+import org.jetbrains.kotlin.formver.embeddings.FieldEmbedding
 import org.jetbrains.kotlin.formver.embeddings.expression.*
 import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.formver.viper.ast.PermExp
@@ -25,7 +26,7 @@ data object FalseTypeInvariant : TypeInvariantEmbedding {
     override fun fillHole(exp: ExpEmbedding): ExpEmbedding = BooleanLit(false)
 }
 
-data class SubTypeInvariantEmbedding(val type: TypeEmbedding) : TypeInvariantEmbedding {
+data class SubTypeInvariantEmbedding(val type: RuntimeTypeHolder) : TypeInvariantEmbedding {
     override fun fillHole(exp: ExpEmbedding): ExpEmbedding = Is(exp, type)
 }
 

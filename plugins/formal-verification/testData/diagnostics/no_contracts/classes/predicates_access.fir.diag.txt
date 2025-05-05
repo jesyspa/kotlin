@@ -32,7 +32,7 @@ predicate p$c$B$unique(this$dispatch: Ref) {
 predicate p$c$C$shared(this$dispatch: Ref) {
   acc(this$dispatch.bf$x, wildcard) &&
   acc(p$c$A$shared(this$dispatch.bf$x), wildcard) &&
-  df$rt$isSubtype(df$rt$typeOf(this$dispatch.bf$x), df$rt$T$c$A()) &&
+  df$rt$isSubtype(df$rt$typeOf(this$dispatch.bf$x), df$rt$c$A()) &&
   acc(p$c$D$shared(this$dispatch), wildcard) &&
   acc(p$c$B$shared(this$dispatch), wildcard)
 }
@@ -40,10 +40,10 @@ predicate p$c$C$shared(this$dispatch: Ref) {
 predicate p$c$C$unique(this$dispatch: Ref) {
   acc(this$dispatch.bf$x, wildcard) &&
   acc(p$c$A$shared(this$dispatch.bf$x), wildcard) &&
-  df$rt$isSubtype(df$rt$typeOf(this$dispatch.bf$x), df$rt$T$c$A()) &&
+  df$rt$isSubtype(df$rt$typeOf(this$dispatch.bf$x), df$rt$c$A()) &&
   acc(this$dispatch.bf$y, write) &&
   acc(p$c$A$shared(this$dispatch.bf$y), wildcard) &&
-  df$rt$isSubtype(df$rt$typeOf(this$dispatch.bf$y), df$rt$T$c$A()) &&
+  df$rt$isSubtype(df$rt$typeOf(this$dispatch.bf$y), df$rt$c$A()) &&
   acc(p$c$D$unique(this$dispatch), write) &&
   acc(p$c$B$unique(this$dispatch), write)
 }
@@ -56,11 +56,11 @@ predicate p$c$D$unique(this$dispatch: Ref) {
   true
 }
 
-method f$accessSuperTypeProperty$TF$T$c$C(p$c: Ref) returns (ret$0: Ref)
+method f$accessSuperTypeProperty$TF$T$C(p$c: Ref) returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 {
   var l0$temp: Ref
-  inhale df$rt$isSubtype(df$rt$typeOf(p$c), df$rt$T$c$C())
+  inhale df$rt$isSubtype(df$rt$typeOf(p$c), df$rt$c$C())
   inhale acc(p$c$C$shared(p$c), wildcard)
   unfold acc(p$c$C$shared(p$c), wildcard)
   unfold acc(p$c$B$shared(p$c), wildcard)
@@ -107,7 +107,7 @@ predicate p$c$B$unique(this$dispatch: Ref) {
 predicate p$c$C$shared(this$dispatch: Ref) {
   acc(this$dispatch.bf$x, wildcard) &&
   acc(p$c$A$shared(this$dispatch.bf$x), wildcard) &&
-  df$rt$isSubtype(df$rt$typeOf(this$dispatch.bf$x), df$rt$T$c$A()) &&
+  df$rt$isSubtype(df$rt$typeOf(this$dispatch.bf$x), df$rt$c$A()) &&
   acc(p$c$D$shared(this$dispatch), wildcard) &&
   acc(p$c$B$shared(this$dispatch), wildcard)
 }
@@ -115,10 +115,10 @@ predicate p$c$C$shared(this$dispatch: Ref) {
 predicate p$c$C$unique(this$dispatch: Ref) {
   acc(this$dispatch.bf$x, wildcard) &&
   acc(p$c$A$shared(this$dispatch.bf$x), wildcard) &&
-  df$rt$isSubtype(df$rt$typeOf(this$dispatch.bf$x), df$rt$T$c$A()) &&
+  df$rt$isSubtype(df$rt$typeOf(this$dispatch.bf$x), df$rt$c$A()) &&
   acc(this$dispatch.bf$y, write) &&
   acc(p$c$A$shared(this$dispatch.bf$y), wildcard) &&
-  df$rt$isSubtype(df$rt$typeOf(this$dispatch.bf$y), df$rt$T$c$A()) &&
+  df$rt$isSubtype(df$rt$typeOf(this$dispatch.bf$y), df$rt$c$A()) &&
   acc(p$c$D$unique(this$dispatch), write) &&
   acc(p$c$B$unique(this$dispatch), write)
 }
@@ -131,12 +131,12 @@ predicate p$c$D$unique(this$dispatch: Ref) {
   true
 }
 
-method f$accessNested$TF$T$c$C(p$c: Ref) returns (ret$0: Ref)
+method f$accessNested$TF$T$C(p$c: Ref) returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 {
   var l0$temp: Ref
   var anon$0: Ref
-  inhale df$rt$isSubtype(df$rt$typeOf(p$c), df$rt$T$c$C())
+  inhale df$rt$isSubtype(df$rt$typeOf(p$c), df$rt$c$C())
   inhale acc(p$c$C$shared(p$c), wildcard)
   unfold acc(p$c$C$shared(p$c), wildcard)
   anon$0 := p$c.bf$x
@@ -162,11 +162,11 @@ predicate p$c$A$unique(this$dispatch: Ref) {
   df$rt$isSubtype(df$rt$typeOf(this$dispatch.bf$a), df$rt$intType())
 }
 
-method f$accessNullable$TF$N$c$A(p$x: Ref) returns (ret$0: Ref)
+method f$accessNullable$TF$NT$A(p$x: Ref) returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 {
   var l0$n: Ref
-  inhale df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$nullable(df$rt$T$c$A()))
+  inhale df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$nullable(df$rt$c$A()))
   inhale p$x != df$rt$nullValue() ==> acc(p$c$A$shared(p$x), wildcard)
   if (!(p$x == df$rt$nullValue())) {
     unfold acc(p$c$A$shared(p$x), wildcard)
@@ -203,13 +203,13 @@ predicate p$c$B$unique(this$dispatch: Ref) {
   acc(p$c$A$unique(this$dispatch), write)
 }
 
-method f$accessCast$TF$T$c$A(p$x: Ref) returns (ret$0: Ref)
+method f$accessCast$TF$T$A(p$x: Ref) returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 {
   var l0$n: Ref
-  inhale df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$T$c$A())
+  inhale df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$c$A())
   inhale acc(p$c$A$shared(p$x), wildcard)
-  inhale df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$T$c$B())
+  inhale df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$c$B())
   inhale acc(p$c$B$shared(p$x), wildcard)
   unfold acc(p$c$B$shared(p$x), wildcard)
   l0$n := p$x.bf$b
@@ -244,19 +244,19 @@ predicate p$c$B$unique(this$dispatch: Ref) {
   acc(p$c$A$unique(this$dispatch), write)
 }
 
-method f$accessSafeCast$TF$T$c$A(p$x: Ref) returns (ret$0: Ref)
+method f$accessSafeCast$TF$T$A(p$x: Ref) returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 {
   var l0$n: Ref
   var l0$y: Ref
-  inhale df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$T$c$A())
+  inhale df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$c$A())
   inhale acc(p$c$A$shared(p$x), wildcard)
   l0$n := df$rt$intToRef(0)
-  if (df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$T$c$B())) {
+  if (df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$c$B())) {
     l0$y := p$x
   } else {
     l0$y := df$rt$nullValue()}
-  inhale df$rt$isSubtype(df$rt$typeOf(l0$y), df$rt$nullable(df$rt$T$c$B()))
+  inhale df$rt$isSubtype(df$rt$typeOf(l0$y), df$rt$nullable(df$rt$c$B()))
   inhale l0$y != df$rt$nullValue() ==> acc(p$c$B$shared(l0$y), wildcard)
   if (!(l0$y == df$rt$nullValue())) {
     unfold acc(p$c$B$shared(l0$y), wildcard)
@@ -293,14 +293,14 @@ predicate p$c$B$unique(this$dispatch: Ref) {
   acc(p$c$A$unique(this$dispatch), write)
 }
 
-method f$accessSmartCast$TF$T$c$A(p$x: Ref) returns (ret$0: Ref)
+method f$accessSmartCast$TF$T$A(p$x: Ref) returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 {
   var l0$n: Ref
-  inhale df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$T$c$A())
+  inhale df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$c$A())
   inhale acc(p$c$A$shared(p$x), wildcard)
   l0$n := df$rt$intToRef(0)
-  if (df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$T$c$B())) {
+  if (df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$c$B())) {
     inhale acc(p$c$B$shared(p$x), wildcard)
     unfold acc(p$c$B$shared(p$x), wildcard)
     l0$n := p$x.bf$b

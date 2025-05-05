@@ -2,7 +2,7 @@
 field bf$x: Ref
 
 method f$getFoo$TF$() returns (ret: Ref)
-  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$T$c$Foo())
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$c$Foo())
   ensures acc(p$c$Foo$shared(ret), wildcard)
 
 
