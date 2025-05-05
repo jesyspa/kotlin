@@ -10,6 +10,7 @@ import org.jetbrains.kotlin.descriptors.Visibilities
 import org.jetbrains.kotlin.descriptors.isInterface
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.declarations.FirSimpleFunction
+import org.jetbrains.kotlin.fir.declarations.processAllDeclarations
 import org.jetbrains.kotlin.fir.declarations.utils.*
 import org.jetbrains.kotlin.fir.resolve.toClassSymbol
 import org.jetbrains.kotlin.fir.resolve.toRegularClassSymbol
@@ -234,8 +235,8 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
     override fun embedFunctionSignature(symbol: FirFunctionSymbol<*>): FunctionSignature {
         val dispatchReceiverType = symbol.receiverType
         val extensionReceiverType = symbol.extensionReceiverType
-        val isExtensionReceiverUnique = symbol.receiverParameter?.isUnique(session) ?: false
-        val isExtensionReceiverBorrowed = symbol.receiverParameter?.isBorrowed(session) ?: false
+        val isExtensionReceiverUnique = symbol.receiverParameterSymbol?.isUnique(session) ?: false
+        val isExtensionReceiverBorrowed = symbol.receiverParameterSymbol?.isBorrowed(session) ?: false
         return object : FunctionSignature {
             override val callableType: FunctionTypeEmbedding = embedFunctionPretype(symbol)
 
@@ -264,8 +265,15 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         }
     }
 
+    @OptIn(SymbolInternals::class)
     private val FirRegularClassSymbol.propertySymbols: List<FirPropertySymbol>
-        get() = this.declarationSymbols.filterIsInstance<FirPropertySymbol>()
+        get() {
+            val result = mutableListOf<FirPropertySymbol>()
+            this.fir.processAllDeclarations(session) {
+                if (it is FirPropertySymbol) result.add(it)
+            }
+            return result
+        }
 
     private fun embedFullSignature(symbol: FirFunctionSymbol<*>): FullNamedFunctionSignature {
         val subSignature = object : NamedFunctionSignature, FunctionSignature by embedFunctionSignature(symbol) {
