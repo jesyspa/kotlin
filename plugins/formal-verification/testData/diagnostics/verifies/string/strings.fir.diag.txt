@@ -284,6 +284,7 @@ method f$testOps$TF$T$String(p$s: Ref) returns (ret$0: Ref)
   var anon$0: Ref
   var l0$str: Ref
   var l0$helloWorld: Ref
+  var l0$stringPlusInteger: Ref
   inhale df$rt$isSubtype(df$rt$typeOf(p$s), df$rt$stringType())
   inhale acc(p$pkg$kotlin$c$String$shared(p$s), wildcard)
   if (|df$rt$stringFromRef(p$s)| > 0) {
@@ -301,10 +302,15 @@ method f$testOps$TF$T$String(p$s: Ref) returns (ret$0: Ref)
   assert df$rt$stringFromRef(l0$str)[1] == 98
   assert Seq(75, 111, 116, 108, 105, 110, 46, 83, 116, 114, 105, 110, 103) ==
     Seq(75, 111, 116, 108, 105, 110, 46, 83, 116, 114, 105, 110, 103)
-  l0$helloWorld := f$pkg$kotlin$c$String$plus$TF$T$String$NT$Any(df$rt$stringToRef(Seq(72,
-    101, 108, 108, 111, 32, 87, 111, 114, 108, 100)), df$rt$charToRef(33))
+  l0$helloWorld := sp$addStringChar(df$rt$stringToRef(Seq(72, 101, 108, 108,
+    111, 32, 87, 111, 114, 108, 100)), df$rt$charToRef(33))
+  assert df$rt$stringFromRef(l0$helloWorld) ==
+    Seq(72, 101, 108, 108, 111, 32, 87, 111, 114, 108, 100, 33)
+  l0$stringPlusInteger := f$pkg$kotlin$c$String$plus$TF$T$String$NT$Any(df$rt$stringToRef(Seq(52,
+    50)), df$rt$intToRef(42))
   label lbl$ret$0
   inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
 method pg$public$length(this$dispatch: Ref) returns (ret: Ref)
+
