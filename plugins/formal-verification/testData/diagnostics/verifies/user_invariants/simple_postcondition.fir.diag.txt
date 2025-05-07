@@ -19,9 +19,6 @@ method f$testString$TF$() returns (ret$0: Ref)
   label lbl$ret$0
 }
 
-method pg$public$length(this$dispatch: Ref) returns (ret: Ref)
-
-
 /simple_postcondition.kt:(323,343): info: Generated Viper text for testWithPrecondition:
 method f$testWithPrecondition$TF$T$Int(p$int: Ref) returns (ret$0: Ref)
   requires df$rt$intFromRef(p$int) > 10
