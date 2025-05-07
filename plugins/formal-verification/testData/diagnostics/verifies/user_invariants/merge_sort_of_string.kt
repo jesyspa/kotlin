@@ -75,7 +75,7 @@ fun String.<!VIPER_TEXT!>mergeSorted<!>(): String {
     postconditions<String> { res ->
         res.length == length
         forAll<Int> {
-            (1 <= it && it < res.length) implies (res[it - 1] <= res[it])
+            (1 <= it && it <= res.length) implies (res[it - 1] <= res[it])
         }
     }
     return if (length <= 1) this
