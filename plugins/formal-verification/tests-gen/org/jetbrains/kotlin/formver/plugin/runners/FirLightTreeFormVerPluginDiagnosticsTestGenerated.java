@@ -691,6 +691,12 @@ public class FirLightTreeFormVerPluginDiagnosticsTestGenerated extends AbstractF
       }
 
       @Test
+      @TestMetadata("merge_sort_of_string.kt")
+      public void testMerge_sort_of_string() {
+        runTest("plugins/formal-verification/testData/diagnostics/verifies/user_invariants/merge_sort_of_string.kt");
+      }
+
+      @Test
       @TestMetadata("simple_forall.kt")
       public void testSimple_forall() {
         runTest("plugins/formal-verification/testData/diagnostics/verifies/user_invariants/simple_forall.kt");
