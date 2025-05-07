@@ -254,6 +254,12 @@ function sp$addCharInt(arg1: Ref, arg2: Ref): Ref
     df$rt$charFromRef(arg1) + df$rt$intFromRef(arg2)
 
 
+function sp$addStringChar(arg1: Ref, arg2: Ref): Ref
+  ensures df$rt$isSubtype(df$rt$typeOf(result), df$rt$stringType())
+  ensures df$rt$stringFromRef(result) ==
+    df$rt$stringFromRef(arg1) ++ Seq(df$rt$charFromRef(arg2))
+
+
 function sp$addStrings(arg1: Ref, arg2: Ref): Ref
   ensures df$rt$isSubtype(df$rt$typeOf(result), df$rt$stringType())
   ensures df$rt$stringFromRef(result) ==
