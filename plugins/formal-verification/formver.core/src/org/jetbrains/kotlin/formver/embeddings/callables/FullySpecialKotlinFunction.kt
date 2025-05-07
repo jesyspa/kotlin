@@ -66,10 +66,7 @@ object SpecialKotlinFunctions {
                 MulIntInt(args[0], args[1])
             }
             addFunction(SpecialPackages.kotlin, className = "Int", name = "div") { args, _ ->
-                blockOf(
-                    InhaleDirect(NeCmp(args[1], IntLit(0))),
-                    DivIntInt(args[0], args[1]),
-                )
+                DivIntInt(args[0], args[1])
             }
         }
 

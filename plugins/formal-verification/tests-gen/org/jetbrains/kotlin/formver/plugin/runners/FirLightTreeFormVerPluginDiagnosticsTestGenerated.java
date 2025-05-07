@@ -719,6 +719,12 @@ public class FirLightTreeFormVerPluginDiagnosticsTestGenerated extends AbstractF
       public void testStrings_in_conditions() {
         runTest("plugins/formal-verification/testData/diagnostics/verifies/user_invariants/strings_in_conditions.kt");
       }
+
+      @Test
+      @TestMetadata("sum_of_1_to_n.kt")
+      public void testSum_of_1_to_n() {
+        runTest("plugins/formal-verification/testData/diagnostics/verifies/user_invariants/sum_of_1_to_n.kt");
+      }
     }
   }
 }
