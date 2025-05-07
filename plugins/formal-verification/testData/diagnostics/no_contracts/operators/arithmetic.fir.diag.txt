@@ -37,7 +37,6 @@ method f$division$TF$T$Int(p$x: Ref) returns (ret$0: Ref)
 {
   var l0$y: Ref
   inhale df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$intType())
-  inhale df$rt$intFromRef(p$x) != 0
   l0$y := sp$divInts(p$x, p$x)
   label lbl$ret$0
   inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())

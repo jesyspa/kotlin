@@ -13,38 +13,35 @@ method f$mid_increased_by_one$TF$T$List$T$Int(p$arr: Ref, p$target: Ref)
   var l0$mid: Ref
   var anon$0: Ref
   var anon$1: Ref
-  var anon$2: Ref
   inhale df$rt$isSubtype(df$rt$typeOf(p$arr), df$rt$c$pkg$kotlin_collections$List())
   inhale acc(p$pkg$kotlin_collections$c$List$shared(p$arr), wildcard)
   inhale df$rt$isSubtype(df$rt$typeOf(p$target), df$rt$intType())
   l0$size := p$arr.sp$size
   inhale df$rt$isSubtype(df$rt$typeOf(l0$size), df$rt$intType())
-  inhale 2 != 0
-  anon$1 := p$arr.sp$size
-  inhale df$rt$isSubtype(df$rt$typeOf(anon$1), df$rt$intType())
-  anon$0 := sp$divInts(anon$1, df$rt$intToRef(2))
-  l0$mid := sp$plusInts(anon$0, df$rt$intToRef(1))
-  anon$2 := f$pkg$kotlin_collections$c$List$isEmpty$TF$T$List(p$arr)
-  if (df$rt$boolFromRef(anon$2)) {
+  anon$0 := p$arr.sp$size
+  inhale df$rt$isSubtype(df$rt$typeOf(anon$0), df$rt$intType())
+  l0$mid := sp$plusInts(sp$divInts(anon$0, df$rt$intToRef(2)), df$rt$intToRef(1))
+  anon$1 := f$pkg$kotlin_collections$c$List$isEmpty$TF$T$List(p$arr)
+  if (df$rt$boolFromRef(anon$1)) {
     ret$0 := df$rt$boolToRef(false)
   } else {
-    var anon$3: Ref
-    anon$3 := f$pkg$kotlin_collections$c$List$get$TF$T$List$T$Int(p$arr, l0$mid)
-    if (df$rt$intFromRef(anon$3) == df$rt$intFromRef(p$target)) {
+    var anon$2: Ref
+    anon$2 := f$pkg$kotlin_collections$c$List$get$TF$T$List$T$Int(p$arr, l0$mid)
+    if (df$rt$intFromRef(anon$2) == df$rt$intFromRef(p$target)) {
       ret$0 := df$rt$boolToRef(true)
     } else {
-      var anon$4: Ref
-      anon$4 := f$pkg$kotlin_collections$c$List$get$TF$T$List$T$Int(p$arr, l0$mid)
-      if (df$rt$intFromRef(anon$4) < df$rt$intFromRef(p$target)) {
+      var anon$3: Ref
+      anon$3 := f$pkg$kotlin_collections$c$List$get$TF$T$List$T$Int(p$arr, l0$mid)
+      if (df$rt$intFromRef(anon$3) < df$rt$intFromRef(p$target)) {
+        var anon$4: Ref
+        anon$4 := f$pkg$kotlin_collections$c$List$subList$TF$T$List$T$Int$T$Int(p$arr,
+          sp$plusInts(l0$mid, df$rt$intToRef(1)), l0$size)
+        ret$0 := f$mid_increased_by_one$TF$T$List$T$Int(anon$4, p$target)
+      } else {
         var anon$5: Ref
         anon$5 := f$pkg$kotlin_collections$c$List$subList$TF$T$List$T$Int$T$Int(p$arr,
-          sp$plusInts(l0$mid, df$rt$intToRef(1)), l0$size)
-        ret$0 := f$mid_increased_by_one$TF$T$List$T$Int(anon$5, p$target)
-      } else {
-        var anon$6: Ref
-        anon$6 := f$pkg$kotlin_collections$c$List$subList$TF$T$List$T$Int$T$Int(p$arr,
           df$rt$intToRef(0), l0$mid)
-        ret$0 := f$mid_increased_by_one$TF$T$List$T$Int(anon$6, p$target)
+        ret$0 := f$mid_increased_by_one$TF$T$List$T$Int(anon$5, p$target)
       }
     }
   }
@@ -120,38 +117,35 @@ method f$mid_decreased_by_one$TF$T$List$T$Int(p$arr: Ref, p$target: Ref)
   var l0$mid: Ref
   var anon$0: Ref
   var anon$1: Ref
-  var anon$2: Ref
   inhale df$rt$isSubtype(df$rt$typeOf(p$arr), df$rt$c$pkg$kotlin_collections$List())
   inhale acc(p$pkg$kotlin_collections$c$List$shared(p$arr), wildcard)
   inhale df$rt$isSubtype(df$rt$typeOf(p$target), df$rt$intType())
   l0$size := p$arr.sp$size
   inhale df$rt$isSubtype(df$rt$typeOf(l0$size), df$rt$intType())
-  inhale 2 != 0
-  anon$1 := p$arr.sp$size
-  inhale df$rt$isSubtype(df$rt$typeOf(anon$1), df$rt$intType())
-  anon$0 := sp$divInts(anon$1, df$rt$intToRef(2))
-  l0$mid := sp$minusInts(anon$0, df$rt$intToRef(1))
-  anon$2 := f$pkg$kotlin_collections$c$List$isEmpty$TF$T$List(p$arr)
-  if (df$rt$boolFromRef(anon$2)) {
+  anon$0 := p$arr.sp$size
+  inhale df$rt$isSubtype(df$rt$typeOf(anon$0), df$rt$intType())
+  l0$mid := sp$minusInts(sp$divInts(anon$0, df$rt$intToRef(2)), df$rt$intToRef(1))
+  anon$1 := f$pkg$kotlin_collections$c$List$isEmpty$TF$T$List(p$arr)
+  if (df$rt$boolFromRef(anon$1)) {
     ret$0 := df$rt$boolToRef(false)
   } else {
-    var anon$3: Ref
-    anon$3 := f$pkg$kotlin_collections$c$List$get$TF$T$List$T$Int(p$arr, l0$mid)
-    if (df$rt$intFromRef(anon$3) == df$rt$intFromRef(p$target)) {
+    var anon$2: Ref
+    anon$2 := f$pkg$kotlin_collections$c$List$get$TF$T$List$T$Int(p$arr, l0$mid)
+    if (df$rt$intFromRef(anon$2) == df$rt$intFromRef(p$target)) {
       ret$0 := df$rt$boolToRef(true)
     } else {
-      var anon$4: Ref
-      anon$4 := f$pkg$kotlin_collections$c$List$get$TF$T$List$T$Int(p$arr, l0$mid)
-      if (df$rt$intFromRef(anon$4) < df$rt$intFromRef(p$target)) {
+      var anon$3: Ref
+      anon$3 := f$pkg$kotlin_collections$c$List$get$TF$T$List$T$Int(p$arr, l0$mid)
+      if (df$rt$intFromRef(anon$3) < df$rt$intFromRef(p$target)) {
+        var anon$4: Ref
+        anon$4 := f$pkg$kotlin_collections$c$List$subList$TF$T$List$T$Int$T$Int(p$arr,
+          sp$plusInts(l0$mid, df$rt$intToRef(1)), l0$size)
+        ret$0 := f$mid_decreased_by_one$TF$T$List$T$Int(anon$4, p$target)
+      } else {
         var anon$5: Ref
         anon$5 := f$pkg$kotlin_collections$c$List$subList$TF$T$List$T$Int$T$Int(p$arr,
-          sp$plusInts(l0$mid, df$rt$intToRef(1)), l0$size)
-        ret$0 := f$mid_decreased_by_one$TF$T$List$T$Int(anon$5, p$target)
-      } else {
-        var anon$6: Ref
-        anon$6 := f$pkg$kotlin_collections$c$List$subList$TF$T$List$T$Int$T$Int(p$arr,
           df$rt$intToRef(0), l0$mid)
-        ret$0 := f$mid_decreased_by_one$TF$T$List$T$Int(anon$6, p$target)
+        ret$0 := f$mid_decreased_by_one$TF$T$List$T$Int(anon$5, p$target)
       }
     }
   }
@@ -232,7 +226,6 @@ method f$mid_decreased_by_one_in_rec_call$TF$T$List$T$Int(p$arr: Ref, p$target: 
   inhale df$rt$isSubtype(df$rt$typeOf(p$target), df$rt$intType())
   l0$size := p$arr.sp$size
   inhale df$rt$isSubtype(df$rt$typeOf(l0$size), df$rt$intType())
-  inhale 2 != 0
   anon$0 := p$arr.sp$size
   inhale df$rt$isSubtype(df$rt$typeOf(anon$0), df$rt$intType())
   l0$mid := sp$divInts(anon$0, df$rt$intToRef(2))
@@ -348,7 +341,6 @@ method f$unsafe_binary_search$TF$T$List$T$Int$T$Int$T$Int(p$arr: Ref, p$target: 
 {
   var l0$mid: Ref
   var anon$0: Ref
-  var anon$1: Ref
   inhale df$rt$isSubtype(df$rt$typeOf(p$arr), df$rt$c$pkg$kotlin_collections$List())
   inhale acc(p$pkg$kotlin_collections$c$List$shared(p$arr), wildcard)
   inhale df$rt$isSubtype(df$rt$typeOf(p$target), df$rt$intType())
@@ -358,16 +350,14 @@ method f$unsafe_binary_search$TF$T$List$T$Int$T$Int$T$Int(p$arr: Ref, p$target: 
     ret$0 := df$rt$boolToRef(false)
     goto lbl$ret$0
   }
-  inhale 2 != 0
-  anon$0 := sp$divInts(sp$minusInts(p$right, p$left), df$rt$intToRef(2))
-  l0$mid := sp$plusInts(p$left, anon$0)
-  anon$1 := f$pkg$kotlin_collections$c$List$get$TF$T$List$T$Int(p$arr, l0$mid)
-  if (df$rt$intFromRef(anon$1) == df$rt$intFromRef(p$target)) {
+  l0$mid := sp$plusInts(p$left, sp$divInts(sp$minusInts(p$right, p$left), df$rt$intToRef(2)))
+  anon$0 := f$pkg$kotlin_collections$c$List$get$TF$T$List$T$Int(p$arr, l0$mid)
+  if (df$rt$intFromRef(anon$0) == df$rt$intFromRef(p$target)) {
     ret$0 := df$rt$boolToRef(true)
   } else {
-    var anon$2: Ref
-    anon$2 := f$pkg$kotlin_collections$c$List$get$TF$T$List$T$Int(p$arr, l0$mid)
-    if (df$rt$intFromRef(anon$2) < df$rt$intFromRef(p$target)) {
+    var anon$1: Ref
+    anon$1 := f$pkg$kotlin_collections$c$List$get$TF$T$List$T$Int(p$arr, l0$mid)
+    if (df$rt$intFromRef(anon$1) < df$rt$intFromRef(p$target)) {
       ret$0 := f$unsafe_binary_search$TF$T$List$T$Int$T$Int$T$Int(p$arr, p$target,
         sp$plusInts(l0$mid, df$rt$intToRef(1)), p$right)
     } else {
