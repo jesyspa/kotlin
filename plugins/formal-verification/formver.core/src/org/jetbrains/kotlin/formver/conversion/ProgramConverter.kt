@@ -433,11 +433,13 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
      *
      * Note that the property either has associated Viper field (and then it is used to access the value) or not (in this case methods are used).
      * The field is only used for final properties with default getter and default setter (if any).
+     *
+     * Null value of parameter [embedding] means that there is no class details corresponding to this type (e.g. it is primitive).
      */
-    private fun processProperty(symbol: FirPropertySymbol, embedding: ClassEmbeddingDetails) {
+    private fun processProperty(symbol: FirPropertySymbol, embedding: ClassEmbeddingDetails?) {
         val unscopedName = symbol.callableId.embedUnscopedPropertyName()
-        properties[symbol.embedMemberPropertyName()] = SpecialProperties.byCallableId[symbol.callableId] ?: run {
-            val backingField = embedding.findField(unscopedName)
+        properties[symbol.embedMemberPropertyName()] = SpecialProperties.byCallableId[symbol.callableId] ?: embedding.run {
+            val backingField = embedding?.findField(unscopedName)
             backingField?.let { fields.add(it) }
             embedProperty(symbol, backingField)
         }
@@ -482,13 +484,20 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         type is ConeTypeParameterType -> {
             isNullable = true; any()
         }
+        type.isString -> {
+            val stringClassSymbol = type.toClassSymbol(session) as FirRegularClassSymbol
+            stringClassSymbol.propertySymbols.forEach {
+                processProperty(it, embedding = null)
+            }
+            string()
+        }
         type.isUnit -> unit()
         type.isChar -> char()
         type.isInt -> int()
         type.isBoolean -> boolean()
         type.isNothing -> nothing()
         type.isSomeFunctionType(session) -> function {
-            check (type is ConeClassLikeType) { "Expected a ConeClassLikeType for a function type, got $type" }
+            check(type is ConeClassLikeType) { "Expected a ConeClassLikeType for a function type, got $type" }
             type.receiverType(session)?.let { withDispatchReceiver { embedTypeWithBuilder(it) } }
             type.valueParameterTypesWithoutReceivers(session).forEach { param ->
                 withParam { embedTypeWithBuilder(param) }

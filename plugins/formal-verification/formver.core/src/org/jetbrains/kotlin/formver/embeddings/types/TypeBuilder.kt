@@ -32,12 +32,7 @@ class TypeBuilder {
     fun int() = IntPretypeBuilder
     fun boolean() = BooleanPretypeBuilder
     fun char() = CharPretypeBuilder
-    fun string() = klass {
-        withName(buildName {
-            packageScope(listOf("kotlin"))
-            ClassKotlinName(listOf("String"))
-        })
-    }
+    fun string() = StringPretypeBuilder
 
     fun function(init: FunctionPretypeBuilder.() -> Unit) = FunctionPretypeBuilder().also { it.init() }
     fun klass(init: ClassPretypeBuilder.() -> Unit) = ClassPretypeBuilder().also { it.init() }

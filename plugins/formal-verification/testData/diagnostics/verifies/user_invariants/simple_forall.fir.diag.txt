@@ -33,13 +33,11 @@ method f$anyIntegerSquaredIsAtLeastZeroStringVersion$TF$T$String(p$str: Ref)
   var l0$i: Ref
   var anon$2: Ref
   inhale df$rt$isSubtype(df$rt$typeOf(p$str), df$rt$stringType())
-  inhale acc(p$pkg$kotlin$c$String$shared(p$str), wildcard)
   l0$res := df$rt$intToRef(0)
   l0$i := df$rt$intToRef(10)
   label lbl$continue$0
     invariant df$rt$isSubtype(df$rt$typeOf(l0$res), df$rt$intType())
     invariant df$rt$isSubtype(df$rt$typeOf(l0$i), df$rt$intType())
-    invariant acc(p$pkg$kotlin$c$String$shared(p$str), wildcard)
     invariant df$rt$isSubtype(df$rt$typeOf(p$str), df$rt$stringType())
     invariant (forall anon$0: Ref ::df$rt$isSubtype(df$rt$typeOf(anon$0), df$rt$intType()) ==>
         0 <= df$rt$intFromRef(anon$0) &&
@@ -57,7 +55,6 @@ method f$anyIntegerSquaredIsAtLeastZeroStringVersion$TF$T$String(p$str: Ref)
   label lbl$break$0
     invariant df$rt$isSubtype(df$rt$typeOf(l0$res), df$rt$intType())
     invariant df$rt$isSubtype(df$rt$typeOf(l0$i), df$rt$intType())
-    invariant acc(p$pkg$kotlin$c$String$shared(p$str), wildcard)
     invariant df$rt$isSubtype(df$rt$typeOf(p$str), df$rt$stringType())
     invariant (forall anon$0: Ref ::df$rt$isSubtype(df$rt$typeOf(anon$0), df$rt$intType()) ==>
         0 <= df$rt$intFromRef(anon$0) &&
@@ -69,5 +66,3 @@ method f$anyIntegerSquaredIsAtLeastZeroStringVersion$TF$T$String(p$str: Ref)
   goto lbl$ret$0
   label lbl$ret$0
 }
-
-method pg$public$length(this$dispatch: Ref) returns (ret: Ref)

@@ -80,8 +80,8 @@ data class TypeEmbeddingFlags(val nullable: Boolean) {
 
 inline fun TypeEmbedding.injectionOr(default: (TypeEmbedding) -> Injection): Injection {
     if (flags.nullable) return default(this)
-    if (equalToType { string() }) return RuntimeTypeDomain.stringInjection
     return when (this.pretype) {
+        StringTypeEmbedding -> RuntimeTypeDomain.stringInjection
         CharTypeEmbedding -> RuntimeTypeDomain.charInjection
         IntTypeEmbedding -> RuntimeTypeDomain.intInjection
         BooleanTypeEmbedding -> RuntimeTypeDomain.boolInjection

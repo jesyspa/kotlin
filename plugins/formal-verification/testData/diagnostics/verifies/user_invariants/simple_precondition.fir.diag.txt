@@ -15,9 +15,6 @@ method f$test$TF$T$Int(p$idx: Ref) returns (ret$0: Ref)
   inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
-method pg$public$length(this$dispatch: Ref) returns (ret: Ref)
-
-
 /simple_precondition.kt:(446,469): info: Generated Viper text for inlineWithSpecification:
 method f$inlineWithSpecification$TF$T$Boolean(p$bool: Ref)
   returns (ret$0: Ref)

@@ -220,6 +220,16 @@ object OperatorExpEmbeddings {
         viperImplementation { Exp.SeqAppend(args[0], args[1], pos, info, trafos) }
     }
 
+    val AddStringChar = buildBinaryOperator {
+        setName("addStringChar")
+        withSignature {
+            withParam { string() }
+            withParam { char() }
+            withReturnType { string() }
+        }
+        viperImplementation { Exp.SeqAppend(args[0], Exp.ExplicitSeq(listOf(args[1])), pos, info, trafos) }
+    }
+
     val allTemplates
         get() = listOf(
             AddIntInt, SubIntInt, MulIntInt, DivIntInt, RemIntInt,
@@ -227,6 +237,6 @@ object OperatorExpEmbeddings {
             Not, And, Or, Implies,
             AddCharInt, SubCharChar, SubCharInt,
             LeCharChar, GeCharChar, LtCharChar, GtCharChar,
-            StringLength, StringGet, AddStringString
+            StringLength, StringGet, AddStringString, AddStringChar,
         )
 }

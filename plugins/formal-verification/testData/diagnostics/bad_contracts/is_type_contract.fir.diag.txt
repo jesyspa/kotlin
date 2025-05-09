@@ -9,9 +9,6 @@ method f$unverifiableTypeCheck$TF$NT$Int(p$x: Ref) returns (ret$0: Ref)
   label lbl$ret$0
 }
 
-method pg$public$length(this$dispatch: Ref) returns (ret: Ref)
-
-
 /is_type_contract.kt:(216,245): warning: Cannot verify that if the function returns then x is Unit.
 
 /is_type_contract.kt:(319,341): info: Generated Viper text for nullableNotNonNullable:

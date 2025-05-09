@@ -7,6 +7,7 @@ package org.jetbrains.kotlin.formver.embeddings.callables
 
 import org.jetbrains.kotlin.formver.conversion.StmtConversionContext
 import org.jetbrains.kotlin.formver.embeddings.expression.ExpEmbedding
+import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.AddStringChar
 import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.AddStringString
 import org.jetbrains.kotlin.formver.embeddings.types.buildFunctionPretype
 import org.jetbrains.kotlin.formver.embeddings.types.equalToType
@@ -34,8 +35,14 @@ abstract class AbstractPartiallySpecialKotlinFunction(
 }
 
 class StringPlusAnyFunction : AbstractPartiallySpecialKotlinFunction("kotlin", className = "String", name = "plus") {
-    override fun tryInsertCall(args: List<ExpEmbedding>, ctx: StmtConversionContext): ExpEmbedding? =
-        if (args[1].type.equalToType { string() }) AddStringString(args[0], args[1]) else null
+    override fun tryInsertCall(args: List<ExpEmbedding>, ctx: StmtConversionContext): ExpEmbedding? {
+        val argType = args[1].type
+        return when {
+            argType.equalToType { string() } -> AddStringString(args[0], args[1])
+            argType.equalToType { char() } -> AddStringChar(args[0], args[1])
+            else -> null
+        }
+    }
 
     override val callableType = buildFunctionPretype {
         withDispatchReceiver { string() }

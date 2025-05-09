@@ -10,9 +10,6 @@ method f$isString$TF$NT$Any(p$x: Ref) returns (ret$0: Ref)
   label lbl$ret$0
 }
 
-method pg$public$length(this$dispatch: Ref) returns (ret: Ref)
-
-
 /is_type_contract.kt:(322,330): info: Generated Viper text for isString:
 method f$isString$TF$T$Any(this$extension: Ref) returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$boolType())
@@ -24,9 +21,6 @@ method f$isString$TF$T$Any(this$extension: Ref) returns (ret$0: Ref)
   goto lbl$ret$0
   label lbl$ret$0
 }
-
-method pg$public$length(this$dispatch: Ref) returns (ret: Ref)
-
 
 /is_type_contract.kt:(491,508): info: Generated Viper text for subtypeTransitive:
 method f$subtypeTransitive$TF$T$Unit(p$x: Ref) returns (ret$0: Ref)

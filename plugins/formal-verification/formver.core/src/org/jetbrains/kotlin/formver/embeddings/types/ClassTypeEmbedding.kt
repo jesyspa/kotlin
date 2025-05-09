@@ -58,16 +58,4 @@ private fun PretypeEmbedding.isCollectionTypeNamed(name: String): Boolean {
     }
 }
 
-val ClassTypeEmbedding.isString: Boolean
-    get() = NameMatcher.matchGlobalScope(name) {
-        ifPackageName(SpecialPackages.kotlin) {
-            ifClassName("String") {
-                return true
-            }
-        }
-        return false
-    }
-
-fun ClassTypeEmbedding.embedClassTypeFunc(): DomainFunc =
-    if (isString) RuntimeTypeDomain.stringType
-    else RuntimeTypeDomain.classTypeFunc(name)
+fun ClassTypeEmbedding.embedClassTypeFunc(): DomainFunc = RuntimeTypeDomain.classTypeFunc(name)
