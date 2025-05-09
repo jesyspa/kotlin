@@ -25,7 +25,6 @@ field bf$c$B$private$field: Ref
 
 method f$c$B$getStringField$TF$T$B(this$dispatch: Ref) returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$stringType())
-  ensures acc(p$pkg$kotlin$c$String$shared(ret$0), wildcard)
 {
   inhale df$rt$isSubtype(df$rt$typeOf(this$dispatch), df$rt$c$B())
   inhale acc(p$c$B$shared(this$dispatch), wildcard)
@@ -36,9 +35,6 @@ method f$c$B$getStringField$TF$T$B(this$dispatch: Ref) returns (ret$0: Ref)
 }
 
 method pg$c$A$private$field(this$dispatch: Ref) returns (ret: Ref)
-
-
-method pg$public$length(this$dispatch: Ref) returns (ret: Ref)
 
 
 method ps$c$A$private$field(this$dispatch: Ref, anon$0: Ref)
@@ -86,9 +82,6 @@ method f$extractPublic$TF$() returns (ret$0: Ref)
 }
 
 method pg$c$A$private$field(this$dispatch: Ref) returns (ret: Ref)
-
-
-method pg$public$length(this$dispatch: Ref) returns (ret: Ref)
 
 
 method ps$c$A$private$field(this$dispatch: Ref, anon$0: Ref)
