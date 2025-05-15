@@ -58,6 +58,7 @@ interface StmtConversionContext : MethodConversionContext {
     fun convert(stmt: FirStatement): ExpEmbedding
 
     fun <R> withNewScope(action: StmtConversionContext.() -> R): R
+    fun <R> withNoScope(action: StmtConversionContext.() -> R): R
     fun <R> withMethodCtx(factory: MethodContextFactory, action: StmtConversionContext.() -> R): R
 
     fun <R> withFreshWhile(label: FirLabel?, action: StmtConversionContext.() -> R): R
@@ -220,8 +221,10 @@ fun StmtConversionContext.insertForAllFunctionCall(
         ),
         parent = this,
     )
-    return withMethodCtx(methodCtxFactory) {
-        ForAllEmbedding(anonVar, collectInvariants(block))
+    return withNoScope {
+        withMethodCtx(methodCtxFactory) {
+            ForAllEmbedding(anonVar, collectInvariants(block))
+        }
     }
 }
 
