@@ -210,7 +210,7 @@ fun StmtConversionContext.insertForAllFunctionCall(
     symbol: FirValueParameterSymbol,
     block: FirBlock,
 ): ExpEmbedding {
-    val anonVar = freshAnonVar(embedType(symbol.resolvedReturnType))
+    val anonVar = freshAnonBuiltinVar(embedType(symbol.resolvedReturnType))
     val methodCtxFactory = MethodContextFactory(
         signature,
         InlineParameterResolver(
