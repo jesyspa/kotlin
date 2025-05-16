@@ -21,7 +21,7 @@ object PluginErrors {
     val INVALID_SUBLIST_RANGE by warning2<PsiElement, String, String>()
 
     val PURE_ANNOTATION_ON_PURE_FUNCTION by info1<PsiElement, String>(SourceElementPositioningStrategies.DECLARATION_NAME)
-    val PURE_ANNOTATION_ON_IMPURE_FUNCTION by warning1<PsiElement, String>()
+    val PURE_ANNOTATION_ON_IMPURE_FUNCTION by error1<PsiElement, String>()
     val PURE_ANNOTATION_REGISTERED by info1<PsiElement, String>(SourceElementPositioningStrategies.DECLARATION_NAME)
 
     val UNIQUENESS_VIOLATION by error1<PsiElement, String>()

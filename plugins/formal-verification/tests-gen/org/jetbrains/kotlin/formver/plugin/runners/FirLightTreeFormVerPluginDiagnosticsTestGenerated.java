@@ -440,9 +440,21 @@ public class FirLightTreeFormVerPluginDiagnosticsTestGenerated extends AbstractF
     }
 
     @Test
-    @TestMetadata("pureAnnotation.kt")
-    public void testPureAnnotation() {
-      runTest("plugins/formal-verification/testData/diagnostics/purity/pureAnnotation.kt");
+    @TestMetadata("DirectImpureCallFailTests.kt")
+    public void testDirectImpureCallFailTests() {
+      runTest("plugins/formal-verification/testData/diagnostics/purity/DirectImpureCallFailTests.kt");
+    }
+
+    @Test
+    @TestMetadata("MultiStatementFailTests.kt")
+    public void testMultiStatementFailTests() {
+      runTest("plugins/formal-verification/testData/diagnostics/purity/MultiStatementFailTests.kt");
+    }
+
+    @Test
+    @TestMetadata("PureSingleExprTests.kt")
+    public void testPureSingleExprTests() {
+      runTest("plugins/formal-verification/testData/diagnostics/purity/PureSingleExprTests.kt");
     }
   }
 

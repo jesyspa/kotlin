@@ -16,11 +16,9 @@ import org.jetbrains.kotlin.fir.declarations.FirContractDescriptionOwner
 import org.jetbrains.kotlin.fir.declarations.FirSimpleFunction
 import org.jetbrains.kotlin.fir.declarations.hasAnnotation
 import org.jetbrains.kotlin.formver.conversion.ProgramConverter
-import org.jetbrains.kotlin.formver.embeddings.callables.UserFunctionEmbedding
 import org.jetbrains.kotlin.formver.embeddings.expression.debug.print
 import org.jetbrains.kotlin.formver.purity.PurityChecker
 import org.jetbrains.kotlin.formver.reporting.reportVerifierError
-import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.formver.viper.Verifier
 import org.jetbrains.kotlin.formver.viper.mangled
 import org.jetbrains.kotlin.formver.viper.ast.Program
@@ -44,13 +42,16 @@ private fun TargetsSelection.applicable(declaration: FirSimpleFunction): Boolean
 
 class ViperPoweredDeclarationChecker(private val session: FirSession, private val config: PluginConfiguration) :
     FirSimpleFunctionChecker(MppCheckerKind.Common) {
+
+    private val purityChecker = PurityChecker()
     override fun check(declaration: FirSimpleFunction, context: CheckerContext, reporter: DiagnosticReporter) {
         if (!config.shouldConvert(declaration)) return
         val errorCollector = ErrorCollector()
         try {
             val programConversionContext = ProgramConverter(session, config, errorCollector)
-            programConversionContext.registerForVerification(declaration)
+            val userEmbedding = programConversionContext.registerForVerification(declaration)
             val program = programConversionContext.program
+            purityChecker.declareFunctionAnnotation(userEmbedding, shouldTriggerPurityCheck(declaration), programConversionContext)
 
             getProgramForLogging(program)?.let {
                 reporter.reportOn(declaration.source, PluginErrors.VIPER_TEXT, declaration.name.asString(), it.toDebugOutput(), context)
@@ -67,28 +68,27 @@ class ViperPoweredDeclarationChecker(private val session: FirSession, private va
                 }
             }
 
-            // this is wrong on so many levels, the function checks only if the current added declaration is pure, then runs the purity check on all embeddings anyway
             if (shouldTriggerPurityCheck(declaration)) {
-                val checker = PurityChecker()
-                for ((name, embedding) in programConversionContext.debugUserFunctionEmbedding) {
+                val isPure = purityChecker.checkIsPure(userEmbedding, programConversionContext)
+                val mangledName = programConversionContext.getMangledName(userEmbedding).mangled
+                if (shouldDumpPurityInformation(declaration)) {
                     reporter.reportOn(
                         declaration.source,
                         PluginErrors.PURE_ANNOTATION_REGISTERED,
-                        name.mangled,
-                        context
-                    )
-                    val isPure = checker.checkIsPure(embedding)
-                    val factory = if (isPure)
-                        PluginErrors.PURE_ANNOTATION_ON_PURE_FUNCTION
-                    else
-                        PluginErrors.PURE_ANNOTATION_ON_IMPURE_FUNCTION
-                    reporter.reportOn(
-                        declaration.source,
-                        factory,
-                        name.mangled,
+                        mangledName,
                         context
                     )
                 }
+                val factory = if (isPure)
+                    PluginErrors.PURE_ANNOTATION_ON_PURE_FUNCTION
+                else
+                    PluginErrors.PURE_ANNOTATION_ON_IMPURE_FUNCTION
+                reporter.reportOn(
+                    declaration.source,
+                    factory,
+                    mangledName,
+                    context
+                )
             }
 
             val verifier = Verifier()
@@ -127,6 +127,7 @@ class ViperPoweredDeclarationChecker(private val session: FirSession, private va
     private val alwaysVerifyId: ClassId = getAnnotationId("AlwaysVerify")
     private val dumpExpEmbeddingsId: ClassId = getAnnotationId("DumpExpEmbeddings")
     private val pureId: ClassId = getAnnotationId("Pure")
+    private val debugPureId: ClassId = getAnnotationId("DebugPurity")
 
     private fun PluginConfiguration.shouldConvert(declaration: FirSimpleFunction): Boolean = when {
         declaration.hasAnnotation(neverConvertId, session) -> false
@@ -145,4 +146,9 @@ class ViperPoweredDeclarationChecker(private val session: FirSession, private va
 
     private fun shouldTriggerPurityCheck(declaration: FirSimpleFunction): Boolean =
         declaration.hasAnnotation(pureId, session)
+
+    private fun shouldDumpPurityInformation(declaration: FirSimpleFunction): Boolean =
+        declaration.hasAnnotation(debugPureId, session)
+
+
 }

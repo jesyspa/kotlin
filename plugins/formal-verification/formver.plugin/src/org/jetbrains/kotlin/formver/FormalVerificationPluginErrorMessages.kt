@@ -73,7 +73,7 @@ object FormalVerificationPluginErrorMessages : BaseDiagnosticRendererFactory() {
         )
         put(
             PluginErrors.PURE_ANNOTATION_ON_IMPURE_FUNCTION,
-            "{0} is annotated @Pure but is impure",
+            "{0}: @Pure annotation on impure function!",
             CommonRenderers.STRING
         )
     }

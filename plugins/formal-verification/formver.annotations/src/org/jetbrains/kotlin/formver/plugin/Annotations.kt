@@ -18,3 +18,4 @@ annotation class Borrowed
 
 // We annotate the function to trigger the purity check, and if that succeeds, convert the function to a Viper function.
 annotation class Pure
+annotation class DebugPurity

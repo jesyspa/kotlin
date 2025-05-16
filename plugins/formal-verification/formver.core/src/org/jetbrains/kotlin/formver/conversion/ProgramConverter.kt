@@ -88,7 +88,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
             predicates = classes.values.flatMap { listOf(it.details.sharedPredicate, it.details.uniquePredicate) }
         )
 
-    fun registerForVerification(declaration: FirSimpleFunction) {
+    fun registerForVerification(declaration: FirSimpleFunction): UserFunctionEmbedding {
         val signature = embedFullSignature(declaration.symbol)
         val returnTarget = returnTargetProducer.getFresh(signature.callableType.returnType)
         val paramResolver =
@@ -109,9 +109,10 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
 
         // Note: it is important that `body` is only set after `embedUserFunction` is complete, as we need to
         // place the embedding in the map before processing the body.
-        embedUserFunction(declaration.symbol, signature).apply {
+        val userEmbedding = embedUserFunction(declaration.symbol, signature).apply {
             body = stmtCtx.convertMethodWithBody(declaration, signature, returnTarget)
         }
+        return userEmbedding
     }
 
     fun embedUserFunction(symbol: FirFunctionSymbol<*>, signature: FullNamedFunctionSignature): UserFunctionEmbedding {
@@ -499,7 +500,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
         type.isBoolean -> boolean()
         type.isNothing -> nothing()
         type.isSomeFunctionType(session) -> function {
-            check (type is ConeClassLikeType) { "Expected a ConeClassLikeType for a function type, got $type" }
+            check(type is ConeClassLikeType) { "Expected a ConeClassLikeType for a function type, got $type" }
             type.receiverType(session)?.let { withDispatchReceiver { embedTypeWithBuilder(it) } }
             type.valueParameterTypesWithoutReceivers(session).forEach { param ->
                 withParam { embedTypeWithBuilder(param) }
@@ -547,4 +548,11 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
                 unit()
             }
         }
+
+    public fun getMangledName(fct: UserFunctionEmbedding): MangledName =
+        // Temporary solution to get the mangled name for debugging purposes, will probably be replaced
+        methods.entries
+            .firstOrNull { it.value === fct }
+            ?.key
+            ?: error("Embedding not registered in methods map")
 }

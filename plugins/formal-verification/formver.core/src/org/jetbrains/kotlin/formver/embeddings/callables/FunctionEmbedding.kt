@@ -22,6 +22,7 @@ class UserFunctionEmbedding(private val callable: RichCallableEmbedding) : Funct
      */
     var body: FunctionBodyEmbedding? = null
 
+
     override val viperMethod: Method?
         get() = body?.toViperMethod(callable) ?: callable.toViperMethodHeader()
 }
