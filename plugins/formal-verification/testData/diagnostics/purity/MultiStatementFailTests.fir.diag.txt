@@ -1,0 +1,34 @@
+/MultiStatementFailTests.kt:(245,261): info: Generated Viper text for multiStmtAverage:
+method f$pkg$test_purity_multistmt$multiStmtAverage$TF$T$Int$T$Int(p$x: Ref,
+  p$y: Ref)
+  returns (ret$0: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$intType())
+{
+  var l0$tmp: Ref
+  inhale df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$intType())
+  inhale df$rt$isSubtype(df$rt$typeOf(p$y), df$rt$intType())
+  l0$tmp := sp$plusInts(p$x, p$y)
+  inhale 2 != 0
+  ret$0 := sp$divInts(l0$tmp, df$rt$intToRef(2))
+  goto lbl$ret$0
+  label lbl$ret$0
+}
+
+/MultiStatementFailTests.kt:(245,261): info: [Purity] f$pkg$test_purity_multistmt$multiStmtAverage$TF$T$Int$T$Int is impure: function body contains more than one top-level expression (2 found)
+
+/MultiStatementFailTests.kt:(406,421): info: Generated Viper text for earlyReturnFail:
+method f$pkg$test_purity_multistmt$earlyReturnFail$TF$T$Int(p$x: Ref)
+  returns (ret$0: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$intType())
+{
+  inhale df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$intType())
+  if (df$rt$intFromRef(p$x) < 0) {
+    ret$0 := df$rt$intToRef(0)
+    goto lbl$ret$0
+  }
+  ret$0 := p$x
+  goto lbl$ret$0
+  label lbl$ret$0
+}
+
+/MultiStatementFailTests.kt:(406,421): info: [Purity] f$pkg$test_purity_multistmt$earlyReturnFail$TF$T$Int is impure: function body contains more than one top-level expression (2 found)

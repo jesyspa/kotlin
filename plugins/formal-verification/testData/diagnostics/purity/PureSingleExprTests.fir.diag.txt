@@ -1,0 +1,229 @@
+/PureSingleExprTests.kt:(362,368): info: Generated Viper text for intLit:
+method f$pkg$test_purity_singleexpr$intLit$TF$T$Int(p$x: Ref)
+  returns (ret$0: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$intType())
+{
+  inhale df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$intType())
+  ret$0 := df$rt$intToRef(3)
+  goto lbl$ret$0
+  label lbl$ret$0
+}
+
+/PureSingleExprTests.kt:(362,368): info: [Purity] Purity check succeeded: f$pkg$test_purity_singleexpr$intLit$TF$T$Int is pure
+
+/PureSingleExprTests.kt:(431,438): info: Generated Viper text for boolLit:
+method f$pkg$test_purity_singleexpr$boolLit$TF$T$Boolean(p$x: Ref)
+  returns (ret$0: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$boolType())
+{
+  inhale df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$boolType())
+  ret$0 := df$rt$boolToRef(true)
+  goto lbl$ret$0
+  label lbl$ret$0
+}
+
+/PureSingleExprTests.kt:(431,438): info: [Purity] Purity check succeeded: f$pkg$test_purity_singleexpr$boolLit$TF$T$Boolean is pure
+
+/PureSingleExprTests.kt:(512,519): info: Generated Viper text for charLit:
+method f$pkg$test_purity_singleexpr$charLit$TF$() returns (ret$0: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$charType())
+{
+  ret$0 := df$rt$charToRef(65)
+  goto lbl$ret$0
+  label lbl$ret$0
+}
+
+/PureSingleExprTests.kt:(512,519): info: [Purity] Purity check succeeded: f$pkg$test_purity_singleexpr$charLit$TF$ is pure
+
+/PureSingleExprTests.kt:(579,588): info: Generated Viper text for stringLit:
+method f$pkg$test_purity_singleexpr$stringLit$TF$() returns (ret$0: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$stringType())
+  ensures acc(p$pkg$kotlin$c$String$shared(ret$0), wildcard)
+{
+  ret$0 := df$rt$stringToRef(Seq(104, 101, 108, 108, 111))
+  goto lbl$ret$0
+  label lbl$ret$0
+}
+
+method pg$public$length(this$dispatch: Ref) returns (ret: Ref)
+
+
+/PureSingleExprTests.kt:(579,588): info: [Purity] Purity check succeeded: f$pkg$test_purity_singleexpr$stringLit$TF$ is pure
+
+/PureSingleExprTests.kt:(732,738): info: Generated Viper text for negate:
+method f$pkg$kotlin$c$Int$unaryMinus$TF$T$Int(this$dispatch: Ref)
+  returns (ret: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$intType())
+
+
+method f$pkg$test_purity_singleexpr$negate$TF$T$Int(p$x: Ref)
+  returns (ret$0: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$intType())
+{
+  inhale df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$intType())
+  ret$0 := f$pkg$kotlin$c$Int$unaryMinus$TF$T$Int(p$x)
+  goto lbl$ret$0
+  label lbl$ret$0
+}
+
+/PureSingleExprTests.kt:(732,738): info: [Purity] Purity check succeeded: f$pkg$test_purity_singleexpr$negate$TF$T$Int is pure
+
+/PureSingleExprTests.kt:(802,815): info: Generated Viper text for negateBoolean:
+method f$pkg$test_purity_singleexpr$negateBoolean$TF$T$Boolean(p$x: Ref)
+  returns (ret$0: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$boolType())
+{
+  inhale df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$boolType())
+  ret$0 := sp$notBool(p$x)
+  goto lbl$ret$0
+  label lbl$ret$0
+}
+
+/PureSingleExprTests.kt:(802,815): info: [Purity] Purity check succeeded: f$pkg$test_purity_singleexpr$negateBoolean$TF$T$Boolean is pure
+
+/PureSingleExprTests.kt:(965,968): info: Generated Viper text for avg:
+method f$pkg$test_purity_singleexpr$avg$TF$T$Int$T$Int(p$x: Ref, p$y: Ref)
+  returns (ret$0: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$intType())
+{
+  inhale df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$intType())
+  inhale df$rt$isSubtype(df$rt$typeOf(p$y), df$rt$intType())
+  inhale 2 != 0
+  ret$0 := sp$divInts(sp$plusInts(p$x, p$y), df$rt$intToRef(2))
+  goto lbl$ret$0
+  label lbl$ret$0
+}
+
+/PureSingleExprTests.kt:(965,968): info: [Purity] Purity check succeeded: f$pkg$test_purity_singleexpr$avg$TF$T$Int$T$Int is pure
+
+/PureSingleExprTests.kt:(1049,1060): info: Generated Viper text for conjunction:
+method f$pkg$test_purity_singleexpr$conjunction$TF$T$Boolean$T$Boolean(p$x: Ref,
+  p$y: Ref)
+  returns (ret$0: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$boolType())
+{
+  inhale df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$boolType())
+  inhale df$rt$isSubtype(df$rt$typeOf(p$y), df$rt$boolType())
+  if (df$rt$boolFromRef(p$x)) {
+    ret$0 := p$y
+  } else {
+    ret$0 := df$rt$boolToRef(false)}
+  goto lbl$ret$0
+  label lbl$ret$0
+}
+
+/PureSingleExprTests.kt:(1049,1060): info: [Purity] Purity check succeeded: f$pkg$test_purity_singleexpr$conjunction$TF$T$Boolean$T$Boolean is pure
+
+/PureSingleExprTests.kt:(1149,1155): info: Generated Viper text for bitAnd:
+method f$pkg$kotlin$c$Int$and$TF$T$Int$T$Int(this$dispatch: Ref, p$other: Ref)
+  returns (ret: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$intType())
+
+
+method f$pkg$test_purity_singleexpr$bitAnd$TF$T$Int$T$Int(p$x: Ref, p$y: Ref)
+  returns (ret$0: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$intType())
+{
+  inhale df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$intType())
+  inhale df$rt$isSubtype(df$rt$typeOf(p$y), df$rt$intType())
+  ret$0 := f$pkg$kotlin$c$Int$and$TF$T$Int$T$Int(p$x, p$y)
+  goto lbl$ret$0
+  label lbl$ret$0
+}
+
+/PureSingleExprTests.kt:(1149,1155): info: [Purity] Purity check succeeded: f$pkg$test_purity_singleexpr$bitAnd$TF$T$Int$T$Int is pure
+
+/PureSingleExprTests.kt:(1232,1240): info: Generated Viper text for bitShift:
+method f$pkg$kotlin$c$Int$shl$TF$T$Int$T$Int(this$dispatch: Ref, p$bitCount: Ref)
+  returns (ret: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$intType())
+
+
+method f$pkg$test_purity_singleexpr$bitShift$TF$T$Int(p$x: Ref)
+  returns (ret$0: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$intType())
+{
+  inhale df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$intType())
+  ret$0 := f$pkg$kotlin$c$Int$shl$TF$T$Int$T$Int(p$x, df$rt$intToRef(1))
+  goto lbl$ret$0
+  label lbl$ret$0
+}
+
+/PureSingleExprTests.kt:(1232,1240): info: [Purity] Purity check succeeded: f$pkg$test_purity_singleexpr$bitShift$TF$T$Int is pure
+
+/PureSingleExprTests.kt:(1348,1360): info: Generated Viper text for compareChars:
+method f$pkg$test_purity_singleexpr$compareChars$TF$T$Char$T$Char(p$a: Ref,
+  p$b: Ref)
+  returns (ret$0: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$intType())
+{
+  inhale df$rt$isSubtype(df$rt$typeOf(p$a), df$rt$charType())
+  inhale df$rt$isSubtype(df$rt$typeOf(p$b), df$rt$charType())
+  if (df$rt$charFromRef(p$a) < df$rt$charFromRef(p$b)) {
+    ret$0 := df$rt$intToRef(1)
+  } else {
+    ret$0 := df$rt$intToRef(0)}
+  goto lbl$ret$0
+  label lbl$ret$0
+}
+
+/PureSingleExprTests.kt:(1348,1360): info: [Purity] Purity check succeeded: f$pkg$test_purity_singleexpr$compareChars$TF$T$Char$T$Char is pure
+
+/PureSingleExprTests.kt:(1529,1547): info: Generated Viper text for avgRandomConstant2:
+method f$pkg$test_purity_singleexpr$avgRandomConstant2$TF$T$Int(p$x: Ref)
+  returns (ret$0: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$intType())
+{
+  var anon$0: Ref
+  inhale df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$intType())
+  inhale 2 != 0
+  anon$0 := f$pkg$test_purity_singleexpr$pureRandomConstant2$TF$T$Int(p$x)
+  ret$0 := sp$divInts(sp$plusInts(p$x, anon$0), df$rt$intToRef(2))
+  goto lbl$ret$0
+  label lbl$ret$0
+}
+
+method f$pkg$test_purity_singleexpr$pureRandomConstant2$TF$T$Int(p$x: Ref)
+  returns (ret: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$intType())
+
+
+/PureSingleExprTests.kt:(1529,1547): info: [Purity] f$pkg$test_purity_singleexpr$avgRandomConstant2$TF$T$Int is now waiting on f$pkg$test_purity_singleexpr$pureRandomConstant2$TF$T$Int (dependency not yet resolved)
+
+/PureSingleExprTests.kt:(1641,1660): info: Generated Viper text for pureRandomConstant2:
+method f$pkg$test_purity_singleexpr$pureRandomConstant$TF$T$Int(p$x: Ref)
+  returns (ret: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$intType())
+
+
+method f$pkg$test_purity_singleexpr$pureRandomConstant2$TF$T$Int(p$x: Ref)
+  returns (ret$0: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$intType())
+{
+  var anon$0: Ref
+  inhale df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$intType())
+  inhale 3 != 0
+  anon$0 := f$pkg$test_purity_singleexpr$pureRandomConstant$TF$T$Int(p$x)
+  ret$0 := sp$divInts(anon$0, df$rt$intToRef(3))
+  goto lbl$ret$0
+  label lbl$ret$0
+}
+
+/PureSingleExprTests.kt:(1641,1660): info: [Purity] f$pkg$test_purity_singleexpr$pureRandomConstant2$TF$T$Int is now waiting on f$pkg$test_purity_singleexpr$pureRandomConstant$TF$T$Int (dependency not yet resolved)
+
+/PureSingleExprTests.kt:(1745,1763): info: Generated Viper text for pureRandomConstant:
+method f$pkg$test_purity_singleexpr$pureRandomConstant$TF$T$Int(p$x: Ref)
+  returns (ret$0: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$intType())
+{
+  inhale df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$intType())
+  ret$0 := df$rt$intToRef(3)
+  goto lbl$ret$0
+  label lbl$ret$0
+}
+
+/PureSingleExprTests.kt:(1745,1763): info: [Purity] Purity check succeeded: f$pkg$test_purity_singleexpr$pureRandomConstant$TF$T$Int is pure
+
+/PureSingleExprTests.kt:(1745,1763): info: [Purity] Purity check succeeded: f$pkg$test_purity_singleexpr$pureRandomConstant2$TF$T$Int is pure
+
+/PureSingleExprTests.kt:(1745,1763): info: [Purity] Purity check succeeded: f$pkg$test_purity_singleexpr$avgRandomConstant2$TF$T$Int is pure

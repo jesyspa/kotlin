@@ -1,0 +1,101 @@
+/DirectImpureCallFailTests.kt:(221,235): info: Generated Viper text for randomConstant:
+method f$pkg$test_purity_impurecall$randomConstant$TF$T$Int(p$x: Ref)
+  returns (ret$0: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$intType())
+{
+  inhale df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$intType())
+  ret$0 := df$rt$intToRef(3)
+  goto lbl$ret$0
+  label lbl$ret$0
+}
+
+/DirectImpureCallFailTests.kt:(298,315): info: Generated Viper text for avgRandomConstant:
+method f$pkg$test_purity_impurecall$avgRandomConstant$TF$T$Int(p$x: Ref)
+  returns (ret$0: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$intType())
+{
+  var anon$0: Ref
+  inhale df$rt$isSubtype(df$rt$typeOf(p$x), df$rt$intType())
+  inhale 2 != 0
+  anon$0 := f$pkg$test_purity_impurecall$randomConstant$TF$T$Int(p$x)
+  ret$0 := sp$divInts(sp$plusInts(p$x, anon$0), df$rt$intToRef(2))
+  goto lbl$ret$0
+  label lbl$ret$0
+}
+
+method f$pkg$test_purity_impurecall$randomConstant$TF$T$Int(p$x: Ref)
+  returns (ret: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$intType())
+
+
+/DirectImpureCallFailTests.kt:(298,315): info: [Purity] Purity check failed: f$pkg$test_purity_impurecall$avgRandomConstant$TF$T$Int is impure (all dependencies resolved)
+
+/DirectImpureCallFailTests.kt:(444,456): info: Generated Viper text for impureHelper:
+method f$pkg$test_purity_impurecall$impureHelper$TF$T$Int(p$n: Ref)
+  returns (ret$0: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$intType())
+{
+  inhale df$rt$isSubtype(df$rt$typeOf(p$n), df$rt$intType())
+  ret$0 := sp$timesInts(p$n, df$rt$intToRef(42))
+  goto lbl$ret$0
+  label lbl$ret$0
+}
+
+/DirectImpureCallFailTests.kt:(524,540): info: Generated Viper text for usesImpureHelper:
+method f$pkg$test_purity_impurecall$impureHelper$TF$T$Int(p$n: Ref)
+  returns (ret: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$intType())
+
+
+method f$pkg$test_purity_impurecall$usesImpureHelper$TF$T$Int(p$n: Ref)
+  returns (ret$0: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$intType())
+{
+  var anon$0: Ref
+  inhale df$rt$isSubtype(df$rt$typeOf(p$n), df$rt$intType())
+  anon$0 := f$pkg$test_purity_impurecall$impureHelper$TF$T$Int(p$n)
+  ret$0 := sp$plusInts(anon$0, df$rt$intToRef(1))
+  goto lbl$ret$0
+  label lbl$ret$0
+}
+
+/DirectImpureCallFailTests.kt:(524,540): info: [Purity] Purity check failed: f$pkg$test_purity_impurecall$usesImpureHelper$TF$T$Int is impure (all dependencies resolved)
+
+/DirectImpureCallFailTests.kt:(647,659): info: Generated Viper text for secondImpure:
+method f$pkg$test_purity_impurecall$impureHelper$TF$T$Int(p$n: Ref)
+  returns (ret: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$intType())
+
+
+method f$pkg$test_purity_impurecall$secondImpure$TF$T$Int(p$n: Ref)
+  returns (ret$0: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$intType())
+{
+  var anon$0: Ref
+  inhale df$rt$isSubtype(df$rt$typeOf(p$n), df$rt$intType())
+  inhale 2 != 0
+  anon$0 := f$pkg$test_purity_impurecall$impureHelper$TF$T$Int(p$n)
+  ret$0 := sp$divInts(anon$0, df$rt$intToRef(2))
+  goto lbl$ret$0
+  label lbl$ret$0
+}
+
+/DirectImpureCallFailTests.kt:(740,758): info: Generated Viper text for transitivelyImpure:
+method f$pkg$test_purity_impurecall$secondImpure$TF$T$Int(p$n: Ref)
+  returns (ret: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$intType())
+
+
+method f$pkg$test_purity_impurecall$transitivelyImpure$TF$T$Int(p$n: Ref)
+  returns (ret$0: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$intType())
+{
+  var anon$0: Ref
+  inhale df$rt$isSubtype(df$rt$typeOf(p$n), df$rt$intType())
+  anon$0 := f$pkg$test_purity_impurecall$secondImpure$TF$T$Int(p$n)
+  ret$0 := sp$minusInts(anon$0, df$rt$intToRef(3))
+  goto lbl$ret$0
+  label lbl$ret$0
+}
+
+/DirectImpureCallFailTests.kt:(740,758): info: [Purity] Purity check failed: f$pkg$test_purity_impurecall$transitivelyImpure$TF$T$Int is impure (all dependencies resolved)
