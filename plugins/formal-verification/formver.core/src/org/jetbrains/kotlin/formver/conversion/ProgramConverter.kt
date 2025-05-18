@@ -57,16 +57,6 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
             debugExp?.let { name to it }
         }.toMap()
 
-    val debugUserFunctionEmbedding: Map<MangledName, UserFunctionEmbedding>
-        get() = buildMap {
-            for ((name, value) in methods) {
-                val embedding = value as? UserFunctionEmbedding
-                if (embedding != null) {
-                    put(name, embedding)
-                }
-            }
-        }
-
     override val whileIndexProducer = indexProducer()
     override val catchLabelNameProducer = simpleFreshEntityProducer(::CatchLabelName)
     override val tryExitLabelNameProducer = simpleFreshEntityProducer(::TryExitLabelName)
@@ -118,6 +108,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
     fun embedUserFunction(symbol: FirFunctionSymbol<*>, signature: FullNamedFunctionSignature): UserFunctionEmbedding {
         (methods[signature.name] as? UserFunctionEmbedding)?.also { return it }
         val new = UserFunctionEmbedding(processCallable(symbol, signature))
+        new.name = signature.name
         methods[signature.name] = new
         return new
     }
@@ -548,11 +539,4 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
                 unit()
             }
         }
-
-    public fun getMangledName(fct: UserFunctionEmbedding): MangledName =
-        // Temporary solution to get the mangled name for debugging purposes, will probably be replaced
-        methods.entries
-            .firstOrNull { it.value === fct }
-            ?.key
-            ?: error("Embedding not registered in methods map")
 }

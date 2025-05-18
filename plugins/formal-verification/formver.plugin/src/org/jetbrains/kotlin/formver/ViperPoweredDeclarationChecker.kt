@@ -51,7 +51,7 @@ class ViperPoweredDeclarationChecker(private val session: FirSession, private va
             val programConversionContext = ProgramConverter(session, config, errorCollector)
             val userEmbedding = programConversionContext.registerForVerification(declaration)
             val program = programConversionContext.program
-            purityChecker.declareFunctionAnnotation(userEmbedding, shouldTriggerPurityCheck(declaration), programConversionContext)
+            purityChecker.declareFunctionAnnotation(userEmbedding, shouldTriggerPurityCheck(declaration))
 
             getProgramForLogging(program)?.let {
                 reporter.reportOn(declaration.source, PluginErrors.VIPER_TEXT, declaration.name.asString(), it.toDebugOutput(), context)
@@ -68,28 +68,21 @@ class ViperPoweredDeclarationChecker(private val session: FirSession, private va
                 }
             }
 
-            if (shouldTriggerPurityCheck(declaration)) {
-                val isPure = purityChecker.checkIsPure(userEmbedding, programConversionContext)
-                val mangledName = programConversionContext.getMangledName(userEmbedding).mangled
-                if (shouldDumpPurityInformation(declaration)) {
+            if (shouldDumpPurityInformation(declaration)) {
+                purityChecker.setDebugSink { msg ->
                     reporter.reportOn(
                         declaration.source,
-                        PluginErrors.PURE_ANNOTATION_REGISTERED,
-                        mangledName,
+                        PluginErrors.PURITY_DEBUG_INFO,
+                        msg,
                         context
                     )
                 }
-                val factory = if (isPure)
-                    PluginErrors.PURE_ANNOTATION_ON_PURE_FUNCTION
-                else
-                    PluginErrors.PURE_ANNOTATION_ON_IMPURE_FUNCTION
-                reporter.reportOn(
-                    declaration.source,
-                    factory,
-                    mangledName,
-                    context
-                )
+            } else {
+                purityChecker.setDebugSink(null)
             }
+
+
+            purityChecker.checkIsPure(userEmbedding)
 
             val verifier = Verifier()
             val onFailure = { err: VerifierError ->
@@ -149,6 +142,4 @@ class ViperPoweredDeclarationChecker(private val session: FirSession, private va
 
     private fun shouldDumpPurityInformation(declaration: FirSimpleFunction): Boolean =
         declaration.hasAnnotation(debugPureId, session)
-
-
 }

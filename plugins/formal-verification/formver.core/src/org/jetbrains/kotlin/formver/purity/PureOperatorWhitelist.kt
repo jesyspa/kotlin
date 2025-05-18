@@ -1,4 +1,3 @@
-// PureOperatorWhitelist.kt
 package org.jetbrains.kotlin.formver.purity
 
 /**
@@ -24,5 +23,5 @@ object PureOperatorWhitelist {
      * @return true  ⇒ treat call as inherently pure (assuming args are pure)
      */
     fun isWhitelisted(mangled: String): Boolean =
-        TOKENS.any { token -> mangled.contains(token) }
+        TOKENS.any { token -> mangled.contains("f\$pkg\$kotlin") && mangled.contains(token) }
 }
