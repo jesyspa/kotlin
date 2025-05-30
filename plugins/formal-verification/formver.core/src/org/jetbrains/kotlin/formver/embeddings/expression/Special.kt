@@ -6,6 +6,8 @@
 package org.jetbrains.kotlin.formver.embeddings.expression
 
 import org.jetbrains.kotlin.KtSourceElement
+import org.jetbrains.kotlin.formver.embeddings.ExpVisitor
+import org.jetbrains.kotlin.formver.purity.ExprPurityVisitor
 import org.jetbrains.kotlin.formver.asPosition
 import org.jetbrains.kotlin.formver.embeddings.types.TypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.types.buildType
@@ -30,6 +32,8 @@ data object ErrorExp : NoResultExpEmbedding, DefaultDebugTreeViewImplementation 
 
     override val debugAnonymousSubexpressions: List<ExpEmbedding>
         get() = listOf()
+
+    override fun <R> accept(v: ExpVisitor<R>): R = v.visitErrorExp(this)
 }
 
 data class Assert(val exp: ExpEmbedding) : UnitResultExpEmbedding, DefaultDebugTreeViewImplementation {
@@ -39,6 +43,12 @@ data class Assert(val exp: ExpEmbedding) : UnitResultExpEmbedding, DefaultDebugT
 
     override val debugAnonymousSubexpressions: List<ExpEmbedding>
         get() = listOf(exp)
+
+    override fun children(): Sequence<ExpEmbedding> = sequenceOf(exp)
+    override fun <R> accept(v: ExpVisitor<R>): R = v.visitAssert(this)
+
+    override fun isValid(): Boolean = exp.accept(ExprPurityVisitor)
+
 }
 
 /**
@@ -54,5 +64,7 @@ data class InhaleDirect(val exp: ExpEmbedding) : UnitResultExpEmbedding, Default
 
     override val debugAnonymousSubexpressions: List<ExpEmbedding>
         get() = listOf(exp)
+
+    override fun <R> accept(v: ExpVisitor<R>): R = v.visitInhaleDirect(this)
 }
 

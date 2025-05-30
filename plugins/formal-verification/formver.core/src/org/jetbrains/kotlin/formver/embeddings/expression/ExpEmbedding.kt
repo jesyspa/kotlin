@@ -6,6 +6,7 @@
 package org.jetbrains.kotlin.formver.embeddings.expression
 
 import org.jetbrains.kotlin.KtSourceElement
+import org.jetbrains.kotlin.formver.embeddings.ExpVisitor
 import org.jetbrains.kotlin.formver.asPosition
 import org.jetbrains.kotlin.formver.domains.RuntimeTypeDomain
 import org.jetbrains.kotlin.formver.embeddings.*
@@ -80,6 +81,10 @@ sealed interface ExpEmbedding : DebugPrintable {
     // TODO: Come up with a better way to solve the problem these `ignoring` functions solve...
     // Probably either virtual functions or a visitor.
     fun ignoringCastsAndMetaNodes(): ExpEmbedding = this
+
+    fun children(): Sequence<ExpEmbedding> = emptySequence()
+    fun <R> accept(v: ExpVisitor<R>): R
+    fun isValid(): Boolean = true
 }
 
 sealed class ToViperBuiltinMisuseError(msg: String) : RuntimeException(msg)
@@ -178,7 +183,6 @@ sealed interface DirectResultExpEmbedding : DefaultMaybeStoringInExpEmbedding, D
      * When the result is unused, we don't want to produce any expression, but we still want to evaluate the subexpressions.
      */
     val subexpressions: List<ExpEmbedding>
-
     override fun toViperUnusedResult(ctx: LinearizationContext) {
         for (exp in subexpressions) {
             exp.toViperUnusedResult(ctx)
@@ -187,6 +191,8 @@ sealed interface DirectResultExpEmbedding : DefaultMaybeStoringInExpEmbedding, D
 
     override val debugAnonymousSubexpressions: List<ExpEmbedding>
         get() = subexpressions
+
+    override fun children(): Sequence<ExpEmbedding> = subexpressions.asSequence()
 }
 
 /**
@@ -262,6 +268,8 @@ sealed interface NoResultExpEmbedding : DefaultMaybeStoringInExpEmbedding, Defau
 sealed interface PureExpEmbedding : NullaryDirectResultExpEmbedding {
     fun toViper(source: KtSourceElement? = null): Exp
     override fun toViper(ctx: LinearizationContext): Exp = toViper(ctx.source)
+
+    override fun <R> accept(v: ExpVisitor<R>): R = v.visitPureExpEmbedding(this)
 }
 
 /**
@@ -314,6 +322,8 @@ sealed interface PassthroughExpEmbedding : ExpEmbedding {
     }
 
     fun <R> withPassthroughHook(ctx: LinearizationContext, action: LinearizationContext.() -> R): R
+
+    override fun children(): Sequence<ExpEmbedding> = sequenceOf(inner)
 }
 
 /**
@@ -347,6 +357,8 @@ data class PrimitiveFieldAccess(override val inner: ExpEmbedding, val field: Fie
 
     override val debugTreeView: TreeView
         get() = OperatorNode(inner.debugTreeView, ".", this.field.debugTreeView)
+
+    override fun <R> accept(v: ExpVisitor<R>): R = v.visitPrimitiveFieldAccess(this)
 }
 
 data class FieldAccess(val receiver: ExpEmbedding, val field: FieldEmbedding) : DefaultMaybeStoringInExpEmbedding,
@@ -407,6 +419,8 @@ data class FieldAccess(val receiver: ExpEmbedding, val field: FieldEmbedding) : 
 
     override val debugTreeView: TreeView
         get() = OperatorNode(receiver.debugTreeView, ".", this.field.debugTreeView)
+
+    override fun <R> accept(v: ExpVisitor<R>): R = v.visitFieldAccess(this)
 }
 
 /**
@@ -427,6 +441,8 @@ data class FieldModification(val receiver: ExpEmbedding, val field: FieldEmbeddi
 
     override val debugTreeView: TreeView
         get() = OperatorNode(OperatorNode(receiver.debugTreeView, ".", this.field.debugTreeView), " := ", newValue.debugTreeView)
+
+    override fun <R> accept(v: ExpVisitor<R>): R = v.visitFieldModification(this)
 }
 
 data class FieldAccessPermissions(override val inner: ExpEmbedding, val field: FieldEmbedding, val perm: PermExp) :
@@ -440,6 +456,8 @@ data class FieldAccessPermissions(override val inner: ExpEmbedding, val field: F
     // field collides with the field context-sensitive keyword.
     override val debugExtraSubtrees: List<TreeView>
         get() = listOf(this.field.debugTreeView, perm.debugTreeView)
+
+    override fun <R> accept(v: ExpVisitor<R>): R = v.visitFieldAccessPermissions(this)
 }
 
 // Ideally we would use the predicate, but due to the possibility of recursion this is inconvenient at present.
@@ -457,6 +475,8 @@ data class PredicateAccessPermissions(val predicateName: MangledName, val args: 
             add(PlaintextLeaf(predicateName.mangled).withDesignation("name"))
             addAll(args.map { it.debugTreeView })
         })
+
+    override fun <R> accept(v: ExpVisitor<R>): R = v.visitPredicateAccessPermissions(this)
 }
 
 data class Assign(val lhs: ExpEmbedding, val rhs: ExpEmbedding) : UnitResultExpEmbedding {
@@ -474,6 +494,9 @@ data class Assign(val lhs: ExpEmbedding, val rhs: ExpEmbedding) : UnitResultExpE
 
     override val debugTreeView: TreeView
         get() = OperatorNode(lhs.debugTreeView, " := ", rhs.debugTreeView)
+
+    override fun children(): Sequence<ExpEmbedding> = sequenceOf(lhs, rhs)
+    override fun <R> accept(v: ExpVisitor<R>): R = v.visitAssign(this)
 }
 
 data class Declare(val variable: VariableEmbedding, val initializer: ExpEmbedding?) : UnitResultExpEmbedding,
@@ -490,4 +513,6 @@ data class Declare(val variable: VariableEmbedding, val initializer: ExpEmbeddin
 
     override val debugExtraSubtrees: List<TreeView>
         get() = listOfNotNull(variable.debugTreeView, variable.type.debugTreeView, initializer?.debugTreeView)
+
+    override fun <R> accept(v: ExpVisitor<R>): R = v.visitDeclare(this)
 }

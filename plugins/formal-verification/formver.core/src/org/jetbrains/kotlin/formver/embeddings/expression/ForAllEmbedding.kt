@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.formver.embeddings.expression
 
+import org.jetbrains.kotlin.formver.embeddings.ExpVisitor
 import org.jetbrains.kotlin.formver.asPosition
 import org.jetbrains.kotlin.formver.domains.RuntimeTypeDomain.Companion.isOf
 import org.jetbrains.kotlin.formver.embeddings.asInfo
@@ -37,4 +38,7 @@ class ForAllEmbedding(
 
     override val type: TypeEmbedding
         get() = buildType { boolean() }
+
+    override fun children(): Sequence<ExpEmbedding> = subexpressions.asSequence()
+    override fun <R> accept(v: ExpVisitor<R>): R = v.visitForAllEmbedding(this)
 }
