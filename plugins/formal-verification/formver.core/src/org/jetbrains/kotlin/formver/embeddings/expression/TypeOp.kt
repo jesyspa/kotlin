@@ -82,6 +82,8 @@ data class SafeCast(val exp: ExpEmbedding, val targetType: TypeEmbedding) : Stor
 
     override val debugExtraSubtrees: List<TreeView>
         get() = listOf(targetType.debugTreeView.withDesignation("type"))
+
+    override fun children(): Sequence<ExpEmbedding> = sequenceOf(exp)
 }
 
 interface InhaleInvariants : ExpEmbedding, DefaultDebugTreeViewImplementation {

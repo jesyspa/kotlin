@@ -47,6 +47,8 @@ sealed interface Block : OptionalResultExpEmbedding {
         exps.last().toViperMaybeStoringIn(result, ctx)
     }
 
+    override fun children(): Sequence<ExpEmbedding> = exps.asSequence()
+
     override val debugTreeView: TreeView
         get() = BlockNode(exps.map { it.debugTreeView })
 }
@@ -62,6 +64,8 @@ data class If(val condition: ExpEmbedding, val thenBranch: ExpEmbedding, val els
             Stmt.If(condViper, thenViper, elseViper, ctx.source.asPosition)
         }
     }
+
+    override fun children(): Sequence<ExpEmbedding> = sequenceOf(condition, thenBranch, elseBranch)
 
     override val debugAnonymousSubexpressions: List<ExpEmbedding>
         get() = listOf(condition, thenBranch, elseBranch)
@@ -92,6 +96,8 @@ data class While(
         }
         ctx.addLabel(breakLabel.toViper(ctx))
     }
+
+    override fun children(): Sequence<ExpEmbedding> = sequenceOf(condition, body)
 
     // TODO: add invariants
     override val debugAnonymousSubexpressions: List<ExpEmbedding>
@@ -143,6 +149,8 @@ data class GotoChainNode(val label: LabelEmbedding?, val exp: ExpEmbedding, val 
         }
     }
 
+    override fun children(): Sequence<ExpEmbedding> = sequenceOf(exp)
+
     override val debugTreeView: TreeView
         get() = NamedBranchingNode("GotoChainNode", listOfNotNull())
 }
@@ -181,6 +189,8 @@ data class MethodCall(val method: NamedFunctionSignature, val args: List<ExpEmbe
                 add(method.nameAsDebugTreeView.withDesignation("callee"))
                 addAll(args.map { it.debugTreeView })
             })
+
+    override fun children(): Sequence<ExpEmbedding> = args.asSequence()
 }
 
 /**
@@ -228,6 +238,8 @@ data class FunctionExp(val signature: FullNamedFunctionSignature?, val body: Exp
         ctx.addLabel(returnLabel.toViper(ctx))
     }
 
+    override fun children(): Sequence<ExpEmbedding> = sequenceOf(body)
+
     override val debugTreeView: TreeView
         get() = NamedBranchingNode(
             "Function",
@@ -250,4 +262,6 @@ data class Elvis(val left: ExpEmbedding, val right: ExpEmbedding, override val t
 
     override val debugAnonymousSubexpressions: List<ExpEmbedding>
         get() = listOf(left, right)
+
+    override fun children(): Sequence<ExpEmbedding> = sequenceOf(left, right)
 }

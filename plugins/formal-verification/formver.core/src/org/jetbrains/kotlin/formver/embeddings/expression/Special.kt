@@ -6,6 +6,8 @@
 package org.jetbrains.kotlin.formver.embeddings.expression
 
 import org.jetbrains.kotlin.KtSourceElement
+import org.jetbrains.kotlin.formver.Purity.ExprPurityVisitor
+import org.jetbrains.kotlin.formver.Purity.accept
 import org.jetbrains.kotlin.formver.asPosition
 import org.jetbrains.kotlin.formver.embeddings.types.TypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.types.buildType
@@ -39,6 +41,11 @@ data class Assert(val exp: ExpEmbedding) : UnitResultExpEmbedding, DefaultDebugT
 
     override val debugAnonymousSubexpressions: List<ExpEmbedding>
         get() = listOf(exp)
+
+    override fun children(): Sequence<ExpEmbedding> = sequenceOf(exp)
+
+    override fun checkOwnValidity(): Boolean = exp.accept(ExprPurityVisitor)
+
 }
 
 /**

@@ -35,6 +35,8 @@ class ForAllEmbedding(
 
     override val subexpressions: List<ExpEmbedding> = conditions
 
+    override fun children(): Sequence<ExpEmbedding> = subexpressions.asSequence()
+
     override val type: TypeEmbedding
         get() = buildType { boolean() }
 }

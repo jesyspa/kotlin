@@ -80,6 +80,13 @@ sealed interface ExpEmbedding : DebugPrintable {
     // TODO: Come up with a better way to solve the problem these `ignoring` functions solve...
     // Probably either virtual functions or a visitor.
     fun ignoringCastsAndMetaNodes(): ExpEmbedding = this
+
+    fun children(): Sequence<ExpEmbedding> = emptySequence()
+
+    /**
+     * Responsible for checking the validity of the node
+     */
+    fun checkOwnValidity(): Boolean = true
 }
 
 sealed class ToViperBuiltinMisuseError(msg: String) : RuntimeException(msg)
@@ -178,7 +185,6 @@ sealed interface DirectResultExpEmbedding : DefaultMaybeStoringInExpEmbedding, D
      * When the result is unused, we don't want to produce any expression, but we still want to evaluate the subexpressions.
      */
     val subexpressions: List<ExpEmbedding>
-
     override fun toViperUnusedResult(ctx: LinearizationContext) {
         for (exp in subexpressions) {
             exp.toViperUnusedResult(ctx)
@@ -187,6 +193,8 @@ sealed interface DirectResultExpEmbedding : DefaultMaybeStoringInExpEmbedding, D
 
     override val debugAnonymousSubexpressions: List<ExpEmbedding>
         get() = subexpressions
+
+    override fun children(): Sequence<ExpEmbedding> = subexpressions.asSequence()
 }
 
 /**
@@ -314,6 +322,8 @@ sealed interface PassthroughExpEmbedding : ExpEmbedding {
     }
 
     fun <R> withPassthroughHook(ctx: LinearizationContext, action: LinearizationContext.() -> R): R
+
+    override fun children(): Sequence<ExpEmbedding> = sequenceOf(inner)
 }
 
 /**
@@ -474,6 +484,8 @@ data class Assign(val lhs: ExpEmbedding, val rhs: ExpEmbedding) : UnitResultExpE
 
     override val debugTreeView: TreeView
         get() = OperatorNode(lhs.debugTreeView, " := ", rhs.debugTreeView)
+
+    override fun children(): Sequence<ExpEmbedding> = sequenceOf(lhs, rhs)
 }
 
 data class Declare(val variable: VariableEmbedding, val initializer: ExpEmbedding?) : UnitResultExpEmbedding,
