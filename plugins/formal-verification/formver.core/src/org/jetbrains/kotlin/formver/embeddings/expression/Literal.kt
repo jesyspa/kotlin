@@ -6,6 +6,7 @@
 package org.jetbrains.kotlin.formver.embeddings.expression
 
 import org.jetbrains.kotlin.KtSourceElement
+import org.jetbrains.kotlin.formver.purity.ExpVisitor
 import org.jetbrains.kotlin.formver.asPosition
 import org.jetbrains.kotlin.formver.domains.RuntimeTypeDomain
 import org.jetbrains.kotlin.formver.embeddings.SourceRole
@@ -38,6 +39,8 @@ data object UnitLit : LiteralEmbedding, UnitResultExpEmbedding {
 
     override fun toViperUnusedResult(ctx: LinearizationContext) =
         super<UnitResultExpEmbedding>.toViperUnusedResult(ctx)
+
+    override fun <R> accept(v: ExpVisitor<R>): R = v.visitUnitLit(this)
 
     // No operation: we just want to return unit.
     override fun toViperSideEffects(ctx: LinearizationContext) = Unit

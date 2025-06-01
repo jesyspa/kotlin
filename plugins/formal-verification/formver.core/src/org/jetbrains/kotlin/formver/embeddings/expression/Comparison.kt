@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.formver.embeddings.expression
 
+import org.jetbrains.kotlin.formver.purity.ExpVisitor
 import org.jetbrains.kotlin.formver.asPosition
 import org.jetbrains.kotlin.formver.domains.InjectionImageFunction
 import org.jetbrains.kotlin.formver.domains.RuntimeTypeDomain
@@ -53,6 +54,7 @@ data class EqCmp(
     override val sourceRole: SourceRole? = null,
 ) : AnyComparisonExpression {
     override val comparisonOperation = EqAny
+    override fun <R> accept(v: ExpVisitor<R>): R = v.visitEqCmp(this)
 }
 
 data class NeCmp(
@@ -62,6 +64,7 @@ data class NeCmp(
 ) : AnyComparisonExpression {
 
     override val comparisonOperation = NeAny
+    override fun <R> accept(v: ExpVisitor<R>): R = v.visitNeCmp(this)
 }
 
 fun ExpEmbedding.notNullCmp(): ExpEmbedding = NeCmp(this, NullLit)

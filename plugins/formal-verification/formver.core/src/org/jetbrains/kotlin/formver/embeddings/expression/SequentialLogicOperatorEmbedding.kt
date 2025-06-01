@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.formver.embeddings.expression
 
+import org.jetbrains.kotlin.formver.purity.ExpVisitor
 import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.And
 import org.jetbrains.kotlin.formver.embeddings.expression.OperatorExpEmbeddings.Or
 import org.jetbrains.kotlin.formver.embeddings.types.buildType
@@ -44,6 +45,8 @@ class SequentialAnd(override val left: ExpEmbedding, override val right: ExpEmbe
         get() = If(left, right, BooleanLit(false), buildType { boolean() })
     override val expressionReplacement
         get() = And(left, right)
+
+    override fun <R> accept(v: ExpVisitor<R>): R = v.visitSequentialAnd(this)
 }
 
 class SequentialOr(override val left: ExpEmbedding, override val right: ExpEmbedding) : SequentialLogicOperatorEmbedding() {
@@ -51,4 +54,6 @@ class SequentialOr(override val left: ExpEmbedding, override val right: ExpEmbed
         get() = If(left, BooleanLit(true), right, buildType { boolean() })
     override val expressionReplacement
         get() = Or(left, right)
+
+    override fun <R> accept(v: ExpVisitor<R>): R = v.visitSequentialOr(this)
 }

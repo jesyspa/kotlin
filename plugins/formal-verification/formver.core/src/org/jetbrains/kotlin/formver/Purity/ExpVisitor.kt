@@ -3,7 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
-package org.jetbrains.kotlin.formver.Purity
+package org.jetbrains.kotlin.formver.purity
 
 import org.jetbrains.kotlin.formver.embeddings.expression.Assert
 import org.jetbrains.kotlin.formver.embeddings.expression.Assign
@@ -15,6 +15,7 @@ import org.jetbrains.kotlin.formver.embeddings.expression.Elvis
 import org.jetbrains.kotlin.formver.embeddings.expression.EqCmp
 import org.jetbrains.kotlin.formver.embeddings.expression.ErrorExp
 import org.jetbrains.kotlin.formver.embeddings.expression.ExpEmbedding
+import org.jetbrains.kotlin.formver.embeddings.expression.ExpWrapper
 import org.jetbrains.kotlin.formver.embeddings.expression.FieldAccess
 import org.jetbrains.kotlin.formver.embeddings.expression.FieldAccessPermissions
 import org.jetbrains.kotlin.formver.embeddings.expression.FieldModification
@@ -47,7 +48,7 @@ import org.jetbrains.kotlin.formver.embeddings.expression.UnitLit
 import org.jetbrains.kotlin.formver.embeddings.expression.While
 import org.jetbrains.kotlin.formver.embeddings.expression.WithPosition
 
-internal interface ExpVisitor<R> {
+interface ExpVisitor<R> {
     fun visitPureExpEmbedding(e: PureExpEmbedding): R
     fun visitBlock(e: Block): R
     fun visitFunctionExp(e: FunctionExp): R
@@ -89,46 +90,4 @@ internal interface ExpVisitor<R> {
     fun visitSharingContext(e: SharingContext): R
     fun visitWithPosition(e: WithPosition): R
     fun visitDefault(e: ExpEmbedding): R
-}
-
-internal fun <R> ExpEmbedding.accept(v: ExpVisitor<R>): R = when (this) {
-    is PureExpEmbedding -> v.visitPureExpEmbedding(this)
-    is Block -> v.visitBlock(this)
-    is FunctionExp -> v.visitFunctionExp(this)
-    is GotoChainNode -> v.visitGotoChainNode(this)
-    is If -> v.visitIf(this)
-    is Elvis -> v.visitElvis(this)
-    is LambdaExp -> v.visitLambdaExp(this)
-    is MethodCall -> v.visitMethodCall(this)
-    is SafeCast -> v.visitSafeCast(this)
-    is Shared -> v.visitShared(this)
-    is Assert -> v.visitAssert(this)
-    is Declare -> v.visitDeclare(this)
-    is EqCmp -> v.visitEqCmp(this)
-    is NeCmp -> v.visitNeCmp(this)
-    is BinaryOperatorExpEmbedding -> v.visitBinaryOperatorExpEmbedding(this)
-    is SequentialAnd -> v.visitSequentialAnd(this)
-    is SequentialOr -> v.visitSequentialOr(this)
-    is InjectionBasedExpEmbedding -> v.visitInjectionBasedExpEmbedding(this)
-    is FieldAccessPermissions -> v.visitFieldAccessPermissions(this)
-    is ForAllEmbedding -> v.visitForAllEmbedding(this)
-    is PredicateAccessPermissions -> v.visitPredicateAccessPermissions(this)
-    is Cast -> v.visitCast(this)
-    is Is -> v.visitIs(this)
-    is Old -> v.visitOld(this)
-    is PrimitiveFieldAccess -> v.visitPrimitiveFieldAccess(this)
-    is ErrorExp -> v.visitErrorExp(this)
-    is Goto -> v.visitGoto(this)
-    is InhaleDirect -> v.visitInhaleDirect(this)
-    is InhaleInvariants -> v.visitInhaleInvariants(this)
-    is NonDeterministically -> v.visitNonDeterministically(this)
-    is While -> v.visitWhile(this)
-    is FieldAccess -> v.visitFieldAccess(this)
-    is InvokeFunctionObject -> v.visitInvokeFunctionObject(this)
-    is Assign -> v.visitAssign(this)
-    is FieldModification -> v.visitFieldModification(this)
-    is LabelExp -> v.visitLabelExp(this)
-    is SharingContext -> v.visitSharingContext(this)
-    is WithPosition -> v.visitWithPosition(this)
-    else -> v.visitDefault(this)
 }

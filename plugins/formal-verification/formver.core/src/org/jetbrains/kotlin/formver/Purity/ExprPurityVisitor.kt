@@ -3,7 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
  */
 
-package org.jetbrains.kotlin.formver.Purity
+package org.jetbrains.kotlin.formver.purity
 
 import org.jetbrains.kotlin.formver.embeddings.expression.Assert
 import org.jetbrains.kotlin.formver.embeddings.expression.Assign
@@ -15,6 +15,7 @@ import org.jetbrains.kotlin.formver.embeddings.expression.Elvis
 import org.jetbrains.kotlin.formver.embeddings.expression.EqCmp
 import org.jetbrains.kotlin.formver.embeddings.expression.ErrorExp
 import org.jetbrains.kotlin.formver.embeddings.expression.ExpEmbedding
+import org.jetbrains.kotlin.formver.embeddings.expression.ExpWrapper
 import org.jetbrains.kotlin.formver.embeddings.expression.FieldAccess
 import org.jetbrains.kotlin.formver.embeddings.expression.FieldAccessPermissions
 import org.jetbrains.kotlin.formver.embeddings.expression.FieldModification
@@ -54,27 +55,26 @@ internal object ExprPurityVisitor : ExpVisitor<Boolean> {
     override fun visitUnitLit(e: UnitLit) = true
 
     /* ————— structural nodes without side effects ————— */
-    override fun visitBlock(e: Block) = e.recurse(this)
-    override fun visitIf(e: If) = e.recurse(this)
-    override fun visitElvis(e: Elvis) = e.recurse(this)
-    override fun visitBinaryOperatorExpEmbedding(e: BinaryOperatorExpEmbedding) =
-        e.recurse(this) // TODO: the injection function should be pure per definition?
+    override fun visitBlock(e: Block) = e.allChildrenPure(this)
+    override fun visitBinaryOperatorExpEmbedding(e: BinaryOperatorExpEmbedding) = e.allChildrenPure(this)
+    override fun visitSequentialAnd(e: SequentialAnd) = e.allChildrenPure(this)
+    override fun visitSequentialOr(e: SequentialOr) = e.allChildrenPure(this)
+    override fun visitEqCmp(e: EqCmp) = e.allChildrenPure(this)
+    override fun visitNeCmp(e: NeCmp) = e.allChildrenPure(this)
+    override fun visitUnaryOperatorExpEmbedding(e: UnaryOperatorExpEmbedding) = e.allChildrenPure(this)
+    override fun visitWithPosition(e: WithPosition) = e.allChildrenPure(this)
+    override fun visitInjectionBasedExpEmbedding(e: InjectionBasedExpEmbedding) = e.allChildrenPure(this)
+    override fun visitSharingContext(e: SharingContext) = e.allChildrenPure(this)
 
-    override fun visitSequentialAnd(e: SequentialAnd) = e.recurse(this)
-    override fun visitSequentialOr(e: SequentialOr) = e.recurse(this)
-    override fun visitSafeCast(e: SafeCast) = e.recurse(this)
-    override fun visitWithPosition(e: WithPosition) = e.recurse(this)
-    override fun visitEqCmp(e: EqCmp) = e.recurse(this)
-    override fun visitNeCmp(e: NeCmp) = e.recurse(this)
-    override fun visitCast(e: Cast) = e.recurse(this)
-    override fun visitIs(e: Is) = e.recurse(this)
-    override fun visitUnaryOperatorExpEmbedding(e: UnaryOperatorExpEmbedding) = e.recurse(this)
-    override fun visitForAllEmbedding(e: ForAllEmbedding) = e.recurse(this)
-    override fun visitOld(e: Old) = e.recurse(this)
-    override fun visitInjectionBasedExpEmbedding(e: InjectionBasedExpEmbedding) = e.recurse(this)
-    override fun visitSharingContext(e: SharingContext) = e.recurse(this)
+    override fun visitIf(e: If) = false
+    override fun visitElvis(e: Elvis) = false
+    override fun visitSafeCast(e: SafeCast) = false
+    override fun visitCast(e: Cast) = false
+    override fun visitIs(e: Is) = false
+    override fun visitOld(e: Old) = false
+    override fun visitForAllEmbedding(e: ForAllEmbedding) = false
 
-    // TODO: maybe throw errors for nodes that definitely should never appear in an Assert?
+
     /* ————— impure nodes ————— */
     override fun visitMethodCall(e: MethodCall) = false   // TODO: Whitelist for annotated methods?
     override fun visitFunctionExp(e: FunctionExp) = false
@@ -102,5 +102,5 @@ internal object ExprPurityVisitor : ExpVisitor<Boolean> {
     override fun visitDefault(e: ExpEmbedding): Boolean = false
 }
 
-private fun ExpEmbedding.recurse(v: ExprPurityVisitor): Boolean =
+private fun ExpEmbedding.allChildrenPure(v: ExprPurityVisitor): Boolean =
     children().all { it.accept(v) }

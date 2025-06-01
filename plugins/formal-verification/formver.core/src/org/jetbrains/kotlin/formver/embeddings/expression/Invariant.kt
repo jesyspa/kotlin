@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.formver.embeddings.expression
 
+import org.jetbrains.kotlin.formver.purity.ExpVisitor
 import org.jetbrains.kotlin.formver.asPosition
 import org.jetbrains.kotlin.formver.embeddings.types.TypeEmbedding
 import org.jetbrains.kotlin.formver.linearization.LinearizationContext
@@ -14,4 +15,5 @@ data class Old(override val inner: ExpEmbedding) : UnaryDirectResultExpEmbedding
     override val type: TypeEmbedding = inner.type
     override fun toViper(ctx: LinearizationContext): Exp = Exp.Old(inner.toViper(ctx), ctx.source.asPosition)
     override fun toViperBuiltinType(ctx: LinearizationContext): Exp = Exp.Old(inner.toViperBuiltinType(ctx), ctx.source.asPosition)
+    override fun <R> accept(v: ExpVisitor<R>): R = v.visitOld(this)
 }

@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.formver.embeddings.expression
 
+import org.jetbrains.kotlin.formver.purity.ExpVisitor
 import org.jetbrains.kotlin.formver.asPosition
 import org.jetbrains.kotlin.formver.embeddings.*
 import org.jetbrains.kotlin.formver.embeddings.types.TypeEmbedding
@@ -47,6 +48,8 @@ sealed interface Block : OptionalResultExpEmbedding {
         exps.last().toViperMaybeStoringIn(result, ctx)
     }
 
+    override fun <R> accept(v: ExpVisitor<R>): R = v.visitBlock(this)
+
     override fun children(): Sequence<ExpEmbedding> = exps.asSequence()
 
     override val debugTreeView: TreeView
@@ -64,6 +67,8 @@ data class If(val condition: ExpEmbedding, val thenBranch: ExpEmbedding, val els
             Stmt.If(condViper, thenViper, elseViper, ctx.source.asPosition)
         }
     }
+
+    override fun <R> accept(v: ExpVisitor<R>): R = v.visitIf(this)
 
     override fun children(): Sequence<ExpEmbedding> = sequenceOf(condition, thenBranch, elseBranch)
 
@@ -98,6 +103,7 @@ data class While(
     }
 
     override fun children(): Sequence<ExpEmbedding> = sequenceOf(condition, body)
+    override fun <R> accept(v: ExpVisitor<R>): R = v.visitWhile(this)
 
     // TODO: add invariants
     override val debugAnonymousSubexpressions: List<ExpEmbedding>
@@ -116,6 +122,8 @@ data class Goto(val target: LabelLink) : NoResultExpEmbedding, DefaultDebugTreeV
         ctx.addStatement { target.toViperGoto(ctx) }
     }
 
+    override fun <R> accept(v: ExpVisitor<R>): R = v.visitGoto(this)
+
     override val debugAnonymousSubexpressions: List<ExpEmbedding>
         get() = listOf()
 
@@ -131,6 +139,8 @@ data class LabelExp(val label: LabelEmbedding) : UnitResultExpEmbedding {
 
     override val debugTreeView: TreeView
         get() = NamedBranchingNode("Label", label.debugTreeView)
+
+    override fun <R> accept(v: ExpVisitor<R>): R = v.visitLabelExp(this)
 }
 
 /**
@@ -150,6 +160,7 @@ data class GotoChainNode(val label: LabelEmbedding?, val exp: ExpEmbedding, val 
     }
 
     override fun children(): Sequence<ExpEmbedding> = sequenceOf(exp)
+    override fun <R> accept(v: ExpVisitor<R>): R = v.visitGotoChainNode(this)
 
     override val debugTreeView: TreeView
         get() = NamedBranchingNode("GotoChainNode", listOfNotNull())
@@ -166,6 +177,8 @@ data class NonDeterministically(val exp: ExpEmbedding) : UnitResultExpEmbedding,
 
     override val debugAnonymousSubexpressions: List<ExpEmbedding>
         get() = listOf(exp)
+
+    override fun <R> accept(v: ExpVisitor<R>): R = v.visitNonDeterministically(this)
 }
 
 // Note: this is always a *real* Viper method call.
@@ -191,6 +204,7 @@ data class MethodCall(val method: NamedFunctionSignature, val args: List<ExpEmbe
             })
 
     override fun children(): Sequence<ExpEmbedding> = args.asSequence()
+    override fun <R> accept(v: ExpVisitor<R>): R = v.visitMethodCall(this)
 }
 
 /**
@@ -210,6 +224,8 @@ data class InvokeFunctionObject(val receiver: ExpEmbedding, val args: List<ExpEm
             access = true
         }.toViper(ctx)
     }
+
+    override fun <R> accept(v: ExpVisitor<R>): R = v.visitInvokeFunctionObject(this)
 
     override val debugTreeView: TreeView
         get() = NamedBranchingNode(
@@ -239,6 +255,7 @@ data class FunctionExp(val signature: FullNamedFunctionSignature?, val body: Exp
     }
 
     override fun children(): Sequence<ExpEmbedding> = sequenceOf(body)
+    override fun <R> accept(v: ExpVisitor<R>): R = v.visitFunctionExp(this)
 
     override val debugTreeView: TreeView
         get() = NamedBranchingNode(
@@ -264,4 +281,5 @@ data class Elvis(val left: ExpEmbedding, val right: ExpEmbedding, override val t
         get() = listOf(left, right)
 
     override fun children(): Sequence<ExpEmbedding> = sequenceOf(left, right)
+    override fun <R> accept(v: ExpVisitor<R>): R = v.visitElvis(this)
 }

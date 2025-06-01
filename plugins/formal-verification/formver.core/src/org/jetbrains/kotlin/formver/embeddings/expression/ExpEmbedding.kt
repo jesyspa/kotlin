@@ -6,6 +6,7 @@
 package org.jetbrains.kotlin.formver.embeddings.expression
 
 import org.jetbrains.kotlin.KtSourceElement
+import org.jetbrains.kotlin.formver.purity.ExpVisitor
 import org.jetbrains.kotlin.formver.asPosition
 import org.jetbrains.kotlin.formver.domains.RuntimeTypeDomain
 import org.jetbrains.kotlin.formver.embeddings.*
@@ -86,7 +87,9 @@ sealed interface ExpEmbedding : DebugPrintable {
     /**
      * Responsible for checking the validity of the node
      */
-    fun checkOwnValidity(): Boolean = true
+
+    fun <R> accept(v: ExpVisitor<R>): R
+    fun isValid(): Boolean = true
 }
 
 sealed class ToViperBuiltinMisuseError(msg: String) : RuntimeException(msg)
@@ -270,6 +273,9 @@ sealed interface NoResultExpEmbedding : DefaultMaybeStoringInExpEmbedding, Defau
 sealed interface PureExpEmbedding : NullaryDirectResultExpEmbedding {
     fun toViper(source: KtSourceElement? = null): Exp
     override fun toViper(ctx: LinearizationContext): Exp = toViper(ctx.source)
+
+    override fun <R> accept(v: ExpVisitor<R>): R = v.visitPureExpEmbedding(this)
+
 }
 
 /**
@@ -355,6 +361,8 @@ data class PrimitiveFieldAccess(override val inner: ExpEmbedding, val field: Fie
 
     override fun toViper(ctx: LinearizationContext): Exp = Exp.FieldAccess(inner.toViper(ctx), field.toViper(), ctx.source.asPosition)
 
+    override fun <R> accept(v: ExpVisitor<R>): R = v.visitPrimitiveFieldAccess(this)
+
     override val debugTreeView: TreeView
         get() = OperatorNode(inner.debugTreeView, ".", this.field.debugTreeView)
 }
@@ -415,6 +423,8 @@ data class FieldAccess(val receiver: ExpEmbedding, val field: FieldEmbedding) : 
         receiver.toViperUnusedResult(ctx)
     }
 
+    override fun <R> accept(v: ExpVisitor<R>): R = v.visitFieldAccess(this)
+
     override val debugTreeView: TreeView
         get() = OperatorNode(receiver.debugTreeView, ".", this.field.debugTreeView)
 }
@@ -437,6 +447,8 @@ data class FieldModification(val receiver: ExpEmbedding, val field: FieldEmbeddi
 
     override val debugTreeView: TreeView
         get() = OperatorNode(OperatorNode(receiver.debugTreeView, ".", this.field.debugTreeView), " := ", newValue.debugTreeView)
+
+    override fun <R> accept(v: ExpVisitor<R>): R = v.visitFieldModification(this)
 }
 
 data class FieldAccessPermissions(override val inner: ExpEmbedding, val field: FieldEmbedding, val perm: PermExp) :
@@ -446,6 +458,8 @@ data class FieldAccessPermissions(override val inner: ExpEmbedding, val field: F
 
     override fun toViperBuiltinType(ctx: LinearizationContext): Exp =
         inner.toViper(ctx).fieldAccessPredicate(field.toViper(), perm, ctx.source.asPosition)
+
+    override fun <R> accept(v: ExpVisitor<R>): R = v.visitFieldAccessPermissions(this)
 
     // field collides with the field context-sensitive keyword.
     override val debugExtraSubtrees: List<TreeView>
@@ -458,6 +472,8 @@ data class PredicateAccessPermissions(val predicateName: MangledName, val args: 
     override val type: TypeEmbedding = buildType { boolean() }
     override fun toViperBuiltinType(ctx: LinearizationContext): Exp =
         Exp.PredicateAccess(predicateName, args.map { it.toViper(ctx) }, perm, ctx.source.asPosition)
+
+    override fun <R> accept(v: ExpVisitor<R>): R = v.visitPredicateAccessPermissions(this)
 
     override val subexpressions: List<ExpEmbedding>
         get() = args
@@ -486,11 +502,14 @@ data class Assign(val lhs: ExpEmbedding, val rhs: ExpEmbedding) : UnitResultExpE
         get() = OperatorNode(lhs.debugTreeView, " := ", rhs.debugTreeView)
 
     override fun children(): Sequence<ExpEmbedding> = sequenceOf(lhs, rhs)
+    override fun <R> accept(v: ExpVisitor<R>): R = v.visitAssign(this)
 }
 
 data class Declare(val variable: VariableEmbedding, val initializer: ExpEmbedding?) : UnitResultExpEmbedding,
     DefaultDebugTreeViewImplementation {
     override val type: TypeEmbedding = buildType { unit() }
+
+    override fun <R> accept(v: ExpVisitor<R>): R = v.visitDeclare(this)
 
     override fun toViperSideEffects(ctx: LinearizationContext) {
         ctx.addDeclaration(variable.toLocalVarDecl(ctx.source.asPosition))

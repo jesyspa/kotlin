@@ -18,7 +18,6 @@ import org.jetbrains.kotlin.fir.symbols.SymbolInternals
 import org.jetbrains.kotlin.fir.symbols.impl.*
 import org.jetbrains.kotlin.fir.types.*
 import org.jetbrains.kotlin.formver.*
-import org.jetbrains.kotlin.formver.Purity.checkValidity
 import org.jetbrains.kotlin.formver.domains.RuntimeTypeDomain
 import org.jetbrains.kotlin.formver.embeddings.callables.*
 import org.jetbrains.kotlin.formver.embeddings.expression.*
@@ -99,11 +98,9 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
 
         // Note: it is important that `body` is only set after `embedUserFunction` is complete, as we need to
         // place the embedding in the map before processing the body.
-        val userFunc = embedUserFunction(declaration.symbol, signature).apply {
+        embedUserFunction(declaration.symbol, signature).apply {
             body = stmtCtx.convertMethodWithBody(declaration, signature, returnTarget)
         }
-
-        val validity = userFunc.body?.debugExpEmbedding!!.checkValidity()
     }
 
     fun embedUserFunction(symbol: FirFunctionSymbol<*>, signature: FullNamedFunctionSignature): UserFunctionEmbedding {

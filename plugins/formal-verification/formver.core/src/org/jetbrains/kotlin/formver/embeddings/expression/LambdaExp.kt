@@ -6,6 +6,7 @@
 package org.jetbrains.kotlin.formver.embeddings.expression
 
 import org.jetbrains.kotlin.fir.declarations.FirAnonymousFunction
+import org.jetbrains.kotlin.formver.purity.ExpVisitor
 import org.jetbrains.kotlin.formver.conversion.MethodConversionContext
 import org.jetbrains.kotlin.formver.conversion.StmtConversionContext
 import org.jetbrains.kotlin.formver.conversion.SubstitutedArgument
@@ -31,6 +32,8 @@ class LambdaExp(
     override fun toViperStoringIn(result: VariableEmbedding, ctx: LinearizationContext) {
         TODO("create new function object with counter, duplicable (requires toViper restructuring)")
     }
+
+    override fun <R> accept(v: ExpVisitor<R>): R = v.visitLambdaExp(this)
 
     override fun insertCall(
         args: List<ExpEmbedding>,
