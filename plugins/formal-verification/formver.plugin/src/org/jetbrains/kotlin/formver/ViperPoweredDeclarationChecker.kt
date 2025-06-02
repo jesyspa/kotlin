@@ -47,7 +47,26 @@ class ViperPoweredDeclarationChecker(private val session: FirSession, private va
         val errorCollector = ErrorCollector()
         try {
             val programConversionContext = ProgramConverter(session, config, errorCollector)
-            programConversionContext.registerForVerification(declaration)
+
+            val reportPurityDiag: ((String, String) -> Unit) =
+                if (shouldDumpPurityDiagnostics(declaration)) {
+                    { msg1, msg2 ->
+                        declaration.source?.let { source ->
+                            reporter.reportOn(
+                                source,
+                                PluginErrors.PURITY,
+                                msg1,
+                                msg2
+                            )
+                        }
+                    }
+                } else {
+                    { msg1, msg2 -> null }
+                }
+
+            with(reportPurityDiag) {
+                programConversionContext.registerForVerification(declaration)
+            }
             val program = programConversionContext.program
 
             getProgramForLogging(program)?.let {
@@ -100,6 +119,7 @@ class ViperPoweredDeclarationChecker(private val session: FirSession, private va
     private val neverVerifyId: ClassId = getAnnotationId("NeverVerify")
     private val alwaysVerifyId: ClassId = getAnnotationId("AlwaysVerify")
     private val dumpExpEmbeddingsId: ClassId = getAnnotationId("DumpExpEmbeddings")
+    private val dumpPurityDiagnosticsId: ClassId = getAnnotationId("DumpPurityDiagnostics")
 
     private fun PluginConfiguration.shouldConvert(declaration: FirSimpleFunction): Boolean = when {
         declaration.hasAnnotation(neverConvertId, session) -> false
@@ -115,4 +135,7 @@ class ViperPoweredDeclarationChecker(private val session: FirSession, private va
 
     private fun shouldDumpExpEmbeddings(declaration: FirSimpleFunction): Boolean =
         declaration.hasAnnotation(dumpExpEmbeddingsId, session)
+
+    private fun shouldDumpPurityDiagnostics(declaration: FirSimpleFunction): Boolean =
+        declaration.hasAnnotation(dumpPurityDiagnosticsId, session)
 }

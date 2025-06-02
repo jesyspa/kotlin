@@ -89,6 +89,8 @@ sealed interface ExpEmbedding : DebugPrintable {
      */
 
     fun <R> accept(v: ExpVisitor<R>): R
+
+    context(reportPurityDiag: (String, String) -> Unit)
     fun isValid(): Boolean = true
 }
 

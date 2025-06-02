@@ -1,0 +1,56 @@
+/simple_assert_statements.kt:(86,91): info: [Purity] verify(true) - expression is pure
+
+/simple_assert_statements.kt:(86,91): info: [Purity] verify(arg) - expression is pure
+
+/simple_assert_statements.kt:(86,91): info: [Purity] verify(5 < x) - expression is pure
+
+/simple_assert_statements.kt:(86,91): info: [Purity] verify(3+2 <= 5) - expression is pure
+
+/simple_assert_statements.kt:(86,91): info: [Purity] verify(++x < 4) - expression is impure
+
+/simple_assert_statements.kt:(86,91): info: Generated Viper text for test1:
+field bf$size: Ref
+
+method f$test1$TF$T$Boolean(p$arg: Ref) returns (ret$0: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
+{
+  var l0$x: Ref
+  var anon$1: Ref
+  var anon$2: Ref
+  var anon$0: Ref
+  inhale df$rt$isSubtype(df$rt$typeOf(p$arg), df$rt$boolType())
+  l0$x := df$rt$intToRef(3)
+  assert true
+  assert df$rt$boolFromRef(p$arg)
+  assert 5 < df$rt$intFromRef(l0$x)
+  assert 3 + 2 <= 5
+  l0$x := sp$plusInts(l0$x, df$rt$intToRef(1))
+  anon$1 := l0$x
+  assert df$rt$intFromRef(anon$1) < 4
+  anon$0 := l0$x
+  l0$x := sp$plusInts(anon$0, df$rt$intToRef(1))
+  anon$2 := anon$0
+  assert df$rt$intFromRef(anon$2) < 5
+  label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
+}
+
+/simple_assert_statements.kt:(346,351): info: [Purity] verify(x++ < 5) - expression is impure
+
+/simple_assert_statements.kt:(346,351): info: Generated Viper text for test2:
+field bf$size: Ref
+
+method f$test2$TF$() returns (ret$0: Ref)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
+{
+  var l0$x: Ref
+  var anon$1: Ref
+  var anon$0: Ref
+  l0$x := df$rt$intToRef(3)
+  anon$0 := l0$x
+  l0$x := sp$plusInts(anon$0, df$rt$intToRef(1))
+  anon$1 := anon$0
+  assert df$rt$intFromRef(anon$1) < 5
+  label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
+}

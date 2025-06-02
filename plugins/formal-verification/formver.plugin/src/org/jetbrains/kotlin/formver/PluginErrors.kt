@@ -19,6 +19,7 @@ object PluginErrors {
     val CONDITIONAL_EFFECT_ERROR by warning2<PsiElement, String, String>()
     val POSSIBLE_INDEX_OUT_OF_BOUND by warning2<PsiElement, String, String>()
     val INVALID_SUBLIST_RANGE by warning2<PsiElement, String, String>()
+    val PURITY by info2<PsiElement, String, String>(SourceElementPositioningStrategies.DECLARATION_NAME)
 
     val UNIQUENESS_VIOLATION by error1<PsiElement, String>()
 

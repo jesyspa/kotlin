@@ -47,7 +47,17 @@ data class Assert(val exp: ExpEmbedding) : UnitResultExpEmbedding, DefaultDebugT
     override fun children(): Sequence<ExpEmbedding> = sequenceOf(exp)
     override fun <R> accept(v: ExpVisitor<R>): R = v.visitAssert(this)
 
-    override fun isValid(): Boolean = exp.accept(ExprPurityVisitor)
+    context(reportPurityDiag: (String, String) -> Unit)
+    override fun isValid(): Boolean {
+        val isPure = exp.accept(ExprPurityVisitor)
+        val snippet = when (exp) {
+            is WithPosition -> "verify(${exp.source.getElementTextInContextForDebug()})"
+            else -> "verify(<no-src>)"
+        }
+        val message = if (isPure) "- expression is pure" else "- expression is impure"
+        reportPurityDiag(snippet, message)
+        return isPure
+    }
 
 }
 

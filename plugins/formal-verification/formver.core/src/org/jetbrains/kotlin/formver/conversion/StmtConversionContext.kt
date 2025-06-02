@@ -28,6 +28,7 @@ import org.jetbrains.kotlin.formver.isCustom
 import org.jetbrains.kotlin.formver.linearization.Linearizer
 import org.jetbrains.kotlin.formver.linearization.SeqnBuilder
 import org.jetbrains.kotlin.formver.linearization.SharedLinearizationState
+import org.jetbrains.kotlin.formver.purity.checkValidity
 import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.utils.addIfNotNull
 import org.jetbrains.kotlin.utils.addToStdlib.ifTrue
@@ -224,6 +225,7 @@ fun StmtConversionContext.insertForAllFunctionCall(
     }
 }
 
+context(reportPurityDiag: (String, String) -> Unit)
 fun StmtConversionContext.convertMethodWithBody(
     declaration: FirSimpleFunction,
     signature: FullNamedFunctionSignature,
@@ -238,6 +240,8 @@ fun StmtConversionContext.convertMethodWithBody(
     // note: we must guarantee somewhere that returned value is Unit
     // as we may not encounter any `return` statement in the body
     returnTarget.variable.withIsUnitInvariantIfUnit().toViperUnusedResult(linearizer)
+
+    body.checkValidity()
     return FunctionBodyEmbedding(seqnBuilder.block, returnTarget, bodyExp)
 }
 

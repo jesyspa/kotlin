@@ -77,6 +77,7 @@ class ProgramConverter(val session: FirSession, override val config: PluginConfi
             predicates = classes.values.flatMap { listOf(it.details.sharedPredicate, it.details.uniquePredicate) }
         )
 
+    context(reportPurityDiag: (String, String) -> Unit)
     fun registerForVerification(declaration: FirSimpleFunction) {
         val signature = embedFullSignature(declaration.symbol)
         val returnTarget = returnTargetProducer.getFresh(signature.callableType.returnType)

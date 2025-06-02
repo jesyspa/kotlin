@@ -15,6 +15,7 @@ fun ExpEmbedding.preorder(): Sequence<ExpEmbedding> = sequence {
     }
 }
 
+context(reportPurityDiag: (String, String) -> Unit)
 fun ExpEmbedding.checkValidity(): Boolean =
     preorder()
         .filterIsInstance<Assert>()
