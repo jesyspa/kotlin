@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.formver.embeddings.expression
 
+import org.jetbrains.kotlin.formver.embeddings.ExpVisitor
 import org.jetbrains.kotlin.formver.asPosition
 import org.jetbrains.kotlin.formver.domains.RuntimeTypeDomain
 import org.jetbrains.kotlin.formver.embeddings.*
@@ -38,6 +39,8 @@ data class Is(
 
     override val debugExtraSubtrees: List<TreeView>
         get() = listOf(comparisonType.debugTreeView.withDesignation("type"))
+
+    override fun <R> accept(v: ExpVisitor<R>): R = v.visitIs(this)
 }
 
 
@@ -50,9 +53,10 @@ data class Cast(override val inner: ExpEmbedding, override val type: TypeEmbeddi
     override fun toViper(ctx: LinearizationContext) = inner.toViper(ctx)
     override fun ignoringCasts(): ExpEmbedding = inner.ignoringCasts()
     override fun ignoringCastsAndMetaNodes(): ExpEmbedding = inner.ignoringCastsAndMetaNodes()
-
     override val debugExtraSubtrees: List<TreeView>
         get() = listOf(type.debugTreeView.withDesignation("target"))
+
+    override fun <R> accept(v: ExpVisitor<R>): R = v.visitCast(this)
 }
 
 fun ExpEmbedding.withType(newType: TypeEmbedding): ExpEmbedding = if (type == newType) this else Cast(this, newType)
@@ -82,6 +86,9 @@ data class SafeCast(val exp: ExpEmbedding, val targetType: TypeEmbedding) : Stor
 
     override val debugExtraSubtrees: List<TreeView>
         get() = listOf(targetType.debugTreeView.withDesignation("type"))
+
+    override fun children(): Sequence<ExpEmbedding> = sequenceOf(exp)
+    override fun <R> accept(v: ExpVisitor<R>): R = v.visitSafeCast(this)
 }
 
 interface InhaleInvariants : ExpEmbedding, DefaultDebugTreeViewImplementation {
@@ -100,6 +107,8 @@ interface InhaleInvariants : ExpEmbedding, DefaultDebugTreeViewImplementation {
     val simplified: ExpEmbedding
         get() = if (invariants.isEmpty()) exp
         else this
+
+    override fun <R> accept(v: ExpVisitor<R>): R = v.visitInhaleInvariants(this)
 }
 
 /**

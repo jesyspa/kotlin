@@ -5,6 +5,7 @@
 
 package org.jetbrains.kotlin.formver.embeddings.expression
 
+import org.jetbrains.kotlin.formver.embeddings.ExpVisitor
 import org.jetbrains.kotlin.formver.asPosition
 import org.jetbrains.kotlin.formver.domains.InjectionImageFunction
 import org.jetbrains.kotlin.formver.embeddings.SourceRole
@@ -32,6 +33,8 @@ interface BinaryOperatorExpEmbedding : BinaryDirectResultExpEmbedding, Injection
             info = sourceRole.asInfo
         )
     }
+
+    override fun <R> accept(v: ExpVisitor<R>): R = v.visitBinaryOperatorExpEmbedding(this)
 }
 
 interface UnaryOperatorExpEmbedding : UnaryDirectResultExpEmbedding, InjectionBasedExpEmbedding {
@@ -40,6 +43,8 @@ interface UnaryOperatorExpEmbedding : UnaryDirectResultExpEmbedding, InjectionBa
 
     override fun toViperBuiltinType(ctx: LinearizationContext) =
         builtinsOperation(inner.toViperBuiltinType(ctx), pos = ctx.source.asPosition, info = sourceRole.asInfo)
+
+    override fun <R> accept(v: ExpVisitor<R>): R = v.visitUnaryOperatorExpEmbedding(this)
 }
 
 sealed interface OperatorExpEmbeddingTemplate {

@@ -6,6 +6,7 @@
 package org.jetbrains.kotlin.formver.embeddings.expression
 
 import org.jetbrains.kotlin.KtSourceElement
+import org.jetbrains.kotlin.formver.embeddings.ExpVisitor
 import org.jetbrains.kotlin.formver.embeddings.types.TypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.expression.debug.NamedBranchingNode
 import org.jetbrains.kotlin.formver.embeddings.expression.debug.PlaintextLeaf
@@ -21,6 +22,7 @@ data class WithPosition(override val inner: ExpEmbedding, val source: KtSourceEl
 
     override fun ignoringMetaNodes(): ExpEmbedding = inner.ignoringMetaNodes()
     override fun ignoringCastsAndMetaNodes(): ExpEmbedding = inner.ignoringCastsAndMetaNodes()
+    override fun <R> accept(v: ExpVisitor<R>): R = v.visitWithPosition(this)
 
     // We ignore position information in the debug view.
     override val debugTreeView: TreeView
@@ -62,13 +64,14 @@ data class SharingContext(override val inner: ExpEmbedding) : PassthroughExpEmbe
 
     override fun ignoringMetaNodes() = inner
     override fun ignoringCastsAndMetaNodes() = inner
-
     override val debugTreeView: TreeView
         get() = NamedBranchingNode(
             "SharingContext",
             inner.debugTreeView,
             PlaintextLeaf(System.identityHashCode(this).toString()).withDesignation("ctxId")
         )
+
+    override fun <R> accept(v: ExpVisitor<R>): R = v.visitSharingContext(this)
 }
 
 /**
@@ -98,8 +101,11 @@ data class Shared(val inner: ExpEmbedding) : StoredResultExpEmbedding, DefaultTo
         context.tryInitShared { inner.toViperUnusedResult(ctx); UnitLit.pureToViper(toBuiltin = false) }
     }
 
+
+
     override fun ignoringMetaNodes() = inner
     override fun ignoringCastsAndMetaNodes() = inner
+    override fun <R> accept(v: ExpVisitor<R>): R = v.visitShared(this)
 
     fun initContext(ctx: SharingContext) {
         check(_context == null) { "Context of shared initialized twice." }
