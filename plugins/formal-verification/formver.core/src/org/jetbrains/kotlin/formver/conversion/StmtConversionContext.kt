@@ -28,6 +28,7 @@ import org.jetbrains.kotlin.formver.isCustom
 import org.jetbrains.kotlin.formver.linearization.Linearizer
 import org.jetbrains.kotlin.formver.linearization.SeqnBuilder
 import org.jetbrains.kotlin.formver.linearization.SharedLinearizationState
+import org.jetbrains.kotlin.formver.purity.checkValidity
 import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.utils.addIfNotNull
 import org.jetbrains.kotlin.utils.addToStdlib.ifTrue
@@ -238,6 +239,9 @@ fun StmtConversionContext.convertMethodWithBody(
     // note: we must guarantee somewhere that returned value is Unit
     // as we may not encounter any `return` statement in the body
     returnTarget.variable.withIsUnitInvariantIfUnit().toViperUnusedResult(linearizer)
+
+    // TODO: Terminate conversion if purity check fails
+    body.checkValidity(declaration.source, errorCollector)
     return FunctionBodyEmbedding(seqnBuilder.block, returnTarget, bodyExp)
 }
 

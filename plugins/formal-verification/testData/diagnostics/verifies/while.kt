@@ -24,8 +24,10 @@ fun <!VIPER_TEXT!>test_while<!>(param: ClassWithField) {
         val paramField = param.field
         iteration = iteration + 1
     }
-    verify(c.field == 13)
-    verify(initParamField == param.field)
+    val cond1 = c.field == 13
+    val cond2 = initParamField == param.field
+    verify(cond1)
+    verify(cond2)
 }
 
 fun <!VIPER_TEXT!>test_while_with_inlining<!>(param: ClassWithField) {
