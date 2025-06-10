@@ -12,6 +12,7 @@ import org.jetbrains.kotlin.formver.asPosition
 import org.jetbrains.kotlin.formver.embeddings.types.TypeEmbedding
 import org.jetbrains.kotlin.formver.embeddings.types.buildType
 import org.jetbrains.kotlin.formver.linearization.LinearizationContext
+import org.jetbrains.kotlin.formver.purity.PurityContext
 import org.jetbrains.kotlin.formver.viper.ast.Exp
 import org.jetbrains.kotlin.formver.viper.ast.Stmt
 
@@ -47,7 +48,13 @@ data class Assert(val exp: ExpEmbedding) : UnitResultExpEmbedding, DefaultDebugT
     override fun children(): Sequence<ExpEmbedding> = sequenceOf(exp)
     override fun <R> accept(v: ExpVisitor<R>): R = v.visitAssert(this)
 
-    override fun isValid(): Boolean = exp.accept(ExprPurityVisitor)
+    override fun isValid(ctx: PurityContext): Boolean {
+        val isValid = exp.accept(ExprPurityVisitor)
+        if(!isValid){
+            ctx.errorCollector.addPurityError(ctx.source!!, "Assert condition is impure")
+        }
+        return isValid
+    }
 
 }
 

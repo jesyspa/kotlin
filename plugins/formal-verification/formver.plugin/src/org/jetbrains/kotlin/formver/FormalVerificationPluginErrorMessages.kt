@@ -61,5 +61,10 @@ object FormalVerificationPluginErrorMessages : BaseDiagnosticRendererFactory() {
             CommonRenderers.STRING,
             CommonRenderers.STRING
         )
+        map.put(
+            PluginErrors.PURITY_VIOLATION,
+            "{0}",
+            CommonRenderers.STRING
+        )
     }
 }

@@ -20,6 +20,7 @@ import org.jetbrains.kotlin.formver.linearization.InhaleExhaleStmtModifier
 import org.jetbrains.kotlin.formver.linearization.LinearizationContext
 import org.jetbrains.kotlin.formver.linearization.UnfoldPolicy
 import org.jetbrains.kotlin.formver.linearization.pureToViper
+import org.jetbrains.kotlin.formver.purity.PurityContext
 import org.jetbrains.kotlin.formver.viper.MangledName
 import org.jetbrains.kotlin.formver.viper.ast.Exp
 import org.jetbrains.kotlin.formver.viper.ast.PermExp
@@ -84,7 +85,7 @@ sealed interface ExpEmbedding : DebugPrintable {
 
     fun children(): Sequence<ExpEmbedding> = emptySequence()
     fun <R> accept(v: ExpVisitor<R>): R
-    fun isValid(): Boolean = true
+    fun isValid(ctx: PurityContext): Boolean = true
 }
 
 sealed class ToViperBuiltinMisuseError(msg: String) : RuntimeException(msg)
