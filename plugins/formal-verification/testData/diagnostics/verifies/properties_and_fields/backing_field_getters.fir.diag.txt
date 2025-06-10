@@ -139,6 +139,8 @@ method f$nullableReceiverNotNullSafeGet$TF$() returns (ret$0: Ref)
   inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
+/backing_field_getters.kt:(1071,1091): error: Assert condition is impure
+
 /backing_field_getters.kt:(1113,1140): info: Generated Viper text for nullableReceiverNullSafeGet:
 field bf$size: Ref
 
@@ -161,6 +163,8 @@ method f$nullableReceiverNullSafeGet$TF$() returns (ret$0: Ref)
   label lbl$ret$0
   inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
+
+/backing_field_getters.kt:(1172,1192): error: Assert condition is impure
 
 /backing_field_getters.kt:(1249,1275): info: Generated Viper text for nonNullableReceiverSafeGet:
 field bf$size: Ref
@@ -190,6 +194,8 @@ method f$nonNullableReceiverSafeGet$TF$() returns (ret$0: Ref)
   label lbl$ret$0
   inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
+
+/backing_field_getters.kt:(1307,1327): error: Assert condition is impure
 
 /backing_field_getters.kt:(1477,1489): info: Generated Viper text for checkPrimary:
 field bf$size: Ref
@@ -261,3 +267,6 @@ method f$checkPrimary$TF$T$Int$T$Int(p$x: Ref, p$y: Ref)
 }
 
 method pg$public$z(this$dispatch: Ref) returns (ret: Ref)
+
+
+/backing_field_getters.kt:(1558,1637): error: Assert condition is impure

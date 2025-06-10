@@ -51,7 +51,7 @@ public fun <!VIPER_TEXT!>useRun<!>() {
     val doubleIntRunResult = 1.doubleIntRun { plus(1) } == 3
     val genericReceiverResult = 1.copiedRun { plus(2) } == 3
 
-    verify(
+    <!PURITY_VIOLATION!>verify(
         intResult,
         genericResult,
         stdlibResult,
@@ -65,7 +65,7 @@ public fun <!VIPER_TEXT!>useRun<!>() {
         doubleEqualsThree { plus(1) },
         doubleIntRunResult,
         genericReceiverResult
-    )
+    )<!>
 }
 
 @NeverConvert
@@ -115,5 +115,5 @@ inline fun <T> CustomClass.extensionRun(block: CustomClass.() -> T): T = block()
 @AlwaysVerify
 fun <!VIPER_TEXT!>testCustomClass<!>() {
     val custom = CustomClass()
-    verify(custom.memberRun { member } == custom.extensionRun { member })
+    <!PURITY_VIOLATION!>verify(custom.memberRun { member } == custom.extensionRun { member })<!>
 }

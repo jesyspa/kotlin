@@ -221,3 +221,6 @@ method f$take4$TF$T$AbstractWithOpenImplementation4(p$obj: Ref)
 
 
 method pg$public$field(this$dispatch: Ref) returns (ret: Ref)
+
+
+/multiple_interfaces.kt:(2322,2488): error: Assert condition is impure

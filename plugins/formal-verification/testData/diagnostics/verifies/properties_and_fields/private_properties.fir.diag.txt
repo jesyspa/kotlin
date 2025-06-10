@@ -86,3 +86,6 @@ method pg$c$A$private$field(this$dispatch: Ref) returns (ret: Ref)
 
 method ps$c$A$private$field(this$dispatch: Ref, anon$0: Ref)
   returns (ret: Ref)
+
+
+/private_properties.kt:(497,539): error: Assert condition is impure

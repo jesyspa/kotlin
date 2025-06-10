@@ -44,20 +44,20 @@ class Baz { val x: Int = 4 }
 @AlwaysVerify
 fun <!VIPER_TEXT!>nullableReceiverNotNullSafeGet<!>() {
     val f: Baz? = Baz()
-    verify(f?.x != null)
+    <!PURITY_VIOLATION!>verify(f?.x != null)<!>
 }
 
 @AlwaysVerify
 fun <!VIPER_TEXT!>nullableReceiverNullSafeGet<!>() {
     val f: Baz? = null
-    verify(f?.x == null)
+    <!PURITY_VIOLATION!>verify(f?.x == null)<!>
 }
 
 @Suppress("UNNECESSARY_SAFE_CALL")
 @AlwaysVerify
 fun <!VIPER_TEXT!>nonNullableReceiverSafeGet<!>() {
     val f: Baz = Baz()
-    verify(f?.x != null)
+    <!PURITY_VIOLATION!>verify(f?.x != null)<!>
 }
 
 open class ClassI(val x: Int, val y: Int) {
@@ -70,8 +70,8 @@ class ClassII(final override val z: Z) : ClassI(10, 10)
 fun <!VIPER_TEXT!>checkPrimary<!>(x: Int, y: Int) {
     val classI = ClassI(x, y)
     val z = Z()
-    verify(
+    <!PURITY_VIOLATION!>verify(
         x != y || classI.x == classI.y,
         ClassII(z).z == z
-    )
+    )<!>
 }

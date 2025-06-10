@@ -21,6 +21,8 @@ method f$simple_return$TF$() returns (ret$0: Ref)
   inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
+/inline_returns.kt:(346,367): error: Assert condition is impure
+
 /inline_returns.kt:(412,426): info: Generated Viper text for unnamed_return:
 method f$unnamed_return$TF$() returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$boolType())

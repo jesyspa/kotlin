@@ -24,7 +24,7 @@ fun <!VIPER_TEXT!>test_while<!>(param: ClassWithField) {
         val paramField = param.field
         iteration = iteration + 1
     }
-    verify(c.field == 13)
+    <!PURITY_VIOLATION!>verify(c.field == 13)<!>
     verify(initParamField == param.field)
 }
 

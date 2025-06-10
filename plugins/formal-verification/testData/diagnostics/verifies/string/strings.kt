@@ -8,16 +8,16 @@ class StringBox(val str: String)
 
 @AlwaysVerify
 fun <!VIPER_TEXT!>testType<!>(s: String) {
-    verify(
-        StringBox(s).str == s,
-        StringBox("str").str == "str",
-    )
+    <!PURITY_VIOLATION!>verify(
+    StringBox(s).str == s,
+    StringBox("str").str == "str",
+    )<!>
 }
 
 @AlwaysVerify
 fun <!VIPER_TEXT!>testLengthField<!>(s: String) {
     val len = s.length
-    verify(StringBox("str").str.length == 3)
+    <!PURITY_VIOLATION!>verify(StringBox("str").str.length == 3)<!>
 }
 
 @AlwaysVerify

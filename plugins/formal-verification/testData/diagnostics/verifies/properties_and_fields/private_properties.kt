@@ -27,5 +27,5 @@ class D: B() {
 @AlwaysVerify
 @Suppress("USELESS_IS_CHECK")
 fun <!VIPER_TEXT!>extractPublic<!>() {
-    verify(C().field is Int, D().field is Int)
+    <!PURITY_VIOLATION!>verify(C().field is Int, D().field is Int)<!>
 }

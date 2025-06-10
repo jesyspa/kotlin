@@ -11,10 +11,10 @@ fun <!VIPER_TEXT!>useChecks<!>(): Unit {
 // TODO: add test for `repeat` (we actually have a bug there because we require unsatisfied precondition in loops)
 
 fun <!VIPER_TEXT!>useRuns<!>(x: Int): Unit {
-    verify(
-        run { x + 1 } == 1 + x,
-        x.run { plus(1) } == 1 + x,
-    )
+    <!PURITY_VIOLATION!>verify(
+    run { x + 1 } == 1 + x,
+    x.run { plus(1) } == 1 + x,
+    )<!>
 }
 
 fun <!VIPER_TEXT!>useAlso<!>(x: Int): Unit {
@@ -22,7 +22,7 @@ fun <!VIPER_TEXT!>useAlso<!>(x: Int): Unit {
 }
 
 fun <!VIPER_TEXT!>useLet<!>(x: Int): Unit {
-    verify(x.let { it + 1 } == 1 + x)
+    <!PURITY_VIOLATION!>verify(x.let { it + 1 } == 1 + x)<!>
 }
 
 fun <!VIPER_TEXT!>useWith<!>(x: Int): Unit {

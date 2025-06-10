@@ -75,6 +75,8 @@ method f$test_while$TF$T$ClassWithField(p$param: Ref) returns (ret$0: Ref)
   inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
+/while.kt:(784,805): error: Assert condition is impure
+
 /while.kt:(855,879): info: Generated Viper text for test_while_with_inlining:
 field bf$field: Ref
 

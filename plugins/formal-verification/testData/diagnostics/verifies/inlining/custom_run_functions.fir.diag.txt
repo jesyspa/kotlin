@@ -356,6 +356,8 @@ method f$useRun$TF$() returns (ret$0: Ref)
   inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
+/custom_run_functions.kt:(1609,2044): error: Assert condition is impure
+
 /custom_run_functions.kt:(2199,2214): info: Generated Viper text for complexScenario:
 method f$complexScenario$TF$T$Boolean(p$arg: Ref) returns (ret$0: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$boolType())
@@ -582,3 +584,5 @@ method f$testCustomClass$TF$() returns (ret$0: Ref)
   label lbl$ret$0
   inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
+
+/custom_run_functions.kt:(3310,3379): error: Assert condition is impure

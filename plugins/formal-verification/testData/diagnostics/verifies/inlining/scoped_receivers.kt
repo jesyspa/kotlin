@@ -14,7 +14,7 @@ inline fun Int?.isNotNull() = this != null
 
 @Suppress("LABEL_NAME_CLASH")
 fun Int?.<!VIPER_TEXT!>with_run_extension_labeled<!>() {
-    verify(isNull() || this@with_run_extension_labeled.isNotNull())
+    <!PURITY_VIOLATION!>verify(isNull() || this@with_run_extension_labeled.isNotNull())<!>
     with(true) {
         with(null) {
             verify(

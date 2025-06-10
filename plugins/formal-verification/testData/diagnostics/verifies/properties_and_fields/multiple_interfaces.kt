@@ -98,12 +98,12 @@ fun <!VIPER_TEXT!>createImpls<!>() {
     val impl6 = create6()
     val start6 = impl6.field + 1 - 1
 
-    verify(
+    <!PURITY_VIOLATION!>verify(
         start12 == impl12.field,
         start23 == impl23.field,
         start3 == impl3.field,
         start14 == impl14.field,
         start6 is Int,
-    )
+    )<!>
 }
 

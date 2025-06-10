@@ -9,7 +9,7 @@ inline fun not(f: () -> Boolean): Boolean = !f()
 
 @AlwaysVerify
 fun <!VIPER_TEXT!>simple_return<!>() {
-    verify(not { false })
+    <!PURITY_VIOLATION!>verify(not { false })<!>
 }
 
 @OptIn(ExperimentalContracts::class)

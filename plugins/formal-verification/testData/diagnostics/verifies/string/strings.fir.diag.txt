@@ -72,7 +72,9 @@ method f$testType$TF$T$String(p$s: Ref) returns (ret$0: Ref)
   inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
-/strings.kt:(368,383): info: Generated Viper text for testLengthField:
+/strings.kt:(263,338): error: Assert condition is impure
+
+/strings.kt:(360,375): info: Generated Viper text for testLengthField:
 field bf$size: Ref
 
 field bf$str: Ref
@@ -142,7 +144,9 @@ method f$testLengthField$TF$T$String(p$s: Ref) returns (ret$0: Ref)
   inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
 }
 
-/strings.kt:(486,493): info: Generated Viper text for testOps:
+/strings.kt:(416,456): error: Assert condition is impure
+
+/strings.kt:(478,485): info: Generated Viper text for testOps:
 field bf$size: Ref
 
 predicate p$pkg$java_io$c$Serializable$shared(this$dispatch: Ref) {

@@ -8,7 +8,7 @@ class CharBox(val char: Char)
 fun <!VIPER_TEXT!>testChars<!>(c: Char) {
     val box = CharBox('a')
     val charA = 'a'
-    verify(charA == box.char)
+    <!PURITY_VIOLATION!>verify(charA == box.char)<!>
     val charZ = 'z'
     verify(
         charA == charZ - 25,
