@@ -713,6 +713,12 @@ public class FirLightTreeFormVerPluginDiagnosticsTestGenerated extends AbstractF
       }
 
       @Test
+      @TestMetadata("quick_sort_of_string.kt")
+      public void testQuick_sort_of_string() {
+        runTest("plugins/formal-verification/testData/diagnostics/verifies/user_invariants/quick_sort_of_string.kt");
+      }
+
+      @Test
       @TestMetadata("simple_forall.kt")
       public void testSimple_forall() {
         runTest("plugins/formal-verification/testData/diagnostics/verifies/user_invariants/simple_forall.kt");
@@ -737,6 +743,12 @@ public class FirLightTreeFormVerPluginDiagnosticsTestGenerated extends AbstractF
       }
 
       @Test
+      @TestMetadata("string_iterations.kt")
+      public void testString_iterations() {
+        runTest("plugins/formal-verification/testData/diagnostics/verifies/user_invariants/string_iterations.kt");
+      }
+
+      @Test
       @TestMetadata("strings_in_conditions.kt")
       public void testStrings_in_conditions() {
         runTest("plugins/formal-verification/testData/diagnostics/verifies/user_invariants/strings_in_conditions.kt");
@@ -746,6 +758,12 @@ public class FirLightTreeFormVerPluginDiagnosticsTestGenerated extends AbstractF
       @TestMetadata("sum_of_1_to_n.kt")
       public void testSum_of_1_to_n() {
         runTest("plugins/formal-verification/testData/diagnostics/verifies/user_invariants/sum_of_1_to_n.kt");
+      }
+
+      @Test
+      @TestMetadata("z_function.kt")
+      public void testZ_function() {
+        runTest("plugins/formal-verification/testData/diagnostics/verifies/user_invariants/z_function.kt");
       }
     }
   }
