@@ -50,7 +50,7 @@ data class Assert(val exp: ExpEmbedding) : UnitResultExpEmbedding, DefaultDebugT
 
     override fun isValid(ctx: PurityContext): Boolean {
         val isValid = exp.accept(ExprPurityVisitor)
-        if(!isValid){
+        if (!isValid) {
             ctx.errorCollector.addPurityError(ctx.source!!, "Assert condition is impure")
         }
         return isValid
