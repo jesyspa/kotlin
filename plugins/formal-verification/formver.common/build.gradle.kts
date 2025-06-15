@@ -5,6 +5,7 @@ plugins {
 
 dependencies {
     compileOnly(kotlinStdlib())
+    compileOnly(project(":compiler:fir:plugin-utils"))
 }
 
 sourceSets {

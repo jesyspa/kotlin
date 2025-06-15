@@ -51,18 +51,26 @@ public fun <!VIPER_TEXT!>useRun<!>() {
     val doubleIntRunResult = 1.doubleIntRun { plus(1) } == 3
     val genericReceiverResult = 1.copiedRun { plus(2) } == 3
 
+    val cond1 = equalsThree { 1 + 2 }
+    val cond2 = !equalsThree { 4 }
+    val cond3 = equalsThreeParametrized { it + 2 }
+    val cond4 = !equalsThreeParametrized { arg -> arg }
+    val cond5 = equalsThreeExtension { this + 2 }
+    val cond6 = equalsThreeExtension { plus(2) }
+    val cond7 = doubleEqualsThree { plus(1) }
+
     verify(
         intResult,
         genericResult,
         stdlibResult,
         capturedResult,
-        equalsThree { 1 + 2 },
-        !equalsThree { 4 },
-        equalsThreeParametrized { it + 2 },
-        !equalsThreeParametrized { arg -> arg },
-        equalsThreeExtension { this + 2 },
-        equalsThreeExtension { plus(2) },
-        doubleEqualsThree { plus(1) },
+        cond1,
+        cond2,
+        cond3,
+        cond4,
+        cond5,
+        cond6,
+        cond7,
         doubleIntRunResult,
         genericReceiverResult
     )
@@ -115,5 +123,6 @@ inline fun <T> CustomClass.extensionRun(block: CustomClass.() -> T): T = block()
 @AlwaysVerify
 fun <!VIPER_TEXT!>testCustomClass<!>() {
     val custom = CustomClass()
-    verify(custom.memberRun { member } == custom.extensionRun { member })
+    val cond1 = custom.memberRun { member } == custom.extensionRun { member }
+    verify(cond1)
 }

@@ -27,5 +27,7 @@ class D: B() {
 @AlwaysVerify
 @Suppress("USELESS_IS_CHECK")
 fun <!VIPER_TEXT!>extractPublic<!>() {
-    verify(C().field is Int, D().field is Int)
+    val cond1 = C().field is Int
+    val cond2 = D().field is Int
+    verify(cond1, cond2)
 }

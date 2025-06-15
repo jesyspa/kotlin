@@ -431,6 +431,22 @@ public class FirLightTreeFormVerPluginDiagnosticsTestGenerated extends AbstractF
   }
 
   @Nested
+  @TestMetadata("plugins/formal-verification/testData/diagnostics/purity")
+  @TestDataPath("$PROJECT_ROOT")
+  public class Purity {
+    @Test
+    public void testAllFilesPresentInPurity() {
+      KtTestUtil.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("plugins/formal-verification/testData/diagnostics/purity"), Pattern.compile("^(.+)\\.kt$"), null, true);
+    }
+
+    @Test
+    @TestMetadata("assert_statements.kt")
+    public void testAssert_statements() {
+      runTest("plugins/formal-verification/testData/diagnostics/purity/assert_statements.kt");
+    }
+  }
+
+  @Nested
   @TestMetadata("plugins/formal-verification/testData/diagnostics/uniqueness")
   @TestDataPath("$PROJECT_ROOT")
   public class Uniqueness {

@@ -22,7 +22,7 @@ interface AnyInterfaceWithoutImplementation5 {
     val field: Any
 }
 
-interface InheritingInterfaceWithoutImplementation6:
+interface InheritingInterfaceWithoutImplementation6 :
     AnyInterfaceWithoutImplementation5, InterfaceWithoutImplementation2
 
 abstract class AbstractWithFinalImplementation3 {
@@ -49,16 +49,16 @@ fun <!VIPER_TEXT!>take4<!>(obj: AbstractWithOpenImplementation4) {
     obj.field
 }
 
-class Impl12: InterfaceWithImplementation1, InterfaceWithoutImplementation2 {
+class Impl12 : InterfaceWithImplementation1, InterfaceWithoutImplementation2 {
     override val field: Int = 0
 }
 
-class Impl3: AbstractWithFinalImplementation3()
-class Impl23: InheritingInterfaceWithoutImplementation6, AbstractWithFinalImplementation3()
+class Impl3 : AbstractWithFinalImplementation3()
+class Impl23 : InheritingInterfaceWithoutImplementation6, AbstractWithFinalImplementation3()
 
-class Impl24: InterfaceWithoutImplementation2, AbstractWithOpenImplementation4()
+class Impl24 : InterfaceWithoutImplementation2, AbstractWithOpenImplementation4()
 
-class Impl14: InterfaceWithImplementation1, AbstractWithOpenImplementation4() {
+class Impl14 : InterfaceWithImplementation1, AbstractWithOpenImplementation4() {
     override val field: Int = 0
 }
 
@@ -98,12 +98,17 @@ fun <!VIPER_TEXT!>createImpls<!>() {
     val impl6 = create6()
     val start6 = impl6.field + 1 - 1
 
+    val cond1 = start12 == impl12.field
+    val cond2 = start23 == impl23.field
+    val cond3 = start3 == impl3.field
+    val cond4 = start14 == impl14.field
+    val cond5 = start6 is Int
     verify(
-        start12 == impl12.field,
-        start23 == impl23.field,
-        start3 == impl3.field,
-        start14 == impl14.field,
-        start6 is Int,
+        cond1,
+        cond2,
+        cond3,
+        cond4,
+        cond5,
     )
 }
 
