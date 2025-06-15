@@ -1,0 +1,88 @@
+/class.kt:(406,414): info: Generated Viper text for testElem:
+field bf$a1: Ref
+
+field bf$a2: Ref
+
+field bf$b: Ref
+
+field bf$x: Ref
+
+field bf$y: Ref
+
+predicate p$c$A$shared(this$dispatch: Ref) {
+  acc(this$dispatch.bf$x, wildcard) &&
+  df$rt$isSubtype(df$rt$typeOf(this$dispatch.bf$x), df$rt$intType())
+}
+
+predicate p$c$A$unique(this$dispatch: Ref) {
+  acc(this$dispatch.bf$x, wildcard) &&
+  df$rt$isSubtype(df$rt$typeOf(this$dispatch.bf$x), df$rt$intType()) &&
+  acc(this$dispatch.bf$y, write) &&
+  df$rt$isSubtype(df$rt$typeOf(this$dispatch.bf$y), df$rt$intType())
+}
+
+predicate p$c$B$shared(this$dispatch: Ref) {
+  acc(this$dispatch.bf$a1, wildcard) &&
+  acc(p$c$A$shared(this$dispatch.bf$a1), wildcard) &&
+  df$rt$isSubtype(df$rt$typeOf(this$dispatch.bf$a1), df$rt$c$A()) &&
+  acc(this$dispatch.bf$a2, wildcard) &&
+  acc(p$c$A$shared(this$dispatch.bf$a2), wildcard) &&
+  df$rt$isSubtype(df$rt$typeOf(this$dispatch.bf$a2), df$rt$c$A())
+}
+
+predicate p$c$B$unique(this$dispatch: Ref) {
+  acc(this$dispatch.bf$a1, wildcard) &&
+  acc(p$c$A$shared(this$dispatch.bf$a1), wildcard) &&
+  acc(p$c$A$unique(this$dispatch.bf$a1), write) &&
+  df$rt$isSubtype(df$rt$typeOf(this$dispatch.bf$a1), df$rt$c$A()) &&
+  acc(this$dispatch.bf$a2, wildcard) &&
+  acc(p$c$A$shared(this$dispatch.bf$a2), wildcard) &&
+  df$rt$isSubtype(df$rt$typeOf(this$dispatch.bf$a2), df$rt$c$A())
+}
+
+predicate p$c$C$shared(this$dispatch: Ref) {
+  acc(p$c$A$shared(this$dispatch), wildcard)
+}
+
+predicate p$c$C$unique(this$dispatch: Ref) {
+  acc(this$dispatch.bf$b, write) &&
+  (this$dispatch.bf$b != df$rt$nullValue() ==>
+  acc(p$c$B$shared(this$dispatch.bf$b), wildcard)) &&
+  (this$dispatch.bf$b != df$rt$nullValue() ==>
+  acc(p$c$B$unique(this$dispatch.bf$b), write)) &&
+  df$rt$isSubtype(df$rt$typeOf(this$dispatch.bf$b), df$rt$nullable(df$rt$c$B())) &&
+  acc(p$c$A$unique(this$dispatch), write)
+}
+
+method f$testElem$TF$T$C(p$instance: Ref) returns (ret$0: Ref)
+  requires acc(p$c$C$unique(p$instance), write)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
+{
+  var l0$abc: Ref
+  var anon$0: Ref
+  var anon$1: Ref
+  inhale df$rt$isSubtype(df$rt$typeOf(p$instance), df$rt$c$C())
+  inhale acc(p$c$C$shared(p$instance), wildcard)
+  inhale acc(p$instance.bf$b, write)
+  anon$1 := p$instance.bf$b
+  exhale acc(p$instance.bf$b, write)
+  inhale df$rt$isSubtype(df$rt$typeOf(anon$1), df$rt$nullable(df$rt$c$B()))
+  inhale anon$1 != df$rt$nullValue() ==>
+    acc(p$c$B$shared(anon$1), wildcard)
+  if (anon$1 != df$rt$nullValue()) {
+    var anon$2: Ref
+    unfold acc(p$c$B$shared(anon$1), wildcard)
+    anon$2 := anon$1.bf$a1
+    anon$0 := anon$2
+  } else {
+    anon$0 := df$rt$nullValue()}
+  if (anon$0 != df$rt$nullValue()) {
+    var anon$3: Ref
+    unfold acc(p$c$A$shared(anon$0), wildcard)
+    anon$3 := anon$0.bf$x
+    l0$abc := anon$3
+  } else {
+    l0$abc := df$rt$nullValue()}
+  label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
+}
