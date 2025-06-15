@@ -482,6 +482,12 @@ public class FirLightTreeFormVerPluginDiagnosticsTestGenerated extends AbstractF
     }
 
     @Test
+    @TestMetadata("class.kt")
+    public void testClass() {
+      runTest("plugins/formal-verification/testData/diagnostics/verifies/class.kt");
+    }
+
+    @Test
     @TestMetadata("multiple_receivers.kt")
     public void testMultiple_receivers() {
       runTest("plugins/formal-verification/testData/diagnostics/verifies/multiple_receivers.kt");
