@@ -98,6 +98,8 @@ data class While(
             Stmt.If(condVar.toViperBuiltinType(ctx), bodyBlock, els = Stmt.Seqn(), ctx.source.asPosition)
         }
         ctx.addLabel(breakLabel.toViper(ctx))
+
+        // TODO: this logic can be rewritten back to invariants once the version of Viper is updated
         invariants.forEach {
             ctx.addStatement {
                 Stmt.Assert(it.pureToViper(toBuiltin = true))

@@ -574,6 +574,34 @@ public class FirLightTreeFormVerPluginDiagnosticsTestGenerated extends AbstractF
     }
 
     @Nested
+    @TestMetadata("plugins/formal-verification/testData/diagnostics/verifies/expensive_diagnostics")
+    @TestDataPath("$PROJECT_ROOT")
+    public class Expensive_diagnostics {
+      @Test
+      public void testAllFilesPresentInExpensive_diagnostics() {
+        KtTestUtil.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("plugins/formal-verification/testData/diagnostics/verifies/expensive_diagnostics"), Pattern.compile("^(.+)\\.kt$"), null, true);
+      }
+
+      @Test
+      @TestMetadata("merge_sort_of_string.kt")
+      public void testMerge_sort_of_string() {
+        runTest("plugins/formal-verification/testData/diagnostics/verifies/expensive_diagnostics/merge_sort_of_string.kt");
+      }
+
+      @Test
+      @TestMetadata("quick_sort_of_string.kt")
+      public void testQuick_sort_of_string() {
+        runTest("plugins/formal-verification/testData/diagnostics/verifies/expensive_diagnostics/quick_sort_of_string.kt");
+      }
+
+      @Test
+      @TestMetadata("z_function.kt")
+      public void testZ_function() {
+        runTest("plugins/formal-verification/testData/diagnostics/verifies/expensive_diagnostics/z_function.kt");
+      }
+    }
+
+    @Nested
     @TestMetadata("plugins/formal-verification/testData/diagnostics/verifies/inlining")
     @TestDataPath("$PROJECT_ROOT")
     public class Inlining {
@@ -707,18 +735,6 @@ public class FirLightTreeFormVerPluginDiagnosticsTestGenerated extends AbstractF
       }
 
       @Test
-      @TestMetadata("merge_sort_of_string.kt")
-      public void testMerge_sort_of_string() {
-        runTest("plugins/formal-verification/testData/diagnostics/verifies/user_invariants/merge_sort_of_string.kt");
-      }
-
-      @Test
-      @TestMetadata("quick_sort_of_string.kt")
-      public void testQuick_sort_of_string() {
-        runTest("plugins/formal-verification/testData/diagnostics/verifies/user_invariants/quick_sort_of_string.kt");
-      }
-
-      @Test
       @TestMetadata("simple_forall.kt")
       public void testSimple_forall() {
         runTest("plugins/formal-verification/testData/diagnostics/verifies/user_invariants/simple_forall.kt");
@@ -758,12 +774,6 @@ public class FirLightTreeFormVerPluginDiagnosticsTestGenerated extends AbstractF
       @TestMetadata("sum_of_1_to_n.kt")
       public void testSum_of_1_to_n() {
         runTest("plugins/formal-verification/testData/diagnostics/verifies/user_invariants/sum_of_1_to_n.kt");
-      }
-
-      @Test
-      @TestMetadata("z_function.kt")
-      public void testZ_function() {
-        runTest("plugins/formal-verification/testData/diagnostics/verifies/user_invariants/z_function.kt");
       }
     }
   }

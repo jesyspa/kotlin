@@ -1,6 +1,7 @@
 import org.jetbrains.kotlin.formver.plugin.*
 
-// TODO: make verification of this procedure stable
+// TODO: make verification of this procedure stable.
+// Currently, it verifies only in rare cases, while during other runs it times out.
 fun <!VIPER_TEXT!>zFuncHelper<!>(s: String, res: String, i: Int, checkedLeft: Int, checkedRight: Int): Int {
     preconditions {
         1 <= i && i < s.length

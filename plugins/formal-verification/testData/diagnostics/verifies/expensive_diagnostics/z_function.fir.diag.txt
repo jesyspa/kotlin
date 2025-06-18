@@ -1,4 +1,4 @@
-/z_function.kt:(102,113): info: Generated Viper text for zFuncHelper:
+/z_function.kt:(187,198): info: Generated Viper text for zFuncHelper:
 method f$zFuncHelper$TF$T$String$T$String$T$Int$T$Int$T$Int(p$s: Ref, p$res: Ref,
   p$i: Ref, p$checkedLeft: Ref, p$checkedRight: Ref)
   returns (ret$0: Ref)
@@ -64,7 +64,7 @@ method f$zFuncHelper$TF$T$String$T$String$T$Int$T$Int$T$Int(p$s: Ref, p$res: Ref
   label lbl$ret$0
 }
 
-/z_function.kt:(1304,1313): info: Generated Viper text for zFunction:
+/z_function.kt:(1389,1398): info: Generated Viper text for zFunction:
 method f$pkg$kotlin$c$String$plus$TF$T$String$NT$Any(this$dispatch: Ref, p$other: Ref)
   returns (ret: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$stringType())
@@ -287,7 +287,7 @@ method f$zFunction$TF$T$String(this$extension: Ref) returns (ret$0: Ref)
   label lbl$ret$0
 }
 
-/z_function.kt:(3396,3410): info: Generated Viper text for zFunctionNaive:
+/z_function.kt:(3481,3495): info: Generated Viper text for zFunctionNaive:
 method f$pkg$kotlin$c$String$plus$TF$T$String$NT$Any(this$dispatch: Ref, p$other: Ref)
   returns (ret: Ref)
   ensures df$rt$isSubtype(df$rt$typeOf(ret), df$rt$stringType())
