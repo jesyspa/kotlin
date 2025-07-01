@@ -1,0 +1,154 @@
+/uniqueness_test.kt:(261,262): info: Generated Viper text for f:
+field bf$size: Ref
+
+field bf$x: Ref
+
+predicate p$c$A$shared(this$dispatch: Ref) {
+  true
+}
+
+predicate p$c$A$unique(this$dispatch: Ref) {
+  acc(this$dispatch.bf$x, write) &&
+  df$rt$isSubtype(df$rt$typeOf(this$dispatch.bf$x), df$rt$intType())
+}
+
+predicate p$pkg$java_io$c$Serializable$shared(this$dispatch: Ref) {
+  true
+}
+
+predicate p$pkg$java_io$c$Serializable$unique(this$dispatch: Ref) {
+  true
+}
+
+predicate p$pkg$kotlin$c$BooleanArray$shared(this$dispatch: Ref) {
+  acc(this$dispatch.bf$size, wildcard) &&
+  df$rt$isSubtype(df$rt$typeOf(this$dispatch.bf$size), df$rt$intType()) &&
+  acc(p$pkg$kotlin$c$Cloneable$shared(this$dispatch), wildcard) &&
+  acc(p$pkg$java_io$c$Serializable$shared(this$dispatch), wildcard)
+}
+
+predicate p$pkg$kotlin$c$BooleanArray$unique(this$dispatch: Ref) {
+  acc(this$dispatch.bf$size, wildcard) &&
+  df$rt$isSubtype(df$rt$typeOf(this$dispatch.bf$size), df$rt$intType()) &&
+  acc(p$pkg$kotlin$c$Cloneable$unique(this$dispatch), write) &&
+  acc(p$pkg$java_io$c$Serializable$unique(this$dispatch), write)
+}
+
+predicate p$pkg$kotlin$c$Cloneable$shared(this$dispatch: Ref) {
+  true
+}
+
+predicate p$pkg$kotlin$c$Cloneable$unique(this$dispatch: Ref) {
+  true
+}
+
+method f$f$TF$T$A(p$a: Ref) returns (ret$0: Ref)
+  requires acc(p$c$A$unique(p$a), write)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
+{
+  var l0$i: Ref
+  var l0$j: Ref
+  inhale df$rt$isSubtype(df$rt$typeOf(p$a), df$rt$c$A())
+  inhale acc(p$c$A$shared(p$a), wildcard)
+  inhale acc(p$a.bf$x, write)
+  l0$i := p$a.bf$x
+  exhale acc(p$a.bf$x, write)
+  inhale df$rt$isSubtype(df$rt$typeOf(l0$i), df$rt$intType())
+  inhale acc(p$a.bf$x, write)
+  l0$j := p$a.bf$x
+  exhale acc(p$a.bf$x, write)
+  inhale df$rt$isSubtype(df$rt$typeOf(l0$j), df$rt$intType())
+  assert df$rt$intFromRef(l0$i) == df$rt$intFromRef(l0$j)
+  label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
+}
+
+/uniqueness_test.kt:(367,368): info: Generated Viper text for g:
+field bf$a: Ref
+
+field bf$size: Ref
+
+field bf$x: Ref
+
+predicate p$c$A$shared(this$dispatch: Ref) {
+  true
+}
+
+predicate p$c$A$unique(this$dispatch: Ref) {
+  acc(this$dispatch.bf$x, write) &&
+  df$rt$isSubtype(df$rt$typeOf(this$dispatch.bf$x), df$rt$intType())
+}
+
+predicate p$c$B$shared(this$dispatch: Ref) {
+  true
+}
+
+predicate p$c$B$unique(this$dispatch: Ref) {
+  acc(this$dispatch.bf$a, write) &&
+  acc(p$c$A$shared(this$dispatch.bf$a), wildcard) &&
+  acc(p$c$A$unique(this$dispatch.bf$a), write) &&
+  df$rt$isSubtype(df$rt$typeOf(this$dispatch.bf$a), df$rt$c$A())
+}
+
+predicate p$pkg$java_io$c$Serializable$shared(this$dispatch: Ref) {
+  true
+}
+
+predicate p$pkg$java_io$c$Serializable$unique(this$dispatch: Ref) {
+  true
+}
+
+predicate p$pkg$kotlin$c$BooleanArray$shared(this$dispatch: Ref) {
+  acc(this$dispatch.bf$size, wildcard) &&
+  df$rt$isSubtype(df$rt$typeOf(this$dispatch.bf$size), df$rt$intType()) &&
+  acc(p$pkg$kotlin$c$Cloneable$shared(this$dispatch), wildcard) &&
+  acc(p$pkg$java_io$c$Serializable$shared(this$dispatch), wildcard)
+}
+
+predicate p$pkg$kotlin$c$BooleanArray$unique(this$dispatch: Ref) {
+  acc(this$dispatch.bf$size, wildcard) &&
+  df$rt$isSubtype(df$rt$typeOf(this$dispatch.bf$size), df$rt$intType()) &&
+  acc(p$pkg$kotlin$c$Cloneable$unique(this$dispatch), write) &&
+  acc(p$pkg$java_io$c$Serializable$unique(this$dispatch), write)
+}
+
+predicate p$pkg$kotlin$c$Cloneable$shared(this$dispatch: Ref) {
+  true
+}
+
+predicate p$pkg$kotlin$c$Cloneable$unique(this$dispatch: Ref) {
+  true
+}
+
+method f$g$TF$T$B(p$b: Ref) returns (ret$0: Ref)
+  requires acc(p$c$B$unique(p$b), write)
+  ensures df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
+{
+  var l0$i: Ref
+  var anon$0: Ref
+  var l0$j: Ref
+  var anon$1: Ref
+  inhale df$rt$isSubtype(df$rt$typeOf(p$b), df$rt$c$B())
+  inhale acc(p$c$B$shared(p$b), wildcard)
+  inhale acc(p$b.bf$a, write)
+  anon$0 := p$b.bf$a
+  exhale acc(p$b.bf$a, write)
+  inhale df$rt$isSubtype(df$rt$typeOf(anon$0), df$rt$c$A())
+  inhale acc(p$c$A$shared(anon$0), wildcard)
+  inhale acc(anon$0.bf$x, write)
+  l0$i := anon$0.bf$x
+  exhale acc(anon$0.bf$x, write)
+  inhale df$rt$isSubtype(df$rt$typeOf(l0$i), df$rt$intType())
+  inhale acc(p$b.bf$a, write)
+  anon$1 := p$b.bf$a
+  exhale acc(p$b.bf$a, write)
+  inhale df$rt$isSubtype(df$rt$typeOf(anon$1), df$rt$c$A())
+  inhale acc(p$c$A$shared(anon$1), wildcard)
+  inhale acc(anon$1.bf$x, write)
+  l0$j := anon$1.bf$x
+  exhale acc(anon$1.bf$x, write)
+  inhale df$rt$isSubtype(df$rt$typeOf(l0$j), df$rt$intType())
+  assert df$rt$intFromRef(l0$i) == df$rt$intFromRef(l0$j)
+  label lbl$ret$0
+  inhale df$rt$isSubtype(df$rt$typeOf(ret$0), df$rt$unitType())
+}

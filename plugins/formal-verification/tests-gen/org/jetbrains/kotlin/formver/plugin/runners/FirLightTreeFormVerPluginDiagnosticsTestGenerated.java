@@ -237,6 +237,12 @@ public class FirLightTreeFormVerPluginDiagnosticsTestGenerated extends AbstractF
       public void testUnique_predicates() {
         runTest("plugins/formal-verification/testData/diagnostics/no_contracts/classes/unique_predicates.kt");
       }
+
+      @Test
+      @TestMetadata("uniqueness_test.kt")
+      public void testUniqueness_test() {
+        runTest("plugins/formal-verification/testData/diagnostics/no_contracts/classes/uniqueness_test.kt");
+      }
     }
 
     @Nested
